@@ -1,0 +1,16 @@
+.sass-cache
+/.idea
+.DS_Store
+tmp
+/node_modules
+/build
+/spec/build
+/coverage
+cypress/screenshots
+cypress/videos
+.nyc_output
+dist
+/test-results/
+/playwright-report/
+/playwright/.cache/
+playwright-coverage

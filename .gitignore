@@ -15,3 +15,4 @@ dist
 /playwright/.cache/
 playwright-coverage
 results.xml
+docs/jsdoc

@@ -4,6 +4,8 @@ This README briefly describes how to bootstrap the Earthdata Download project. F
 
 ## Development
 
+Ensure you are using the NodeJS version defined in `.nvmrc`
+
 To install dependencies:
 
     npm install

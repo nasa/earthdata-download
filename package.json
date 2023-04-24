@@ -18,7 +18,7 @@
     "preplaywright:coverage": "rm -rf playwright-coverage/ .nyc_output/",
     "playwright": "NODE_ENV=playwright nyc playwright test",
     "playwright:coverage": "PLAYWRIGHT_JUNIT_OUTPUT_NAME=results.xml NODE_ENV=playwright nyc playwright test --reporter=junit",
-    "playwright:bamboo": "start-server-and-test 'npm run dev' http://localhost:5173 'npm run playwright:coverage'",
+    "playwright:bamboo": "start-server-and-test 'npm run dev' http://localhost:5173 'xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" -- npm run playwright:coverage'",
     "playwright:ui": "npx playwright test --ui",
     "postplaywright:coverage": "npx nyc report --reporter=json --reporter=lcov --reporter=clover --report-dir=playwright-coverage"
   },

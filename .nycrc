@@ -1,0 +1,15 @@
+{
+  "extends": "@istanbuljs/nyc-config-babel",
+  "all": true,
+  "extension": [".js", ".jsx"],
+  "include": [
+    "src/**/"
+  ],
+  "exclude": [
+    "src/**/*.test.js",
+    "src/**/*.spec.js",
+    "src/**/*.config.js"
+  ],
+  "sourceMap": false,
+  "instrument": false
+}

@@ -1,0 +1,44 @@
+{
+  "preferences": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "lastDownloadLocation": {
+        "type": "string",
+        "description": "The last download location used."
+      },
+      "createSubDirectories": {
+        "type": "boolean",
+        "description": "Should the application create sub directories if the download contains multiple collections."
+      },
+      "defaultDownloadLocation": {
+        "type": "string",
+        "description": "Default application download location."
+      }
+    }
+  },
+  "downloads": {
+    "type": "object",
+    "patternProperties": {
+      "^.*$": {
+        "type": "object",
+        "additionalProperties": false,
+        "$comment": "In the future we might store download status/percentage/etc for each download here",
+        "properties": {
+          "downloadLocation": {
+            "type": "string",
+            "description": "Download location used for this download."
+          },
+          "timeStart": {
+            "type": "number",
+            "description": "The time when the download was started."
+          },
+          "timeEnd": {
+            "type": "number",
+            "description": "The time when the download was completed."
+          }
+        }
+      }
+    }
+  }
+}

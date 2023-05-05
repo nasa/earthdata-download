@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './public/vite.svg'
+import React from 'react'
+
+import Layout from './components/Layout/Layout'
 
 import './App.css'
+
+// ? How much state do we need to keep at the top level, or do we need to set up any contexts here?
 
 /**
  * Renders the Application
@@ -12,43 +14,8 @@ import './App.css'
  *   <App />
  * )
  */
-const App = () => {
-  const [count, setCount] = useState(0)
-
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button
-          data-testid="count-button"
-          onClick={() => setCount((count) => count + 1)}
-          type="button"
-        >
-          count is
-          {' '}
-          {count}
-        </button>
-        <p>
-          Edit
-          {' '}
-          <code>src/App.jsx</code>
-          {' '}
-          and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
-}
+const App = () => (
+  <Layout />
+)
 
 export default App

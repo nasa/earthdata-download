@@ -1,25 +1,97 @@
-const { app, BrowserWindow } = require('electron')
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  shell
+} = require('electron')
 const path = require('path')
+const Store = require('electron-store')
+
+const storageSchema = require('./storageSchema.json')
+
+const { beginDownload } = require('./eventHandlers/beginDownload')
+const { chooseDownloadLocation } = require('./eventHandlers/chooseDownloadLocation')
+const { clearDefaultDownload } = require('./eventHandlers/clearDefaultDownload')
+const { didFinishLoad } = require('./eventHandlers/didFinishLoad')
+
+const store = new Store({
+  // TODO set this key before publishing application
+  // encryptionKey: 'this key only obsures the data',
+  name: 'preferences',
+  schema: storageSchema,
+  defaults: {
+    preferences: {
+      createSubDirectories: true
+    }
+  }
+})
+
+// Uncomment this line to delete your local storage
+// store.clear()
+
+// const downloadId = 'test-download'
+const downloadId = `shortName_version-${new Date().getTime()}`
 
 const createWindow = () => {
-  const win = new BrowserWindow({
+  const window = new BrowserWindow({
     width: 800,
     height: 600,
+    resizable: false,
+    maximizable: false,
+    show: false,
+    title: 'Earthdata Download',
+    titleBarStyle: 'hiddenInset',
+    frame: false,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js')
     }
   })
 
-  win.menuBarVisible = false
+  window.menuBarVisible = false
 
-  win.loadURL('http://localhost:5173/')
+  // ? how does this work when deployed?
+  window.loadURL('http://localhost:5173/')
+
+  ipcMain.on('chooseDownloadLocation', () => {
+    chooseDownloadLocation({
+      window
+    })
+  })
+
+  ipcMain.on('beginDownload', (event, info) => {
+    beginDownload({
+      info,
+      store
+    })
+  })
+
+  ipcMain.on('clearDefaultDownload', () => {
+    clearDefaultDownload({
+      downloadId,
+      store,
+      window
+    })
+  })
+
+  window.webContents.once('did-finish-load', () => {
+    didFinishLoad({
+      downloadId,
+      store,
+      window
+    })
+  })
+
+  // Open `target="_blank"` links in the system browser
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url)
+    return { action: 'deny' }
+  })
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(createWindow)
-// app.whenReady().then(createAuthWindow)
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

@@ -9,10 +9,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   clearDefaultDownload: () => ipcRenderer.send('clearDefaultDownload'),
 
   // Messages to be received by the renderer process
-  initializeDownloadOff: (callback) => ipcRenderer.off('initializeDownload', callback),
-  initializeDownloadOn: (callback) => ipcRenderer.on('initializeDownload', callback),
-  setDownloadLocationOff: (callback) => ipcRenderer.off('setDownloadLocation', callback),
-  setDownloadLocationOn: (callback) => ipcRenderer.on('setDownloadLocation', callback),
+  initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'off']('initializeDownload', callback),
+  setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'off']('setDownloadLocation', callback),
 
   // System values for renderer
   isMac: process.platform === 'darwin'

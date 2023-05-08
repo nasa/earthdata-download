@@ -34,12 +34,12 @@ const Downloads = () => {
 
   // Setup event listeners
   useEffect(() => {
-    electronAPI.setDownloadLocationOn(onSetDownloadLocation)
-    electronAPI.initializeDownloadOn(onInitializeDownload)
+    electronAPI.setDownloadLocation(true, onSetDownloadLocation)
+    electronAPI.initializeDownload(true, onInitializeDownload)
 
     return () => {
-      electronAPI.setDownloadLocationOff(onSetDownloadLocation)
-      electronAPI.initializeDownloadOff(onInitializeDownload)
+      electronAPI.setDownloadLocation(false, onSetDownloadLocation)
+      electronAPI.initializeDownload(false, onInitializeDownload)
     }
   }, [])
 

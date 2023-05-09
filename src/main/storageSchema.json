@@ -14,6 +14,33 @@
       "defaultDownloadLocation": {
         "type": "string",
         "description": "Default application download location."
+      },
+      "windowState": {
+        "type": "object",
+        "description": "Saves the state of the application window.",
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "type": "number",
+            "description": "X position of the window."
+          },
+          "y": {
+            "type": "number",
+            "description": "Y position of the window."
+          },
+          "height": {
+            "type": "number",
+            "description": "Height of the window."
+          },
+          "width": {
+            "type": "number",
+            "description": "Width of the window."
+          },
+          "isMaximized": {
+            "type": "boolean",
+            "description": "Is the window maximized"
+          }
+        }
       }
     }
   },

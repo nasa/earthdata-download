@@ -13,6 +13,7 @@ const { beginDownload } = require('./eventHandlers/beginDownload')
 const { chooseDownloadLocation } = require('./eventHandlers/chooseDownloadLocation')
 const { clearDefaultDownload } = require('./eventHandlers/clearDefaultDownload')
 const { didFinishLoad } = require('./eventHandlers/didFinishLoad')
+const { windowStateKeeper } = require('./windowStateKeeper')
 
 const store = new Store({
   // TODO set this key before publishing application
@@ -33,10 +34,13 @@ const store = new Store({
 const downloadId = `shortName_version-${new Date().getTime()}`
 
 const createWindow = () => {
+  const windowState = windowStateKeeper(store)
+
   const window = new BrowserWindow({
-    width: 800,
-    height: 600,
-    resizable: false,
+    width: windowState.width,
+    height: windowState.height,
+    x: windowState.x,
+    y: windowState.y,
     maximizable: false,
     show: false,
     title: 'Earthdata Download',
@@ -46,6 +50,8 @@ const createWindow = () => {
       preload: path.join(__dirname, '..', 'preload', 'preload.js')
     }
   })
+
+  windowState.track(window)
 
   window.menuBarVisible = false
 

@@ -24,6 +24,7 @@ const windowStateKeeper = (store) => {
   }
 
   function saveState() {
+    console.log('🚀 ~ file: windowStateKeeper.js:29 ~ saveState ~ windowState:', windowState)
     if (!windowState.isMaximized) {
       windowState = window.getBounds()
     }

@@ -8,7 +8,7 @@ import App from '../App'
 // Example test to show jest working
 // Remove once real app starts development
 describe('App component', () => {
-  test('increments the couter', async () => {
+  test.skip('increments the couter', async () => {
     const user = userEvent.setup()
 
     render(

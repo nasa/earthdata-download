@@ -46,8 +46,8 @@ const didFinishLoad = ({
   // Show the electron app window
   window.show()
 
-  // Open the DevTools.
-  window.webContents.openDevTools({ mode: 'detach' })
+  // Open the DevTools if running in development.
+  if (!app.isPackaged) window.webContents.openDevTools({ mode: 'detach' })
 }
 
 module.exports = { didFinishLoad }

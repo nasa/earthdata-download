@@ -13,7 +13,7 @@ const { beginDownload } = require('./eventHandlers/beginDownload')
 const { chooseDownloadLocation } = require('./eventHandlers/chooseDownloadLocation')
 const { clearDefaultDownload } = require('./eventHandlers/clearDefaultDownload')
 const { didFinishLoad } = require('./eventHandlers/didFinishLoad')
-const { windowStateKeeper } = require('./windowStateKeeper')
+const { windowStateKeeper } = require('./utils/windowStateKeeper')
 
 const store = new Store({
   // TODO set this key before publishing application

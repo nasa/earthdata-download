@@ -94,7 +94,8 @@ module.exports = {
   moduleNameMapper: {
     // Use the moduleNameMapper for all images except the logo.png that exist in the portals directory
     '(?<!/portals)(?<!/logo).(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/test-utils/fileMock.js',
-    '^.+\\.(css|less|scss)$': 'babel-jest'
+    '^.+\\.(css|less|scss)$': 'babel-jest',
+    electron: '<rootDir>/__mocks__/electronMock.js'
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader

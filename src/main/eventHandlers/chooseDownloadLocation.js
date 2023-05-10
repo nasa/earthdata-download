@@ -21,7 +21,6 @@ const chooseDownloadLocation = ({
   if (!result) return
 
   const [downloadLocation] = result
-  console.log('🚀 ~ file: chooseDownloadLocation.js:23 ~ downloadLocation:', downloadLocation)
 
   // Send a message back to the renderer with the downloadLocation
   window.webContents.send('setDownloadLocation', { downloadLocation })

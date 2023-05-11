@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import InitializeDownload from './InitializeDownload'
+import PropTypes from 'prop-types'
+import { FaDownload, FaHistory, FaSearch } from 'react-icons/fa'
+
+import InitializeDownload from '../InitializeDownload/InitializeDownload'
+
+import Button from '../Button/Button'
+import Dialog from '../Dialog/Dialog'
+import ListPage from '../ListPage/ListPage'
+
+import { PAGES } from '../../constants/pages'
+
+import * as styles from './Downloads.module.scss'
 
 // ipcRenderer is setup in preload.js and functions are exposed within `window.electronAPI`
 // ?? Should we only call this in App.jsx and pass it down as a prop?
@@ -8,10 +19,13 @@ const { electronAPI } = window
 /**
  * Renders the `Downloads` page
  */
-const Downloads = () => {
+const Downloads = ({
+  setCurrentPage
+}) => {
   const [downloadId, setDownloadId] = useState(null)
   const [downloadLocation, setDownloadLocation] = useState(null)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
+  const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
 
   // When a new downloadLocation has been selected from the main process, update the state
   const onSetDownloadLocation = (event, info) => {
@@ -32,6 +46,10 @@ const Downloads = () => {
     setUseDefaultLocation(shouldUseDefaultLocation)
   }
 
+  const onCloseChooseLocationModal = () => {
+    setChooseDownloadLocationIsOpen(false)
+  }
+
   // Setup event listeners
   useEffect(() => {
     electronAPI.setDownloadLocation(true, onSetDownloadLocation)
@@ -43,36 +61,61 @@ const Downloads = () => {
     }
   }, [])
 
+  // Open the modal when there is no default location set and a download id exists
+  useEffect(() => {
+    if (!useDefaultLocation && downloadId) setChooseDownloadLocationIsOpen(true)
+  }, [useDefaultLocation, downloadId])
+
   return (
     <>
-      {
-        !useDefaultLocation && downloadId && (
-          <InitializeDownload
-            downloadId={downloadId}
-            downloadLocation={downloadLocation}
-            useDefaultLocation={useDefaultLocation}
-            setDownloadId={setDownloadId}
-          />
-        )
-      }
-      {
-        useDefaultLocation && downloadId && (
+      <Dialog
+        open={chooseDownloadLocationIsOpen}
+        setOpen={setChooseDownloadLocationIsOpen}
+        showTitle
+        title="Choose a download location"
+        TitleIcon={FaDownload}
+      >
+        <InitializeDownload
+          downloadId={downloadId}
+          downloadLocation={downloadLocation}
+          useDefaultLocation={useDefaultLocation}
+          setDownloadId={setDownloadId}
+          onCloseChooseLocationModal={onCloseChooseLocationModal}
+        />
+      </Dialog>
+      <ListPage
+        actions={(
           <>
-            <p>Download will use the default download location and begin downloading</p>
-            <a href="https://search.earthdata.nasa.gov/" target="_blank" rel="noreferrer">Find data in Earthdata Search</a>
+            <Button
+              className={styles.button}
+              size="lg"
+              Icon={FaSearch}
+              href="https://search.earthdata.nasa.gov/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Find data in Earthdata Search
+            </Button>
+            <Button
+              className={styles.button}
+              size="lg"
+              Icon={FaHistory}
+              onClick={() => setCurrentPage(PAGES.downloadHistory)}
+            >
+              View Download History
+            </Button>
           </>
-        )
-      }
-      {
-        !downloadId && (
-          <>
-            <p>List of downloads goes here</p>
-            <a href="https://search.earthdata.nasa.gov/" target="_blank" rel="noreferrer">Find data in Earthdata Search</a>
-          </>
-        )
-      }
+        )}
+        emptyMessage="No downloads in progress"
+        Icon={FaDownload}
+        items={[]}
+      />
     </>
   )
+}
+
+Downloads.propTypes = {
+  setCurrentPage: PropTypes.func.isRequired
 }
 
 export default Downloads

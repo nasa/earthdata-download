@@ -1,0 +1,93 @@
+@value button from "../Button/Button.module.scss";
+
+body {
+  overflow-y: hidden;
+}
+
+.wrapper {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template: "header" min-content "main" 1fr / 1fr;
+  gap: 0 0;
+}
+
+.header {
+  grid-area: header;
+  left: 0%;
+  right: 0%;
+  top: 0%;
+  height: 40px;
+  display: grid;
+  grid-template: ". navigation actions" 100% / 1fr auto 1fr;
+  gap: 0 0;
+  justify-content: end;
+  background: var(--color__blue);
+  border-bottom: 1px solid var(--color__blue--200);
+  color: #FFF;
+  -webkit-app-region: drag;
+
+  &.isWindows {
+    grid-template: "actions navigation ." 100% / 1fr auto 1fr;
+  }
+}
+
+.nav {
+  grid-area: navigation;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-family: Inter, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.navButton {
+  margin-left: var(--size__050);
+  background-color: var(--color__blue);
+  color: var(--color__blue--050);
+  border-radius: var(--size__100);
+  border: 1px solid transparent;
+  -webkit-app-region: no-drag;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:hover {
+    background-color: var(--color__blue--600);
+    color: var(--color__blue--050);
+  }
+
+  &.isActive {
+    background: var(--color__blue--600);
+    color: var(--color__white);
+    border: 1px solid var(--color__blue--600);
+  }
+}
+
+.actions {
+  display: flex;
+  padding-left: var(--size__200);
+  padding-right: var(--size__200);
+  align-items: center;
+  justify-content: flex-end;
+  grid-area: actions;
+
+  .isWindows & {
+    justify-content: flex-start;
+  }
+}
+
+.settingsButton {
+  composes: navButton;
+  border: 1px solid var(--color__blue--700)
+}
+
+.main {
+  grid-area: main;
+  overflow-y: auto;
+  background-color: var(--color__black--050);
+}

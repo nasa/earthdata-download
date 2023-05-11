@@ -1,0 +1,98 @@
+:root {
+  --color__white: #fcfcfc;
+  --color__gray: #848e94;
+  --color__black: #000;
+  --color__blue: #2A81BB;
+  --color__green: #27AE60;
+  --color__red: #ED2B38;
+
+  // Black
+  --color__black--050: color-mix(in srgb, var(--color__white) 90%, var(--color__gray));
+  --color__black--100: color-mix(in srgb, var(--color__white) 80%, var(--color__gray));
+  --color__black--150: color-mix(in srgb, var(--color__white) 70%, var(--color__gray));
+  --color__black--200: color-mix(in srgb, var(--color__white) 60%, var(--color__gray));
+  --color__black--250: color-mix(in srgb, var(--color__white) 50%, var(--color__gray));
+  --color__black--300: color-mix(in srgb, var(--color__white) 40%, var(--color__gray));
+  --color__black--350: color-mix(in srgb, var(--color__white) 30%, var(--color__gray));
+  --color__black--400: color-mix(in srgb, var(--color__white) 20%, var(--color__gray));
+  --color__black--450: color-mix(in srgb, var(--color__white) 10%, var(--color__gray));
+  --color__black--500: color-mix(in srgb, var(--color__white) 0%, var(--color__gray));
+  --color__black--550: color-mix(in srgb, var(--color__black) 10%, var(--color__gray));
+  --color__black--600: color-mix(in srgb, var(--color__black) 20%, var(--color__gray));
+  --color__black--650: color-mix(in srgb, var(--color__black) 30%, var(--color__gray));
+  --color__black--700: color-mix(in srgb, var(--color__black) 40%, var(--color__gray));
+  --color__black--750: color-mix(in srgb, var(--color__black) 50%, var(--color__gray));
+  --color__black--800: color-mix(in srgb, var(--color__black) 60%, var(--color__gray));
+  --color__black--850: color-mix(in srgb, var(--color__black) 70%, var(--color__gray));
+  --color__black--900: color-mix(in srgb, var(--color__black) 80%, var(--color__gray));
+  --color__black--950: color-mix(in srgb, var(--color__black) 90%, var(--color__gray));
+
+  // Blue
+  --color__blue--050: color-mix(in srgb, var(--color__white) 90%, var(--color__blue));
+  --color__blue--100: color-mix(in srgb, var(--color__white) 80%, var(--color__blue));
+  --color__blue--150: color-mix(in srgb, var(--color__white) 70%, var(--color__blue));
+  --color__blue--200: color-mix(in srgb, var(--color__white) 60%, var(--color__blue));
+  --color__blue--250: color-mix(in srgb, var(--color__white) 50%, var(--color__blue));
+  --color__blue--300: color-mix(in srgb, var(--color__white) 40%, var(--color__blue));
+  --color__blue--350: color-mix(in srgb, var(--color__white) 30%, var(--color__blue));
+  --color__blue--400: color-mix(in srgb, var(--color__white) 20%, var(--color__blue));
+  --color__blue--450: color-mix(in srgb, var(--color__white) 10%, var(--color__blue));
+  --color__blue--500: color-mix(in srgb, var(--color__white) 0%, var(--color__blue));
+  --color__blue--550: color-mix(in srgb, var(--color__black) 10%, var(--color__blue));
+  --color__blue--600: color-mix(in srgb, var(--color__black) 20%, var(--color__blue));
+  --color__blue--650: color-mix(in srgb, var(--color__black) 30%, var(--color__blue));
+  --color__blue--700: color-mix(in srgb, var(--color__black) 40%, var(--color__blue));
+  --color__blue--750: color-mix(in srgb, var(--color__black) 50%, var(--color__blue));
+  --color__blue--800: color-mix(in srgb, var(--color__black) 60%, var(--color__blue));
+  --color__blue--850: color-mix(in srgb, var(--color__black) 70%, var(--color__blue));
+  --color__blue--900: color-mix(in srgb, var(--color__black) 80%, var(--color__blue));
+  --color__blue--950: color-mix(in srgb, var(--color__black) 90%, var(--color__blue));
+
+  // Green
+  --color__green--050: color-mix(in srgb, var(--color__white) 90%, var(--color__green));
+  --color__green--100: color-mix(in srgb, var(--color__white) 80%, var(--color__green));
+  --color__green--150: color-mix(in srgb, var(--color__white) 70%, var(--color__green));
+  --color__green--200: color-mix(in srgb, var(--color__white) 60%, var(--color__green));
+  --color__green--250: color-mix(in srgb, var(--color__white) 50%, var(--color__green));
+  --color__green--300: color-mix(in srgb, var(--color__white) 40%, var(--color__green));
+  --color__green--350: color-mix(in srgb, var(--color__white) 30%, var(--color__green));
+  --color__green--400: color-mix(in srgb, var(--color__white) 20%, var(--color__green));
+  --color__green--450: color-mix(in srgb, var(--color__white) 10%, var(--color__green));
+  --color__green--500: color-mix(in srgb, var(--color__white) 0%, var(--color__green));
+  --color__green--550: color-mix(in srgb, var(--color__black) 10%, var(--color__green));
+  --color__green--600: color-mix(in srgb, var(--color__black) 20%, var(--color__green));
+  --color__green--650: color-mix(in srgb, var(--color__black) 30%, var(--color__green));
+  --color__green--700: color-mix(in srgb, var(--color__black) 40%, var(--color__green));
+  --color__green--750: color-mix(in srgb, var(--color__black) 50%, var(--color__green));
+  --color__green--800: color-mix(in srgb, var(--color__black) 60%, var(--color__green));
+  --color__green--850: color-mix(in srgb, var(--color__black) 70%, var(--color__green));
+  --color__green--900: color-mix(in srgb, var(--color__black) 80%, var(--color__green));
+  --color__green--950: color-mix(in srgb, var(--color__black) 90%, var(--color__green));
+
+  // Red
+  --color__red--050: color-mix(in srgb, var(--color__white) 90%, var(--color__red));
+  --color__red--100: color-mix(in srgb, var(--color__white) 80%, var(--color__red));
+  --color__red--150: color-mix(in srgb, var(--color__white) 70%, var(--color__red));
+  --color__red--200: color-mix(in srgb, var(--color__white) 60%, var(--color__red));
+  --color__red--250: color-mix(in srgb, var(--color__white) 50%, var(--color__red));
+  --color__red--300: color-mix(in srgb, var(--color__white) 40%, var(--color__red));
+  --color__red--350: color-mix(in srgb, var(--color__white) 30%, var(--color__red));
+  --color__red--400: color-mix(in srgb, var(--color__white) 20%, var(--color__red));
+  --color__red--450: color-mix(in srgb, var(--color__white) 10%, var(--color__red));
+  --color__red--500: color-mix(in srgb, var(--color__white) 0%, var(--color__red));
+  --color__red--550: color-mix(in srgb, var(--color__black) 10%, var(--color__red));
+  --color__red--600: color-mix(in srgb, var(--color__black) 20%, var(--color__red));
+  --color__red--650: color-mix(in srgb, var(--color__black) 30%, var(--color__red));
+  --color__red--700: color-mix(in srgb, var(--color__black) 40%, var(--color__red));
+  --color__red--750: color-mix(in srgb, var(--color__black) 50%, var(--color__red));
+  --color__red--800: color-mix(in srgb, var(--color__black) 60%, var(--color__red));
+  --color__red--850: color-mix(in srgb, var(--color__black) 70%, var(--color__red));
+  --color__red--900: color-mix(in srgb, var(--color__black) 80%, var(--color__red));
+  --color__red--950: color-mix(in srgb, var(--color__black) 90%, var(--color__red));
+
+  // Text colors
+  --color__text--lighter: var(--color__black--400);
+  --color__text--light: var(--color__black--500);
+  --color__text--normal: var(--color__black--700);
+  --color__text--dark: var(--color__black--800);
+}

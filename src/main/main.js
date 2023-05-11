@@ -17,7 +17,7 @@ const { windowStateKeeper } = require('./utils/windowStateKeeper')
 
 const store = new Store({
   // TODO set this key before publishing application
-  // encryptionKey: 'this key only obsures the data',
+  // encryptionKey: 'this key only obscures the data',
   name: 'preferences',
   schema: storageSchema,
   defaults: {
@@ -39,6 +39,8 @@ const createWindow = () => {
   const window = new BrowserWindow({
     width: windowState.width,
     height: windowState.height,
+    minWidth: 400,
+    minHeight: 445,
     x: windowState.x,
     y: windowState.y,
     maximizable: false,

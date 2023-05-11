@@ -1,0 +1,60 @@
+.location {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--size__500);
+}
+
+.downloadLocationLabel {
+  margin-bottom: var(--size__150);
+  color: var(--color__text--normal);
+}
+
+.downloadLocationText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.downloadLocation {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--size__150) var(--size__350);
+  margin-bottom: var(--size__250);
+  color: var(--color__text--dark);
+  font-size: 0.875rem;
+  background-color: var(--color__black--100);
+  border: 1px solid var(--color__black--150);
+  border-radius: var(--size__350);
+  cursor: pointer;
+  transition: background-color 150ms var(--animation__spring);
+
+  &:hover {
+    background-color: var(--color__black--150);
+  }
+}
+
+.downloadLocationIcon {
+  margin-right: var(--size__150);
+  color: var(--color__black--500);
+}
+
+.options {
+  margin-bottom: var(--size__500);
+  padding: 0 var(--size__500)
+}
+
+.actions {
+  margin-right: var(--size__200);
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.note {
+  margin: var(--size__500) auto;
+  margin-bottom: 0;
+  color: var(--color__text--light);
+  max-width: 20rem;
+}

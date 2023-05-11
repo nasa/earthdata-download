@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import classNames from 'classnames'
+import { FaCog } from 'react-icons/fa'
 
+import Button from '../Button/Button'
 import DownloadHistory from '../DownloadHistory/DownloadHistory'
 import Downloads from '../Downloads/Downloads'
+import Dialog from '../Dialog/Dialog'
 import Settings from '../Settings/Settings'
 
 import { PAGES } from '../../constants/pages'
 
-import './Layout.css'
+import * as styles from './Layout.module.scss'
 
 const { electronAPI } = window
 
@@ -40,68 +43,71 @@ const Layout = () => {
       break
   }
 
-  const settingsClassNames = classNames([
-    'settings',
-    {
-      'mac-settings': electronAPI.isMac
-    },
-    {
-      'windows-settings': !electronAPI.isMac
-    }
-  ])
-
-  const downloadsButtonClassNames = classNames([
-    'nav-button',
-    {
-      'is-active': currentPage === PAGES.downloads
-    }
-  ])
-  const downloadHistoryButtonClassNames = classNames([
-    'nav-button',
-    {
-      'is-active': currentPage === PAGES.downloadHistory
-    }
-  ])
-  const settingsButtonClassNames = classNames([
-    'settings-button',
-    {
-      'is-active': currentPage === PAGES.settings
-    }
-  ])
-
   return (
-    <div>
-      <div className="titlebar">
-        <div className="navigation">
-          <button
-            className={downloadsButtonClassNames}
-            onClick={() => setCurrentPage(PAGES.downloads)}
-            type="button"
-          >
-            Downloads
-          </button>
-          <button
-            className={downloadHistoryButtonClassNames}
-            onClick={() => setCurrentPage(PAGES.downloadHistory)}
-            type="button"
-          >
-            Download History
-          </button>
-        </div>
-        <div className={settingsClassNames}>
-          <button
-            className={settingsButtonClassNames}
-            onClick={() => setCurrentPage(PAGES.settings)}
-            type="button"
-          >
-            Settings
-          </button>
-        </div>
+    <>
+      <Dialog />
+      <div className={styles.wrapper}>
+        <header
+          className={
+            classNames(
+              [
+                styles.header,
+                {
+                  [styles.isWindows]: !electronAPI.isMac
+                }
+              ]
+            )
+          }
+        >
+          <nav className={styles.nav}>
+            <Button
+              className={
+                classNames(
+                  [
+                    styles.navButton,
+                    {
+                      [styles.isActive]: currentPage === PAGES.downloads
+                    }
+                  ]
+                )
+              }
+              onClick={() => setCurrentPage(PAGES.downloads)}
+              type="button"
+            >
+              Downloads
+            </Button>
+            <Button
+              className={
+                classNames(
+                  [
+                    styles.navButton,
+                    {
+                      [styles.isActive]: currentPage === PAGES.downloadHistory
+                    }
+                  ]
+                )
+              }
+              onClick={() => setCurrentPage(PAGES.downloadHistory)}
+              type="button"
+            >
+              Download History
+            </Button>
+          </nav>
+          <section className={styles.actions}>
+            <Button
+              className={styles.settingsButton}
+              Icon={FaCog}
+              onClick={() => setCurrentPage(PAGES.settings)}
+            >
+              Settings
+            </Button>
+          </section>
+        </header>
+        <main className={styles.main}>
+          {pageComponent}
+        </main>
       </div>
-      <div className="wrapper">
-        {pageComponent}
-      </div>
-    </div>
+    </>
   )
 }
 

@@ -1,0 +1,39 @@
+.listPage {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.list {
+  padding: var(--size__100);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.icon {
+  font-size: 3rem;
+  color: var(--color__black--400);
+}
+
+.message {
+  margin-top: var(--size__500);
+  font-size: var(--size__500);
+  color: var(--color__black--500);
+}
+
+.actions {
+  margin-top: var(--size__500);
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
+  flex-wrap: wrap;
+}

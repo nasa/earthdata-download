@@ -1,0 +1,38 @@
+{
+  "customSyntax": "postcss-scss",
+  "extends": ["stylelint-config-standard"],
+  "plugins": [
+    "stylelint-scss"
+  ],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "value"
+        ]
+      }
+    ],
+    "custom-property-pattern": "[a-z]__.+",
+    "import-notation": "string",
+    "keyframes-name-pattern": "[a-zA-Z]",
+    "property-no-unknown": [
+      true,
+      {
+        "ignoreProperties": [
+          "composes",
+          "compose-with"
+        ]
+      }
+    ],
+    "selector-class-pattern": "[a-zA-Z]",
+    "value-keyword-case": [
+      "lower",
+      {
+        "ignoreKeywords": [
+          "/[a-zA-Z]/"
+        ]
+      }
+    ]
+  }
+}

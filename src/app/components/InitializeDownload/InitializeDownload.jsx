@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { FaBan, FaDownload, FaFolder } from 'react-icons/fa'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -6,10 +6,9 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import Button from '../Button/Button'
 import Checkbox from '../Checkbox/Checkbox'
 
-import * as styles from './InitializeDownload.module.scss'
+import { ElectronApiContext } from '../../context/ElectronApiContext'
 
-// ipcRenderer is setup in preload.js and functions are exposed within `window.electronAPI`
-const { electronAPI } = window
+import * as styles from './InitializeDownload.module.scss'
 
 const InitializeDownload = ({
   downloadId,
@@ -18,16 +17,17 @@ const InitializeDownload = ({
   onCloseChooseLocationModal,
   setDownloadId
 }) => {
+  const { chooseDownloadLocation, beginDownload } = useContext(ElectronApiContext)
   const [makeDefaultDownloadLocation, setMakeDefaultDownloadLocation] = useState(true)
 
   // Send a message to the main process to show the open dialog
   const onChooseDownloadLocation = () => {
-    electronAPI.chooseDownloadLocation()
+    chooseDownloadLocation()
   }
 
   // Send a message to the main process to begin the download
   const handleBeginDownload = () => {
-    electronAPI.beginDownload({
+    beginDownload({
       downloadId,
       downloadLocation,
       makeDefaultDownloadLocation

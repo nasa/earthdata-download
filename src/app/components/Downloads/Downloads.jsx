@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { FaDownload, FaHistory, FaSearch } from 'react-icons/fa'
 
@@ -10,11 +10,9 @@ import ListPage from '../ListPage/ListPage'
 
 import { PAGES } from '../../constants/pages'
 
-import * as styles from './Downloads.module.scss'
+import { ElectronApiContext } from '../../context/ElectronApiContext'
 
-// ipcRenderer is setup in preload.js and functions are exposed within `window.electronAPI`
-// ?? Should we only call this in App.jsx and pass it down as a prop?
-const { electronAPI } = window
+import * as styles from './Downloads.module.scss'
 
 /**
  * Renders the `Downloads` page
@@ -22,15 +20,16 @@ const { electronAPI } = window
 const Downloads = ({
   setCurrentPage
 }) => {
+  const { setDownloadLocation, initializeDownload } = useContext(ElectronApiContext)
   const [downloadId, setDownloadId] = useState(null)
-  const [downloadLocation, setDownloadLocation] = useState(null)
+  const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
   const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
 
   // When a new downloadLocation has been selected from the main process, update the state
   const onSetDownloadLocation = (event, info) => {
     const { downloadLocation: newDownloadLocation } = info
-    setDownloadLocation(newDownloadLocation)
+    setSelectedDownloadLocation(newDownloadLocation)
   }
 
   // When a download needs to be initialized (show the starting modal, or start the download)
@@ -42,7 +41,7 @@ const Downloads = ({
     } = info
 
     setDownloadId(newDownloadId)
-    setDownloadLocation(newDownloadLocation)
+    setSelectedDownloadLocation(newDownloadLocation)
     setUseDefaultLocation(shouldUseDefaultLocation)
   }
 
@@ -52,12 +51,12 @@ const Downloads = ({
 
   // Setup event listeners
   useEffect(() => {
-    electronAPI.setDownloadLocation(true, onSetDownloadLocation)
-    electronAPI.initializeDownload(true, onInitializeDownload)
+    setDownloadLocation(true, onSetDownloadLocation)
+    initializeDownload(true, onInitializeDownload)
 
     return () => {
-      electronAPI.setDownloadLocation(false, onSetDownloadLocation)
-      electronAPI.initializeDownload(false, onInitializeDownload)
+      setDownloadLocation(false, onSetDownloadLocation)
+      initializeDownload(false, onInitializeDownload)
     }
   }, [])
 
@@ -77,7 +76,7 @@ const Downloads = ({
       >
         <InitializeDownload
           downloadId={downloadId}
-          downloadLocation={downloadLocation}
+          downloadLocation={selectedDownloadLocation}
           useDefaultLocation={useDefaultLocation}
           setDownloadId={setDownloadId}
           onCloseChooseLocationModal={onCloseChooseLocationModal}

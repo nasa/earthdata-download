@@ -2,9 +2,11 @@ import React from 'react'
 
 import Layout from './components/Layout/Layout'
 
+import { ElectronApiContext } from './context/ElectronApiContext'
+
 import './App.scss'
 
-// ? How much state do we need to keep at the top level, or do we need to set up any contexts here?
+const { electronApi } = window
 
 /**
  * Renders the Application
@@ -15,7 +17,9 @@ import './App.scss'
  * )
  */
 const App = () => (
-  <Layout />
+  <ElectronApiContext.Provider value={electronApi}>
+    <Layout />
+  </ElectronApiContext.Provider>
 )
 
 export default App

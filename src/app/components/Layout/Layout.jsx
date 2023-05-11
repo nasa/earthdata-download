@@ -1,23 +1,24 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import classNames from 'classnames'
 import { FaCog } from 'react-icons/fa'
 
 import Button from '../Button/Button'
 import DownloadHistory from '../DownloadHistory/DownloadHistory'
 import Downloads from '../Downloads/Downloads'
-import Dialog from '../Dialog/Dialog'
 import Settings from '../Settings/Settings'
 
 import { PAGES } from '../../constants/pages'
 
-import * as styles from './Layout.module.scss'
+import { ElectronApiContext } from '../../context/ElectronApiContext'
 
-const { electronAPI } = window
+import * as styles from './Layout.module.scss'
 
 /**
  * Renders the page layout of the application. The title bar contents and the main 'page'
  */
 const Layout = () => {
+  const { isMac } = useContext(ElectronApiContext)
+
   const [currentPage, setCurrentPage] = useState(PAGES.downloads)
 
   let pageComponent
@@ -44,24 +45,22 @@ const Layout = () => {
   }
 
   return (
-    <>
-      <Dialog />
-      <div className={styles.wrapper}>
-        <header
-          className={
+    <div className={styles.wrapper}>
+      <header
+        className={
             classNames(
               [
                 styles.header,
                 {
-                  [styles.isWindows]: !electronAPI.isMac
+                  [styles.isWindows]: !isMac
                 }
               ]
             )
           }
-        >
-          <nav className={styles.nav}>
-            <Button
-              className={
+      >
+        <nav className={styles.nav}>
+          <Button
+            className={
                 classNames(
                   [
                     styles.navButton,
@@ -71,13 +70,13 @@ const Layout = () => {
                   ]
                 )
               }
-              onClick={() => setCurrentPage(PAGES.downloads)}
-              type="button"
-            >
-              Downloads
-            </Button>
-            <Button
-              className={
+            onClick={() => setCurrentPage(PAGES.downloads)}
+            type="button"
+          >
+            Downloads
+          </Button>
+          <Button
+            className={
                 classNames(
                   [
                     styles.navButton,
@@ -87,27 +86,27 @@ const Layout = () => {
                   ]
                 )
               }
-              onClick={() => setCurrentPage(PAGES.downloadHistory)}
-              type="button"
-            >
-              Download History
-            </Button>
-          </nav>
-          <section className={styles.actions}>
-            <Button
-              className={styles.settingsButton}
-              Icon={FaCog}
-              onClick={() => setCurrentPage(PAGES.settings)}
-            >
-              Settings
-            </Button>
-          </section>
-        </header>
-        <main className={styles.main}>
-          {pageComponent}
-        </main>
-      </div>
-    </>
+            onClick={() => setCurrentPage(PAGES.downloadHistory)}
+            type="button"
+          >
+            Download History
+          </Button>
+        </nav>
+        <section className={styles.actions}>
+          <Button
+            className={styles.settingsButton}
+            Icon={FaCog}
+            onClick={() => setCurrentPage(PAGES.settings)}
+          >
+            Settings
+          </Button>
+        </section>
+      </header>
+
+      <main className={styles.main}>
+        {pageComponent}
+      </main>
+    </div>
   )
 }
 

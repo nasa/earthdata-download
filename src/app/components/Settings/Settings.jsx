@@ -1,19 +1,18 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { FaBan } from 'react-icons/fa'
 
 import Button from '../Button/Button'
-
-// ipcRenderer is setup in preload.js and functions are exposed within `window.electronAPI`
-// ?? Should we only call this in App.jsx and pass it down as a prop?
-const { electronAPI } = window
+import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 /**
  * Renders the `Settings` page
  */
 const Settings = () => {
+  const { clearDefaultDownload } = useContext(ElectronApiContext)
+
   // Send a message to the clear the default download location
   const handleClearDefaultDownload = () => {
-    electronAPI.clearDefaultDownload()
+    clearDefaultDownload()
   }
 
   return (

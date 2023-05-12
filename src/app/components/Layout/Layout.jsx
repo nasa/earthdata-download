@@ -6,7 +6,6 @@ import Button from '../Button/Button'
 import DownloadHistory from '../../pages/DownloadHistory/DownloadHistory'
 import Downloads from '../../pages/Downloads/Downloads'
 import Settings from '../../pages/Settings/Settings'
-import Tooltip from '../Tooltip/Tooltip'
 
 import { PAGES } from '../../constants/pages'
 

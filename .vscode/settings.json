@@ -1,3 +1,9 @@
 {
-  "scss.lint.unknownAtRules": "ignore"
+  "scss.lint.unknownAtRules": "ignore",
+  "stylelint.validate": [
+    "css",
+    "less",
+    "postcss",
+    "scss"
+  ]
 }

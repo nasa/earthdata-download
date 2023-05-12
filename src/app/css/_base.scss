@@ -1,23 +1,23 @@
 html {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 body {
-  height: 100%;
   width: 100%;
-  margin: 0 auto;
+  height: 100%;
   padding: 0;
-  text-align: center;
+  margin: 0 auto;
   background: var(--color__white);
   color: var(--color__black--600);
   font-family: Inter, sans-serif;
   font-size: var(--size__350);
+  text-align: center;
 }
 
 .root {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 * > * {

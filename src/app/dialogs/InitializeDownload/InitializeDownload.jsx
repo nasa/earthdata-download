@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { FaBan, FaDownload, FaFolder } from 'react-icons/fa'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import MiddleEllipsis from 'react-middle-ellipsis'
 
 import Button from '../../components/Button/Button'
 import Checkbox from '../../components/Checkbox/Checkbox'
@@ -72,13 +73,25 @@ const InitializeDownload = ({
       <div className={styles.location}>
         <span className={styles.downloadLocationLabel}>Download files to:</span>
         <button
-          className={styles.downloadLocation}
+          className={styles.downloadLocationButton}
           type="button"
           onClick={onChooseDownloadLocation}
           data-testid="initialize-download-location"
         >
-          <FaFolder className={styles.downloadLocationIcon} />
-          <span className={styles.downloadLocationText}>{`~${downloadLocation}`}</span>
+          <span className={styles.downloadLocationWrapper}>
+            <FaFolder className={styles.downloadLocationIcon} />
+            <VisuallyHidden>
+              <span>{`~${downloadLocation}`}</span>
+            </VisuallyHidden>
+            <MiddleEllipsis>
+              <span
+                className={styles.downloadLocationText}
+                aria-hidden="true"
+              >
+                {`~${downloadLocation}`}
+              </span>
+            </MiddleEllipsis>
+          </span>
         </button>
         <VisuallyHidden>
           <Button

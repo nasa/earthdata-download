@@ -59,6 +59,7 @@ body {
   &:hover {
     background-color: var(--color__blue--600);
     color: var(--color__blue--050);
+    border: 1px solid var(--color__blue--700);
   }
 
   &.isActive {

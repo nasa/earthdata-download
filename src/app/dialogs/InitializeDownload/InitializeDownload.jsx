@@ -93,12 +93,12 @@ const InitializeDownload = ({
               <VisuallyHidden>
                 <span>{`${downloadLocation}`}</span>
               </VisuallyHidden>
-              <MiddleEllipsis>
+              <MiddleEllipsis key={downloadLocation}>
                 <span
                   className={styles.downloadLocationText}
                   aria-hidden="true"
                 >
-                  {`${downloadLocation}`}
+                  {downloadLocation}
                 </span>
               </MiddleEllipsis>
             </span>

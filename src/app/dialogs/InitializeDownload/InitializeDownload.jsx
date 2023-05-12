@@ -10,6 +10,7 @@ import Checkbox from '../../components/Checkbox/Checkbox'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import * as styles from './InitializeDownload.module.scss'
+import Tooltip from '../../components/Tooltip/Tooltip'
 
 /**
  * @typedef {Object} InitializeDownloadProps
@@ -57,7 +58,7 @@ const InitializeDownload = ({
   }
 
   // Send a message to the main process to begin the download
-  const handleBeginDownload = () => {
+  const onBeginDownload = () => {
     beginDownload({
       downloadId,
       downloadLocation,
@@ -72,36 +73,37 @@ const InitializeDownload = ({
     <>
       <div className={styles.location}>
         <span className={styles.downloadLocationLabel}>Download files to:</span>
-        <button
-          className={styles.downloadLocationButton}
-          type="button"
-          onClick={onChooseDownloadLocation}
-          data-testid="initialize-download-location"
+        <Tooltip
+          content="Change the download location for your files"
+          additionalContent={(
+            <span className={styles.tooltipFilePath}>
+              {`${downloadLocation}`}
+            </span>
+          )}
         >
-          <span className={styles.downloadLocationWrapper}>
-            <FaFolder className={styles.downloadLocationIcon} />
-            <VisuallyHidden>
-              <span>{`~${downloadLocation}`}</span>
-            </VisuallyHidden>
-            <MiddleEllipsis>
-              <span
-                className={styles.downloadLocationText}
-                aria-hidden="true"
-              >
-                {`~${downloadLocation}`}
-              </span>
-            </MiddleEllipsis>
-          </span>
-        </button>
-        <VisuallyHidden>
-          <Button
-            className={styles.changeLocationButton}
-            Icon={FaFolder}
+          <button
+            className={styles.downloadLocationButton}
+            type="button"
             onClick={onChooseDownloadLocation}
+            data-testid="initialize-download-location"
+            aria-label="Choose another folder"
           >
-            Choose another folder
-          </Button>
-        </VisuallyHidden>
+            <span className={styles.downloadLocationWrapper}>
+              <FaFolder className={styles.downloadLocationIcon} />
+              <VisuallyHidden>
+                <span>{`${downloadLocation}`}</span>
+              </VisuallyHidden>
+              <MiddleEllipsis>
+                <span
+                  className={styles.downloadLocationText}
+                  aria-hidden="true"
+                >
+                  {`${downloadLocation}`}
+                </span>
+              </MiddleEllipsis>
+            </span>
+          </button>
+        </Tooltip>
       </div>
       <div className={styles.options}>
         <Checkbox
@@ -134,7 +136,7 @@ const InitializeDownload = ({
           size="lg"
           Icon={FaDownload}
           variant="success"
-          onClick={handleBeginDownload}
+          onClick={onBeginDownload}
           dataTestId="initialize-download-begin-download"
         >
           Begin download

@@ -18,7 +18,7 @@ const Settings = () => {
   const { clearDefaultDownload } = useContext(ElectronApiContext)
 
   // Send a message to the clear the default download location
-  const handleClearDefaultDownload = () => {
+  const onClearDefaultDownload = () => {
     clearDefaultDownload()
   }
 
@@ -29,7 +29,7 @@ const Settings = () => {
       <Button
         size="lg"
         Icon={FaBan}
-        onClick={handleClearDefaultDownload}
+        onClick={onClearDefaultDownload}
         dataTestId="settings-clear-default-download"
       >
         Clear default download location

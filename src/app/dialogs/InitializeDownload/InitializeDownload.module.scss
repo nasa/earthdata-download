@@ -5,6 +5,10 @@
   margin-bottom: var(--size__500);
 }
 
+.tooltipFilePath {
+  line-break: anywhere;
+}
+
 .downloadLocationLabel {
   margin-bottom: var(--size__150);
   color: var(--color__text--normal);
@@ -19,22 +23,23 @@
 
 .downloadLocationButton {
   display: flex;
-  max-width: 100%;
+  max-width: 90%;
   flex-grow: 0;
   flex-shrink: 1;
   align-items: center;
-  padding: var(--size__150) var(--size__350);
+  padding: var(--size__250) var(--size__500);
   border: 1px solid var(--color__black--150);
-  border-radius: var(--size__350);
+  border-radius: var(--size__600);
   margin-bottom: var(--size__250);
   background-color: var(--color__black--100);
   color: var(--color__text--dark);
-  font-size: 0.875rem;
+  font-size: 0.925rem;
   font-weight: 500;
   transition: background-color 150ms var(--animation__spring);
 
   &:hover {
     background-color: var(--color__black--150);
+    color: var(--color__black--900);
   }
 }
 

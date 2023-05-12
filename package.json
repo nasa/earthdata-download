@@ -34,6 +34,7 @@
     "@babel/eslint-parser": "^7.21.3",
     "@radix-ui/react-checkbox": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.3",
+    "@radix-ui/react-tooltip": "^1.0.5",
     "@radix-ui/react-visually-hidden": "^1.0.2",
     "classnames": "^2.3.2",
     "electron-store": "^8.1.0",
@@ -43,8 +44,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
-    "react-middle-ellipsis": "^1.2.2",
-    "vite-plugin-fonts": "^0.7.0"
+    "react-middle-ellipsis": "^1.2.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.21.0",
@@ -81,6 +81,7 @@
     "stylelint-config-idiomatic-order": "^9.0.0",
     "stylelint-config-standard": "^33.0.0",
     "stylelint-config-standard-scss": "^9.0.0",
+    "unplugin-fonts": "^1.0.3",
     "vite": "^4.2.0"
   }
 }

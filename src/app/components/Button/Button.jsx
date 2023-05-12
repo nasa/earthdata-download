@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -48,7 +48,7 @@ import * as styles from './Button.module.scss'
  *   </Button>
  * )
  */
-const Button = ({
+const Button = forwardRef(({
   className,
   children,
   dataTestId,
@@ -59,7 +59,7 @@ const Button = ({
   size,
   target,
   variant
-}) => {
+}, ref) => {
   // If a href is passed, an <a> is used for the base element, otherwise a <button> is used
   const TagName = !href ? 'button' : 'a'
 
@@ -75,6 +75,7 @@ const Button = ({
 
   return (
     <TagName
+      ref={ref}
       className={
         classNames([
           styles.button,
@@ -91,7 +92,9 @@ const Button = ({
       {children}
     </TagName>
   )
-}
+})
+
+Button.displayName = 'button'
 
 Button.defaultProps = {
   className: null,

@@ -13,25 +13,24 @@
 .downloadLocationWrapper {
   display: flex;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .downloadLocationButton {
   display: flex;
+  max-width: 100%;
   flex-grow: 0;
   flex-shrink: 1;
-  max-width: 100%;
   align-items: center;
   padding: var(--size__150) var(--size__350);
+  border: 1px solid var(--color__black--150);
+  border-radius: var(--size__350);
   margin-bottom: var(--size__250);
+  background-color: var(--color__black--100);
   color: var(--color__text--dark);
   font-size: 0.875rem;
   font-weight: 500;
-  background-color: var(--color__black--100);
-  border: 1px solid var(--color__black--150);
-  border-radius: var(--size__350);
-  cursor: pointer;
   transition: background-color 150ms var(--animation__spring);
 
   &:hover {
@@ -40,15 +39,15 @@
 }
 
 .downloadLocationIcon {
+  flex-grow: 0;
+  flex-shrink: 0;
   margin-right: var(--size__150);
   color: var(--color__black--500);
-  flex-shrink: 0;
-  flex-grow: 0;
 }
 
 .options {
-  margin-bottom: var(--size__500);
-  padding: 0 var(--size__500)
+  padding: 0 var(--size__500);
+  margin-bottom: var(--size__500)
 }
 
 .actions {
@@ -60,8 +59,8 @@
 }
 
 .note {
+  max-width: 20rem;
   margin: var(--size__500) auto;
   margin-bottom: 0;
   color: var(--color__text--light);
-  max-width: 20rem;
 }

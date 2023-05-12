@@ -3,23 +3,22 @@
   align-items: center;
   justify-content: center;
   padding: var(--size__100) var(--size__250);
-  background-color: var(--color__white);
-  outline: none;
-  border-radius: 0.25rem;
   border: 1px solid var(--color__black--150);
+  border-radius: 0.25rem;
+  -webkit-app-region: no-drag;
+  background-color: var(--color__white);
   color: var(--color__black--600);
   font-size: 0.875rem;
   font-weight: 500;
-  text-decoration: none;
   letter-spacing: 1.03;
+  outline: none;
+  text-decoration: none;
   transition: all 0.1s ease-in-out;
-  cursor: pointer;
-  -webkit-app-region: no-drag;
 
   &:hover {
+    border: 1px solid var(--color__black--200);
     background-color: var(--color__black--100);
     color: var(--color__black--850);
-    border: 1px solid var(--color__black--200);
   }
 
   &.lg {
@@ -28,39 +27,39 @@
   }
 
   &.outline {
-    background-color: transparent;
     border: 1px solid rgba(0 0 0 / 32.5%);
+    background-color: transparent;
     color: rgba(0 0 0 / 32.5%);
 
     &:hover {
-      color: rgba(0 0 0 / 32.5%);
       background-color: rgba(0 0 0 / 25%);
+      color: rgba(0 0 0 / 32.5%);
     }
   }
 
   &.primary {
+    border-color: var(--color__blue--500);
     background-color: var(--color__blue--500);
     color: var(--color__blue--050);
-    border-color: var(--color__blue--500);
     text-shadow: 0 0 0.75rem var(--color__blue--600);
 
     &:hover {
+      border-color: var(--color__blue--700);
       background-color: var(--color__blue--600);
       color: var(--color__blue--100);
-      border-color: var(--color__blue--700);
     }
   }
 
   &.success {
+    border-color: var(--color__green--600);
     background-color: var(--color__green--500);
     color: var(--color__white);
-    border-color: var(--color__green--600);
     text-shadow: 0 0 0.75rem var(--color__green--600);
 
     &:hover {
+      border-color: var(--color__green--600);
       background-color: var(--color__green--600);
       color: var(--color__green--050);
-      border-color: var(--color__green--600);
     }
   }
 
@@ -74,6 +73,6 @@
 }
 
 .icon {
-  vertical-align: middle;
   margin-right: var(--size__150);
+  vertical-align: middle;
 }

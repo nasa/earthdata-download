@@ -1,7 +1,7 @@
 .listPage {
-  height: 100%;
-  width: 100%;
   display: flex;
+  width: 100%;
+  height: 100%;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -18,22 +18,22 @@
 }
 
 .icon {
-  font-size: 3rem;
   color: var(--color__black--400);
+  font-size: 3rem;
 }
 
 .message {
   margin-top: var(--size__500);
-  font-size: var(--size__500);
   color: var(--color__black--500);
+  font-size: var(--size__500);
 }
 
 .actions {
-  margin-top: var(--size__500);
-  width: auto;
   display: flex;
+  width: auto;
   flex-direction: column;
-  align-items: center;
   /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
   flex-wrap: wrap;
+  align-items: center;
+  margin-top: var(--size__500);
 }

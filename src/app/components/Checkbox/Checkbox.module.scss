@@ -5,17 +5,18 @@
 
 .checkboxRoot {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
   width: 1rem;
   height: 1rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color__black--350);
   border-radius: 4px;
   background-color: var(--color__white);
-  border: 1px solid var(--color__black--350);
+
 
   &:hover {
-    background-color: var(--black--050);
+    background-color: var(--color__black--050);
   }
 
   &:focus {
@@ -23,16 +24,16 @@
   }
 
   &[data-state="checked"] {
-    background-color: var(--color__blue--500);
     border: 1px solid var(--color__blue--700);
+    background-color: var(--color__blue--500);
   }
 }
 
 .checkboxIndicator {
-  font-size: 0.75rem;
   color: var(--color__blue--600);
+  font-size: 0.75rem;
 
-  .checkboxRoot[data-state=checked] & {
+  .checkboxRoot[data-state="checked"] & {
     color: var(--color__blue--050);
   }
 }
@@ -43,11 +44,11 @@
 }
 
 .label {
-  text-align: left;
-  color: var(--color__text--normal);
   padding-left: var(--size__200);
+  color: var(--color__text--normal);
   font-size: 0.875rem;
   line-height: 1.25;
+  text-align: left;
 }
 
 .labelNote {

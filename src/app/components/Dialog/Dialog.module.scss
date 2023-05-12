@@ -7,11 +7,11 @@ input {
 
 .contentWrapper {
   position: fixed;
-  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--size__050);
+  inset: 0;
 }
 
 .overlay {
@@ -19,9 +19,9 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
-  inset: 0;
-  background-color: rgba(0 0 0 / 50%);
   animation: overlayShow 150ms var(--animation__spring);
+  background-color: rgba(0 0 0 / 50%);
+  inset: 0;
 }
 
 .closeButton {
@@ -32,16 +32,16 @@ input {
 
 .content {
   position: relative;
-  background-color: white;
-  border-radius: var(--size__150);
-  border: 1px solid var(--color__blue--700);
-  box-shadow: hsl(206deg 22% 7% / 35%) 0 10px 38px -10px, hsl(206deg 22% 7% / 20%) 0 10px 20px -15px;
   width: 80vw;
   max-width: 27rem;
   max-height: 85vh;
   padding: var(--size__600);
+  border: 1px solid var(--color__blue--700);
+  border-radius: var(--size__150);
   margin: var(--size__500);
   animation: contentShow 150ms var(--animation__spring);
+  background-color: white;
+  box-shadow: hsl(206deg 22% 7% / 35%) 0 10px 38px -10px, hsl(206deg 22% 7% / 20%) 0 10px 20px -15px;
 }
 
 .content:focus {
@@ -51,15 +51,15 @@ input {
 .title {
   margin: 0;
   margin-bottom: var(--size__500);
-  font-weight: 700;
   color: var(--color__text--normal);
   font-size: var(--size__500);
+  font-weight: 700;
 }
 
 .titleIcon {
   margin-bottom: var(--size__250);
-  font-size: 3rem;
   color: var(--color__black--300);
+  font-size: 3rem;
 }
 
 .description {

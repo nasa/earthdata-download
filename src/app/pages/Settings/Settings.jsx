@@ -30,6 +30,7 @@ const Settings = () => {
         size="lg"
         Icon={FaBan}
         onClick={handleClearDefaultDownload}
+        dataTestId="settings-clear-default-download"
       >
         Clear default download location
       </Button>

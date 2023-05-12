@@ -17,14 +17,6 @@
   text-overflow: ellipsis;
 }
 
-// .downloadLocationText {
-//   display: block;
-//   overflow: hidden;
-//   white-space: nowrap;
-//   text-overflow: ellipsis;
-//   direction: rtl;
-// }
-
 .downloadLocationButton {
   display: flex;
   flex-grow: 0;
@@ -35,7 +27,7 @@
   margin-bottom: var(--size__250);
   color: var(--color__text--dark);
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 500;
   background-color: var(--color__black--100);
   border: 1px solid var(--color__black--150);
   border-radius: var(--size__350);

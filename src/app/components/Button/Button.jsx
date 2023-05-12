@@ -7,6 +7,7 @@ import * as styles from './Button.module.scss'
 const Button = ({
   className,
   children,
+  dataTestId,
   href,
   Icon,
   onClick,
@@ -34,6 +35,7 @@ const Button = ({
       type="button"
       target={target}
       rel={rel}
+      data-testid={dataTestId}
       {...conditionalProps}
     >
       {Icon && <Icon className={styles.icon} />}
@@ -44,6 +46,7 @@ const Button = ({
 
 Button.defaultProps = {
   className: null,
+  dataTestId: null,
   href: null,
   Icon: null,
   onClick: null,
@@ -59,6 +62,7 @@ Button.propTypes = {
     PropTypes.func,
     PropTypes.string
   ]).isRequired,
+  dataTestId: PropTypes.string,
   href: PropTypes.string,
   Icon: PropTypes.func,
   onClick: PropTypes.func,

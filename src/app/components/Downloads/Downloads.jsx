@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+// eslint-disable-next-line no-unused-vars
 import { FaDownload, FaHistory, FaSearch } from 'react-icons/fa'
 
 import InitializeDownload from '../InitializeDownload/InitializeDownload'
@@ -8,6 +9,7 @@ import Button from '../Button/Button'
 import Dialog from '../Dialog/Dialog'
 import ListPage from '../ListPage/ListPage'
 
+// eslint-disable-next-line no-unused-vars
 import { PAGES } from '../../constants/pages'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
@@ -18,9 +20,10 @@ import * as styles from './Downloads.module.scss'
  * Renders the `Downloads` page
  */
 const Downloads = ({
+  // eslint-disable-next-line no-unused-vars
   setCurrentPage
 }) => {
-  const { setDownloadLocation, initializeDownload } = useContext(ElectronApiContext)
+  const { initializeDownload, setDownloadLocation } = useContext(ElectronApiContext)
   const [downloadId, setDownloadId] = useState(null)
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
@@ -77,7 +80,6 @@ const Downloads = ({
         <InitializeDownload
           downloadId={downloadId}
           downloadLocation={selectedDownloadLocation}
-          useDefaultLocation={useDefaultLocation}
           setDownloadId={setDownloadId}
           onCloseChooseLocationModal={onCloseChooseLocationModal}
         />
@@ -95,14 +97,15 @@ const Downloads = ({
             >
               Find data in Earthdata Search
             </Button>
-            <Button
+            {/* Hiding nav buttons until EDD-18 */}
+            {/* <Button
               className={styles.button}
               size="lg"
               Icon={FaHistory}
               onClick={() => setCurrentPage(PAGES.downloadHistory)}
             >
               View Download History
-            </Button>
+            </Button> */}
           </>
         )}
         emptyMessage="No downloads in progress"

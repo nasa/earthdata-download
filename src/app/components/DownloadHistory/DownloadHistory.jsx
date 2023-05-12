@@ -1,10 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+// eslint-disable-next-line no-unused-vars
 import { FaDownload, FaHistory, FaSearch } from 'react-icons/fa'
 
 import Button from '../Button/Button'
 import ListPage from '../ListPage/ListPage'
 
+// eslint-disable-next-line no-unused-vars
 import { PAGES } from '../../constants/pages'
 
 import * as styles from './DownloadHistory.module.scss'
@@ -14,6 +16,7 @@ import * as styles from './DownloadHistory.module.scss'
  * @param {Object} props
  * @param {Function} props.setCurrentPage Callback to update the current page
  */
+// eslint-disable-next-line no-unused-vars
 const DownloadHistory = ({ setCurrentPage }) => (
   <ListPage
     actions={(
@@ -28,14 +31,15 @@ const DownloadHistory = ({ setCurrentPage }) => (
         >
           Find data in Earthdata Search
         </Button>
-        <Button
+        {/* Hiding nav buttons until EDD-18 */}
+        {/* <Button
           className={styles.button}
           Icon={FaDownload}
           size="lg"
           onClick={() => setCurrentPage(PAGES.downloads)}
         >
           View Downloads
-        </Button>
+        </Button> */}
       </>
     )}
     emptyMessage="Download history is empty"

@@ -13,11 +13,10 @@ import * as styles from './InitializeDownload.module.scss'
 const InitializeDownload = ({
   downloadId,
   downloadLocation,
-  useDefaultLocation,
   onCloseChooseLocationModal,
   setDownloadId
 }) => {
-  const { chooseDownloadLocation, beginDownload } = useContext(ElectronApiContext)
+  const { beginDownload, chooseDownloadLocation } = useContext(ElectronApiContext)
   const [makeDefaultDownloadLocation, setMakeDefaultDownloadLocation] = useState(true)
 
   // Send a message to the main process to show the open dialog
@@ -39,80 +38,67 @@ const InitializeDownload = ({
 
   return (
     <>
-      <div>
-        <p style={{ display: 'none' }}>
-          Download ID:
-          {' '}
-          {downloadId}
-        </p>
+      <div className={styles.location}>
+        <span className={styles.downloadLocationLabel}>Download files to:</span>
+        <button
+          className={styles.downloadLocation}
+          type="button"
+          onClick={onChooseDownloadLocation}
+          data-testid="initialize-download-location"
+        >
+          <FaFolder className={styles.downloadLocationIcon} />
+          <span className={styles.downloadLocationText}>{`~${downloadLocation}`}</span>
+        </button>
+        <VisuallyHidden>
+          <Button
+            className={styles.changeLocationButton}
+            Icon={FaFolder}
+            onClick={onChooseDownloadLocation}
+          >
+            Choose another folder
+          </Button>
+        </VisuallyHidden>
       </div>
-      {
-        useDefaultLocation ? (
-          <span>Download will use the default download location and begin downloading</span>
-        ) : (
-          <>
-            <div className={styles.location}>
-              <span className={styles.downloadLocationLabel}>Download files to:</span>
-              <button
-                className={styles.downloadLocation}
-                type="button"
-                onClick={onChooseDownloadLocation}
-              >
-                <FaFolder className={styles.downloadLocationIcon} />
-                <span className={styles.downloadLocationText}>{`~${downloadLocation}`}</span>
-              </button>
-              <VisuallyHidden>
-                <Button
-                  className={styles.changeLocationButton}
-                  Icon={FaFolder}
-                  onClick={onChooseDownloadLocation}
-                >
-                  Choose another folder
-                </Button>
-              </VisuallyHidden>
-            </div>
-            <div className={styles.options}>
-              <Checkbox
-                defaultChecked
-                id="defaultDownloadLocation"
-                label="Set this as my default download location and do not ask again next time"
-                labelNote="The default download location can be changed in the “Settings” menu"
-                checked={makeDefaultDownloadLocation}
-                onChange={(checked) => {
-                  setMakeDefaultDownloadLocation(checked)
-                }}
-              />
-            </div>
-            <div>
-              <Button
-                className={styles.actions}
-                size="lg"
-                variant="danger"
-                Icon={FaBan}
-                onClick={() => {
-                  // TODO Do we need to do any other cleanup with the download id here?
-                  // TODO Can we add an undo functionality?
-                  onCloseChooseLocationModal()
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                className={styles.actions}
-                size="lg"
-                Icon={FaDownload}
-                variant="success"
-                onClick={handleBeginDownload}
-              >
-                Begin download
-              </Button>
-            </div>
-            <p className={styles.note}>
-              Note: Each dataset will be downloaded to its own folder within your chosen location.
-            </p>
-          </>
-        )
-      }
+      <div className={styles.options}>
+        <Checkbox
+          defaultChecked
+          id="defaultDownloadLocation"
+          label="Set this as my default download location and do not ask again next time"
+          labelNote="The default download location can be changed in the “Settings” menu"
+          checked={makeDefaultDownloadLocation}
+          onChange={(checked) => {
+            setMakeDefaultDownloadLocation(checked)
+          }}
+        />
+      </div>
+      <div>
+        <Button
+          className={styles.actions}
+          size="lg"
+          variant="danger"
+          Icon={FaBan}
+          onClick={
+            // TODO Do we need to do any other cleanup with the download id here?
+            // TODO Can we add an undo functionality?
+            onCloseChooseLocationModal
+          }
+        >
+          Cancel
+        </Button>
+        <Button
+          className={styles.actions}
+          size="lg"
+          Icon={FaDownload}
+          variant="success"
+          onClick={handleBeginDownload}
+          dataTestId="initialize-download-begin-download"
+        >
+          Begin download
+        </Button>
+      </div>
+      <p className={styles.note}>
+        Note: Each dataset will be downloaded to its own folder within your chosen location.
+      </p>
     </>
   )
 }
@@ -125,7 +111,6 @@ InitializeDownload.defaultProps = {
 InitializeDownload.propTypes = {
   downloadId: PropTypes.string,
   downloadLocation: PropTypes.string,
-  useDefaultLocation: PropTypes.bool.isRequired,
   onCloseChooseLocationModal: PropTypes.func.isRequired,
   setDownloadId: PropTypes.func.isRequired
 }

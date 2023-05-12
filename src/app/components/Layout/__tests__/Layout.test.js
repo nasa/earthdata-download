@@ -1,0 +1,116 @@
+import React from 'react'
+
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+import Layout from '../Layout'
+
+jest.mock('../../Downloads/Downloads', () => jest.fn(({ children }) => (
+  <mock-Downloads data-testid="Downloads">
+    {children}
+  </mock-Downloads>
+)))
+jest.mock('../../DownloadHistory/DownloadHistory', () => jest.fn(({ children }) => (
+  <mock-DownloadHistory data-testid="DownloadHistory">
+    {children}
+  </mock-DownloadHistory>
+)))
+jest.mock('../../Settings/Settings', () => jest.fn(({ children }) => (
+  <mock-Settings data-testid="Settings">
+    {children}
+  </mock-Settings>
+)))
+
+import { ElectronApiContext } from '../../../context/ElectronApiContext'
+
+import Downloads from '../../Downloads/Downloads'
+import DownloadHistory from '../../DownloadHistory/DownloadHistory'
+import Settings from '../../Settings/Settings'
+
+describe('Layout component', () => {
+  test('renders the downloads page', () => {
+    render(
+      <ElectronApiContext.Provider value={{ isMac: true }}>
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    expect(Downloads).toHaveBeenCalledTimes(1)
+  })
+
+  test.skip('renders the downloads page when clicking the nav button', async () => {
+    // Skipping because the nav buttons are hidden until EDD-18
+    const user = userEvent.setup()
+
+    render(
+      <ElectronApiContext.Provider value={{ isMac: true }}>
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    expect(Downloads).toHaveBeenCalledTimes(1)
+
+    await user.click(screen.getByTestId('layout-button-downloadHistory'))
+
+    expect(DownloadHistory).toHaveBeenCalledTimes(1)
+
+    await user.click(screen.getByTestId('layout-button-downloads'))
+
+    expect(Downloads).toHaveBeenCalledTimes(2)
+  })
+
+  test.skip('renders the download history page when clicking the nav button', async () => {
+    // Skipping because the nav buttons are hidden until EDD-18
+    const user = userEvent.setup()
+
+    render(
+      <ElectronApiContext.Provider value={{ isMac: true }}>
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    expect(Downloads).toHaveBeenCalledTimes(1)
+
+    await user.click(screen.getByTestId('layout-button-downloadHistory'))
+
+    expect(DownloadHistory).toHaveBeenCalledTimes(1)
+  })
+
+  test('renders the settings page when clicking the nav button', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ElectronApiContext.Provider value={{ isMac: true }}>
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    expect(Downloads).toHaveBeenCalledTimes(1)
+
+    await user.click(screen.getByTestId('layout-button-settings'))
+
+    expect(Settings).toHaveBeenCalledTimes(1)
+  })
+
+  test('renders the settings button on a mac', () => {
+    render(
+      <ElectronApiContext.Provider value={{ isMac: true }}>
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    expect(Downloads).toHaveBeenCalledTimes(1)
+
+    expect(screen.getByTestId('layout-header').className).toContain('isMac')
+  })
+
+  test('renders the settings button on windows', () => {
+    render(
+      <ElectronApiContext.Provider value={{ isMac: false }}>
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    expect(screen.getByTestId('layout-header').className).not.toContain('isMac')
+  })
+})

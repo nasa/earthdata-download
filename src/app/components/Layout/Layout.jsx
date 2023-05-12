@@ -39,7 +39,6 @@ const Layout = () => {
         <Settings />
       )
       break
-
     default:
       break
   }
@@ -47,56 +46,61 @@ const Layout = () => {
   return (
     <div className={styles.wrapper}>
       <header
+        data-testid="layout-header"
         className={
-            classNames(
-              [
-                styles.header,
-                {
-                  [styles.isWindows]: !isMac
-                }
-              ]
-            )
-          }
+          classNames(
+            [
+              styles.header,
+              {
+                [styles.isMac]: isMac
+              }
+            ]
+          )
+        }
       >
-        <nav className={styles.nav}>
+        {/* Hiding nav buttons until EDD-18 */}
+        {/* <nav className={styles.nav}>
           <Button
             className={
-                classNames(
-                  [
-                    styles.navButton,
-                    {
-                      [styles.isActive]: currentPage === PAGES.downloads
-                    }
-                  ]
-                )
-              }
+              classNames(
+                [
+                  styles.navButton,
+                  {
+                    [styles.isActive]: currentPage === PAGES.downloads
+                  }
+                ]
+              )
+            }
             onClick={() => setCurrentPage(PAGES.downloads)}
             type="button"
+            dataTestId="layout-button-downloads"
           >
             Downloads
           </Button>
           <Button
             className={
-                classNames(
-                  [
-                    styles.navButton,
-                    {
-                      [styles.isActive]: currentPage === PAGES.downloadHistory
-                    }
-                  ]
-                )
-              }
+              classNames(
+                [
+                  styles.navButton,
+                  {
+                    [styles.isActive]: currentPage === PAGES.downloadHistory
+                  }
+                ]
+              )
+            }
             onClick={() => setCurrentPage(PAGES.downloadHistory)}
             type="button"
+            dataTestId="layout-button-downloadHistory"
           >
             Download History
           </Button>
-        </nav>
+        </nav> */}
         <section className={styles.actions}>
           <Button
             className={styles.settingsButton}
             Icon={FaCog}
             onClick={() => setCurrentPage(PAGES.settings)}
+            dataTestId="layout-button-settings"
           >
             Settings
           </Button>

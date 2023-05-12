@@ -28,9 +28,10 @@ module.exports = {
   coverageDirectory: 'coverage',
 
   // An array of regexp pattern strings used to skip coverage collection
-  // coveragePathIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '.scss'
+  ],
 
   // Indicates which provider should be used to instrument code for coverage
   // coverageProvider: "babel",
@@ -94,7 +95,6 @@ module.exports = {
   moduleNameMapper: {
     // Use the moduleNameMapper for all images except the logo.png that exist in the portals directory
     '(?<!/portals)(?<!/logo).(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/test-utils/fileMock.js',
-    '^.+\\.(css|less|scss)$': 'babel-jest',
     electron: '<rootDir>/__mocks__/electronMock.js'
   },
 
@@ -140,7 +140,9 @@ module.exports = {
   // runner: "jest-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  // setupFiles: [],
+  setupFiles: [
+    '<rootDir>/jest.setup.js'
+  ],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   // setupFilesAfterEnv: [],
@@ -184,7 +186,8 @@ module.exports = {
 
   // A map from regular expressions to paths to transformers
   transform: {
-    '^.+\\.(js|jsx)$': 'babel-jest'
+    '^.+\\.(js|jsx)$': 'babel-jest',
+    '^.+\\.(css|less|scss)$': 'jest-css-modules-transform'
   }
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation

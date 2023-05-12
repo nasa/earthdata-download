@@ -19,7 +19,7 @@ body {
   top: 0%;
   height: 40px;
   display: grid;
-  grid-template: ". navigation actions" 100% / 1fr auto 1fr;
+  grid-template: "actions navigation ." 100% / 1fr auto 1fr;
   gap: 0 0;
   justify-content: end;
   background: var(--color__blue);
@@ -27,8 +27,8 @@ body {
   color: #FFF;
   -webkit-app-region: drag;
 
-  &.isWindows {
-    grid-template: "actions navigation ." 100% / 1fr auto 1fr;
+  &.isMac {
+    grid-template: ". navigation actions" 100% / 1fr auto 1fr;
   }
 }
 
@@ -73,11 +73,11 @@ body {
   padding-left: var(--size__200);
   padding-right: var(--size__200);
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   grid-area: actions;
 
-  .isWindows & {
-    justify-content: flex-start;
+  .isMac & {
+    justify-content: flex-end;
   }
 }
 

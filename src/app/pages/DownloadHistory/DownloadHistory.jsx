@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 // eslint-disable-next-line no-unused-vars
 import { FaDownload, FaHistory, FaSearch } from 'react-icons/fa'
 
-import Button from '../Button/Button'
-import ListPage from '../ListPage/ListPage'
+import Button from '../../components/Button/Button'
+import ListPage from '../../components/ListPage/ListPage'
 
 // eslint-disable-next-line no-unused-vars
 import { PAGES } from '../../constants/pages'
@@ -12,9 +12,21 @@ import { PAGES } from '../../constants/pages'
 import * as styles from './DownloadHistory.module.scss'
 
 /**
- * Renders the `Download History` page
- * @param {Object} props
- * @param {Function} props.setCurrentPage Callback to update the current page
+ * @typedef {Object} DownloadHistoryProps
+ * @property {Function} setCurrentPage A function which sets the active page.
+ */
+
+/**
+ * Renders a `DownloadHistory` page.
+ * @param {DownloadHistoryProps} props
+ *
+ * @example <caption>Render a Download History page.</caption>
+ *
+ * return (
+ *   <DownloadHistory
+ *     setCurrentPage={setCurrentPage}
+ *   />
+ * )
  */
 // eslint-disable-next-line no-unused-vars
 const DownloadHistory = ({ setCurrentPage }) => (

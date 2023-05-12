@@ -5,17 +5,17 @@ import userEvent from '@testing-library/user-event'
 
 import Layout from '../Layout'
 
-jest.mock('../../Downloads/Downloads', () => jest.fn(({ children }) => (
+jest.mock('../../../pages/Downloads/Downloads', () => jest.fn(({ children }) => (
   <mock-Downloads data-testid="Downloads">
     {children}
   </mock-Downloads>
 )))
-jest.mock('../../DownloadHistory/DownloadHistory', () => jest.fn(({ children }) => (
+jest.mock('../../../pages/DownloadHistory/DownloadHistory', () => jest.fn(({ children }) => (
   <mock-DownloadHistory data-testid="DownloadHistory">
     {children}
   </mock-DownloadHistory>
 )))
-jest.mock('../../Settings/Settings', () => jest.fn(({ children }) => (
+jest.mock('../../../pages/Settings/Settings', () => jest.fn(({ children }) => (
   <mock-Settings data-testid="Settings">
     {children}
   </mock-Settings>
@@ -23,9 +23,9 @@ jest.mock('../../Settings/Settings', () => jest.fn(({ children }) => (
 
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 
-import Downloads from '../../Downloads/Downloads'
-import DownloadHistory from '../../DownloadHistory/DownloadHistory'
-import Settings from '../../Settings/Settings'
+import Downloads from '../../../pages/Downloads/Downloads'
+import DownloadHistory from '../../../pages/DownloadHistory/DownloadHistory'
+import Settings from '../../../pages/Settings/Settings'
 
 describe('Layout component', () => {
   test('renders the downloads page', () => {

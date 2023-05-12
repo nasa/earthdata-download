@@ -3,13 +3,44 @@ import PropTypes from 'prop-types'
 import { FaBan, FaDownload, FaFolder } from 'react-icons/fa'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
-import Button from '../Button/Button'
-import Checkbox from '../Checkbox/Checkbox'
+import Button from '../../components/Button/Button'
+import Checkbox from '../../components/Checkbox/Checkbox'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import * as styles from './InitializeDownload.module.scss'
 
+/**
+ * @typedef {Object} InitializeDownloadProps
+ * @property {String} downloadId A string representing the id of a download.
+ * @property {String} downloadLocation A string representing the id of a download
+ * @property {Boolean} useDefaultLocation A boolean flag which indicates whether a default download location should be used.
+ * @property {Function} onCloseChooseLocationModal A function which sets the dialog state.
+ */
+
+/**
+ * Renders a `InitializeDownload` dialog.
+ * @param {InitializeDownloadProps} props
+ *
+ * @example <caption>Render a InitializeDownload dialog.</caption>
+ *
+ * const [downloadId, setDownloadId] = useState(null)
+ * const [downloadLocation, setDownloadLocation] = useState(null)
+ * const [useDefaultLocation, setUseDefaultLocation] = useState(false)
+ * const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
+ *
+ *
+ * return (
+ *   <Dialog {...dialogProps}>
+ *     <InitializeDownload
+ *       downloadId={downloadId}
+ *       downloadLocation={downloadLocation}
+ *       useDefaultLocation={useDefaultLocation}
+ *       onCloseChooseLocationModal={() => setChooseDownloadLocationIsOpen(false)}
+ *     />
+ *   </Dialog>
+ * )
+ */
 const InitializeDownload = ({
   downloadId,
   downloadLocation,

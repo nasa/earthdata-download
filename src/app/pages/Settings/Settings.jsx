@@ -1,11 +1,18 @@
 import React, { useContext } from 'react'
 import { FaBan } from 'react-icons/fa'
 
-import Button from '../Button/Button'
+import Button from '../../components/Button/Button'
+
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 /**
- * Renders the `Settings` page
+ * Renders a `Settings` page.
+ *
+ * @example <caption>Render a Settings page.</caption>
+ *
+ * return (
+ *   <Settings />
+ * )
  */
 const Settings = () => {
   const { clearDefaultDownload } = useContext(ElectronApiContext)

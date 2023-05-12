@@ -3,11 +3,36 @@ import PropTypes from 'prop-types'
 
 import * as styles from './ListPage.module.scss'
 
+/**
+ * @typedef {Object} ListPageProps
+ * @property {React.ReactNode} [actions] An optional React node which is displayed when an empty state is visible.
+ * @property {String} emptyMessage A string which is displayed as the description when an empty state is visibile.
+ * @property {Function} [Icon] An optional react-icons icon.
+ * @property {Array} items An array of React nodes
+ */
+
+/**
+ * Renders a `ListPage` page.
+ * @param {ListPageProps} props
+ *
+ * @example <caption>Render a ListPage component.</caption>
+ *
+ * return (
+ *   <ListPage
+ *     actions={(
+ *       <Button>Do something!<Button>
+ *     )}
+ *     emptyMessage={"You have nothing to show!"}
+ *     Icon={FaQuestionCircle}
+ *     items={[]}
+ *   />
+ * )
+ */
 const ListPage = ({
-  items,
+  actions,
   emptyMessage,
   Icon,
-  actions
+  items
 }) => (
   <section className={styles.listPage}>
     {

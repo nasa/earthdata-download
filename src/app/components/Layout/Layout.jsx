@@ -3,9 +3,9 @@ import classNames from 'classnames'
 import { FaCog } from 'react-icons/fa'
 
 import Button from '../Button/Button'
-import DownloadHistory from '../DownloadHistory/DownloadHistory'
-import Downloads from '../Downloads/Downloads'
-import Settings from '../Settings/Settings'
+import DownloadHistory from '../../pages/DownloadHistory/DownloadHistory'
+import Downloads from '../../pages/Downloads/Downloads'
+import Settings from '../../pages/Settings/Settings'
 
 import { PAGES } from '../../constants/pages'
 
@@ -14,7 +14,13 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
 import * as styles from './Layout.module.scss'
 
 /**
- * Renders the page layout of the application. The title bar contents and the main 'page'
+ * Renders a `Layout` page.
+ *
+ * @example <caption>Render a Layout component.</caption>
+ *
+ * return (
+ *   <Layout />
+ * )
  */
 const Layout = () => {
   const { isMac } = useContext(ElectronApiContext)

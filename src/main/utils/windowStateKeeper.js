@@ -1,6 +1,7 @@
 /**
  * Keeps the current window state (size/location) update in the preferences store. So the window
  * will open in the same place as the user last had it open.
+ * https://medium.com/@hql287/persisting-windows-state-in-electron-using-javascript-closure-17fc0821d37
  * @param {Object} store `electron-store` instance
  */
 const windowStateKeeper = (store) => {
@@ -24,7 +25,6 @@ const windowStateKeeper = (store) => {
   }
 
   function saveState() {
-    console.log('🚀 ~ file: windowStateKeeper.js:29 ~ saveState ~ windowState:', windowState)
     if (!windowState.isMaximized) {
       windowState = window.getBounds()
     }
@@ -53,4 +53,4 @@ const windowStateKeeper = (store) => {
   })
 }
 
-module.exports = { windowStateKeeper }
+module.exports = windowStateKeeper

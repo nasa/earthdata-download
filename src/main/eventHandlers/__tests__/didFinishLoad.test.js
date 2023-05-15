@@ -1,7 +1,7 @@
 const { app } = require('electron')
 const MockDate = require('mockdate')
 
-const { didFinishLoad } = require('../didFinishLoad')
+const didFinishLoad = require('../didFinishLoad')
 
 beforeEach(() => {
   MockDate.set('2023-05-01')
@@ -10,16 +10,16 @@ beforeEach(() => {
 })
 
 describe('didFinishLoad', () => {
-  describe('when a downloadId is not provided', () => {
+  describe('when downloadIds is not provided', () => {
     test('shows the window', () => {
-      const downloadId = undefined
+      const downloadIds = undefined
       const store = {}
       const window = {
         show: jest.fn()
       }
 
       didFinishLoad({
-        downloadId,
+        downloadIds,
         store,
         window
       })
@@ -30,7 +30,7 @@ describe('didFinishLoad', () => {
     test('opens devtools in development', () => {
       app.isPackaged = false
 
-      const downloadId = undefined
+      const downloadIds = undefined
       const store = {}
       const window = {
         show: jest.fn(),
@@ -40,7 +40,7 @@ describe('didFinishLoad', () => {
       }
 
       didFinishLoad({
-        downloadId,
+        downloadIds,
         store,
         window
       })
@@ -51,9 +51,9 @@ describe('didFinishLoad', () => {
     })
   })
 
-  describe('when a downloadId is provided', () => {
+  describe('when downloadIds is provided', () => {
     test('sends the system default downloads directory to the renderer process', () => {
-      const downloadId = 'mock-download-id'
+      const downloadIds = 'mock-download-id'
       const store = {
         get: jest.fn().mockReturnValue({
           defaultDownloadLocation: undefined,
@@ -68,7 +68,7 @@ describe('didFinishLoad', () => {
       }
 
       didFinishLoad({
-        downloadId,
+        downloadIds,
         store,
         window
       })
@@ -76,14 +76,14 @@ describe('didFinishLoad', () => {
       expect(window.show).toHaveBeenCalledTimes(1)
       expect(window.webContents.send).toHaveBeenCalledTimes(1)
       expect(window.webContents.send).toHaveBeenCalledWith('initializeDownload', {
-        downloadId: 'mock-download-id',
+        downloadIds: 'mock-download-id',
         downloadLocation: '/Downloads',
         shouldUseDefaultLocation: false
       })
     })
 
     test('sends the lastDownloadLocation to the renderer process', () => {
-      const downloadId = 'mock-download-id'
+      const downloadIds = 'mock-download-id'
       const store = {
         get: jest.fn().mockReturnValue({
           defaultDownloadLocation: undefined,
@@ -98,7 +98,7 @@ describe('didFinishLoad', () => {
       }
 
       didFinishLoad({
-        downloadId,
+        downloadIds,
         store,
         window
       })
@@ -106,14 +106,14 @@ describe('didFinishLoad', () => {
       expect(window.show).toHaveBeenCalledTimes(1)
       expect(window.webContents.send).toHaveBeenCalledTimes(1)
       expect(window.webContents.send).toHaveBeenCalledWith('initializeDownload', {
-        downloadId: 'mock-download-id',
+        downloadIds: 'mock-download-id',
         downloadLocation: '/mock/last/location',
         shouldUseDefaultLocation: false
       })
     })
 
     test('sends the defaultDownloadLocation to the renderer process', () => {
-      const downloadId = 'mock-download-id'
+      const downloadIds = 'mock-download-id'
       const store = {
         get: jest.fn().mockReturnValue({
           defaultDownloadLocation: '/mock/default/location',
@@ -128,7 +128,7 @@ describe('didFinishLoad', () => {
       }
 
       didFinishLoad({
-        downloadId,
+        downloadIds,
         store,
         window
       })
@@ -136,7 +136,7 @@ describe('didFinishLoad', () => {
       expect(window.show).toHaveBeenCalledTimes(1)
       expect(window.webContents.send).toHaveBeenCalledTimes(1)
       expect(window.webContents.send).toHaveBeenCalledWith('initializeDownload', {
-        downloadId: 'mock-download-id',
+        downloadIds: 'mock-download-id',
         downloadLocation: '/mock/default/location',
         shouldUseDefaultLocation: true
       })

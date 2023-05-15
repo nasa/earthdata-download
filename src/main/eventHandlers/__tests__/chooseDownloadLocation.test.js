@@ -1,6 +1,6 @@
 const { dialog } = require('electron')
 
-const { chooseDownloadLocation } = require('../chooseDownloadLocation')
+const chooseDownloadLocation = require('../chooseDownloadLocation')
 
 describe('chooseDownloadLocation', () => {
   test('returns if no location was selected', () => {

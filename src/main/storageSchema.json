@@ -7,9 +7,9 @@
         "type": "string",
         "description": "The last download location used."
       },
-      "createSubDirectories": {
-        "type": "boolean",
-        "description": "Should the application create sub directories if the download contains multiple collections."
+      "concurrentDownloads": {
+        "type": "number",
+        "description": "How many files should download at the same time."
       },
       "defaultDownloadLocation": {
         "type": "string",
@@ -49,12 +49,15 @@
     "patternProperties": {
       "^.*$": {
         "type": "object",
-        "additionalProperties": false,
-        "$comment": "In the future we might store download status/percentage/etc for each download here",
+        "additionalProperties": true,
         "properties": {
           "downloadLocation": {
             "type": "string",
             "description": "Download location used for this download."
+          },
+          "state": {
+            "type": "string",
+            "description": "Download state of the full download."
           },
           "timeStart": {
             "type": "number",
@@ -63,6 +66,46 @@
           "timeEnd": {
             "type": "number",
             "description": "The time when the download was completed."
+          },
+          "files": {
+            "type": "object",
+            "patternProperties": {
+              "^.*$": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the download file."
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "URL to download the file"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Download state of the file."
+                  },
+                  "percent": {
+                    "type": "number",
+                    "description": "Percent download complete of the file."
+                  },
+                  "timeStart": {
+                    "type": "number",
+                    "description": "The time when the download was started."
+                  },
+                  "timeEnd": {
+                    "type": "number",
+                    "description": "The time when the download was completed."
+                  },
+                  "errors": {
+                    "type": "string",
+                    "description": "Errors associated with downloading this file.",
+                    "$comment": "EDD-16 is the ticket to figure errors out"
+                  }
+                }
+              }
+            }
           }
         }
       }

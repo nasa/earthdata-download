@@ -26,7 +26,7 @@ import Tooltip from '../../components/Tooltip/Tooltip'
  *
  * @example <caption>Render a InitializeDownload dialog.</caption>
  *
- * const [downloadId, setDownloadId] = useState(null)
+ * const [downloadIds, setDownloadIds] = useState(null)
  * const [downloadLocation, setDownloadLocation] = useState(null)
  * const [useDefaultLocation, setUseDefaultLocation] = useState(false)
  * const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
@@ -35,7 +35,7 @@ import Tooltip from '../../components/Tooltip/Tooltip'
  * return (
  *   <Dialog {...dialogProps}>
  *     <InitializeDownload
- *       downloadId={downloadId}
+ *       downloadIds={downloadIds}
  *       downloadLocation={downloadLocation}
  *       useDefaultLocation={useDefaultLocation}
  *       onCloseChooseLocationModal={() => setChooseDownloadLocationIsOpen(false)}
@@ -44,10 +44,10 @@ import Tooltip from '../../components/Tooltip/Tooltip'
  * )
  */
 const InitializeDownload = ({
-  downloadId,
+  downloadIds,
   downloadLocation,
   onCloseChooseLocationModal,
-  setDownloadId
+  setDownloadIds
 }) => {
   const { beginDownload, chooseDownloadLocation } = useContext(ElectronApiContext)
   const [makeDefaultDownloadLocation, setMakeDefaultDownloadLocation] = useState(true)
@@ -60,12 +60,12 @@ const InitializeDownload = ({
   // Send a message to the main process to begin the download
   const onBeginDownload = () => {
     beginDownload({
-      downloadId,
+      downloadIds,
       downloadLocation,
       makeDefaultDownloadLocation
     })
 
-    setDownloadId(null)
+    setDownloadIds(null)
     onCloseChooseLocationModal()
   }
 
@@ -150,15 +150,15 @@ const InitializeDownload = ({
 }
 
 InitializeDownload.defaultProps = {
-  downloadId: null,
+  downloadIds: null,
   downloadLocation: null
 }
 
 InitializeDownload.propTypes = {
-  downloadId: PropTypes.string,
+  downloadIds: PropTypes.arrayOf(PropTypes.string),
   downloadLocation: PropTypes.string,
   onCloseChooseLocationModal: PropTypes.func.isRequired,
-  setDownloadId: PropTypes.func.isRequired
+  setDownloadIds: PropTypes.func.isRequired
 }
 
 export default InitializeDownload

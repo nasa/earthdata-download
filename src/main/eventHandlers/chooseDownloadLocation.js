@@ -26,4 +26,4 @@ const chooseDownloadLocation = ({
   window.webContents.send('setDownloadLocation', { downloadLocation })
 }
 
-module.exports = { chooseDownloadLocation }
+module.exports = chooseDownloadLocation

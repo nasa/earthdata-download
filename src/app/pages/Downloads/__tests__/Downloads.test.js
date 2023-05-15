@@ -9,11 +9,29 @@ import { ElectronApiContext } from '../../../context/ElectronApiContext'
 describe('Downloads component', () => {
   test('renders the downloads page', () => {
     const setCurrentPage = jest.fn()
-    const setDownloadLocation = jest.fn()
+    const beginDownload = jest.fn()
     const initializeDownload = jest.fn()
+    const setDownloadLocation = jest.fn()
+    const pauseDownloadItem = jest.fn()
+    const reportProgress = jest.fn()
+    const requestProgressReport = jest.fn()
+    const resumeDownloadItem = jest.fn()
+    const cancelDownloadItem = jest.fn()
 
     render(
-      <ElectronApiContext.Provider value={{ setDownloadLocation, initializeDownload }}>
+      <ElectronApiContext.Provider value={
+        {
+          beginDownload,
+          initializeDownload,
+          setDownloadLocation,
+          pauseDownloadItem,
+          reportProgress,
+          requestProgressReport,
+          resumeDownloadItem,
+          cancelDownloadItem
+        }
+      }
+      >
         <Downloads setCurrentPage={setCurrentPage} />
       </ElectronApiContext.Provider>
     )

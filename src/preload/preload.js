@@ -8,9 +8,16 @@ contextBridge.exposeInMainWorld('electronApi', {
   chooseDownloadLocation: () => ipcRenderer.send('chooseDownloadLocation'),
   clearDefaultDownload: () => ipcRenderer.send('clearDefaultDownload'),
 
+  pauseDownloadItem: (data) => ipcRenderer.send('pauseDownloadItem', data),
+  resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),
+  cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
+
+  requestProgressReport: (data) => ipcRenderer.send('requestProgressReport', data),
+
   // Messages to be received by the renderer process
   initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'off']('initializeDownload', callback),
   setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'off']('setDownloadLocation', callback),
+  reportProgress: (on, callback) => ipcRenderer[on ? 'on' : 'off']('reportProgress', callback),
 
   // System values for renderer
   isMac: process.platform === 'darwin'

@@ -1,4 +1,4 @@
-const { windowStateKeeper } = require('../windowStateKeeper')
+const windowStateKeeper = require('../windowStateKeeper')
 
 describe('windowStateKeeper', () => {
   test('returns the default window state', () => {

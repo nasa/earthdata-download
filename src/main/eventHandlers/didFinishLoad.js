@@ -8,13 +8,13 @@ const { app } = require('electron')
  * @param {Object} params.window Electron window instance
  */
 const didFinishLoad = ({
-  downloadId,
+  downloadIds = [],
   store,
   window
 }) => {
   // TODO downloadId might need to be generated here once we are getting a context value from EDSC
 
-  if (downloadId) {
+  if (downloadIds.length > 0) {
     // Default the download location to the user's `downloads` foler
     let location = app.getPath('downloads')
 
@@ -37,7 +37,7 @@ const didFinishLoad = ({
 
     // Send a message to the renderer to initialize the download
     window.webContents.send('initializeDownload', {
-      downloadId,
+      downloadIds,
       downloadLocation: location,
       shouldUseDefaultLocation: !!defaultDownloadLocation
     })
@@ -50,4 +50,4 @@ const didFinishLoad = ({
   if (!app.isPackaged) window.webContents.openDevTools({ mode: 'detach' })
 }
 
-module.exports = { didFinishLoad }
+module.exports = didFinishLoad

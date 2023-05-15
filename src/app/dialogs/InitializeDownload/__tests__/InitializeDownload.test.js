@@ -8,7 +8,7 @@ import InitializeDownload from '../InitializeDownload'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 
 const setup = () => {
-  const setDownloadId = jest.fn()
+  const setDownloadIds = jest.fn()
   const chooseDownloadLocation = jest.fn()
   const beginDownload = jest.fn()
   const onCloseChooseLocationModal = jest.fn()
@@ -16,10 +16,10 @@ const setup = () => {
   render(
     <ElectronApiContext.Provider value={{ beginDownload, chooseDownloadLocation }}>
       <InitializeDownload
-        downloadId="mock-id"
+        downloadIds={['mock-id']}
         downloadLocation="/mock/location"
         onCloseChooseLocationModal={onCloseChooseLocationModal}
-        setDownloadId={setDownloadId}
+        setDownloadIds={setDownloadIds}
       />
     </ElectronApiContext.Provider>
   )
@@ -56,7 +56,7 @@ describe('InitializeDownload component', () => {
 
     expect(beginDownload).toHaveBeenCalledTimes(1)
     expect(beginDownload).toHaveBeenCalledWith({
-      downloadId: 'mock-id',
+      downloadIds: ['mock-id'],
       downloadLocation: '/mock/location',
       makeDefaultDownloadLocation: true
     })
@@ -72,7 +72,7 @@ describe('InitializeDownload component', () => {
 
     expect(beginDownload).toHaveBeenCalledTimes(1)
     expect(beginDownload).toHaveBeenCalledWith({
-      downloadId: 'mock-id',
+      downloadIds: ['mock-id'],
       downloadLocation: '/mock/location',
       makeDefaultDownloadLocation: false
     })

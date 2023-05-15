@@ -8,6 +8,7 @@ import InitializeDownload from '../../dialogs/InitializeDownload/InitializeDownl
 import Button from '../../components/Button/Button'
 import Dialog from '../../components/Dialog/Dialog'
 import ListPage from '../../components/ListPage/ListPage'
+import DownloadItem from '../../components/DownloadItem/DownloadItem'
 
 // eslint-disable-next-line no-unused-vars
 import { PAGES } from '../../constants/pages'
@@ -24,7 +25,7 @@ import * as styles from './Downloads.module.scss'
  * Renders a `Downloads` page.
  * @param {DownloadsProps} props
  *
- * @example <caption>Render a Download History page.</caption>
+ * @example <caption>Render a Downloads page.</caption>
  *
  * return (
  *   <Downloads
@@ -36,11 +37,21 @@ const Downloads = ({
   // eslint-disable-next-line no-unused-vars
   setCurrentPage
 }) => {
-  const { initializeDownload, setDownloadLocation } = useContext(ElectronApiContext)
-  const [downloadId, setDownloadId] = useState(null)
+  const {
+    beginDownload,
+    initializeDownload,
+    setDownloadLocation,
+    pauseDownloadItem,
+    reportProgress,
+    requestProgressReport,
+    resumeDownloadItem,
+    cancelDownloadItem
+  } = useContext(ElectronApiContext)
+  const [downloadIds, setDownloadIds] = useState(null)
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
   const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
+  const [runningDownloads, setRunningDownloads] = useState([])
 
   // When a new downloadLocation has been selected from the main process, update the state
   const onSetDownloadLocation = (event, info) => {
@@ -51,35 +62,95 @@ const Downloads = ({
   // When a download needs to be initialized (show the starting modal, or start the download)
   const onInitializeDownload = (event, info) => {
     const {
-      downloadId: newDownloadId,
+      downloadIds: newDownloadIds,
       downloadLocation: newDownloadLocation,
       shouldUseDefaultLocation
     } = info
 
-    setDownloadId(newDownloadId)
+    setDownloadIds(newDownloadIds)
     setSelectedDownloadLocation(newDownloadLocation)
     setUseDefaultLocation(shouldUseDefaultLocation)
+
+    // If shouldUseDefaultLocation is true, start the download(s)
+    if (shouldUseDefaultLocation) {
+      beginDownload({
+        downloadIds: newDownloadIds,
+        downloadLocation: newDownloadLocation,
+        makeDefaultDownloadLocation: true
+      })
+
+      // Ensure the main process is reporting progress updates
+      requestProgressReport()
+    }
   }
 
   const onCloseChooseLocationModal = () => {
     setChooseDownloadLocationIsOpen(false)
+
+    // Ensure the main process is reporting progress updates
+    requestProgressReport()
+  }
+
+  const onPauseDownloadItem = (downloadId) => {
+    pauseDownloadItem({ downloadId })
+  }
+
+  const onResumeDownloadItem = (downloadId) => {
+    resumeDownloadItem({ downloadId })
+  }
+
+  const onCancelDownloadItem = (downloadId) => {
+    cancelDownloadItem({ downloadId })
+  }
+
+  const onReportProgress = (event, info) => {
+    const { progress } = info
+    // console.log('🚀 ~ file: Downloads.jsx:90 ~ onReportProgress ~ progress:', progress)
+    setRunningDownloads(progress)
   }
 
   // Setup event listeners
   useEffect(() => {
     setDownloadLocation(true, onSetDownloadLocation)
     initializeDownload(true, onInitializeDownload)
+    reportProgress(true, onReportProgress)
+
+    requestProgressReport()
 
     return () => {
       setDownloadLocation(false, onSetDownloadLocation)
       initializeDownload(false, onInitializeDownload)
+      reportProgress(false, onReportProgress)
     }
   }, [])
 
   // Open the modal when there is no default location set and a download id exists
   useEffect(() => {
-    if (!useDefaultLocation && downloadId) setChooseDownloadLocationIsOpen(true)
-  }, [useDefaultLocation, downloadId])
+    if (!useDefaultLocation && downloadIds) setChooseDownloadLocationIsOpen(true)
+  }, [useDefaultLocation, downloadIds])
+
+  // Create the downloadItems array from the runningDownloads reported from the main process
+  const downloadItems = runningDownloads.map((runningDownload) => {
+    const {
+      downloadId,
+      downloadName,
+      progress,
+      state
+    } = runningDownload
+
+    return (
+      <DownloadItem
+        key={downloadId}
+        downloadId={downloadId}
+        downloadName={downloadName}
+        progress={progress}
+        state={state}
+        onPauseDownload={onPauseDownloadItem}
+        onResumeDownload={onResumeDownloadItem}
+        onCancelDownload={onCancelDownloadItem}
+      />
+    )
+  })
 
   return (
     <>
@@ -91,9 +162,9 @@ const Downloads = ({
         TitleIcon={FaDownload}
       >
         <InitializeDownload
-          downloadId={downloadId}
+          downloadIds={downloadIds}
           downloadLocation={selectedDownloadLocation}
-          setDownloadId={setDownloadId}
+          setDownloadIds={setDownloadIds}
           onCloseChooseLocationModal={onCloseChooseLocationModal}
         />
       </Dialog>
@@ -123,7 +194,7 @@ const Downloads = ({
         )}
         emptyMessage="No downloads in progress"
         Icon={FaDownload}
-        items={[]}
+        items={downloadItems}
       />
     </>
   )

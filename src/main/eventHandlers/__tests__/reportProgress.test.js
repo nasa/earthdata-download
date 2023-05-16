@@ -129,7 +129,7 @@ describe('reportProgress', () => {
     })
   })
 
-  test('does not report progress if no downloads exist', () => {
+  test('reports empty progress if no downloads exist', () => {
     const store = {
       get: jest.fn().mockReturnValue(undefined)
     }
@@ -141,6 +141,7 @@ describe('reportProgress', () => {
 
     expect(result).toEqual(false)
 
-    expect(webContents.send).toHaveBeenCalledTimes(0)
+    expect(webContents.send).toHaveBeenCalledTimes(1)
+    expect(webContents.send).toHaveBeenCalledWith('reportProgress', { progress: [] })
   })
 })

@@ -23,6 +23,11 @@ const willDownload = ({
   // Pull the downloadLocation for this downloadId from the store
   const downloadLocation = store.get(`downloads.${downloadId}.downloadLocation`)
 
+  if (!downloadLocation) {
+    item.cancel()
+    return
+  }
+
   // Set the save path for the DownloadItem
   const name = item.getFilename()
   item.setSavePath(path.join(downloadLocation, name))

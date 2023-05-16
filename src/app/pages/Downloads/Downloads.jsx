@@ -168,6 +168,30 @@ const Downloads = ({
           onCloseChooseLocationModal={onCloseChooseLocationModal}
         />
       </Dialog>
+      <Button
+        className={styles.button}
+        size="lg"
+        // Icon={FaHistory}
+        onClick={() => onPauseDownloadItem()}
+      >
+        Pause All
+      </Button>
+      <Button
+        className={styles.button}
+        size="lg"
+        // Icon={FaHistory}
+        onClick={() => onResumeDownloadItem()}
+      >
+        Resume All
+      </Button>
+      <Button
+        className={styles.button}
+        size="lg"
+        // Icon={FaHistory}
+        onClick={() => onCancelDownloadItem()}
+      >
+        Cancel All
+      </Button>
       <ListPage
         actions={(
           <>

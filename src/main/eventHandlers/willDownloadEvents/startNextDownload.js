@@ -57,7 +57,6 @@ const startNextDownload = ({
 
   // If the item was cancelled, or there are no more pending files in the download, find the next active download with pending files to start
   // TODO if all the files were cancelled, this needs to trigger more downloads
-  // If the next active collection has pending files, start the first file
   if (wasCancelled || !nextFile) {
     const allDownloads = store.get('downloads')
     const nextActiveDownloadId = Object.keys(allDownloads)

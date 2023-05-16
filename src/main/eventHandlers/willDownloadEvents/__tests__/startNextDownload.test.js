@@ -162,7 +162,7 @@ describe('startNextDownload', () => {
     expect(downloadIdContext).toEqual({})
   })
 
-  test.only('starts downloading the next file in the next active download', () => {
+  test('starts downloading the next file in the next active download', () => {
     const downloadId = 'mock-download-id'
     const downloadIdContext = {}
     const store = {
@@ -186,21 +186,36 @@ describe('startNextDownload', () => {
           }
         })
         .mockReturnValueOnce({
-          // storeDownload
-          'mock-filename-1.png': {
-            url: 'http://example.com/mock-filename-1.png',
-            state: 'COMPLETED',
-            percent: 100
-          },
-          'mock-filename-2.png': {
-            url: 'http://example.com/mock-filename-2.png',
+          // allDownloads
+          [downloadId]: {
             state: 'ACTIVE',
-            percent: 39
+            files: {
+              'mock-filename-1.png': {
+                url: 'http://example.com/mock-filename-1.png',
+                state: 'COMPLETED',
+                percent: 100
+              },
+              'mock-filename-2.png': {
+                url: 'http://example.com/mock-filename-2.png',
+                state: 'ACTIVE',
+                percent: 39
+              },
+              'mock-filename-3.png': {
+                url: 'http://example.com/mock-filename-3.png',
+                state: 'ACTIVE',
+                percent: 0
+              }
+            }
           },
-          'mock-filename-3.png': {
-            url: 'http://example.com/mock-filename-3.png',
+          [`${downloadId}-2`]: {
             state: 'ACTIVE',
-            percent: 0
+            files: {
+              'mock-filename-4.png': {
+                url: 'http://example.com/mock-filename-4.png',
+                state: 'PENDING',
+                percent: 0
+              }
+            }
           }
         }),
       set: jest.fn()
@@ -227,7 +242,82 @@ describe('startNextDownload', () => {
     })
   })
 
-  test('does not start downloading a file if no more need to be downloading', () => {})
+  test('does not start downloading a file if no more need to be downloading', () => {
+    const downloadId = 'mock-download-id'
+    const downloadIdContext = {}
+    const store = {
+      get: jest.fn()
+        .mockReturnValueOnce({
+          // allFiles
+          'mock-filename-1.png': {
+            url: 'http://example.com/mock-filename-1.png',
+            state: 'COMPLETED',
+            percent: 100
+          },
+          'mock-filename-2.png': {
+            url: 'http://example.com/mock-filename-2.png',
+            state: 'ACTIVE',
+            percent: 39
+          },
+          'mock-filename-3.png': {
+            url: 'http://example.com/mock-filename-3.png',
+            state: 'ACTIVE',
+            percent: 0
+          }
+        })
+        .mockReturnValueOnce({
+          // allDownloads
+          [downloadId]: {
+            state: 'ACTIVE',
+            files: {
+              'mock-filename-1.png': {
+                url: 'http://example.com/mock-filename-1.png',
+                state: 'COMPLETED',
+                percent: 100
+              },
+              'mock-filename-2.png': {
+                url: 'http://example.com/mock-filename-2.png',
+                state: 'ACTIVE',
+                percent: 39
+              },
+              'mock-filename-3.png': {
+                url: 'http://example.com/mock-filename-3.png',
+                state: 'ACTIVE',
+                percent: 20
+              }
+            }
+          },
+          [`${downloadId}-2`]: {
+            state: 'ACTIVE',
+            files: {
+              'mock-filename-4.png': {
+                url: 'http://example.com/mock-filename-4.png',
+                state: 'ACTIVE',
+                percent: 10
+              }
+            }
+          }
+        }),
+      set: jest.fn()
+    }
+    const webContents = {
+      downloadURL: jest.fn()
+    }
+
+    startNextDownload({
+      downloadId,
+      downloadIdContext,
+      store,
+      wasCancelled: false,
+      webContents
+    })
+
+    expect(store.set).toHaveBeenCalledTimes(0)
+
+    expect(webContents.downloadURL).toHaveBeenCalledTimes(0)
+
+    expect(downloadIdContext).toEqual({})
+  })
 
   test('starts multiple files if necessary from a cancelled download', () => {})
 })

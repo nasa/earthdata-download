@@ -20,9 +20,9 @@ const reportProgress = require('./eventHandlers/reportProgress')
 const CurrentDownloadItems = require('./utils/currentDownloadItems')
 const downloadStates = require('../app/constants/downloadStates')
 
-// const { downloads } = require('../../test-download-files.json')
+const { downloads } = require('../../test-download-files.json')
 // const { downloads } = require('../../test-download-files-one-collection.json')
-const { downloads } = require('../../test-download-files-one-file.json')
+// const { downloads } = require('../../test-download-files-one-file.json')
 
 console.log('🚀 ~ file: main.js:18 ~ downloads:', downloads)
 
@@ -146,7 +146,19 @@ const createWindow = () => {
 
     currentDownloadItems.pauseItem(downloadId, name)
 
-    if (!name) store.set(`downloads.${downloadId}.state`, downloadStates.paused)
+    if (downloadId && !name) store.set(`downloads.${downloadId}.state`, downloadStates.paused)
+
+    if (!downloadId) {
+      const downloads = store.get('downloads')
+      Object.keys(downloads).forEach((downloadId) => {
+        const download = downloads[downloadId]
+        const { state } = download
+
+        const newState = state === downloadStates.active ? downloadStates.paused : state
+        download.state = newState
+      })
+      store.set('downloads', downloads)
+    }
   })
 
   ipcMain.on('cancelDownloadItem', (event, info) => {
@@ -159,7 +171,9 @@ const createWindow = () => {
 
     // Cancelling a download will remove it from the list of downloads
     // TODO how will this work when cancelling a granule download? I don't think we want to remove single items from a provided list of links
-    if (!name) store.delete(`downloads.${downloadId}`)
+    if (downloadId && !name) store.delete(`downloads.${downloadId}`)
+
+    if (!downloadId) store.delete('downloads')
   })
 
   ipcMain.on('resumeDownloadItem', (event, info) => {
@@ -168,7 +182,19 @@ const createWindow = () => {
 
     currentDownloadItems.resumeItem(downloadId, name)
 
-    if (!name) store.set(`downloads.${downloadId}.state`, downloadStates.active)
+    if (downloadId && !name) store.set(`downloads.${downloadId}.state`, downloadStates.active)
+
+    if (!downloadId) {
+      const downloads = store.get('downloads')
+      Object.keys(downloads).forEach((downloadId) => {
+        const download = downloads[downloadId]
+        const { state } = download
+
+        const newState = state === downloadStates.paused ? downloadStates.active : state
+        download.state = newState
+      })
+      store.set('downloads', downloads)
+    }
   })
 
   let isReporting = false

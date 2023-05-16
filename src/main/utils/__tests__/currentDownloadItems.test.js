@@ -86,6 +86,23 @@ describe('currentDownloadItems', () => {
         })
       })
     })
+
+    describe('when a downloadId is not provided', () => {
+      test('cancels all download items', () => {
+        const downloadId = 'mock-download-id'
+        const name = 'test-file.png'
+
+        const currentDownloadItems = new CurrentDownloadItems()
+
+        currentDownloadItems.addItem(downloadId, `1-${name}`, mockItem)
+        currentDownloadItems.addItem(`${downloadId}-1`, `2-${name}`, mockItem)
+        currentDownloadItems.cancelItem()
+
+        expect(mockItem.cancel).toHaveBeenCalledTimes(2)
+
+        expect(currentDownloadItems.getAllItemsInDownload(downloadId)).toEqual(undefined)
+      })
+    })
   })
 
   describe('getItem', () => {
@@ -202,6 +219,21 @@ describe('currentDownloadItems', () => {
         expect(mockItem.pause).toHaveBeenCalledTimes(0)
       })
     })
+
+    describe('when a downloadId is not provided', () => {
+      test('pauses all download items', () => {
+        const downloadId = 'mock-download-id'
+        const name = 'test-file.png'
+
+        const currentDownloadItems = new CurrentDownloadItems()
+
+        currentDownloadItems.addItem(downloadId, `1-${name}`, mockItem)
+        currentDownloadItems.addItem(`${downloadId}-1`, `2-${name}`, mockItem)
+        currentDownloadItems.pauseItem()
+
+        expect(mockItem.pause).toHaveBeenCalledTimes(2)
+      })
+    })
   })
 
   describe('removeItem', () => {
@@ -229,6 +261,21 @@ describe('currentDownloadItems', () => {
         currentDownloadItems.addItem(downloadId, `1-${name}`, mockItem)
         currentDownloadItems.addItem(downloadId, `2-${name}`, mockItem)
         currentDownloadItems.removeItem(downloadId)
+
+        expect(currentDownloadItems.getAllItemsInDownload(downloadId, name)).toEqual(undefined)
+      })
+    })
+
+    describe('when a downloadId is not provided', () => {
+      test('removes all download items', () => {
+        const downloadId = 'mock-download-id'
+        const name = 'test-file.png'
+
+        const currentDownloadItems = new CurrentDownloadItems()
+
+        currentDownloadItems.addItem(downloadId, `1-${name}`, mockItem)
+        currentDownloadItems.addItem(`${downloadId}-1`, `2-${name}`, mockItem)
+        currentDownloadItems.removeItem()
 
         expect(currentDownloadItems.getAllItemsInDownload(downloadId, name)).toEqual(undefined)
       })
@@ -287,6 +334,21 @@ describe('currentDownloadItems', () => {
         currentDownloadItems.resumeItem(`${downloadId}1`)
 
         expect(mockItem.resume).toHaveBeenCalledTimes(0)
+      })
+    })
+
+    describe('when a downloadId is not provided', () => {
+      test('resumes all download items', () => {
+        const downloadId = 'mock-download-id'
+        const name = 'test-file.png'
+
+        const currentDownloadItems = new CurrentDownloadItems()
+
+        currentDownloadItems.addItem(downloadId, `1-${name}`, mockItem)
+        currentDownloadItems.addItem(`${downloadId}-1`, `2-${name}`, mockItem)
+        currentDownloadItems.resumeItem()
+
+        expect(mockItem.resume).toHaveBeenCalledTimes(2)
       })
     })
   })

@@ -8,7 +8,10 @@ const reportProgress = ({
   const downloads = store.get('downloads')
   // console.log('🚀 ~ file: reportProgress.js:9 ~ downloads:', downloads)
 
-  if (!downloads) return false
+  if (!downloads) {
+    webContents.send('reportProgress', { progress: [] })
+    return false
+  }
 
   const progress = Object.keys(downloads)
     // Show the newest downloads first
@@ -33,10 +36,7 @@ const reportProgress = ({
         .filter(([, values]) => values.state === downloadStates.completed).length
 
       const percent = Math.floor((finishedFiles / totalFiles) * 100)
-      // percent,
-      // finishedFiles,
-      // totalFiles,
-      // totalTime
+
       const now = new Date().getTime()
 
       const lastTime = timeEnd || now
@@ -58,7 +58,6 @@ const reportProgress = ({
       }
     })
 
-  // console.log('🚀 ~ file: reportProgress.js:47 ~ progress:', progress)
   webContents.send('reportProgress', { progress })
 
   return true

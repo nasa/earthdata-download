@@ -57,6 +57,24 @@ const onDone = ({
     errors
   })
 
+  // TODO trying to loop through here isn't working because its inside an event handler, so all 5 are being cancelled at once, so startNextDownload is being called 5 times at the same time, not within a timeout
+
+  // const numberOfRunningDownloads = currentDownloadItems.getNumberOfDownloads()
+  // const concurrentDownloads = store.get('preferences.concurrentDownloads')
+
+  // const numberDownloadsToStart = concurrentDownloads - numberOfRunningDownloads
+  // Array.from(Array(numberDownloadsToStart)).forEach(() => {
+  //   setTimeout(() => {
+  //     // Start the next file downloading
+  //     startNextDownload({
+  //       downloadId,
+  //       downloadIdContext,
+  //       store,
+  //       wasCancelled: state === 'cancelled',
+  //       webContents
+  //     })
+  //   }, 500)
+  // })
   // Start the next file downloading
   startNextDownload({
     downloadId,

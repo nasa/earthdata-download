@@ -31,7 +31,7 @@ class CurrentDownloadItems {
 
       // Cancel the download
       if (item) item.cancel()
-    } else {
+    } else if (downloadId) {
       const items = this.getAllItemsInDownload(downloadId)
 
       if (items) {
@@ -39,6 +39,16 @@ class CurrentDownloadItems {
           items[name].cancel()
         })
       }
+    } else {
+      Object.keys(this.downloadItems).forEach((id) => {
+        const items = this.getAllItemsInDownload(id)
+
+        if (items) {
+          Object.keys(items).forEach((name) => {
+            items[name].cancel()
+          })
+        }
+      })
     }
 
     // Remove the item from the downloadItems
@@ -87,7 +97,7 @@ class CurrentDownloadItems {
       const item = this.getItem(downloadId, name)
 
       if (item) item.pause()
-    } else {
+    } else if (downloadId) {
       const items = this.getAllItemsInDownload(downloadId)
 
       if (items) {
@@ -95,6 +105,16 @@ class CurrentDownloadItems {
           items[name].pause()
         })
       }
+    } else {
+      Object.keys(this.downloadItems).forEach((id) => {
+        const items = this.getAllItemsInDownload(id)
+
+        if (items) {
+          Object.keys(items).forEach((name) => {
+            items[name].pause()
+          })
+        }
+      })
     }
   }
 
@@ -104,10 +124,16 @@ class CurrentDownloadItems {
    * @param {String} name Name of the downloaded file
    */
   removeItem(downloadId, name) {
-    if (name) {
-      delete this.downloadItems[downloadId][name]
-    } else {
-      delete this.downloadItems[downloadId]
+    try {
+      if (name) {
+        delete this.downloadItems[downloadId][name]
+      } else if (downloadId) {
+        delete this.downloadItems[downloadId]
+      } else {
+        this.downloadItems = {}
+      }
+    } catch {
+      console.log(`Item: ${downloadId}.${name} did not exist.`)
     }
   }
 
@@ -121,7 +147,7 @@ class CurrentDownloadItems {
       const item = this.getItem(downloadId, name)
 
       if (item) item.resume()
-    } else {
+    } else if (downloadId) {
       const items = this.getAllItemsInDownload(downloadId)
 
       if (items) {
@@ -129,6 +155,16 @@ class CurrentDownloadItems {
           items[name].resume()
         })
       }
+    } else {
+      Object.keys(this.downloadItems).forEach((id) => {
+        const items = this.getAllItemsInDownload(id)
+
+        if (items) {
+          Object.keys(items).forEach((name) => {
+            items[name].resume()
+          })
+        }
+      })
     }
   }
 }

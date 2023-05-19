@@ -2,7 +2,8 @@ const {
   app,
   BrowserWindow,
   ipcMain,
-  shell
+  shell,
+  clipboard
 } = require('electron')
 const path = require('path')
 const Store = require('electron-store')
@@ -202,6 +203,18 @@ const createWindow = () => {
         webContents: window.webContents
       })
     }, 1000)
+  })
+
+  ipcMain.on('openDownloadFolder', (event, info) => {
+    const { downloadId } = info
+    const folderPath = store.get('downloads')[downloadId].downloadLocation
+    shell.openPath(folderPath)
+  })
+
+  ipcMain.on('copyDownloadPath', (event, info) => {
+    const { downloadId } = info
+    const folderPath = store.get('downloads')[downloadId].downloadLocation
+    clipboard.writeText(folderPath)
   })
 
   // Open `target="_blank"` links in the system browser

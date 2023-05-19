@@ -53,7 +53,9 @@ const Downloads = ({
     reportProgress,
     requestProgressReport,
     resumeDownloadItem,
-    cancelDownloadItem
+    cancelDownloadItem,
+    openDownloadFolder,
+    copyDownloadPath
   } = useContext(ElectronApiContext)
   const [downloadIds, setDownloadIds] = useState(null)
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
@@ -111,6 +113,14 @@ const Downloads = ({
 
   const onPauseDownloadItem = (downloadId) => {
     pauseDownloadItem({ downloadId })
+  }
+
+  const onOpenDownloadFolder = (downloadId) => {
+    openDownloadFolder({ downloadId })
+  }
+
+  const onCopyDownloadPath = (downloadId) => {
+    copyDownloadPath({ downloadId })
   }
 
   const onResumeDownloadItem = (downloadId) => {
@@ -208,6 +218,8 @@ const Downloads = ({
         downloadName={downloadName}
         progress={progress}
         state={state}
+        onOpenDownloadFolder={onOpenDownloadFolder}
+        onCopyDownloadPath={onCopyDownloadPath}
         onPauseDownload={onPauseDownloadItem}
         onResumeDownload={onResumeDownloadItem}
         onCancelDownload={onCancelDownloadItem}

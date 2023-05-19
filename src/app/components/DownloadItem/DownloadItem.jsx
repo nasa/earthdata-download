@@ -58,6 +58,8 @@ const DownloadItem = ({
   progress,
   state,
   onCancelDownload,
+  onOpenDownloadFolder,
+  onCopyDownloadPath,
   onPauseDownload,
   onResumeDownload
 }) => {
@@ -203,7 +205,7 @@ const DownloadItem = ({
                     size="sm"
                     Icon={FaFolderOpen}
                     hideLabel
-                    onClick={() => {}}
+                    onClick={() => onOpenDownloadFolder(downloadId)}
                     tabIndex="0"
                   >
                     Open Folder
@@ -219,7 +221,7 @@ const DownloadItem = ({
                     size="sm"
                     Icon={FaClipboard}
                     hideLabel
-                    onClick={() => {}}
+                    onClick={() => onCopyDownloadPath(downloadId)}
                     tabIndex="0"
                   >
                     Copy Folder Path
@@ -265,6 +267,8 @@ DownloadItem.propTypes = {
   state: PropTypes.string.isRequired,
   onCancelDownload: PropTypes.func.isRequired,
   onPauseDownload: PropTypes.func.isRequired,
+  onOpenDownloadFolder: PropTypes.func.isRequired,
+  onCopyDownloadPath: PropTypes.func.isRequired,
   onResumeDownload: PropTypes.func.isRequired
 }
 

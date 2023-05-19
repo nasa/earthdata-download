@@ -16,6 +16,8 @@ describe('Downloads component', () => {
     const requestProgressReport = jest.fn()
     const resumeDownloadItem = jest.fn()
     const cancelDownloadItem = jest.fn()
+    const openDownloadFolder = jest.fn()
+    const copyDownloadPath = jest.fn()
 
     render(
       <ElectronApiContext.Provider value={
@@ -27,7 +29,9 @@ describe('Downloads component', () => {
           reportProgress,
           requestProgressReport,
           resumeDownloadItem,
-          cancelDownloadItem
+          cancelDownloadItem,
+          openDownloadFolder,
+          copyDownloadPath
         }
       }
       >

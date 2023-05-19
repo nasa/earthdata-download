@@ -11,7 +11,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   pauseDownloadItem: (data) => ipcRenderer.send('pauseDownloadItem', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),
   cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
-
+  openDownloadFolder: (data) => ipcRenderer.send('openDownloadFolder', data),
+  copyDownloadPath: (data) => ipcRenderer.send('copyDownloadPath', data),
   requestProgressReport: (data) => ipcRenderer.send('requestProgressReport', data),
 
   // Messages to be received by the renderer process

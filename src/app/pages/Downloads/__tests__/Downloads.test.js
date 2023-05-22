@@ -1,10 +1,9 @@
 import React from 'react'
-
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-import Downloads from '../Downloads'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
+import Downloads from '../Downloads'
 
 describe('Downloads component', () => {
   test('renders the downloads page', () => {

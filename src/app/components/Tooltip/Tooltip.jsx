@@ -27,39 +27,52 @@ import * as styles from './Tooltip.module.scss'
  * )
  */
 const Tooltip = ({
+  additionalContent,
   children,
   content,
-  additionalContent
-}) => (
-  <RadixTooltip.Provider delayDuration={300}>
-    <RadixTooltip.Root>
-      <RadixTooltip.Trigger asChild>
-        {children}
-      </RadixTooltip.Trigger>
-      <RadixTooltip.Portal>
-        <RadixTooltip.Content
-          className={styles.tooltipContent}
-          sideOffset={5}
-        >
-          <div>
-            <span className={styles.content}>{content}</span>
-            <span className={styles.additionalContent}>{additionalContent}</span>
-          </div>
-          <RadixTooltip.Arrow className={styles.tooltipArrow} />
-        </RadixTooltip.Content>
-      </RadixTooltip.Portal>
-    </RadixTooltip.Root>
-  </RadixTooltip.Provider>
-)
+  open
+}) => {
+  const conditionalRootProps = {}
+
+  if (open) conditionalRootProps.open = true
+
+  return (
+    <RadixTooltip.Provider delayDuration={300}>
+      <RadixTooltip.Root {...conditionalRootProps}>
+        <RadixTooltip.Trigger asChild>
+          {children}
+        </RadixTooltip.Trigger>
+        <RadixTooltip.Portal>
+          <RadixTooltip.Content
+            className={styles.tooltipContent}
+            sideOffset={5}
+          >
+            <div>
+              <span className={styles.content}>{content}</span>
+              {
+                additionalContent && (
+                  <span className={styles.additionalContent}>{additionalContent}</span>
+                )
+              }
+            </div>
+            <RadixTooltip.Arrow className={styles.tooltipArrow} />
+          </RadixTooltip.Content>
+        </RadixTooltip.Portal>
+      </RadixTooltip.Root>
+    </RadixTooltip.Provider>
+  )
+}
 
 Tooltip.defaultProps = {
-  additionalContent: null
+  additionalContent: null,
+  open: undefined
 }
 
 Tooltip.propTypes = {
   additionalContent: PropTypes.node,
   children: PropTypes.node.isRequired,
-  content: PropTypes.node.isRequired
+  content: PropTypes.node.isRequired,
+  open: PropTypes.bool
 }
 
 export default Tooltip

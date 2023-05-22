@@ -59,17 +59,20 @@ const Checkbox = ({
       </RadixCheckbox.Root>
       <label className={styles.label} htmlFor={id}>
         {label}
-        <span className={styles.labelNote}>
-          {labelNote}
-        </span>
+        {labelNote && (
+          <span className={styles.labelNote}>
+            {labelNote}
+          </span>
+        )}
       </label>
     </div>
   </form>
 )
 
 Checkbox.defaultProps = {
-  checked: false,
-  defaultChecked: false
+  checked: null,
+  defaultChecked: false,
+  labelNote: null
 }
 
 Checkbox.propTypes = {
@@ -77,7 +80,7 @@ Checkbox.propTypes = {
   defaultChecked: PropTypes.bool,
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  labelNote: PropTypes.string.isRequired,
+  labelNote: PropTypes.string,
   onChange: PropTypes.func.isRequired
 }
 

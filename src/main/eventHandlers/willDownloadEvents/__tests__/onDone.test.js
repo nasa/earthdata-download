@@ -6,7 +6,7 @@ const startNextDownload = require('../startNextDownload')
 jest.mock('../startNextDownload')
 
 beforeEach(() => {
-  MockDate.set('2023-05-13T22:00:00')
+  MockDate.set(new Date('2023-05-13T22:00:00.000'))
 })
 
 describe('onDone', () => {

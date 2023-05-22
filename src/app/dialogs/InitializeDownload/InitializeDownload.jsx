@@ -72,14 +72,9 @@ const InitializeDownload = ({
   return (
     <>
       <div className={styles.location}>
-        <span className={styles.downloadLocationLabel}>Download files to:</span>
+        <span className={styles.downloadLocationLabel}>Download files to</span>
         <Tooltip
-          content="Change the download location for your files"
-          additionalContent={(
-            <span className={styles.tooltipFilePath}>
-              {`${downloadLocation}`}
-            </span>
-          )}
+          content="Change the selected download location"
         >
           <button
             className={styles.downloadLocationButton}
@@ -143,7 +138,7 @@ const InitializeDownload = ({
         </Button>
       </div>
       <p className={styles.note}>
-        Note: Each dataset will be downloaded to its own folder within your chosen location.
+        Note: Each dataset will be downloaded to a separate folder within the chosen location.
       </p>
     </>
   )

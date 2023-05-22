@@ -19,16 +19,13 @@ const startNextDownload = ({
   let nextFile
 
   // If the item wasn't cancelled, find the next pending file in the download to start
-  console.log('🚀 ~ file: startNextDownload.js:23 ~ wasCancelled:', wasCancelled)
   if (!wasCancelled) {
     // Get all files from the current download
     const allFiles = store.get(`downloads.${downloadId}.files`)
 
-    console.log('🚀 ~ file: startNextDownload.js:26 ~ allFiles:', allFiles)
     // Get the next file that is pending
     nextFile = Object.entries(allFiles)
       .find(([, values]) => values.state === downloadStates.pending)
-    console.log('🚀 ~ file: startNextDownload.js:30 ~ nextFile:', nextFile)
 
     // If there is another file still in pending, start downloading it
     if (nextFile) {

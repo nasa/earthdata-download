@@ -1,9 +1,27 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
+import {
+  FaBan,
+  FaCheckCircle,
+  FaClipboard,
+  FaEllipsisV,
+  FaFolderOpen,
+  FaPause,
+  FaPlay,
+  FaSpinner
+} from 'react-icons/fa'
+import humanizeDuration from 'humanize-duration'
 
 import Button from '../Button/Button'
+import Progress from '../Progress/Progress'
 
-// import downloadStates from '../../constants/downloadStates'
+import * as styles from './DownloadItem.module.scss'
+import createVariantClassName from '../../utils/createVariantName'
+import Tooltip from '../Tooltip/Tooltip'
+
+import downloadStates from '../../constants/downloadStates'
+import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
 /**
  * @typedef {Object} DownloadItemProps
@@ -50,97 +68,186 @@ const DownloadItem = ({
     totalTime
   } = progress
 
-  // TODO I want to use the contants, but importing them from module.exports isn't working
-  // const shouldShowPause = [
-  //   downloadStates.active
-  // ].includes(state)
-  // const shouldShowResume = [
-  //   downloadStates.paused,
-  //   downloadStates.interrupted
-  // ].includes(state)
-  // const shouldShowCancel = [
-  //   downloadStates.paused,
-  //   downloadStates.active,
-  //   downloadStates.error,
-  //   downloadStates.interrupted
-  // ].includes(state)
   const shouldShowPause = [
-    'ACTIVE'
+    downloadStates.active
   ].includes(state)
   const shouldShowResume = [
-    'PAUSED',
-    'INTERRUPTED'
+    downloadStates.paused,
+    downloadStates.interrupted
   ].includes(state)
   const shouldShowCancel = [
-    'PAUSED',
-    'ACTIVE',
-    'ERROR',
-    'INTERRUPTED'
+    downloadStates.paused,
+    downloadStates.active,
+    downloadStates.error,
+    downloadStates.interrupted
+  ].includes(state)
+  const shouldShowOpenFolder = [
+    downloadStates.completed
+  ].includes(state)
+  const shouldShowCopyPath = [
+    downloadStates.completed
   ].includes(state)
 
   return (
-    <div>
-      <div>
-        {downloadName}
+    <li
+      className={
+        classNames([
+          styles.wrapper,
+          styles[createVariantClassName(state)]
+        ])
+      }
+      data-testid="download-item"
+    >
+      <div
+        className={styles.innerWrapper}
+        onClick={() => {}}
+        onKeyDown={() => {}}
+        role="button"
+        tabIndex="0"
+      >
+        <h3 className={styles.name}>
+          {downloadName}
+        </h3>
+        <div className={styles.meta}>
+          <div className={styles.metaPrimary}>
+            <div className={styles.percentComplete}>
+              {percent}
+              %
+            </div>
+            {humanizedDownloadStates[state] && (
+            <div className={styles.displayStatus}>
+              {
+                state === 'ACTIVE' && (
+                  <FaSpinner
+                    className={
+                      classNames([
+                        styles.statusDescriptionIcon,
+                        styles.spinner
+                      ])
+                    }
+                  />
+                )
+              }
+              {
+                state === 'COMPLETED' && <FaCheckCircle className={styles.statusDescriptionIcon} />
+              }
+              {humanizedDownloadStates[state]}
+            </div>
+            )}
+            <div className={styles.statusDescription}>
+              {finishedFiles}
+              {' '}
+              of
+              {' '}
+              {totalFiles}
+              {' '}
+              files done in
+              {' '}
+              {humanizeDuration(totalTime * 1000)}
+            </div>
+          </div>
+          <div className={styles.metaSecondary}>
+            {
+              shouldShowPause && (
+                <Tooltip content="Pause Download">
+                  <Button
+                    className={styles.action}
+                    size="sm"
+                    Icon={FaPause}
+                    hideLabel
+                    onClick={() => onPauseDownload(downloadId, downloadName)}
+                  >
+                    Pause Download
+                  </Button>
+                </Tooltip>
+              )
+            }
+            {
+              shouldShowResume && (
+                <Tooltip content="Resume Download">
+                  <Button
+                    className={styles.action}
+                    size="sm"
+                    Icon={FaPlay}
+                    hideLabel
+                    onClick={() => onResumeDownload(downloadId, downloadName)}
+                  >
+                    Resume Download
+                  </Button>
+                </Tooltip>
+              )
+            }
+            {
+              shouldShowCancel && (
+                <Tooltip content="Cancel Download">
+                  <Button
+                    className={styles.action}
+                    size="sm"
+                    Icon={FaBan}
+                    hideLabel
+                    onClick={() => onCancelDownload(downloadId, downloadName)}
+                    variant="danger"
+                  >
+                    Cancel Download
+                  </Button>
+                </Tooltip>
+              )
+            }
+            {
+              shouldShowOpenFolder && (
+                <Tooltip content="Open Folder">
+                  <Button
+                    className={styles.action}
+                    size="sm"
+                    Icon={FaFolderOpen}
+                    hideLabel
+                    onClick={() => {}}
+                    tabIndex="0"
+                  >
+                    Open Folder
+                  </Button>
+                </Tooltip>
+              )
+            }
+            {
+              shouldShowCopyPath && (
+                <Tooltip content="Copy Folder Path">
+                  <Button
+                    className={styles.action}
+                    size="sm"
+                    Icon={FaClipboard}
+                    hideLabel
+                    onClick={() => {}}
+                    tabIndex="0"
+                  >
+                    Copy Folder Path
+                  </Button>
+                </Tooltip>
+              )
+            }
+            <Tooltip content="More Actions">
+              <Button
+                className={styles.action}
+                size="sm"
+                Icon={FaEllipsisV}
+                hideLabel
+                onClick={() => {}}
+              >
+                More Actions
+              </Button>
+            </Tooltip>
+          </div>
+        </div>
+        <div>
+          <Progress
+            className={styles.progress}
+            progress={percent}
+            state={state}
+          />
+        </div>
+        <div style={{ width: `${percent}%` }} className={styles.progressBackground} />
       </div>
-      <div>
-        {state}
-      </div>
-      <div>
-        {percent}
-        %
-      </div>
-      <div>
-        {finishedFiles}
-        {' '}
-        of
-        {' '}
-        {totalFiles}
-        {' '}
-        in
-        {' '}
-        {totalTime}
-        s
-      </div>
-      <div>
-        {
-          shouldShowPause && (
-            <Button
-              // className={styles.button}
-              size="lg"
-              // Icon={FaHistory}
-              onClick={() => onPauseDownload(downloadId, downloadName)}
-            >
-              Pause
-            </Button>
-          )
-        }
-        {
-          shouldShowResume && (
-            <Button
-              // className={styles.button}
-              size="lg"
-              // Icon={FaHistory}
-              onClick={() => onResumeDownload(downloadId, downloadName)}
-            >
-              Resume
-            </Button>
-          )
-        }
-        {
-          shouldShowCancel && (
-            <Button
-              // className={styles.button}
-              size="lg"
-              // Icon={FaHistory}
-              onClick={() => onCancelDownload(downloadId, downloadName)}
-            >
-              Cancel
-            </Button>
-          )
-        }
-      </div>
-    </div>
+    </li>
   )
 }
 

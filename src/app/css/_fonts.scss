@@ -1,0 +1,5 @@
+html { font-family: Inter, system-ui; }
+
+@supports (font-variation-settings: normal) {
+  html { font-family: "Inter var", system-ui; }
+}

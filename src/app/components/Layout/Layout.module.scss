@@ -51,15 +51,18 @@ body {
   -webkit-app-region: no-drag;
   background-color: var(--color__blue);
   color: var(--color__blue--050);
+  outline-color: var(--color__blue--200);
 
   &:first-child {
     margin-left: 0;
   }
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     border: 1px solid var(--color__blue--700);
     background-color: var(--color__blue--600);
     color: var(--color__blue--050);
+    outline-color: var(--color__blue--200);
   }
 
   &.isActive {
@@ -88,6 +91,7 @@ body {
 }
 
 .main {
+  width: 100%;
   background-color: var(--color__black--050);
   grid-area: main;
   overflow-y: auto;

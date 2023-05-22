@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 import * as styles from './Button.module.scss'
 
@@ -8,6 +9,7 @@ import * as styles from './Button.module.scss'
  * @typedef {Object} ButtonProps
  * @property {String} [className] An optional css class name.
  * @property {React.ReactNode} [children] An optional React node.
+ * @property {Boolean} [disabled] An optional flag to set `disabled` attribute on the button.
  * @property {String} [href] An optional url. If passed, the button will be rendered as an <a> element.
  * @property {Function} [Icon] An optional react-icons icon.
  * @property {Function} [onClick] An optional callback function to be called when the button is clicked.
@@ -15,6 +17,7 @@ import * as styles from './Button.module.scss'
  * @property {String} [size] An optional string which modifies the size of the button.
  * @property {String} [target] An optional string to be used as the `target` attribute on a link.
  * @property {String} [variant] An optional variant which modifies the visual appearance of the button.
+ * @property {...*} [rest] Any additional props will be spread as props onto the root element, which is important for allowing tooltips and other enhancements.
  */
 
 /**
@@ -52,13 +55,16 @@ const Button = forwardRef(({
   className,
   children,
   dataTestId,
+  disabled,
+  hideLabel,
   href,
   Icon,
   onClick,
   rel,
   size,
   target,
-  variant
+  variant,
+  ...rest
 }, ref) => {
   // If a href is passed, an <a> is used for the base element, otherwise a <button> is used
   const TagName = !href ? 'button' : 'a'
@@ -81,15 +87,26 @@ const Button = forwardRef(({
           styles.button,
           styles[size],
           styles[variant],
+          { [styles.hasLabel]: !hideLabel },
           className
         ])
       }
-      type="button"
       data-testid={dataTestId}
+      disabled={disabled}
+      type="button"
       {...conditionalProps}
+      {...rest}
     >
       {Icon && <Icon className={styles.icon} />}
-      {children}
+      {
+        hideLabel
+          ? (
+            <VisuallyHidden>
+              {children}
+            </VisuallyHidden>
+          )
+          : children
+      }
     </TagName>
   )
 })
@@ -99,6 +116,8 @@ Button.displayName = 'button'
 Button.defaultProps = {
   className: null,
   dataTestId: null,
+  disabled: false,
+  hideLabel: false,
   href: null,
   Icon: null,
   onClick: null,
@@ -115,6 +134,8 @@ Button.propTypes = {
     PropTypes.string
   ]).isRequired,
   dataTestId: PropTypes.string,
+  disabled: PropTypes.bool,
+  hideLabel: PropTypes.bool,
   href: PropTypes.string,
   Icon: PropTypes.func,
   onClick: PropTypes.func,

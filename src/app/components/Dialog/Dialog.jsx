@@ -79,7 +79,7 @@ const Dialog = ({
         </RadixDialog.Content>
         {
           closeButton && (
-            <Dialog.Close asChild>
+            <RadixDialog.Close asChild>
               <Button
                 className="IconButton"
                 aria-label="Close"
@@ -87,7 +87,7 @@ const Dialog = ({
               >
                 Close
               </Button>
-            </Dialog.Close>
+            </RadixDialog.Close>
           )
         }
       </div>

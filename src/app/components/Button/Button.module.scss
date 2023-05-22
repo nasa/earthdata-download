@@ -1,27 +1,56 @@
 .button {
+  position: relative;
   display: inline-flex;
+  width: 1.75rem;
+  height: 1.75rem;
   align-items: center;
   justify-content: center;
-  padding: var(--size__100) var(--size__250);
-  border: 1px solid var(--color__black--150);
+  border: 1px solid var(--color__black--350);
   border-radius: 0.25rem;
   -webkit-app-region: no-drag;
   background-color: var(--color__white);
-  color: var(--color__black--600);
+  box-shadow: 0 0.125rem 1rem -0.5rem transparent;
+  color: var(--color__black--700);
   font-size: 0.875rem;
+  font-weight: 500;
   letter-spacing: 1.03;
   outline: none;
   text-decoration: none;
   transition: all 0.1s ease-in-out;
+  white-space: nowrap;
+
+  &.hasLabel {
+    width: auto;
+    padding: 0 var(--size__250);
+  }
 
   &:hover {
-    border: 1px solid var(--color__black--200);
-    background-color: var(--color__black--100);
+    box-shadow: 0 0.125rem 0.5rem -0.5rem var(--color__black--800)
+  }
+
+  &:hover,
+  &:focus-visible {
+    border: 1px solid var(--color__black--450);
+    background-color: var(--color__black--050);
     color: var(--color__black--850);
   }
 
+  &:active {
+    top: 1px;
+    border: 1px solid var(--color__black--500);
+    background-color: var(--color__black--100);
+    color: var(--color__black--900);
+  }
+
+  &[disabled] {
+    background-color: var(--color__white);
+    color: var(--color__black--600);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
   &.lg {
-    padding: var(--size__200) var(--size__350);
+    height: 2.25rem;
     font-size: var(--size__350);
   }
 
@@ -30,7 +59,8 @@
     background-color: transparent;
     color: rgba(0 0 0 / 32.5%);
 
-    &:hover {
+    &:hover,
+    &:focus-visible  {
       background-color: rgba(0 0 0 / 25%);
       color: rgba(0 0 0 / 32.5%);
     }
@@ -42,7 +72,8 @@
     color: var(--color__blue--050);
     text-shadow: 0 0 0.75rem var(--color__blue--600);
 
-    &:hover {
+    &:hover,
+    &:focus-visible  {
       border-color: var(--color__blue--700);
       background-color: var(--color__blue--600);
       color: var(--color__blue--100);
@@ -55,7 +86,8 @@
     color: var(--color__white);
     text-shadow: 0 0 0.75rem var(--color__green--600);
 
-    &:hover {
+    &:hover,
+    &:focus-visible  {
       border-color: var(--color__green--600);
       background-color: var(--color__green--600);
       color: var(--color__green--050);
@@ -65,13 +97,17 @@
   &.danger {
     color: var(--color__red--600);
 
-    &:hover {
+    &:hover,
+    &:focus-visible      {
       color: var(--color__red--650);
     }
   }
 }
 
 .icon {
-  margin-right: var(--size__150);
   vertical-align: middle;
+
+  .hasLabel & {
+    margin-right: var(--size__100);
+  }
 }

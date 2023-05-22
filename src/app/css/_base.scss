@@ -1,3 +1,5 @@
+@use "vars/colors" as colors;
+
 html {
   width: 100%;
   height: 100%;
@@ -10,7 +12,6 @@ body {
   margin: 0 auto;
   background: var(--color__white);
   color: var(--color__black--600);
-  font-family: Inter, sans-serif;
   font-size: var(--size__350);
   text-align: center;
 }
@@ -21,5 +22,25 @@ body {
 }
 
 * > * {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
   letter-spacing: 0.01rem;
+  outline: 0 solid transparent;
+  outline-offset: 0;
+  transition:
+    outline 200ms var(--animation__spring)
+    outline-offset 200ms var(--animation__spring);
+
+  &:focus-visible {
+  outline: 3px solid var(--color__blue--600);
+    outline-offset: var(--size__050);
+  }
+}
+
+.simplebar-scrollbar::before {
+  background-color: rgba(0 0 0 / 65%) !important;
+}
+
+.simplebar-track.simplebar-vertical {
+  width: 10px;
 }

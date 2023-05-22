@@ -10,4 +10,4 @@ const downloadStates = {
   completed: 'COMPLETED'
 }
 
-module.exports = downloadStates
+export default downloadStates

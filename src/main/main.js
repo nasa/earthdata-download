@@ -122,7 +122,6 @@ const createWindow = () => {
 
   ipcMain.on('clearDefaultDownload', () => {
     clearDefaultDownload({
-      // downloadId,
       store,
       window
     })

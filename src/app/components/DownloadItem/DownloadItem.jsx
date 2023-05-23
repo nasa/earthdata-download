@@ -32,6 +32,8 @@ import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
  * @property {Function} onCancelDownload A function which cancels a DownloadItem.
  * @property {Function} onPauseDownload A function which pauses a DownloadItem.
  * @property {Function} onResumeDownload A function which resumes a DownloadItem.
+ * @property {Function} onOpenDownloadFolder A function which opens the file(s) download folder.
+ * @property {Function} onCopyDownloadPath A function which copies the file(s) downloaded path to the users clipboard.
 
 /**
  * Renders a DownloadItem

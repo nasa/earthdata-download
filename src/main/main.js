@@ -24,8 +24,6 @@ const { downloads } = require('../../test-download-files.json')
 // const { downloads } = require('../../test-download-files-one-collection.json')
 // const { downloads } = require('../../test-download-files-one-file.json')
 
-console.log('🚀 ~ file: main.js:18 ~ downloads:', downloads)
-
 const store = new Store({
   // TODO set this key before publishing application
   // encryptionKey: 'this key only obscures the data',
@@ -140,9 +138,7 @@ const createWindow = () => {
   })
 
   ipcMain.on('pauseDownloadItem', (event, info) => {
-    console.log('🚀 ~ file: main.js:147 ~ ipcMain.on ~ info:', info)
     const { downloadId, name } = info
-    console.log('🚀 ~ file: main.js:148 ~ ipcMain.on ~ downloadId, name:', downloadId, name)
 
     currentDownloadItems.pauseItem(downloadId, name)
 
@@ -162,7 +158,6 @@ const createWindow = () => {
   })
 
   ipcMain.on('cancelDownloadItem', (event, info) => {
-    console.log('🚀 ~ file: main.js:155 ~ ipcMain.on ~ info:', info)
     const { downloadId, name } = info
 
     store.set(`downloads.${downloadId}.state`, downloadStates.completed)
@@ -177,7 +172,6 @@ const createWindow = () => {
   })
 
   ipcMain.on('resumeDownloadItem', (event, info) => {
-    console.log('🚀 ~ file: main.js:162 ~ ipcMain.on ~ info:', info)
     const { downloadId, name } = info
 
     currentDownloadItems.resumeItem(downloadId, name)
@@ -199,7 +193,6 @@ const createWindow = () => {
 
   let isReporting = false
   ipcMain.on('requestProgressReport', () => {
-    console.log('🚀 ~ file: main.js:175 ~ ipcMain.on ~ isReporting:', isReporting)
     // if (isReporting || currentDownloadItems.getNumberOfDownloads() === 0) return
     if (isReporting) return
 

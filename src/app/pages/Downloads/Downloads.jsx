@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-// eslint-disable-next-line no-unused-vars
 import {
   FaBan,
   FaCheckCircle,
@@ -12,8 +11,6 @@ import {
 } from 'react-icons/fa'
 import classNames from 'classnames'
 
-// eslint-disable-next-line no-unused-vars
-import { PAGES } from '../../constants/pages'
 import downloadStates from '../../constants/downloadStates'
 import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
@@ -67,9 +64,12 @@ const Downloads = ({
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
   const [hasActiveDownload, setHasActiveDownload] = useState(false)
   const [hasPausedDownload, setHasPausedDownload] = useState(false)
-  const [derivedStateFromDownloads, setDerivedStateFromDownloads] = useState(downloadStates.completed)
   const [totalDownloadFiles, setTotalDownloadFiles] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
+  const [
+    derivedStateFromDownloads,
+    setDerivedStateFromDownloads
+  ] = useState(downloadStates.completed)
 
   // When a new downloadLocation has been selected from the main process, update the state
   const onSetDownloadLocation = (event, info) => {
@@ -123,7 +123,6 @@ const Downloads = ({
 
   const onReportProgress = (event, info) => {
     const { progress } = info
-    console.log('progress', progress)
     setRunningDownloads(progress)
   }
 

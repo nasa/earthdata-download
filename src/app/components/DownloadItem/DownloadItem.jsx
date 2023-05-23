@@ -117,7 +117,7 @@ const DownloadItem = ({
             {humanizedDownloadStates[state] && (
             <div className={styles.displayStatus}>
               {
-                state === 'ACTIVE' && (
+                state === downloadStates.active && (
                   <FaSpinner
                     className={
                       classNames([
@@ -129,7 +129,9 @@ const DownloadItem = ({
                 )
               }
               {
-                state === 'COMPLETED' && <FaCheckCircle className={styles.statusDescriptionIcon} />
+                state === downloadStates.completed && (
+                  <FaCheckCircle className={styles.statusDescriptionIcon} />
+                )
               }
               {humanizedDownloadStates[state]}
             </div>

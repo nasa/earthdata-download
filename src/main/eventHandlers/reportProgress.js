@@ -6,7 +6,6 @@ const reportProgress = ({
 }) => {
   // Pull download status for each download in the store
   const downloads = store.get('downloads')
-  // console.log('🚀 ~ file: reportProgress.js:9 ~ downloads:', downloads)
 
   if (!downloads) {
     webContents.send('reportProgress', { progress: [] })

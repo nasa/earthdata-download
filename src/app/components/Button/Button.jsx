@@ -10,6 +10,7 @@ import * as styles from './Button.module.scss'
  * @property {String} [className] An optional css class name.
  * @property {React.ReactNode} [children] An optional React node.
  * @property {Boolean} [disabled] An optional flag to set `disabled` attribute on the button.
+ * @property {Boolean} [hideLabel] An optional flag to set `hideLabel` attribute on the button.
  * @property {String} [href] An optional url. If passed, the button will be rendered as an <a> element.
  * @property {Function} [Icon] An optional react-icons icon.
  * @property {Function} [onClick] An optional callback function to be called when the button is clicked.

@@ -15,7 +15,7 @@ import Tooltip from '../../components/Tooltip/Tooltip'
 /**
  * @typedef {Object} InitializeDownloadProps
  * @property {String} downloadId A string representing the id of a download.
- * @property {String} downloadLocation A string representing the id of a download
+ * @property {String} downloadLocation A string representing the absolute path of a download
  * @property {Boolean} useDefaultLocation A boolean flag which indicates whether a default download location should be used.
  * @property {Function} onCloseChooseLocationModal A function which sets the dialog state.
  */

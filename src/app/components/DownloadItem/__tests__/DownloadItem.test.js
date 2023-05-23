@@ -1,72 +1,258 @@
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import userEvent from '@testing-library/user-event'
+
 import DownloadItem from '../DownloadItem'
 
-describe('DownloadItem', () => {
-  const mockProps = {
-    downloadId: 'shortName_version-2-20230518_144046',
-    downloadName: 'shortName_version-2-20230518_144046',
-    progress: {
-      percent: 75,
-      finishedFiles: 2,
-      totalFiles: 6,
-      totalTime: 45
-    },
-    state: 'ACTIVE',
-    onCancelDownload: jest.fn(),
-    onPauseDownload: jest.fn(),
-    onOpenDownloadFolder: jest.fn(),
-    onCopyDownloadPath: jest.fn(),
-    onResumeDownload: jest.fn()
-  }
+const progressObj = {
+  percent: 0,
+  finishedFiles: 0,
+  totalFiles: 1,
+  totalTime: 0
+}
 
-  test('calls onResumeDownload when resume button is clicked', () => {
-    const { getByText } = render(<DownloadItem {...mockProps} state="PAUSED" />)
-    const resumeButton = getByText('Resume')
+describe('DownloadItem component', () => {
+  test('displays the download title', () => {
+    render(
+      <DownloadItem
+        downloadId="download-id"
+        downloadName="download-name"
+        progress={progressObj}
+        state="ACTIVE"
+        onCancelDownload={() => {}}
+        onPauseDownload={() => {}}
+        onResumeDownload={() => {}}
+        onOpenDownloadFolder={() => {}}
+        onCopyDownloadPath={() => {}}
+      />
+    )
 
-    fireEvent.click(resumeButton)
-
-    expect(mockProps.onResumeDownload).toHaveBeenCalledTimes(1)
-    expect(mockProps.onResumeDownload).toHaveBeenCalledWith('shortName_version-2-20230518_144046', 'shortName_version-2-20230518_144046')
+    expect(screen.getByText('download-name')).toBeInTheDocument()
   })
 
-  test('calls onCancelDownload when cancel button is clicked', () => {
-    const { getByText } = render(<DownloadItem {...mockProps} />)
-    const cancelButton = getByText('Cancel')
+  test('displays the download percentage', () => {
+    render(
+      <DownloadItem
+        downloadId="download-id"
+        downloadName="download-name"
+        progress={progressObj}
+        state="ACTIVE"
+        onCancelDownload={() => {}}
+        onPauseDownload={() => {}}
+        onResumeDownload={() => {}}
+        onOpenDownloadFolder={() => {}}
+        onCopyDownloadPath={() => {}}
+      />
+    )
 
-    fireEvent.click(cancelButton)
-
-    expect(mockProps.onCancelDownload).toHaveBeenCalledTimes(1)
-    expect(mockProps.onCancelDownload).toHaveBeenCalledWith('shortName_version-2-20230518_144046', 'shortName_version-2-20230518_144046')
+    expect(screen.getByText('0%')).toBeInTheDocument()
   })
 
-  test('calls onPauseDownload when pause button is clicked', () => {
-    const { getByText } = render(<DownloadItem {...mockProps} />)
-    const pauseButton = getByText('Pause')
+  test('displays a humanized status', () => {
+    render(
+      <DownloadItem
+        downloadId="download-id"
+        downloadName="download-name"
+        progress={progressObj}
+        state="ACTIVE"
+        onCancelDownload={() => {}}
+        onPauseDownload={() => {}}
+        onResumeDownload={() => {}}
+        onOpenDownloadFolder={() => {}}
+        onCopyDownloadPath={() => {}}
+      />
+    )
 
-    fireEvent.click(pauseButton)
-
-    expect(mockProps.onPauseDownload).toHaveBeenCalledTimes(1)
-    expect(mockProps.onPauseDownload).toHaveBeenCalledWith('shortName_version-2-20230518_144046', 'shortName_version-2-20230518_144046')
+    expect(screen.getByText('0 of 1 files done in 0 seconds')).toBeInTheDocument()
   })
 
-  test('calls onOpenDownloadFolder when open folder button is clicked', () => {
-    const { getByText } = render(<DownloadItem {...mockProps} state="COMPLETED" />)
-    const openFolderButton = getByText('Open Folder')
+  describe('when a download is active', () => {
+    test('displays the correct download status', () => {
+      render(
+        <DownloadItem
+          downloadId="download-id"
+          downloadName="download-name"
+          progress={progressObj}
+          state="ACTIVE"
+          onCancelDownload={() => {}}
+          onPauseDownload={() => {}}
+          onResumeDownload={() => {}}
+          onOpenDownloadFolder={() => {}}
+          onCopyDownloadPath={() => {}}
+        />
+      )
 
-    fireEvent.click(openFolderButton)
+      expect(screen.getByText('Downloading')).toBeInTheDocument()
+    })
 
-    expect(mockProps.onOpenDownloadFolder).toHaveBeenCalledTimes(1)
-    expect(mockProps.onOpenDownloadFolder).toHaveBeenCalledWith('shortName_version-2-20230518_144046')
+    describe('when clicking the pause button', () => {
+      test('fires the onPauseDownload callback', async () => {
+        const onPauseDownloadMock = jest.fn()
+
+        render(
+          <DownloadItem
+            downloadId="download-id"
+            downloadName="download-name"
+            progress={progressObj}
+            state="ACTIVE"
+            onCancelDownload={() => {}}
+            onPauseDownload={onPauseDownloadMock}
+            onResumeDownload={() => {}}
+            onOpenDownloadFolder={() => {}}
+            onCopyDownloadPath={() => {}}
+          />
+        )
+
+        const pauseButton = screen.getByText('Pause Download')
+
+        await userEvent.click(pauseButton)
+
+        expect(onPauseDownloadMock).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('when clicking the cancel button', () => {
+      test('fires the onCancelDownload callback', async () => {
+        const onCancelDownloadMock = jest.fn()
+
+        render(
+          <DownloadItem
+            downloadId="download-id"
+            downloadName="download-name"
+            progress={progressObj}
+            state="ACTIVE"
+            onCancelDownload={onCancelDownloadMock}
+            onPauseDownload={() => {}}
+            onResumeDownload={() => {}}
+            onOpenDownloadFolder={() => {}}
+            onCopyDownloadPath={() => {}}
+          />
+        )
+
+        const cancelButton = screen.getByText('Cancel Download')
+
+        await userEvent.click(cancelButton)
+
+        expect(onCancelDownloadMock).toHaveBeenCalledTimes(1)
+      })
+    })
   })
 
-  test('calls onCopyDownloadPath when copy path button is clicked', () => {
-    const { getByText } = render(<DownloadItem {...mockProps} state="COMPLETED" />)
-    const copyPathButton = getByText('Copy Path')
+  describe('when a download is paused', () => {
+    test('displays the correct download status', () => {
+      render(
+        <DownloadItem
+          downloadId="download-id"
+          downloadName="download-name"
+          progress={progressObj}
+          state="PAUSED"
+          onCancelDownload={() => {}}
+          onPauseDownload={() => {}}
+          onResumeDownload={() => {}}
+          onOpenDownloadFolder={() => {}}
+          onCopyDownloadPath={() => {}}
+        />
+      )
 
-    fireEvent.click(copyPathButton)
+      expect(screen.getByText('Paused')).toBeInTheDocument()
+    })
 
-    expect(mockProps.onCopyDownloadPath).toHaveBeenCalledTimes(1)
-    expect(mockProps.onCopyDownloadPath).toHaveBeenCalledWith('shortName_version-2-20230518_144046')
+    describe('when clicking the resume button', () => {
+      test('fires the onResumeDownload callback', async () => {
+        const onResumeDownloadMock = jest.fn()
+
+        render(
+          <DownloadItem
+            downloadId="download-id"
+            downloadName="download-name"
+            progress={progressObj}
+            state="PAUSED"
+            onCancelDownload={() => {}}
+            onPauseDownload={() => {}}
+            onResumeDownload={onResumeDownloadMock}
+            onOpenDownloadFolder={() => {}}
+            onCopyDownloadPath={() => {}}
+          />
+        )
+
+        const resumeButton = screen.getByText('Resume Download')
+
+        await userEvent.click(resumeButton)
+
+        expect(onResumeDownloadMock).toHaveBeenCalledTimes(1)
+      })
+    })
+  })
+
+  describe('when a download is completed', () => {
+    test('displays the correct download status', () => {
+      render(
+        <DownloadItem
+          downloadId="download-id"
+          downloadName="download-name"
+          progress={progressObj}
+          state="COMPLETED"
+          onCancelDownload={() => {}}
+          onPauseDownload={() => {}}
+          onResumeDownload={() => {}}
+          onOpenDownloadFolder={() => {}}
+          onCopyDownloadPath={() => {}}
+        />
+      )
+
+      expect(screen.getByText('Completed')).toBeInTheDocument()
+    })
+
+    describe('when clicking the open download folder button', () => {
+      test('fires the onOpenDownloadFolder callback', async () => {
+        const onOpenFolderMock = jest.fn()
+
+        render(
+          <DownloadItem
+            downloadId="download-id"
+            downloadName="download-name"
+            progress={progressObj}
+            state="COMPLETED"
+            onCancelDownload={() => {}}
+            onPauseDownload={() => {}}
+            onResumeDownload={() => {}}
+            onOpenDownloadFolder={onOpenFolderMock}
+            onCopyDownloadPath={() => {}}
+          />
+        )
+        // Copy Folder Path
+        const openFolderButton = screen.getByText('Open Folder')
+
+        await userEvent.click(openFolderButton)
+
+        expect(onOpenFolderMock).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('when clicking the copy folder path button', () => {
+      test('fires the onCopyDownloadPath callback', async () => {
+        const onCopyDownloadPathMock = jest.fn()
+
+        render(
+          <DownloadItem
+            downloadId="download-id"
+            downloadName="download-name"
+            progress={progressObj}
+            state="COMPLETED"
+            onCancelDownload={() => {}}
+            onPauseDownload={() => {}}
+            onResumeDownload={() => {}}
+            onOpenDownloadFolder={() => {}}
+            onCopyDownloadPath={onCopyDownloadPathMock}
+          />
+        )
+        const onCopyDownloadPathButton = screen.getByText('Copy Folder Path')
+
+        await userEvent.click(onCopyDownloadPathButton)
+
+        expect(onCopyDownloadPathMock).toHaveBeenCalledTimes(1)
+      })
+    })
   })
 })

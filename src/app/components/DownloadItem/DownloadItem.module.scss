@@ -3,6 +3,7 @@
 .innerWrapper {
   position: relative;
   display: flex;
+  overflow: hidden;
   flex-direction: column;
   padding: var(--size__200);
   padding-top: var(--size__350);
@@ -14,7 +15,6 @@
   background-color: var(--color__white);
   text-align: left;
   transition: all 200ms cubic-bezier(0.65, 0, 0.35, 1);
-
 
   &:hover,
   &:focus-visible  {

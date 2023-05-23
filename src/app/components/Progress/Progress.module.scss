@@ -34,12 +34,12 @@
   }
 
   &::after {
-    display: block;
-    content: '';
     position: absolute;
-    inset: 0;
-    background: transparent;
     z-index: 1;
+    display: block;
+    background: transparent;
+    content: '';
+    inset: 0;
 
     .isActive & {
       animation: progressPulse 2s cubic-bezier(0.65, 0, 0.35, 1) infinite;

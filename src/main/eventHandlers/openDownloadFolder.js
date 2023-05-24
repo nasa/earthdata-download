@@ -4,7 +4,7 @@ const { shell } = require('electron')
  * Opens the download folder associated with the given download ID.
  * @param {Object} params The params object.
  * @param {Object} params.store The store object.
- * @param {string} params.info.downloadId The download ID.
+ * @param {String} params.info.downloadId The download ID.
  */
 const openDownloadFolder = ({
   info,

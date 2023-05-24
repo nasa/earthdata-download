@@ -2,9 +2,9 @@ const { clipboard } = require('electron')
 
 /**
  * Copies the file(s) downloaded path to the clipboard.
- *  @param {Object} params The params object.
- *  @param {Object} params.store The store object.
- *  @param {string} params.info.downloadId The download ID.
+ * @param {Object} params The params object.
+ * @param {Object} params.store The store object.
+ * @param {String} params.info.downloadId The download ID.
  */
 const copyDownloadPath = ({
   info,

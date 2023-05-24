@@ -2,8 +2,7 @@ const {
   app,
   BrowserWindow,
   ipcMain,
-  shell,
-  clipboard
+  shell
 } = require('electron')
 const path = require('path')
 const Store = require('electron-store')
@@ -17,6 +16,8 @@ const didFinishLoad = require('./eventHandlers/didFinishLoad')
 const windowStateKeeper = require('./utils/windowStateKeeper')
 const willDownload = require('./eventHandlers/willDownload')
 const reportProgress = require('./eventHandlers/reportProgress')
+const copyDownloadPath = require('./eventHandlers/copyDownloadPath')
+const openDownloadFolder = require('./eventHandlers/openDownloadFolder')
 
 const CurrentDownloadItems = require('./utils/currentDownloadItems')
 const downloadStates = require('../app/constants/downloadStates')
@@ -205,15 +206,17 @@ const createWindow = () => {
   })
 
   ipcMain.on('openDownloadFolder', (event, info) => {
-    const { downloadId } = info
-    const folderPath = store.get('downloads')[downloadId].downloadLocation
-    shell.openPath(folderPath)
+    openDownloadFolder({
+      info,
+      store
+    })
   })
 
   ipcMain.on('copyDownloadPath', (event, info) => {
-    const { downloadId } = info
-    const folderPath = store.get('downloads')[downloadId].downloadLocation
-    clipboard.writeText(folderPath)
+    copyDownloadPath({
+      info,
+      store
+    })
   })
 
   // Open `target="_blank"` links in the system browser

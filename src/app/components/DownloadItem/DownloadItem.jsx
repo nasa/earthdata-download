@@ -48,6 +48,8 @@ import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
  *     downloadName={downloadName}
  *     progress={progress}
  *     state={state}
+ *     onOpenDownloadFolder={onOpenDownloadFolder}
+ *     onCopyDownloadPath={onCopyDownloadPath}
  *     onPauseDownload={onPauseDownloadItem}
  *     onResumeDownload={onResumeDownloadItem}
  *     onCancelDownload={onCancelDownloadItem}

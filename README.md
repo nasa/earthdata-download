@@ -10,11 +10,7 @@ To install dependencies:
 
     npm install
 
-In order to run the project locally you need to run Vite in one terminal:
-
-    npm run dev
-
-And you need to run Electron in a separate terminal:
+In order to run the project locally you need to run:
 
     npm start
 
@@ -31,6 +27,14 @@ To build the jsdoc documentation:
     npm run docs
 
     # Outputs documentation in the `docs/jsdoc` directory
+
+## Building
+
+To build the installers run one of the following, matching your operating system:
+
+    npm run dist:mac
+    npm run dist:win
+    npm run dist:linux
 
 ## Documentation
 

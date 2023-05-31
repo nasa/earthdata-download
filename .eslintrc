@@ -6,6 +6,7 @@
     "node": true,
     "jest": true
   },
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true,
@@ -15,7 +16,8 @@
     "sourceType": "module"
   },
   "plugins": [
-    "react"
+    "react",
+    "@typescript-eslint"
   ],
   "ignorePatterns": ["dist", "jsdoc"],
   "rules": {
@@ -82,7 +84,18 @@
       "custom": "ignore"
     }],
 
-    "react/function-component-definition": "off"
+    "react/function-component-definition": "off",
+
+    "import/extensions": [
+      2,
+      {
+        "ts": "never",
+        "json": "always"
+      }
+    ],
+    "import/no-unresolved": [
+      0
+    ]
   },
 
   "overrides": [

@@ -5,17 +5,17 @@ import * as RadixTooltip from '@radix-ui/react-tooltip'
 import * as styles from './Tooltip.module.scss'
 
 /**
- * @typedef {Object} ButtonProps
+ * @typedef {Object} TooltipProps
  * @property {React.ReactNode} children A React node to be wrapped in the tooltip trigger.
  * @property {React.ReactNode} content A React node to be used as the content for the tooltip.
  * @property {React.ReactNode} [additionalContent]  A React node to be used as the additional content for the tooltip.
 */
 
 /**
- * Renders a `Button` component.
- * @param {ButtonProps} props
+ * Renders a `Tooltip` component.
+ * @param {TooltipProps} props
  *
- * @example <caption>Render the button as a `button` element.</caption>
+ * @example <caption>Render the tooltip as a `tooltip` element.</caption>
  *
  * return (
  *   <Tooltip

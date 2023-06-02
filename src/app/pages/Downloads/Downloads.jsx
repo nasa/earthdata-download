@@ -211,6 +211,13 @@ const Downloads = ({
       state
     } = runningDownload
 
+    const moreActions = [
+      [{
+        label: 'Copy Folder Path',
+        onSelect: () => onCopyDownloadPath(downloadId)
+      }]
+    ]
+
     return (
       <DownloadItem
         key={downloadId}
@@ -223,6 +230,7 @@ const Downloads = ({
         onPauseDownload={onPauseDownloadItem}
         onResumeDownload={onResumeDownloadItem}
         onCancelDownload={onCancelDownloadItem}
+        moreActions={moreActions}
       />
     )
   })

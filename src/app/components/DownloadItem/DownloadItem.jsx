@@ -5,15 +5,14 @@ import {
   FaBan,
   FaCheckCircle,
   FaClipboard,
-  FaEllipsisV,
   FaFolderOpen,
   FaPause,
   FaPlay,
   FaSpinner
 } from 'react-icons/fa'
 import humanizeDuration from 'humanize-duration'
-
 import Button from '../Button/Button'
+import DownloadDropdown from '../DownloadDropdown/DownloadDropdown'
 import Progress from '../Progress/Progress'
 
 import * as styles from './DownloadItem.module.scss'
@@ -65,7 +64,8 @@ const DownloadItem = ({
   onOpenDownloadFolder,
   onCopyDownloadPath,
   onPauseDownload,
-  onResumeDownload
+  onResumeDownload,
+  moreActions
 }) => {
   const {
     percent,
@@ -86,6 +86,13 @@ const DownloadItem = ({
     downloadStates.active,
     downloadStates.error,
     downloadStates.interrupted
+  ].includes(state)
+  const shouldShowDropdown = [
+    downloadStates.paused,
+    downloadStates.active,
+    downloadStates.error,
+    downloadStates.interrupted,
+    downloadStates.completed
   ].includes(state)
   const shouldShowOpenFolder = [
     downloadStates.completed
@@ -121,26 +128,26 @@ const DownloadItem = ({
               %
             </div>
             {humanizedDownloadStates[state] && (
-            <div className={styles.displayStatus}>
-              {
-                state === downloadStates.active && (
-                  <FaSpinner
-                    className={
-                      classNames([
-                        styles.statusDescriptionIcon,
-                        styles.spinner
-                      ])
-                    }
-                  />
-                )
-              }
-              {
-                state === downloadStates.completed && (
-                  <FaCheckCircle className={styles.statusDescriptionIcon} />
-                )
-              }
-              {humanizedDownloadStates[state]}
-            </div>
+              <div className={styles.displayStatus}>
+                {
+                  state === downloadStates.active && (
+                    <FaSpinner
+                      className={
+                        classNames([
+                          styles.statusDescriptionIcon,
+                          styles.spinner
+                        ])
+                      }
+                    />
+                  )
+                }
+                {
+                  state === downloadStates.completed && (
+                    <FaCheckCircle className={styles.statusDescriptionIcon} />
+                  )
+                }
+                {humanizedDownloadStates[state]}
+              </div>
             )}
             <div className={styles.statusDescription}>
               {finishedFiles}
@@ -233,17 +240,23 @@ const DownloadItem = ({
                 </Tooltip>
               )
             }
-            <Tooltip content="More Actions">
-              <Button
-                className={styles.action}
-                size="sm"
-                Icon={FaEllipsisV}
-                hideLabel
-                onClick={() => {}}
+            {
+              shouldShowDropdown && (
+              <DownloadDropdown
+                onPauseDownload={() => onPauseDownload(downloadId, downloadName)}
+                onResumeDownload={() => onResumeDownload(downloadId, downloadName)}
+                onCancelDownload={() => onCancelDownload(downloadId, downloadName)}
+                onOpenDownloadFolder={() => onOpenDownloadFolder(downloadId)}
+                state={state}
+                finishedFiles={finishedFiles}
               >
-                More Actions
-              </Button>
-            </Tooltip>
+                {
+                  moreActions
+                }
+              </DownloadDropdown>
+              )
+            }
+
           </div>
         </div>
         <div>
@@ -257,6 +270,10 @@ const DownloadItem = ({
       </div>
     </li>
   )
+}
+
+DownloadItem.defaultProps = {
+  moreActions: null
 }
 
 DownloadItem.propTypes = {
@@ -273,7 +290,11 @@ DownloadItem.propTypes = {
   onPauseDownload: PropTypes.func.isRequired,
   onOpenDownloadFolder: PropTypes.func.isRequired,
   onCopyDownloadPath: PropTypes.func.isRequired,
-  onResumeDownload: PropTypes.func.isRequired
+  onResumeDownload: PropTypes.func.isRequired,
+  moreActions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    onSelect: PropTypes.func.isRequired
+  })))
 }
 
 export default DownloadItem

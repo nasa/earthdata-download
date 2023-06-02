@@ -36,7 +36,7 @@ import Button from '../Button/Button'
  *      title="I am a dialog"
  *   >
  *      <p>I am a dialog!</p>
- *   </Checkbox>
+ *   </Dialog>
  * )
  */
 const Dialog = ({

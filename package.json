@@ -1,7 +1,7 @@
 {
   "name": "earthdata-download",
   "version": "0.0.1",
-  "description": "Earthdata Download is a download manager application designed for downloading Earth science data. It will accept download lists from applications like Earthdata Search (https://search.earthdata.nasa.gov/) enabling clients to offer users a streamlined download interface.",
+  "description": "Earthdata Download is a cross-platform download manager designed to improve how users download Earth Science data. It accepts lists of files from applications like Earthdata Search (https://search.earthdata.nasa.gov/) and enables clients to offer users a streamlined experience when downloading files from their browser.",
   "repository": {
     "type": "git",
     "url": "ssh://git@git.earthdata.nasa.gov:7999/edsc/earthdata-download.git"

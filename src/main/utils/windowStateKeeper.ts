@@ -36,10 +36,11 @@ const windowStateKeeper = (store) => {
     store.set('preferences.windowState', windowState)
   }
 
-  function track(win) {
-    appWindow = win;
+  function track(trackedWindow) {
+    appWindow = trackedWindow;
+
     ['resize', 'move', 'close'].forEach((event) => {
-      win.on(event, saveState)
+      trackedWindow.on(event, saveState)
     })
   }
 

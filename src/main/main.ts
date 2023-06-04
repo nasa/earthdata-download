@@ -71,7 +71,6 @@ const createWindow = () => {
     minHeight: 445,
     x: windowState.x,
     y: windowState.y,
-    // maximizable: false,
     show: false,
     title: 'Earthdata Download',
     // TODO we want to use hiddenInset, but windows buttons aren't visible. We'll need to manually add the windows buttons, and send messages to the main process to perform the button actions.
@@ -92,7 +91,7 @@ const createWindow = () => {
 
   appWindow.menuBarVisible = false
 
-  // You can use `process.env.VITE_DEV_SERVER_URL` when the vite command is called `serve`
+  // You can use `process.env.VITE_DEV_SERVER_URL` when the vite command is called with `serve`
   if (process.env.VITE_DEV_SERVER_URL) {
     appWindow.loadURL(process.env.VITE_DEV_SERVER_URL)
   } else {
@@ -209,7 +208,7 @@ const createWindow = () => {
     }
   })
 
-  // Setup a interval to report progress to the renderer process every 1s
+  // Set up an interval to report progress to the renderer process every 1s
   const reportProgressInterval = setInterval(() => {
     reportProgress({
       store,

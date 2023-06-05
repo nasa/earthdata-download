@@ -12,7 +12,7 @@ import {
 } from 'react-icons/fa'
 import humanizeDuration from 'humanize-duration'
 import Button from '../Button/Button'
-import DownloadDropdown from '../DownloadDropdown/DownloadDropdown'
+import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
 
 import * as styles from './DownloadItem.module.scss'
@@ -242,18 +242,7 @@ const DownloadItem = ({
             }
             {
               shouldShowDropdown && (
-              <DownloadDropdown
-                onPauseDownload={() => onPauseDownload(downloadId, downloadName)}
-                onResumeDownload={() => onResumeDownload(downloadId, downloadName)}
-                onCancelDownload={() => onCancelDownload(downloadId, downloadName)}
-                onOpenDownloadFolder={() => onOpenDownloadFolder(downloadId)}
-                state={state}
-                finishedFiles={finishedFiles}
-              >
-                {
-                  moreActions
-                }
-              </DownloadDropdown>
+                <Dropdown moreActions={moreActions} />
               )
             }
 

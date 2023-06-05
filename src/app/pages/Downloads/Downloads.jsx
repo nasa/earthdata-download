@@ -160,7 +160,7 @@ const Downloads = ({
     // TODO Consider improving how we are determining these states. For downloads with
     // many files, this method may not be ideal.
     setAllDownloadsPaused(runningDownloads.length && runningDownloads.every(
-      ({ state }) => state === downloadStates.paused
+      ({ state }) => (state === downloadStates.paused || state === downloadStates.completed)
     ))
     setAllDownloadsCompleted(runningDownloads.length && runningDownloads.every(
       ({ state }) => state === downloadStates.completed
@@ -210,12 +210,58 @@ const Downloads = ({
       progress,
       state
     } = runningDownload
+    const { finishedFiles } = progress
+
+    const shouldShowPause = [
+      downloadStates.active
+    ].includes(state)
+    const shouldShowResume = [
+      downloadStates.paused,
+      downloadStates.interrupted
+    ].includes(state)
+    const shouldShowCancel = [
+      downloadStates.paused,
+      downloadStates.active,
+      downloadStates.error,
+      downloadStates.interrupted
+    ].includes(state)
+    const shouldDisableOpenFolder = finishedFiles === 0
 
     const moreActions = [
-      [{
-        label: 'Copy Folder Path',
-        onSelect: () => onCopyDownloadPath(downloadId)
-      }]
+      [
+        {
+          label: 'Pause Download',
+          onSelect: () => onPauseDownloadItem(downloadId, downloadName),
+          visible: shouldShowPause,
+          disabled: false
+        },
+        {
+          label: 'Resume Download',
+          onSelect: () => onResumeDownloadItem(downloadId, downloadName),
+          visible: shouldShowResume,
+          disabled: false
+        },
+        {
+          label: 'Cancel Download',
+          onSelect: () => onCancelDownloadItem(downloadId, downloadName),
+          visible: shouldShowCancel,
+          disabled: false
+        }
+      ],
+      [
+        {
+          label: 'Open Folder',
+          onSelect: () => onOpenDownloadFolder(downloadId),
+          visible: true,
+          disabled: shouldDisableOpenFolder
+        },
+        {
+          label: 'Copy Folder Path',
+          onSelect: () => onCopyDownloadPath(downloadId),
+          visible: true,
+          disabled: false
+        }
+      ]
     ]
 
     return (

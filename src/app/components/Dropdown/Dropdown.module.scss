@@ -27,6 +27,10 @@
   color: var(--color__white);
 }
 
+.item[data-disabled] {
+  color: var(--color__black--300);
+}
+
 .action {
   margin-right: var(--size__200);
 }

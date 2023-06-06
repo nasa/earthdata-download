@@ -3,7 +3,9 @@ import PropTypes from 'prop-types'
 import {
   FaBan,
   FaCheckCircle,
+  FaClipboard,
   FaDownload,
+  FaFolderOpen,
   FaPause,
   FaPlay,
   FaSearch,
@@ -211,7 +213,6 @@ const Downloads = ({
       state
     } = runningDownload
     const { finishedFiles } = progress
-
     const shouldShowPause = [
       downloadStates.active
     ].includes(state)
@@ -225,9 +226,55 @@ const Downloads = ({
       downloadStates.error,
       downloadStates.interrupted
     ].includes(state)
+    const shouldShowOpenFolder = [
+      downloadStates.completed
+    ].includes(state)
+    const shouldShowCopyPath = [
+      downloadStates.completed
+    ].includes(state)
     const shouldDisableOpenFolder = finishedFiles === 0
+    const isComplete = state === downloadStates.completed
 
-    const moreActions = [
+    const primaryActionsList = [
+      {
+        label: 'Pause Download',
+        isActive: shouldShowPause,
+        isPrimary: !isComplete,
+        callback: () => onPauseDownloadItem(downloadId, downloadName),
+        icon: FaPause
+      },
+      {
+        label: 'Resume Download',
+        isActive: shouldShowResume,
+        isPrimary: !isComplete,
+        callback: () => onResumeDownloadItem(downloadId, downloadName),
+        icon: FaPlay
+      },
+      {
+        label: 'Cancel Download',
+        isActive: shouldShowCancel,
+        isPrimary: !isComplete,
+        variant: 'danger',
+        callback: () => onCancelDownloadItem(downloadId, downloadName),
+        icon: FaBan
+      },
+      {
+        label: 'Open Folder',
+        isActive: shouldShowOpenFolder,
+        isPrimary: isComplete,
+        callback: () => onOpenDownloadFolder(downloadId),
+        icon: FaFolderOpen
+      },
+      {
+        label: 'Copy Folder Path',
+        isActive: shouldShowCopyPath,
+        isPrimary: isComplete,
+        callback: () => onCopyDownloadPath(downloadId),
+        icon: FaClipboard
+      }
+    ]
+
+    const dropdownActionsList = [
       [
         {
           label: 'Pause Download',
@@ -271,12 +318,8 @@ const Downloads = ({
         downloadName={downloadName}
         progress={progress}
         state={state}
-        onOpenDownloadFolder={onOpenDownloadFolder}
-        onCopyDownloadPath={onCopyDownloadPath}
-        onPauseDownload={onPauseDownloadItem}
-        onResumeDownload={onResumeDownloadItem}
-        onCancelDownload={onCancelDownloadItem}
-        moreActions={moreActions}
+        primaryActionsList={primaryActionsList}
+        dropdownActionsList={dropdownActionsList}
       />
     )
   })

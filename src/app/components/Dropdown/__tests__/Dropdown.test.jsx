@@ -7,10 +7,10 @@ import Dropdown from '../Dropdown'
 
 describe('Dropdown component', () => {
   test('renders a dropdown menu', async () => {
-    const moreActions = [
+    const dropdownActionsList = [
       [
         {
-          label: 'Pause Download',
+          label: 'test-label',
           onSelect: () => {},
           visible: true,
           disabled: false
@@ -18,22 +18,21 @@ describe('Dropdown component', () => {
       ]
     ]
     render(
-      <Dropdown moreActions={moreActions} />
+      <Dropdown dropdownActionsList={dropdownActionsList} />
     )
 
     const trigger = screen.queryByRole('button')
     await userEvent.click(trigger)
-    screen.debug()
 
-    expect(screen.queryByText('Pause Download')).toBeInTheDocument()
+    expect(screen.queryByText('test-label')).toBeInTheDocument()
   })
 
   describe('when a dropdown option is picked', () => {
     test('associated function is triggered', async () => {
-      const moreActions = [
+      const dropdownActionsList = [
         [
           {
-            label: 'Pause Download',
+            label: 'test-label',
             onSelect: jest.fn(),
             visible: true,
             disabled: false
@@ -41,15 +40,15 @@ describe('Dropdown component', () => {
         ]
       ]
       render(
-        <Dropdown moreActions={moreActions} />
+        <Dropdown dropdownActionsList={dropdownActionsList} />
       )
       const trigger = screen.queryByRole('button')
       await userEvent.click(trigger)
 
-      const pauseOption = screen.queryByText('Pause Download')
-      await userEvent.click(pauseOption)
+      const testButton = screen.queryByText('test-label')
+      await userEvent.click(testButton)
 
-      expect(moreActions[0][0].onSelect).toHaveBeenCalledTimes(1)
+      expect(dropdownActionsList[0][0].onSelect).toHaveBeenCalledTimes(1)
     })
   })
 })

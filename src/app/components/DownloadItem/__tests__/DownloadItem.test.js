@@ -20,11 +20,6 @@ describe('DownloadItem component', () => {
         downloadName="download-name"
         progress={progressObj}
         state="ACTIVE"
-        onCancelDownload={() => {}}
-        onPauseDownload={() => {}}
-        onResumeDownload={() => {}}
-        onOpenDownloadFolder={() => {}}
-        onCopyDownloadPath={() => {}}
       />
     )
 
@@ -38,11 +33,6 @@ describe('DownloadItem component', () => {
         downloadName="download-name"
         progress={progressObj}
         state="ACTIVE"
-        onCancelDownload={() => {}}
-        onPauseDownload={() => {}}
-        onResumeDownload={() => {}}
-        onOpenDownloadFolder={() => {}}
-        onCopyDownloadPath={() => {}}
       />
     )
 
@@ -56,11 +46,6 @@ describe('DownloadItem component', () => {
         downloadName="download-name"
         progress={progressObj}
         state="ACTIVE"
-        onCancelDownload={() => {}}
-        onPauseDownload={() => {}}
-        onResumeDownload={() => {}}
-        onOpenDownloadFolder={() => {}}
-        onCopyDownloadPath={() => {}}
       />
     )
 
@@ -75,20 +60,23 @@ describe('DownloadItem component', () => {
           downloadName="download-name"
           progress={progressObj}
           state="ACTIVE"
-          onCancelDownload={() => {}}
-          onPauseDownload={() => {}}
-          onResumeDownload={() => {}}
-          onOpenDownloadFolder={() => {}}
-          onCopyDownloadPath={() => {}}
         />
       )
 
       expect(screen.getByText('Downloading')).toBeInTheDocument()
     })
 
-    describe('when clicking the pause button', () => {
-      test('fires the onPauseDownload callback', async () => {
-        const onPauseDownloadMock = jest.fn()
+    describe('when clicking a primary action button', () => {
+      test('fires the action callback', async () => {
+        const primaryActionsList = [
+          {
+            label: 'test-label',
+            isActive: true,
+            isPrimary: true,
+            callback: jest.fn(),
+            icon: null
+          }
+        ]
 
         render(
           <DownloadItem
@@ -96,25 +84,36 @@ describe('DownloadItem component', () => {
             downloadName="download-name"
             progress={progressObj}
             state="ACTIVE"
-            onCancelDownload={() => {}}
-            onPauseDownload={onPauseDownloadMock}
-            onResumeDownload={() => {}}
-            onOpenDownloadFolder={() => {}}
-            onCopyDownloadPath={() => {}}
+            primaryActionsList={primaryActionsList}
           />
         )
 
-        const pauseButton = screen.getByText('Pause Download')
+        const testButton = screen.getByText('test-label')
 
-        await userEvent.click(pauseButton)
+        await userEvent.click(testButton)
 
-        expect(onPauseDownloadMock).toHaveBeenCalledTimes(1)
+        expect(primaryActionsList[0].callback).toHaveBeenCalledTimes(1)
       })
     })
 
-    describe('when clicking the cancel button', () => {
-      test('fires the onCancelDownload callback', async () => {
-        const onCancelDownloadMock = jest.fn()
+    describe('when generating primary actions', () => {
+      test('if action is not primary it is not visible', async () => {
+        const primaryActionsList = [
+          {
+            label: 'test-label-1',
+            isActive: true,
+            isPrimary: true,
+            callback: jest.fn(),
+            icon: null
+          },
+          {
+            label: 'test-label-2',
+            isActive: true,
+            isPrimary: false,
+            callback: jest.fn(),
+            icon: null
+          }
+        ]
 
         render(
           <DownloadItem
@@ -122,28 +121,21 @@ describe('DownloadItem component', () => {
             downloadName="download-name"
             progress={progressObj}
             state="ACTIVE"
-            onCancelDownload={onCancelDownloadMock}
-            onPauseDownload={() => {}}
-            onResumeDownload={() => {}}
-            onOpenDownloadFolder={() => {}}
-            onCopyDownloadPath={() => {}}
+            primaryActionsList={primaryActionsList}
           />
         )
 
-        const cancelButton = screen.getByText('Cancel Download')
-
-        await userEvent.click(cancelButton)
-
-        expect(onCancelDownloadMock).toHaveBeenCalledTimes(1)
+        expect(screen.queryByText('test-label-1')).toBeInTheDocument()
+        expect(screen.queryByText('test-label-2')).not.toBeInTheDocument()
       })
     })
 
     describe('when clicking the dropdown button', () => {
       test('opens the dropdown component', async () => {
-        const moreActions = [
+        const dropdownActionsList = [
           [
             {
-              label: 'Copy Folder Path',
+              label: 'test-label',
               onSelect: jest.fn(),
               visible: true,
               disabled: false
@@ -157,26 +149,21 @@ describe('DownloadItem component', () => {
             downloadName="download-name"
             progress={progressObj}
             state="ACTIVE"
-            onCancelDownload={() => {}}
-            onPauseDownload={() => {}}
-            onResumeDownload={() => {}}
-            onOpenDownloadFolder={() => {}}
-            onCopyDownloadPath={() => {}}
-            moreActions={moreActions}
+            dropdownActionsList={dropdownActionsList}
           />
         )
         const dropdownTrigger = screen.getByTestId('dropdown-trigger')
 
         await userEvent.click(dropdownTrigger)
-        expect(screen.queryByText('Copy Folder Path')).toBeInTheDocument()
+        expect(screen.queryByText('test-label')).toBeInTheDocument()
       })
 
       describe('when selecting a dropdown option', () => {
         test('fires the function callback', async () => {
-          const moreActions = [
+          const dropdownActionsList = [
             [
               {
-                label: 'Copy Folder Path',
+                label: 'test-label',
                 onSelect: jest.fn(),
                 visible: true,
                 disabled: false
@@ -190,21 +177,16 @@ describe('DownloadItem component', () => {
               downloadName="download-name"
               progress={progressObj}
               state="ACTIVE"
-              onCancelDownload={() => {}}
-              onPauseDownload={() => {}}
-              onResumeDownload={() => {}}
-              onOpenDownloadFolder={() => {}}
-              onCopyDownloadPath={() => {}}
-              moreActions={moreActions}
+              dropdownActionsList={dropdownActionsList}
             />
           )
           const dropdownTrigger = screen.getByTestId('dropdown-trigger')
 
           await userEvent.click(dropdownTrigger)
-          const copyPathButton = screen.queryByText('Copy Folder Path')
-          await userEvent.click(copyPathButton)
+          const testButton = screen.queryByText('test-label')
+          await userEvent.click(testButton)
 
-          expect(moreActions[0][0].onSelect).toHaveBeenCalledTimes(1)
+          expect(dropdownActionsList[0][0].onSelect).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -218,41 +200,10 @@ describe('DownloadItem component', () => {
           downloadName="download-name"
           progress={progressObj}
           state="PAUSED"
-          onCancelDownload={() => {}}
-          onPauseDownload={() => {}}
-          onResumeDownload={() => {}}
-          onOpenDownloadFolder={() => {}}
-          onCopyDownloadPath={() => {}}
         />
       )
 
       expect(screen.getByText('Paused')).toBeInTheDocument()
-    })
-
-    describe('when clicking the resume button', () => {
-      test('fires the onResumeDownload callback', async () => {
-        const onResumeDownloadMock = jest.fn()
-
-        render(
-          <DownloadItem
-            downloadId="download-id"
-            downloadName="download-name"
-            progress={progressObj}
-            state="PAUSED"
-            onCancelDownload={() => {}}
-            onPauseDownload={() => {}}
-            onResumeDownload={onResumeDownloadMock}
-            onOpenDownloadFolder={() => {}}
-            onCopyDownloadPath={() => {}}
-          />
-        )
-
-        const resumeButton = screen.getByText('Resume Download')
-
-        await userEvent.click(resumeButton)
-
-        expect(onResumeDownloadMock).toHaveBeenCalledTimes(1)
-      })
     })
   })
 
@@ -264,66 +215,10 @@ describe('DownloadItem component', () => {
           downloadName="download-name"
           progress={progressObj}
           state="COMPLETED"
-          onCancelDownload={() => {}}
-          onPauseDownload={() => {}}
-          onResumeDownload={() => {}}
-          onOpenDownloadFolder={() => {}}
-          onCopyDownloadPath={() => {}}
         />
       )
 
       expect(screen.getByText('Completed')).toBeInTheDocument()
-    })
-
-    describe('when clicking the open download folder button', () => {
-      test('fires the onOpenDownloadFolder callback', async () => {
-        const onOpenFolderMock = jest.fn()
-
-        render(
-          <DownloadItem
-            downloadId="download-id"
-            downloadName="download-name"
-            progress={progressObj}
-            state="COMPLETED"
-            onCancelDownload={() => {}}
-            onPauseDownload={() => {}}
-            onResumeDownload={() => {}}
-            onOpenDownloadFolder={onOpenFolderMock}
-            onCopyDownloadPath={() => {}}
-          />
-        )
-        // Copy Folder Path
-        const openFolderButton = screen.getByText('Open Folder')
-
-        await userEvent.click(openFolderButton)
-
-        expect(onOpenFolderMock).toHaveBeenCalledTimes(1)
-      })
-    })
-
-    describe('when clicking the copy folder path button', () => {
-      test('fires the onCopyDownloadPath callback', async () => {
-        const onCopyDownloadPathMock = jest.fn()
-
-        render(
-          <DownloadItem
-            downloadId="download-id"
-            downloadName="download-name"
-            progress={progressObj}
-            state="COMPLETED"
-            onCancelDownload={() => {}}
-            onPauseDownload={() => {}}
-            onResumeDownload={() => {}}
-            onOpenDownloadFolder={() => {}}
-            onCopyDownloadPath={onCopyDownloadPathMock}
-          />
-        )
-        const onCopyDownloadPathButton = screen.getByText('Copy Folder Path')
-
-        await userEvent.click(onCopyDownloadPathButton)
-
-        expect(onCopyDownloadPathMock).toHaveBeenCalledTimes(1)
-      })
     })
   })
 })

@@ -8,7 +8,7 @@ import Tooltip from '../Tooltip/Tooltip'
 
 /**
  * @typedef {Object} DropdownProps
- * @property {Array} moreActions An array of arrays of objects detailing dropdown display options.
+ * @property {Array} dropdownActionsList A 2-D array of objects detailing dropdown action attributes.
 /**
  * Renders a Dropdown component
  * @param {DropdownProps} props
@@ -17,17 +17,18 @@ import Tooltip from '../Tooltip/Tooltip'
  *
  * return (
  *  <Dropdown
- *    moreActions={moreActions}
+ *    dropdownActionsList={dropdownActionsList}
  *  >
  *  </Dropdown>
  * )
  */
 const Dropdown = ({
-  moreActions
+  dropdownActionsList
 }) => {
   const dropdownOptions = []
-  if (moreActions) {
-    moreActions.forEach((actionGroup) => {
+
+  if (dropdownActionsList) {
+    dropdownActionsList.forEach((actionGroup) => {
       let showSeparator = false
       actionGroup.forEach((action) => {
         showSeparator = showSeparator || action.visible
@@ -89,11 +90,11 @@ const Dropdown = ({
 }
 
 Dropdown.defaultProps = {
-  moreActions: null
+  dropdownActionsList: null
 }
 
 Dropdown.propTypes = {
-  moreActions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
+  dropdownActionsList: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,
     onSelect: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,

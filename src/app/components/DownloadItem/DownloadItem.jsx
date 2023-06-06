@@ -2,12 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import {
-  FaBan,
   FaCheckCircle,
-  FaClipboard,
-  FaFolderOpen,
-  FaPause,
-  FaPlay,
   FaSpinner
 } from 'react-icons/fa'
 import humanizeDuration from 'humanize-duration'
@@ -24,16 +19,11 @@ import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
 /**
  * @typedef {Object} DownloadItemProps
- * @property {String} downloadId The downloadId the DownloadId belongs to.
  * @property {String} downloadName The name of the DownloadItem.
  * @property {Object} progress The progress of the DownloadItem.
  * @property {String} state The state of the DownloadItem.
- * @property {Function} onCancelDownload A function which cancels a DownloadItem.
- * @property {Function} onPauseDownload A function which pauses a DownloadItem.
- * @property {Function} onResumeDownload A function which resumes a DownloadItem.
- * @property {Function} onOpenDownloadFolder A function which opens the file(s) download folder.
- * @property {Function} onCopyDownloadPath A function which copies the file(s) downloaded path to the users clipboard.
-
+ * @property {Array} primaryActionsList An array of objects detailing primary action attributes.
+ * @property {Array} dropdownActionsList A 2-D array of objects detailing dropdown action attributes.
 /**
  * Renders a DownloadItem
  * @param {DownloadItemProps} props
@@ -43,29 +33,20 @@ import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
  * return (
  *   <DownloadItem
  *     key={downloadId}
- *     downloadId={downloadId}
  *     downloadName={downloadName}
  *     progress={progress}
  *     state={state}
- *     onOpenDownloadFolder={onOpenDownloadFolder}
- *     onCopyDownloadPath={onCopyDownloadPath}
- *     onPauseDownload={onPauseDownloadItem}
- *     onResumeDownload={onResumeDownloadItem}
- *     onCancelDownload={onCancelDownloadItem}
+ *     primaryActionsList={primaryActionsList},
+ *     dropdownActionsList={dropdownActionsList}
  *   />
  * )
  */
 const DownloadItem = ({
-  downloadId,
   downloadName,
   progress,
   state,
-  onCancelDownload,
-  onOpenDownloadFolder,
-  onCopyDownloadPath,
-  onPauseDownload,
-  onResumeDownload,
-  moreActions
+  primaryActionsList,
+  dropdownActionsList
 }) => {
   const {
     percent,
@@ -74,32 +55,29 @@ const DownloadItem = ({
     totalTime
   } = progress
 
-  const shouldShowPause = [
-    downloadStates.active
-  ].includes(state)
-  const shouldShowResume = [
-    downloadStates.paused,
-    downloadStates.interrupted
-  ].includes(state)
-  const shouldShowCancel = [
-    downloadStates.paused,
-    downloadStates.active,
-    downloadStates.error,
-    downloadStates.interrupted
-  ].includes(state)
-  const shouldShowDropdown = [
-    downloadStates.paused,
-    downloadStates.active,
-    downloadStates.error,
-    downloadStates.interrupted,
-    downloadStates.completed
-  ].includes(state)
-  const shouldShowOpenFolder = [
-    downloadStates.completed
-  ].includes(state)
-  const shouldShowCopyPath = [
-    downloadStates.completed
-  ].includes(state)
+  const primaryActions = []
+  if (primaryActionsList) {
+    primaryActionsList.forEach((action) => {
+      primaryActions.push(
+        (action.isActive && action.isPrimary) && (
+          <Tooltip content={action.label}>
+            <Button
+              className={styles.action}
+              size="sm"
+              Icon={action.icon}
+              hideLabel
+              onClick={action.callback}
+              variant={action.variant}
+            >
+              {
+                action.label
+              }
+            </Button>
+          </Tooltip>
+        )
+      )
+    })
+  }
 
   return (
     <li
@@ -163,89 +141,9 @@ const DownloadItem = ({
           </div>
           <div className={styles.metaSecondary}>
             {
-              shouldShowPause && (
-                <Tooltip content="Pause Download">
-                  <Button
-                    className={styles.action}
-                    size="sm"
-                    Icon={FaPause}
-                    hideLabel
-                    onClick={() => onPauseDownload(downloadId, downloadName)}
-                  >
-                    Pause Download
-                  </Button>
-                </Tooltip>
-              )
+              primaryActions
             }
-            {
-              shouldShowResume && (
-                <Tooltip content="Resume Download">
-                  <Button
-                    className={styles.action}
-                    size="sm"
-                    Icon={FaPlay}
-                    hideLabel
-                    onClick={() => onResumeDownload(downloadId, downloadName)}
-                  >
-                    Resume Download
-                  </Button>
-                </Tooltip>
-              )
-            }
-            {
-              shouldShowCancel && (
-                <Tooltip content="Cancel Download">
-                  <Button
-                    className={styles.action}
-                    size="sm"
-                    Icon={FaBan}
-                    hideLabel
-                    onClick={() => onCancelDownload(downloadId, downloadName)}
-                    variant="danger"
-                  >
-                    Cancel Download
-                  </Button>
-                </Tooltip>
-              )
-            }
-            {
-              shouldShowOpenFolder && (
-                <Tooltip content="Open Folder">
-                  <Button
-                    className={styles.action}
-                    size="sm"
-                    Icon={FaFolderOpen}
-                    hideLabel
-                    onClick={() => onOpenDownloadFolder(downloadId)}
-                    tabIndex="0"
-                  >
-                    Open Folder
-                  </Button>
-                </Tooltip>
-              )
-            }
-            {
-              shouldShowCopyPath && (
-                <Tooltip content="Copy Folder Path">
-                  <Button
-                    className={styles.action}
-                    size="sm"
-                    Icon={FaClipboard}
-                    hideLabel
-                    onClick={() => onCopyDownloadPath(downloadId)}
-                    tabIndex="0"
-                  >
-                    Copy Folder Path
-                  </Button>
-                </Tooltip>
-              )
-            }
-            {
-              shouldShowDropdown && (
-                <Dropdown moreActions={moreActions} />
-              )
-            }
-
+            <Dropdown dropdownActionsList={dropdownActionsList} />
           </div>
         </div>
         <div>
@@ -262,11 +160,11 @@ const DownloadItem = ({
 }
 
 DownloadItem.defaultProps = {
-  moreActions: null
+  primaryActionsList: null,
+  dropdownActionsList: null
 }
 
 DownloadItem.propTypes = {
-  downloadId: PropTypes.string.isRequired,
   downloadName: PropTypes.string.isRequired,
   progress: PropTypes.shape({
     percent: PropTypes.number,
@@ -275,14 +173,19 @@ DownloadItem.propTypes = {
     totalTime: PropTypes.number
   }).isRequired,
   state: PropTypes.string.isRequired,
-  onCancelDownload: PropTypes.func.isRequired,
-  onPauseDownload: PropTypes.func.isRequired,
-  onOpenDownloadFolder: PropTypes.func.isRequired,
-  onCopyDownloadPath: PropTypes.func.isRequired,
-  onResumeDownload: PropTypes.func.isRequired,
-  moreActions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
+  primaryActionsList: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,
-    onSelect: PropTypes.func.isRequired
+    isActive: PropTypes.bool.isRequired,
+    isPrimary: PropTypes.bool.isRequired,
+    variant: PropTypes.string,
+    callback: PropTypes.func.isRequired,
+    icon: PropTypes.func.isRequired
+  })),
+  dropdownActionsList: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    onSelect: PropTypes.func.isRequired,
+    visible: PropTypes.bool.isRequired,
+    disabled: PropTypes.bool.isRequired
   })))
 }
 

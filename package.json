@@ -2,10 +2,7 @@
   "name": "earthdata-download",
   "version": "0.0.1",
   "description": "Earthdata Download is a cross-platform download manager designed to improve how users download Earth Science data. It accepts lists of files from applications like Earthdata Search (https://search.earthdata.nasa.gov/) and enables clients to offer users a streamlined experience when downloading files from their browser.",
-  "repository": {
-    "type": "git",
-    "url": "ssh://git@git.earthdata.nasa.gov:7999/edsc/earthdata-download.git"
-  },
+  "repository": "nasa/earthdata-download",
   "homepage": "https://github.com/nasa/earthdata-download#readme",
   "author": {
     "name": "Earthdata Search",
@@ -15,7 +12,6 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "docs": "./node_modules/.bin/jsdoc -p -c ./.jsdoc.conf.json",
-    "postinstall": "npm run docs",
     "start": "vite",
     "dev:test": "NODE_ENV=playwright vite",
     "build": "vite build",

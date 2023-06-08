@@ -22,7 +22,7 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .jsx,.js,.ts",
     "lint:css": "npx stylelint './src/**/*.(sc|c)ss'",
-    "test": "jest",
+    "test": "TZ='America/New_York' jest",
     "test:watch": "TZ='America/New_York' jest --watchAll",
     "test:watch-lite": "TZ='America/New_York' jest --watchAll --collectCoverageFrom='' --coverage=true",
     "test:bamboo": "TZ='America/New_York' jest --ci --reporters=default --reporters=jest-junit",

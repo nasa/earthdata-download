@@ -1,5 +1,9 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {
+  render,
+  screen,
+  within
+} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 
@@ -68,77 +72,14 @@ describe('DownloadItem component', () => {
 
     describe('when clicking a primary action button', () => {
       test('fires the action callback', async () => {
-        const primaryActionsList = [
-          {
-            label: 'test-label',
-            isActive: true,
-            isPrimary: true,
-            callback: jest.fn(),
-            icon: null
-          }
-        ]
-
-        render(
-          <DownloadItem
-            downloadId="download-id"
-            downloadName="download-name"
-            progress={progressObj}
-            state="ACTIVE"
-            primaryActionsList={primaryActionsList}
-          />
-        )
-
-        const testButton = screen.getByText('test-label')
-
-        await userEvent.click(testButton)
-
-        expect(primaryActionsList[0].callback).toHaveBeenCalledTimes(1)
-      })
-    })
-
-    describe('when generating primary actions', () => {
-      test('if action is not primary it is not visible', async () => {
-        const primaryActionsList = [
-          {
-            label: 'test-label-1',
-            isActive: true,
-            isPrimary: true,
-            callback: jest.fn(),
-            icon: null
-          },
-          {
-            label: 'test-label-2',
-            isActive: true,
-            isPrimary: false,
-            callback: jest.fn(),
-            icon: null
-          }
-        ]
-
-        render(
-          <DownloadItem
-            downloadId="download-id"
-            downloadName="download-name"
-            progress={progressObj}
-            state="ACTIVE"
-            primaryActionsList={primaryActionsList}
-          />
-        )
-
-        expect(screen.queryByText('test-label-1')).toBeInTheDocument()
-        expect(screen.queryByText('test-label-2')).not.toBeInTheDocument()
-      })
-    })
-
-    describe('when clicking the dropdown button', () => {
-      test('opens the dropdown component', async () => {
-        const dropdownActionsList = [
+        const actionsList = [
           [
             {
               label: 'test-label',
-              onSelect: jest.fn(),
-              visible: true,
-              disabled: false
+              isActive: true,
+              isPrimary: true,
+              callback: jest.fn(),
+              icon: null
             }
           ]
         ]
@@ -149,24 +90,94 @@ describe('DownloadItem component', () => {
             downloadName="download-name"
             progress={progressObj}
             state="ACTIVE"
-            dropdownActionsList={dropdownActionsList}
+            actionsList={actionsList}
+          />
+        )
+
+        const testButton = screen.getByText('test-label')
+
+        await userEvent.click(testButton)
+
+        expect(actionsList[0][0].callback).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('when generating primary actions', () => {
+      test('if action is not primary it is not visible', async () => {
+        const actionsList = [
+          [
+            {
+              label: 'test-label-1',
+              isActive: true,
+              isPrimary: true,
+              callback: jest.fn(),
+              icon: null
+            },
+            {
+              label: 'test-label-2',
+              isActive: true,
+              isPrimary: false,
+              callback: jest.fn(),
+              icon: null
+            }
+          ]
+        ]
+
+        render(
+          <DownloadItem
+            downloadId="download-id"
+            downloadName="download-name"
+            progress={progressObj}
+            state="ACTIVE"
+            actionsList={actionsList}
+          />
+        )
+
+        expect(screen.queryByText('test-label-1')).toBeInTheDocument()
+        expect(screen.queryByText('test-label-2')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when clicking the dropdown button', () => {
+      test('opens the dropdown component', async () => {
+        const actionsList = [
+          [
+            {
+              label: 'test-label',
+              isActive: true,
+              isPrimary: true,
+              callback: jest.fn(),
+              icon: null
+            }
+          ]
+        ]
+
+        render(
+          <DownloadItem
+            downloadId="download-id"
+            downloadName="download-name"
+            progress={progressObj}
+            state="ACTIVE"
+            actionsList={actionsList}
           />
         )
         const dropdownTrigger = screen.getByTestId('dropdown-trigger')
 
         await userEvent.click(dropdownTrigger)
-        expect(screen.queryByText('test-label')).toBeInTheDocument()
+
+        expect(screen.getByRole('menuitem')).toBeInTheDocument()
       })
 
       describe('when selecting a dropdown option', () => {
         test('fires the function callback', async () => {
-          const dropdownActionsList = [
+          const actionsList = [
             [
               {
                 label: 'test-label',
-                onSelect: jest.fn(),
-                visible: true,
-                disabled: false
+                isActive: true,
+                isPrimary: false,
+                callback: jest.fn(),
+                icon: null
               }
             ]
           ]
@@ -177,16 +188,16 @@ describe('DownloadItem component', () => {
               downloadName="download-name"
               progress={progressObj}
               state="ACTIVE"
-              dropdownActionsList={dropdownActionsList}
+              actionsList={actionsList}
             />
           )
           const dropdownTrigger = screen.getByTestId('dropdown-trigger')
 
           await userEvent.click(dropdownTrigger)
-          const testButton = screen.queryByText('test-label')
+          const testButton = screen.getByRole('menuitem')
           await userEvent.click(testButton)
 
-          expect(dropdownActionsList[0][0].onSelect).toHaveBeenCalledTimes(1)
+          expect(actionsList[0][0].callback).toHaveBeenCalledTimes(1)
         })
       })
     })

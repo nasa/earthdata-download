@@ -7,18 +7,19 @@ import Dropdown from '../Dropdown'
 
 describe('Dropdown component', () => {
   test('renders a dropdown menu', async () => {
-    const dropdownActionsList = [
+    const actionsList = [
       [
         {
           label: 'test-label',
-          onSelect: () => {},
-          visible: true,
-          disabled: false
+          isActive: true,
+          isPrimary: true,
+          callback: jest.fn(),
+          icon: null
         }
       ]
     ]
     render(
-      <Dropdown dropdownActionsList={dropdownActionsList} />
+      <Dropdown actionsList={actionsList} />
     )
 
     const trigger = screen.queryByRole('button')
@@ -29,18 +30,19 @@ describe('Dropdown component', () => {
 
   describe('when a dropdown option is picked', () => {
     test('associated function is triggered', async () => {
-      const dropdownActionsList = [
+      const actionsList = [
         [
           {
             label: 'test-label',
-            onSelect: jest.fn(),
-            visible: true,
-            disabled: false
+            isActive: true,
+            isPrimary: true,
+            callback: jest.fn(),
+            icon: null
           }
         ]
       ]
       render(
-        <Dropdown dropdownActionsList={dropdownActionsList} />
+        <Dropdown actionsList={actionsList} />
       )
       const trigger = screen.queryByRole('button')
       await userEvent.click(trigger)
@@ -48,7 +50,7 @@ describe('Dropdown component', () => {
       const testButton = screen.queryByText('test-label')
       await userEvent.click(testButton)
 
-      expect(dropdownActionsList[0][0].onSelect).toHaveBeenCalledTimes(1)
+      expect(actionsList[0][0].callback).toHaveBeenCalledTimes(1)
     })
   })
 })

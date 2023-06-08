@@ -22,8 +22,7 @@ import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
  * @property {String} downloadName The name of the DownloadItem.
  * @property {Object} progress The progress of the DownloadItem.
  * @property {String} state The state of the DownloadItem.
- * @property {Array} primaryActionsList An array of objects detailing primary action attributes.
- * @property {Array} dropdownActionsList A 2-D array of objects detailing dropdown action attributes.
+ * @property {Array} actionsList A 2-D array of objects detailing action attributes.
 /**
  * Renders a DownloadItem
  * @param {DownloadItemProps} props
@@ -36,8 +35,7 @@ import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
  *     downloadName={downloadName}
  *     progress={progress}
  *     state={state}
- *     primaryActionsList={primaryActionsList},
- *     dropdownActionsList={dropdownActionsList}
+ *     actionsList={actionsList},
  *   />
  * )
  */
@@ -45,8 +43,7 @@ const DownloadItem = ({
   downloadName,
   progress,
   state,
-  primaryActionsList,
-  dropdownActionsList
+  actionsList,
 }) => {
   const {
     percent,
@@ -56,26 +53,28 @@ const DownloadItem = ({
   } = progress
 
   const primaryActions = []
-  if (primaryActionsList) {
-    primaryActionsList.forEach((action) => {
-      primaryActions.push(
-        (action.isActive && action.isPrimary) && (
-          <Tooltip content={action.label}>
-            <Button
-              className={styles.action}
-              size="sm"
-              Icon={action.icon}
-              hideLabel
-              onClick={action.callback}
-              variant={action.variant}
-            >
-              {
-                action.label
-              }
-            </Button>
-          </Tooltip>
+  if (actionsList) {
+    actionsList.forEach((actionGroup) => {
+      actionGroup.forEach((action) => {
+        primaryActions.push(
+          (action.isActive && action.isPrimary) && (
+            <Tooltip content={action.label} key={action.label}>
+              <Button
+                className={styles.action}
+                size="sm"
+                Icon={action.icon}
+                hideLabel
+                onClick={action.callback}
+                variant={action.variant}
+              >
+                {
+                  action.label
+                }
+              </Button>
+            </Tooltip>
+          )
         )
-      )
+      })
     })
   }
 
@@ -143,7 +142,7 @@ const DownloadItem = ({
             {
               primaryActions
             }
-            <Dropdown dropdownActionsList={dropdownActionsList} />
+            <Dropdown actionsList={actionsList} />
           </div>
         </div>
         <div>
@@ -160,8 +159,7 @@ const DownloadItem = ({
 }
 
 DownloadItem.defaultProps = {
-  primaryActionsList: null,
-  dropdownActionsList: null
+  actionsList: null
 }
 
 DownloadItem.propTypes = {
@@ -173,19 +171,14 @@ DownloadItem.propTypes = {
     totalTime: PropTypes.number
   }).isRequired,
   state: PropTypes.string.isRequired,
-  primaryActionsList: PropTypes.arrayOf(PropTypes.shape({
+  actionsList: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,
     isActive: PropTypes.bool.isRequired,
     isPrimary: PropTypes.bool.isRequired,
     variant: PropTypes.string,
     callback: PropTypes.func.isRequired,
-    icon: PropTypes.func.isRequired
-  })),
-  dropdownActionsList: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    onSelect: PropTypes.func.isRequired,
-    visible: PropTypes.bool.isRequired,
-    disabled: PropTypes.bool.isRequired
+    icon: PropTypes.func.isRequired,
+    disabled: PropTypes.bool
   })))
 }
 

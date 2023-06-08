@@ -8,7 +8,7 @@ import Tooltip from '../Tooltip/Tooltip'
 
 /**
  * @typedef {Object} DropdownProps
- * @property {Array} dropdownActionsList A 2-D array of objects detailing dropdown action attributes.
+ * @property {Array} actionsList A 2-D array of objects detailing action attributes.
 /**
  * Renders a Dropdown component
  * @param {DropdownProps} props
@@ -17,29 +17,28 @@ import Tooltip from '../Tooltip/Tooltip'
  *
  * return (
  *  <Dropdown
- *    dropdownActionsList={dropdownActionsList}
+ *    actionsList={actionsList}
  *  >
  *  </Dropdown>
  * )
  */
 const Dropdown = ({
-  dropdownActionsList
+  actionsList
 }) => {
   const dropdownOptions = []
-
-  if (dropdownActionsList) {
-    dropdownActionsList.forEach((actionGroup) => {
+  if (actionsList) {
+    actionsList.forEach((actionGroup) => {
       let showSeparator = false
       actionGroup.forEach((action) => {
-        showSeparator = showSeparator || action.visible
+        showSeparator = showSeparator || action.isActive
         // Create dropdown item element for each action object
         dropdownOptions.push(
-          action.visible && (
+          (action.isActive) && (
           <RadixDropdown.Item
             key={action.label}
             className={styles.item}
             disabled={action.disabled}
-            onSelect={action.onSelect}
+            onSelect={action.callback}
           >
             {
               action.label
@@ -90,15 +89,18 @@ const Dropdown = ({
 }
 
 Dropdown.defaultProps = {
-  dropdownActionsList: null
+  actionsList: null
 }
 
 Dropdown.propTypes = {
-  dropdownActionsList: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
+  actionsList: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,
-    onSelect: PropTypes.func.isRequired,
-    visible: PropTypes.bool.isRequired,
-    disabled: PropTypes.bool.isRequired
+    isActive: PropTypes.bool.isRequired,
+    isPrimary: PropTypes.bool.isRequired,
+    variant: PropTypes.string,
+    callback: PropTypes.func.isRequired,
+    icon: PropTypes.func,
+    disabled: PropTypes.bool
   })))
 }
 

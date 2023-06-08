@@ -226,87 +226,49 @@ const Downloads = ({
       downloadStates.error,
       downloadStates.interrupted
     ].includes(state)
-    const shouldShowOpenFolder = [
-      downloadStates.completed
-    ].includes(state)
-    const shouldShowCopyPath = [
-      downloadStates.completed
-    ].includes(state)
     const shouldDisableOpenFolder = finishedFiles === 0
     const isComplete = state === downloadStates.completed
 
-    const primaryActionsList = [
-      {
-        label: 'Pause Download',
-        isActive: shouldShowPause,
-        isPrimary: !isComplete,
-        callback: () => onPauseDownloadItem(downloadId, downloadName),
-        icon: FaPause
-      },
-      {
-        label: 'Resume Download',
-        isActive: shouldShowResume,
-        isPrimary: !isComplete,
-        callback: () => onResumeDownloadItem(downloadId, downloadName),
-        icon: FaPlay
-      },
-      {
-        label: 'Cancel Download',
-        isActive: shouldShowCancel,
-        isPrimary: !isComplete,
-        variant: 'danger',
-        callback: () => onCancelDownloadItem(downloadId, downloadName),
-        icon: FaBan
-      },
-      {
-        label: 'Open Folder',
-        isActive: shouldShowOpenFolder,
-        isPrimary: isComplete,
-        callback: () => onOpenDownloadFolder(downloadId),
-        icon: FaFolderOpen
-      },
-      {
-        label: 'Copy Folder Path',
-        isActive: shouldShowCopyPath,
-        isPrimary: isComplete,
-        callback: () => onCopyDownloadPath(downloadId),
-        icon: FaClipboard
-      }
-    ]
-
-    const dropdownActionsList = [
+    const actionsList = [
       [
         {
           label: 'Pause Download',
-          onSelect: () => onPauseDownloadItem(downloadId, downloadName),
-          visible: shouldShowPause,
-          disabled: false
+          isActive: shouldShowPause,
+          isPrimary: !isComplete,
+          callback: () => onPauseDownloadItem(downloadId, downloadName),
+          icon: FaPause
         },
         {
           label: 'Resume Download',
-          onSelect: () => onResumeDownloadItem(downloadId, downloadName),
-          visible: shouldShowResume,
-          disabled: false
+          isActive: shouldShowResume,
+          isPrimary: !isComplete,
+          callback: () => onResumeDownloadItem(downloadId, downloadName),
+          icon: FaPlay
         },
         {
           label: 'Cancel Download',
-          onSelect: () => onCancelDownloadItem(downloadId, downloadName),
-          visible: shouldShowCancel,
-          disabled: false
+          isActive: shouldShowCancel,
+          isPrimary: !isComplete,
+          variant: 'danger',
+          callback: () => onCancelDownloadItem(downloadId, downloadName),
+          icon: FaBan
         }
       ],
       [
         {
           label: 'Open Folder',
-          onSelect: () => onOpenDownloadFolder(downloadId),
-          visible: true,
+          isActive: !shouldDisableOpenFolder,
+          isPrimary: isComplete,
+          callback: () => onOpenDownloadFolder(downloadId),
+          icon: FaFolderOpen,
           disabled: shouldDisableOpenFolder
         },
         {
           label: 'Copy Folder Path',
-          onSelect: () => onCopyDownloadPath(downloadId),
-          visible: true,
-          disabled: false
+          isActive: true,
+          isPrimary: isComplete,
+          callback: () => onCopyDownloadPath(downloadId),
+          icon: FaClipboard
         }
       ]
     ]
@@ -314,12 +276,10 @@ const Downloads = ({
     return (
       <DownloadItem
         key={downloadId}
-        downloadId={downloadId}
         downloadName={downloadName}
         progress={progress}
         state={state}
-        primaryActionsList={primaryActionsList}
-        dropdownActionsList={dropdownActionsList}
+        actionsList={actionsList}
       />
     )
   })

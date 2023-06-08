@@ -15,6 +15,8 @@ const reportProgress = ({
   }
 
   const progress = Object.keys(downloads)
+    // Only report progress on downloads that are not `pending`
+    .filter((key) => downloads[key].state !== downloadStates.pending)
     // Show the newest downloads first
     .sort((a, b) => {
       if (downloads[a].timeStart > downloads[b].timeStart) return -1
@@ -26,6 +28,7 @@ const reportProgress = ({
 
       const {
         files,
+        loadingMoreFiles,
         name: downloadName = downloadId,
         state,
         timeEnd,
@@ -54,6 +57,7 @@ const reportProgress = ({
       return {
         downloadId,
         downloadName,
+        loadingMoreFiles,
         progress,
         state
       }

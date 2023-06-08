@@ -18,10 +18,15 @@ const onUpdated = ({
 }) => {
   const name = item.getFilename()
   // Escape the `.` character in the file name for interacting with the store
-  const storeName = name.replace('.', '\\.')
+  const storeName = name.replaceAll('.', '\\.')
 
   // Get the download item from the store
   const storeItem = store.get(`downloads.${downloadId}.files.${storeName}`)
+
+  if (!storeItem) {
+    item.cancel()
+    return
+  }
 
   // Calculate the percent done of the download
   const receivedBytes = item.getReceivedBytes()

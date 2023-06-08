@@ -57,10 +57,10 @@ describe('onDone', () => {
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
     expect(startNextDownload).toHaveBeenCalledWith({
+      currentDownloadItems,
       downloadId: 'mock-download-id',
       downloadIdContext: {},
       store,
-      wasCancelled: false,
       webContents: {}
     })
   })
@@ -112,10 +112,10 @@ describe('onDone', () => {
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
     expect(startNextDownload).toHaveBeenCalledWith({
+      currentDownloadItems,
       downloadId: 'mock-download-id',
       downloadIdContext: {},
       store,
-      wasCancelled: false,
       webContents: {}
     })
   })
@@ -167,10 +167,10 @@ describe('onDone', () => {
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
     expect(startNextDownload).toHaveBeenCalledWith({
+      currentDownloadItems,
       downloadId: 'mock-download-id',
       downloadIdContext: {},
       store,
-      wasCancelled: true,
       webContents: {}
     })
   })

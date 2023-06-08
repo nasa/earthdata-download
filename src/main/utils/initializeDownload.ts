@@ -3,19 +3,17 @@
 import { app } from 'electron'
 
 /**
- * Opens the electron open dialog to choose a download location
+ * Sends a message to the renderer process to start a download for the given downloadIds.
  * @param {Object} params
- * @param {String} params.downloadId ID for the download being initialized
- * @param {Object} params.store `electron-store` instance
  * @param {Object} params.appWindow Electron window instance
+ * @param {Array} params.downloadIds Download IDs to be initialized
+ * @param {Object} params.store `electron-store` instance
  */
-const didFinishLoad = ({
-  downloadIds = [],
-  store,
-  appWindow
+const initializeDownload = ({
+  appWindow,
+  downloadIds,
+  store
 }) => {
-  // TODO downloadId might need to be generated here once we are getting a context value from EDSC
-
   if (downloadIds.length > 0) {
     // Default the download location to the user's `downloads` foler
     let location = app.getPath('downloads')
@@ -44,12 +42,6 @@ const didFinishLoad = ({
       shouldUseDefaultLocation: !!defaultDownloadLocation
     })
   }
-
-  // Show the electron appWindow
-  appWindow.show()
-
-  // Open the DevTools if running in development.
-  if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })
 }
 
-export default didFinishLoad
+export default initializeDownload

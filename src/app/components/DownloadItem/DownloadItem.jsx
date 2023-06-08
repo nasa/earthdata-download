@@ -17,6 +17,8 @@ import Tooltip from '../Tooltip/Tooltip'
 import downloadStates from '../../constants/downloadStates'
 import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
+import commafy from '../../utils/commafy'
+
 /**
  * @typedef {Object} DownloadItemProps
  * @property {String} downloadName The name of the DownloadItem.
@@ -131,7 +133,7 @@ const DownloadItem = ({
               {' '}
               of
               {' '}
-              {totalFiles}
+              {commafy(totalFiles)}
               {' '}
               files done in
               {' '}

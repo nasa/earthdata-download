@@ -67,6 +67,10 @@
             "type": "number",
             "description": "The time when the download was completed."
           },
+          "loadingMoreFiles": {
+            "type": "boolean",
+            "description": "If more files are being loaded into a download"
+          },
           "files": {
             "type": "object",
             "patternProperties": {

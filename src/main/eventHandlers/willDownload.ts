@@ -38,7 +38,7 @@ const willDownload = ({
   currentDownloadItems.addItem(downloadId, name, item)
 
   // Escape the `.` character in the file name for interacting with the store
-  const storeName = name.replace('.', '\\.')
+  const storeName = name.replaceAll('.', '\\.')
   store.set(`downloads.${downloadId}.files.${storeName}.timeStart`, new Date().getTime())
 
   item.on('updated', (event, state) => {

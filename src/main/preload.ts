@@ -15,7 +15,6 @@ contextBridge.exposeInMainWorld('electronApi', {
   cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
   openDownloadFolder: (data) => ipcRenderer.send('openDownloadFolder', data),
   copyDownloadPath: (data) => ipcRenderer.send('copyDownloadPath', data),
-  requestProgressReport: (data) => ipcRenderer.send('requestProgressReport', data),
 
   // Messages to be received by the renderer process
   initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'off']('initializeDownload', callback),

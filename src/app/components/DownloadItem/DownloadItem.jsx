@@ -43,7 +43,7 @@ const DownloadItem = ({
   downloadName,
   progress,
   state,
-  actionsList,
+  actionsList
 }) => {
   const {
     percent,

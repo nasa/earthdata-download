@@ -5,79 +5,82 @@ import downloadStates from '../../../app/constants/downloadStates'
 /**
  * Starts the next download when a download completes
  * @param {Object} params
+ * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {String} params.downloadId downloadId of the DownloadItem being downloaded
  * @param {Object} params.downloadIdContext Object where we can associated a newly created download to a downloadId
  * @param {Object} params.store `electron-store` instance
- * @param {Boolean} params.wasCancelled Was the previous file cancelled
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
 const startNextDownload = ({
+  currentDownloadItems,
   downloadId,
   downloadIdContext,
   store,
-  wasCancelled,
   webContents
 }) => {
-  let nextFile
+  // Get the concurrentDownloads from preferences
+  const concurrentDownloads = store.get('preferences.concurrentDownloads')
 
-  // If the item wasn't cancelled, find the next pending file in the download to start
-  if (!wasCancelled) {
-    // Get all files from the current download
-    const allFiles = store.get(`downloads.${downloadId}.files`)
+  // Get number of running downloads
+  const numberOfRunningDownloads = currentDownloadItems.getNumberOfDownloads()
 
-    // Get the next file that is pending
-    nextFile = Object.entries(allFiles)
-      .find(([, values]) => values.state === downloadStates.pending)
+  // For available number of downloads, find the next `active` download with `pending` files and start downloading
+  let numberDownloadsToStart = concurrentDownloads - numberOfRunningDownloads
 
-    // If there is another file still in pending, start downloading it
-    if (nextFile) {
-      const [nextFilename] = nextFile
-      const { url } = allFiles[nextFilename]
-
-      // eslint-disable-next-line no-param-reassign
-      downloadIdContext[url] = downloadId
-      webContents.downloadURL(url)
-    } else {
-      // Find the next file in the download that has not completed
-      const nextNotCompletedFile = Object.entries(allFiles)
-        .find(([, values]) => values.state !== downloadStates.completed)
-
-      // If no more files in the download are not completed, set the timeEnd and state for the download in the store
-      if (!nextNotCompletedFile) {
-        const storeDownload = store.get(`downloads.${downloadId}`)
-        store.set(`downloads.${downloadId}`, {
-          ...storeDownload,
-          timeEnd: new Date().getTime(),
-          state: downloadStates.completed
-        })
-      }
-    }
-  }
-
-  // If the item was cancelled, or there are no more pending files in the download, find the next active download with pending files to start
-  // TODO if all the files were cancelled, this needs to trigger more downloads
-  if (wasCancelled || !nextFile) {
+  while (numberDownloadsToStart > 0) {
     const allDownloads = store.get('downloads')
-    const nextActiveDownloadId = Object.keys(allDownloads)
+
+    const activeDownloadIds = Object.keys(allDownloads)
       // eslint-disable-next-line arrow-body-style
-      .find((nextDownloadId) => {
-        return downloadId !== nextDownloadId
-        && allDownloads[nextDownloadId].state === downloadStates.active
-      })
+      .filter((nextDownloadId) => allDownloads[nextDownloadId].state === downloadStates.active)
 
-    if (!nextActiveDownloadId) return
+    if (activeDownloadIds.length === 0) return
 
-    const nextActiveDownloadFiles = allDownloads[nextActiveDownloadId].files
-    const nextActiveDownloadPendingFile = Object.entries(nextActiveDownloadFiles)
-      .find(([, values]) => values.state === downloadStates.pending)
+    let startedFile = false
 
-    if (nextActiveDownloadPendingFile) {
-      const [nextFilename] = nextActiveDownloadPendingFile
-      const { url } = nextActiveDownloadFiles[nextFilename]
+    // Find the next pending file within all active downloads
+    activeDownloadIds.forEach((activeDownloadId) => {
+      // If a file has already been started in this loop, don't look for another file to start
+      if (startedFile) return
 
-      // eslint-disable-next-line no-param-reassign
-      downloadIdContext[url] = nextActiveDownloadId
-      webContents.downloadURL(url)
+      const { files: nextActiveDownloadFiles } = allDownloads[activeDownloadId]
+      const nextActiveDownloadPendingFile = Object.entries(nextActiveDownloadFiles)
+        .find(([, values]) => values.state === downloadStates.pending)
+
+      // If a pending file was found, start it downloading
+      if (nextActiveDownloadPendingFile) {
+        const [nextFilename] = nextActiveDownloadPendingFile
+        const { url } = nextActiveDownloadFiles[nextFilename]
+
+        store.set(`downloads.${activeDownloadId.replaceAll('.', '\\.')}.files.${nextFilename.replaceAll('.', '\\.')}.state`, downloadStates.active)
+
+        // eslint-disable-next-line no-param-reassign
+        downloadIdContext[url] = activeDownloadId.replaceAll('.', '\\.')
+        webContents.downloadURL(url)
+
+        startedFile = true
+      } else {
+        const nextNotCompletedFile = Object.entries(nextActiveDownloadFiles)
+          .find(([, values]) => values.state !== downloadStates.completed)
+
+        // If no more files in the download are not completed, set the timeEnd and state for the download in the store
+        if (!nextNotCompletedFile) {
+          const storeDownload = store.get(`downloads.${downloadId}`)
+          store.set(`downloads.${downloadId}`, {
+            ...storeDownload,
+            timeEnd: new Date().getTime(),
+            state: downloadStates.completed
+          })
+        }
+      }
+    })
+
+    // If a file was started, decrement the number of downloads we still need to start
+    if (startedFile) {
+      numberDownloadsToStart -= 1
+    } else {
+      // If a file was not started, set numberDownloadsToStart to 0 to stop the loop
+      numberDownloadsToStart = 0
     }
   }
 }

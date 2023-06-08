@@ -25,7 +25,7 @@ const onDone = ({
 }) => {
   const name = item.getFilename()
   // Escape the `.` character in the file name for interacting with the store
-  const storeName = name.replace('.', '\\.')
+  const storeName = name.replaceAll('.', '\\.')
 
   // Get the download item from the store
   const storeItem = store.get(`downloads.${downloadId}.files.${storeName}`)
@@ -51,38 +51,21 @@ const onDone = ({
   }
 
   // Update the state in the store
-  store.set(`downloads.${downloadId}.files.${storeName}`, {
-    ...storeItem,
-    timeEnd: new Date().getTime(),
-    state: updatedState,
-    percent: updatedState === downloadStates.completed ? 100 : 0,
-    errors
-  })
+  if (storeItem) {
+    store.set(`downloads.${downloadId}.files.${storeName}`, {
+      ...storeItem,
+      timeEnd: new Date().getTime(),
+      state: updatedState,
+      percent: updatedState === downloadStates.completed ? 100 : 0,
+      errors
+    })
+  }
 
-  // TODO trying to loop through here isn't working because its inside an event handler, so all 5 are being cancelled at once, so startNextDownload is being called 5 times at the same time, not within a timeout
-
-  // const numberOfRunningDownloads = currentDownloadItems.getNumberOfDownloads()
-  // const concurrentDownloads = store.get('preferences.concurrentDownloads')
-
-  // const numberDownloadsToStart = concurrentDownloads - numberOfRunningDownloads
-  // Array.from(Array(numberDownloadsToStart)).forEach(() => {
-  //   setTimeout(() => {
-  //     // Start the next file downloading
-  //     startNextDownload({
-  //       downloadId,
-  //       downloadIdContext,
-  //       store,
-  //       wasCancelled: state === 'cancelled',
-  //       webContents
-  //     })
-  //   }, 500)
-  // })
-  // Start the next file downloading
   startNextDownload({
+    currentDownloadItems,
     downloadId,
     downloadIdContext,
     store,
-    wasCancelled: state === 'cancelled',
     webContents
   })
 }

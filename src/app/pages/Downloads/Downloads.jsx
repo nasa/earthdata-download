@@ -53,7 +53,6 @@ const Downloads = ({
     setDownloadLocation,
     pauseDownloadItem,
     reportProgress,
-    requestProgressReport,
     resumeDownloadItem,
     cancelDownloadItem,
     openDownloadFolder,
@@ -95,22 +94,17 @@ const Downloads = ({
 
     // If shouldUseDefaultLocation is true, start the download(s)
     if (shouldUseDefaultLocation) {
+      // TODO this is calling beginDownload twice
       beginDownload({
         downloadIds: newDownloadIds,
         downloadLocation: newDownloadLocation,
         makeDefaultDownloadLocation: true
       })
-
-      // Ensure the main process is reporting progress updates
-      requestProgressReport()
     }
   }
 
   const onCloseChooseLocationModal = () => {
     setChooseDownloadLocationIsOpen(false)
-
-    // Ensure the main process is reporting progress updates
-    requestProgressReport()
   }
 
   const onPauseDownloadItem = (downloadId) => {
@@ -143,8 +137,6 @@ const Downloads = ({
     setDownloadLocation(true, onSetDownloadLocation)
     initializeDownload(true, onInitializeDownload)
     reportProgress(true, onReportProgress)
-
-    requestProgressReport()
 
     return () => {
       setDownloadLocation(false, onSetDownloadLocation)
@@ -209,10 +201,13 @@ const Downloads = ({
     const {
       downloadId,
       downloadName,
+      loadingMoreFiles,
       progress,
       state
     } = runningDownload
+
     const { finishedFiles } = progress
+
     const shouldShowPause = [
       downloadStates.active
     ].includes(state)
@@ -277,6 +272,7 @@ const Downloads = ({
       <DownloadItem
         key={downloadId}
         downloadName={downloadName}
+        loadingMoreFiles={loadingMoreFiles}
         progress={progress}
         state={state}
         actionsList={actionsList}

@@ -2,6 +2,9 @@ import MockDate from 'mockdate'
 
 import beginDownload from '../beginDownload'
 import CurrentDownloadItems from '../../utils/currentDownloadItems'
+import startNextDownload from '../willDownloadEvents/startNextDownload'
+
+jest.mock('../willDownloadEvents/startNextDownload')
 
 beforeEach(() => {
   MockDate.set('2023-05-01')
@@ -17,21 +20,24 @@ describe('beginDownload', () => {
     }
     const store = {
       set: jest.fn(),
-      get: jest.fn().mockReturnValue({
-        concurrentDownloads: 5
-      })
+      get: jest.fn()
+        .mockReturnValueOnce({
+          concurrentDownloads: 5
+        })
+        .mockReturnValueOnce({
+          files: {
+            'mock-url': {
+              name: undefined,
+              percent: 0,
+              state: 'ACTIVE',
+              url: 'mock-url'
+            }
+          },
+          state: 'PENDING'
+        })
     }
     const webContents = {
       downloadURL: jest.fn()
-    }
-    const pendingDownloads = {
-      'mock-id': {
-        files: [
-          {
-            url: 'mock-url'
-          }
-        ]
-      }
     }
 
     beginDownload({
@@ -39,11 +45,10 @@ describe('beginDownload', () => {
       currentDownloadItems: new CurrentDownloadItems(),
       info,
       store,
-      webContents,
-      pendingDownloads
+      webContents
     })
 
-    expect(store.get).toHaveBeenCalledTimes(1)
+    expect(store.get).toHaveBeenCalledTimes(2)
     expect(store.set).toHaveBeenCalledTimes(2)
     expect(store.set).toHaveBeenCalledWith('preferences', {
       defaultDownloadLocation: undefined,
@@ -64,9 +69,13 @@ describe('beginDownload', () => {
       state: 'ACTIVE'
     })
 
-    expect(downloadIdContext).toEqual({ 'mock-url': 'mock-id' })
-    expect(webContents.downloadURL).toHaveBeenCalledTimes(1)
-    expect(webContents.downloadURL).toHaveBeenCalledWith('mock-url')
+    expect(startNextDownload).toHaveBeenCalledTimes(1)
+    expect(startNextDownload).toHaveBeenCalledWith(
+      expect.objectContaining({
+        downloadId: 'mock-id',
+        downloadIdContext: {}
+      })
+    )
   })
 
   test('updates the store with defaultDownloadLocation', () => {
@@ -78,21 +87,24 @@ describe('beginDownload', () => {
     }
     const store = {
       set: jest.fn(),
-      get: jest.fn().mockReturnValue({
-        concurrentDownloads: 5
-      })
+      get: jest.fn()
+        .mockReturnValueOnce({
+          concurrentDownloads: 5
+        })
+        .mockReturnValueOnce({
+          files: {
+            'mock-url': {
+              name: undefined,
+              percent: 0,
+              state: 'ACTIVE',
+              url: 'mock-url'
+            }
+          },
+          state: 'PENDING'
+        })
     }
     const webContents = {
       downloadURL: jest.fn()
-    }
-    const pendingDownloads = {
-      'mock-id': {
-        files: [
-          {
-            url: 'mock-url'
-          }
-        ]
-      }
     }
 
     beginDownload({
@@ -100,11 +112,10 @@ describe('beginDownload', () => {
       currentDownloadItems: new CurrentDownloadItems(),
       info,
       store,
-      webContents,
-      pendingDownloads
+      webContents
     })
 
-    expect(store.get).toHaveBeenCalledTimes(1)
+    expect(store.get).toHaveBeenCalledTimes(2)
     expect(store.set).toHaveBeenCalledTimes(2)
     expect(store.set).toHaveBeenCalledWith('preferences', {
       defaultDownloadLocation: '/mock/location',
@@ -125,78 +136,12 @@ describe('beginDownload', () => {
       state: 'ACTIVE'
     })
 
-    expect(downloadIdContext).toEqual({ 'mock-url': 'mock-id' })
-    expect(webContents.downloadURL).toHaveBeenCalledTimes(1)
-    expect(webContents.downloadURL).toHaveBeenCalledWith('mock-url')
-  })
-
-  test('sets files to pending if they exceed the concurrentDownloads limit', () => {
-    const downloadIdContext = {}
-    const info = {
-      downloadIds: ['mock-id'],
-      downloadLocation: '/mock/location',
-      makeDefaultDownloadLocation: false
-    }
-    const store = {
-      set: jest.fn(),
-      get: jest.fn().mockReturnValue({
-        concurrentDownloads: 1
+    expect(startNextDownload).toHaveBeenCalledTimes(1)
+    expect(startNextDownload).toHaveBeenCalledWith(
+      expect.objectContaining({
+        downloadId: 'mock-id',
+        downloadIdContext: {}
       })
-    }
-    const webContents = {
-      downloadURL: jest.fn()
-    }
-    const pendingDownloads = {
-      'mock-id': {
-        files: [
-          {
-            url: 'mock-url-1'
-          },
-          {
-            url: 'mock-url-2'
-          }
-        ]
-      }
-    }
-
-    beginDownload({
-      downloadIdContext,
-      currentDownloadItems: new CurrentDownloadItems(),
-      info,
-      store,
-      webContents,
-      pendingDownloads
-    })
-
-    expect(store.get).toHaveBeenCalledTimes(1)
-    expect(store.set).toHaveBeenCalledTimes(2)
-    expect(store.set).toHaveBeenCalledWith('preferences', {
-      defaultDownloadLocation: undefined,
-      lastDownloadLocation: '/mock/location',
-      concurrentDownloads: 1
-    })
-    expect(store.set).toHaveBeenCalledWith('downloads.mock-id', {
-      downloadLocation: '/mock/location/mock-id',
-      timeStart: 1682899200000,
-      files: {
-        'mock-url-1': {
-          name: undefined,
-          percent: 0,
-          state: 'ACTIVE',
-          url: 'mock-url-1'
-        },
-        'mock-url-2': {
-          name: undefined,
-          percent: 0,
-          state: 'PENDING',
-          url: 'mock-url-2'
-        }
-      },
-      state: 'ACTIVE'
-    })
-
-    expect(downloadIdContext).toEqual({ 'mock-url-1': 'mock-id' })
-    expect(webContents.downloadURL).toHaveBeenCalledTimes(1)
-    expect(webContents.downloadURL).toHaveBeenCalledWith('mock-url-1')
+    )
   })
 })

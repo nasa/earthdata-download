@@ -12,8 +12,10 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "docs": "./node_modules/.bin/jsdoc -p -c ./.jsdoc.conf.json",
+    "prestart": "rm -rf dist-electron/ dist/",
     "start": "vite",
     "dev:test": "NODE_ENV=playwright vite",
+    "prebuild": "rm -rf dist-electron/ dist/",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .jsx,.js,.ts",
@@ -51,6 +53,7 @@
     "eslint-config-airbnb": "^19.0.4",
     "humanize-duration": "^3.28.0",
     "inter-ui": "^3.19.3",
+    "node-fetch": "^3.3.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

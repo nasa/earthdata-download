@@ -3,7 +3,6 @@
 import {
   app,
   BrowserWindow,
-  dialog,
   ipcMain,
   shell
 } from 'electron'
@@ -15,19 +14,16 @@ import storageSchema from './storageSchema.json'
 import beginDownload from './eventHandlers/beginDownload'
 import chooseDownloadLocation from './eventHandlers/chooseDownloadLocation'
 import clearDefaultDownload from './eventHandlers/clearDefaultDownload'
-import didFinishLoad from './eventHandlers/didFinishLoad'
-import windowStateKeeper from './utils/windowStateKeeper'
-import willDownload from './eventHandlers/willDownload'
-import reportProgress from './eventHandlers/reportProgress'
 import copyDownloadPath from './eventHandlers/copyDownloadPath'
 import openDownloadFolder from './eventHandlers/openDownloadFolder'
+import openUrl from './eventHandlers/openUrl'
+import reportProgress from './eventHandlers/reportProgress'
+import willDownload from './eventHandlers/willDownload'
+import windowStateKeeper from './utils/windowStateKeeper'
 
 import CurrentDownloadItems from './utils/currentDownloadItems'
-import downloadStates from '../app/constants/downloadStates'
 
-// const { downloads } = require('../../test-download-files.json')
-// const { downloads } = require('../../test-download-files-one-collection.json')
-const { downloads } = require('../../test-download-files-one-file.json')
+import downloadStates from '../app/constants/downloadStates'
 
 const store = new Store({
   // TODO set this key before publishing application
@@ -44,22 +40,14 @@ const store = new Store({
 // Uncomment this line to delete your local storage
 // store.clear()
 
-const today = new Date()
-  .toISOString()
-  .replace(/(:|-)/g, '')
-  .replace('T', '_')
-  .split('.')[0]
-
-const pendingDownloads = downloads.reduce((map, download) => ({
-  ...map,
-  [`${download.id}-${today}`]: {
-    ...download
-  }
-}), {})
-
 const currentDownloadItems = new CurrentDownloadItems()
 
 let appWindow
+
+// `downloadIdContext` holds the downloadId for a new file beginning to download.
+// `beginDownload`, or `willDownload` will save the downloadId associated with a new URL
+// so that within willDownload we can associate the DownloadItem instance with the correct download.
+const downloadIdContext = {}
 
 const createWindow = () => {
   const windowState = windowStateKeeper(store)
@@ -99,10 +87,6 @@ const createWindow = () => {
     appWindow.loadFile('dist/index.html')
   }
 
-  // `downloadIdContext` holds the downloadId for a new file beginning to download.
-  // `beginDownload`, or `willDownload` will save the downloadId associated with a new URL
-  // so that within willDownload we can associate the DownloadItem instance with the correct download.
-  const downloadIdContext = {}
   appWindow.webContents.session.on('will-download', (event, item, webContents) => {
     const url = item.getURL()
     const downloadId = downloadIdContext[url]
@@ -132,8 +116,7 @@ const createWindow = () => {
       currentDownloadItems,
       info,
       store,
-      webContents: appWindow.webContents,
-      pendingDownloads
+      webContents: appWindow.webContents
     })
   })
 
@@ -145,11 +128,11 @@ const createWindow = () => {
   })
 
   appWindow.webContents.once('did-finish-load', () => {
-    didFinishLoad({
-      downloadIds: Object.keys(pendingDownloads),
-      store,
-      appWindow
-    })
+    // Show the electron appWindow
+    appWindow.show()
+
+    // Open the DevTools if running in development.
+    if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })
   })
 
   ipcMain.on('pauseDownloadItem', (event, info) => {
@@ -157,7 +140,7 @@ const createWindow = () => {
 
     currentDownloadItems.pauseItem(downloadId, name)
 
-    if (downloadId && !name) store.set(`downloads.${downloadId}.state`, downloadStates.paused)
+    if (downloadId && !name) store.set(`downloads.${downloadId.replaceAll('.', '\\.')}.state`, downloadStates.paused)
 
     if (!downloadId) {
       const downloads = store.get('downloads')
@@ -175,13 +158,15 @@ const createWindow = () => {
   ipcMain.on('cancelDownloadItem', (event, info) => {
     const { downloadId, name } = info
 
-    store.set(`downloads.${downloadId}.state`, downloadStates.completed)
+    if (downloadId) {
+      store.set(`downloads.${downloadId.replaceAll('.', '\\.')}.state`, downloadStates.completed)
+    }
 
     currentDownloadItems.cancelItem(downloadId, name)
 
     // Cancelling a download will remove it from the list of downloads
     // TODO how will this work when cancelling a granule download? I don't think we want to remove single items from a provided list of links
-    if (downloadId && !name) store.delete(`downloads.${downloadId}`)
+    if (downloadId && !name) store.delete(`downloads.${downloadId.replaceAll('.', '\\.')}`)
 
     if (!downloadId) store.delete('downloads')
   })
@@ -191,7 +176,7 @@ const createWindow = () => {
 
     currentDownloadItems.resumeItem(downloadId, name)
 
-    if (downloadId && !name) store.set(`downloads.${downloadId}.state`, downloadStates.active)
+    if (downloadId && !name) store.set(`downloads.${downloadId.replaceAll('.', '\\.')}.state`, downloadStates.active)
 
     if (!downloadId) {
       const downloads = store.get('downloads')
@@ -287,8 +272,13 @@ if (!gotTheLock) {
     // the commandLine is array of strings in which last element is deep link url
     // the url str ends with /
 
-    // TODO example of deep linking, process these parameters in EDD-5
-    dialog.showErrorBox('Welcome Back', `You arrived from: ${commandLine.pop().slice(0, -1)}`)
+    const url = commandLine.pop().slice(0, -1)
+
+    openUrl({
+      deepLink: url,
+      store,
+      appWindow
+    })
   })
 
   // Create window, load the rest of the app, etc...
@@ -298,7 +288,10 @@ if (!gotTheLock) {
 
   // Handle the protocol. In this case, we choose to show an Error Box.
   app.on('open-url', (event, url) => {
-    // TODO example of deep linking, process these parameters in EDD-5
-    dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
+    openUrl({
+      deepLink: url,
+      store,
+      appWindow
+    })
   })
 }

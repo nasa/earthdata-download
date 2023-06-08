@@ -121,6 +121,7 @@ const InitializeDownload = ({
           onClick={
             // TODO Do we need to do any other cleanup with the download id here?
             // TODO Can we add an undo functionality?
+            // TODO remove downloadIds from store
             onCloseChooseLocationModal
           }
         >

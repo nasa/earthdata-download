@@ -1,9 +1,8 @@
 name: Build/release
 
+# Only run this workflow on tag pushes
 on:
   push:
-    # branches: [main]
-    # branches: [EDD-4]
     tags:
       - 'v*'
 

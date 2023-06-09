@@ -51,5 +51,8 @@
 .settingsClearDefaultDownload {
   width: 20%;
   color: var(--color__text--dark);
-  
+}
+
+.activeDownloadsWarn{
+  color: red;
 }

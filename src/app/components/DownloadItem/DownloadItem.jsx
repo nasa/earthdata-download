@@ -22,6 +22,7 @@ import commafy from '../../utils/commafy'
 /**
  * @typedef {Object} DownloadItemProps
  * @property {String} downloadName The name of the DownloadItem.
+ * @property {Boolean} loadingMoreFiles Is EDD loading more download files.
  * @property {Object} progress The progress of the DownloadItem.
  * @property {String} state The state of the DownloadItem.
  * @property {Array} actionsList A 2-D array of objects detailing action attributes.
@@ -35,6 +36,7 @@ import commafy from '../../utils/commafy'
  *   <DownloadItem
  *     key={downloadId}
  *     downloadName={downloadName}
+ *     loadingMoreFiles,
  *     progress={progress}
  *     state={state}
  *     actionsList={actionsList},
@@ -43,6 +45,7 @@ import commafy from '../../utils/commafy'
  */
 const DownloadItem = ({
   downloadName,
+  loadingMoreFiles,
   progress,
   state,
   actionsList
@@ -97,48 +100,93 @@ const DownloadItem = ({
         role="button"
         tabIndex="0"
       >
-        <h3 className={styles.name}>
+        <h3
+          className={styles.name}
+          data-testid="download-item-name"
+        >
           {downloadName}
         </h3>
         <div className={styles.meta}>
           <div className={styles.metaPrimary}>
-            <div className={styles.percentComplete}>
-              {percent}
-              %
-            </div>
-            {humanizedDownloadStates[state] && (
-              <div className={styles.displayStatus}>
-                {
-                  state === downloadStates.active && (
-                    <FaSpinner
-                      className={
-                        classNames([
-                          styles.statusDescriptionIcon,
-                          styles.spinner
-                        ])
-                      }
-                    />
-                  )
-                }
-                {
-                  state === downloadStates.completed && (
-                    <FaCheckCircle className={styles.statusDescriptionIcon} />
-                  )
-                }
-                {humanizedDownloadStates[state]}
-              </div>
-            )}
-            <div className={styles.statusDescription}>
-              {finishedFiles}
-              {' '}
-              of
-              {' '}
-              {commafy(totalFiles)}
-              {' '}
-              files done in
-              {' '}
-              {humanizeDuration(totalTime * 1000)}
-            </div>
+            {
+              (state !== downloadStates.pending && totalFiles > 0) && (
+                <div
+                  className={styles.percentComplete}
+                  data-testid="download-item-percent"
+                >
+                  {percent}
+                  %
+                </div>
+              )
+            }
+            {
+              humanizedDownloadStates[state] && (
+                <div
+                  className={styles.displayStatus}
+                  data-testid="download-item-state"
+                >
+                  {
+                    state === downloadStates.active && (
+                      <FaSpinner
+                        className={
+                          classNames([
+                            styles.statusDescriptionIcon,
+                            styles.spinner
+                          ])
+                        }
+                        data-testid="download-item-spinner"
+                      />
+                    )
+                  }
+                  {
+                    state === downloadStates.completed && (
+                      <FaCheckCircle className={styles.statusDescriptionIcon} />
+                    )
+                  }
+                  {humanizedDownloadStates[state]}
+                </div>
+              )
+            }
+            {
+              state !== downloadStates.pending && (
+                <div
+                  className={styles.statusDescription}
+                  data-testid="download-item-status-description"
+                >
+                  {commafy(finishedFiles)}
+                  {
+                    !loadingMoreFiles && (
+                      <>
+                        {' '}
+                        of
+                        {' '}
+                        {commafy(totalFiles)}
+                      </>
+                    )
+                  }
+                  {' '}
+                  files
+                  {
+                    (state !== downloadStates.pending && totalFiles > 0) && (
+                      <>
+                        {' '}
+                        done in
+                        {' '}
+                        {humanizeDuration(totalTime * 1000)}
+                      </>
+                    )
+                  }
+                  {
+                    loadingMoreFiles && (
+                      <>
+                        {' '}
+                        (determining file count)
+                      </>
+                    )
+                  }
+                </div>
+              )
+            }
           </div>
           <div className={styles.metaSecondary}>
             {
@@ -161,7 +209,8 @@ const DownloadItem = ({
 }
 
 DownloadItem.defaultProps = {
-  actionsList: null
+  actionsList: null,
+  loadingMoreFiles: false
 }
 
 DownloadItem.propTypes = {
@@ -172,6 +221,7 @@ DownloadItem.propTypes = {
     totalFiles: PropTypes.number,
     totalTime: PropTypes.number
   }).isRequired,
+  loadingMoreFiles: PropTypes.bool,
   state: PropTypes.string.isRequired,
   actionsList: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,

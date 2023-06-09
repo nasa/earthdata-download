@@ -20,7 +20,7 @@ beforeEach(() => {
 })
 
 describe('fetchLinks', () => {
-  test.only('loads the links and calls initializeDownload', async () => {
+  test('loads the links and calls initializeDownload', async () => {
     const appWindow = {}
     const downloadId = 'shortName_versionId'
     const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
@@ -98,19 +98,22 @@ describe('fetchLinks', () => {
       downloadIds: ['shortName_versionId-20230501_000000']
     }))
 
-    expect(store.set).toHaveBeenCalledTimes(3)
+    expect(store.set).toHaveBeenCalledTimes(4)
     expect(store.set).toHaveBeenCalledWith(
       'downloads.shortName_versionId-20230501_000000',
       {
-        files: {
-          'file1.png': {
-            percent: 0,
-            state: 'PENDING',
-            url: 'https://example.com/file1.png'
-          }
-        },
         loadingMoreFiles: true,
         state: 'PENDING'
+      }
+    )
+    expect(store.set).toHaveBeenCalledWith(
+      'downloads.shortName_versionId-20230501_000000.files',
+      {
+        'file1.png': {
+          percent: 0,
+          state: 'PENDING',
+          url: 'https://example.com/file1.png'
+        }
       }
     )
     expect(store.set).toHaveBeenCalledWith(
@@ -131,7 +134,7 @@ describe('fetchLinks', () => {
     expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000.loadingMoreFiles', false)
   })
 
-  test.only('does not call initializeDownload on error', async () => {
+  test('saves the error on error', async () => {
     const appWindow = {}
     const downloadId = 'shortName_versionId'
     const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
@@ -139,10 +142,14 @@ describe('fetchLinks', () => {
       set: jest.fn(),
       get: jest.fn()
         .mockReturnValueOnce({
-          'file1.png': {
-            percent: 0,
-            state: 'PENDING',
-            url: 'https://example.com/file1.png'
+          loadingMoreFiles: true,
+          state: 'PENDING',
+          files: {
+            'file1.png': {
+              percent: 0,
+              state: 'PENDING',
+              url: 'https://example.com/file1.png'
+            }
           }
         })
     }
@@ -174,6 +181,31 @@ describe('fetchLinks', () => {
 
     expect(initializeDownload).toHaveBeenCalledTimes(0)
 
-    expect(store.set).toHaveBeenCalledTimes(0)
+    expect(store.get).toHaveBeenCalledTimes(1)
+    expect(store.get).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000')
+
+    expect(store.set).toHaveBeenCalledTimes(2)
+    expect(store.set).toHaveBeenCalledWith(
+      'downloads.shortName_versionId-20230501_000000',
+      {
+        loadingMoreFiles: true,
+        state: 'PENDING'
+      }
+    )
+    expect(store.set).toHaveBeenCalledWith(
+      'downloads.shortName_versionId-20230501_000000',
+      {
+        files: {
+          'file1.png': {
+            percent: 0,
+            state: 'PENDING',
+            url: 'https://example.com/file1.png'
+          }
+        },
+        loadingMoreFiles: false,
+        state: 'ERROR',
+        error: 'error'
+      }
+    )
   })
 })

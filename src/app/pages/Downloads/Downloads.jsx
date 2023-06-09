@@ -209,6 +209,7 @@ const Downloads = ({
     const { finishedFiles } = progress
 
     const shouldShowPause = [
+      downloadStates.pending,
       downloadStates.active
     ].includes(state)
     const shouldShowResume = [
@@ -216,6 +217,7 @@ const Downloads = ({
       downloadStates.interrupted
     ].includes(state)
     const shouldShowCancel = [
+      downloadStates.pending,
       downloadStates.paused,
       downloadStates.active,
       downloadStates.error,

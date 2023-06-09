@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 
+import { FaPause } from 'react-icons/fa'
+
 import DownloadItem from '../DownloadItem'
 
 const progressObj = {
@@ -13,47 +15,27 @@ const progressObj = {
 }
 
 describe('DownloadItem component', () => {
-  test('displays the download title', () => {
-    render(
-      <DownloadItem
-        downloadId="download-id"
-        downloadName="download-name"
-        progress={progressObj}
-        state="ACTIVE"
-      />
-    )
+  describe('when a download is pending', () => {
+    test('displays the correct download information', () => {
+      render(
+        <DownloadItem
+          downloadId="download-id"
+          downloadName="download-name"
+          progress={progressObj}
+          loadingMoreFiles
+          state="PENDING"
+        />
+      )
 
-    expect(screen.getByText('download-name')).toBeInTheDocument()
-  })
-
-  test('displays the download percentage', () => {
-    render(
-      <DownloadItem
-        downloadId="download-id"
-        downloadName="download-name"
-        progress={progressObj}
-        state="ACTIVE"
-      />
-    )
-
-    expect(screen.getByText('0%')).toBeInTheDocument()
-  })
-
-  test('displays a humanized status', () => {
-    render(
-      <DownloadItem
-        downloadId="download-id"
-        downloadName="download-name"
-        progress={progressObj}
-        state="ACTIVE"
-      />
-    )
-
-    expect(screen.getByText('0 of 1 files done in 0 seconds')).toBeInTheDocument()
+      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+      expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('download-item-status-description')).not.toBeInTheDocument()
+      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Initializing')
+    })
   })
 
   describe('when a download is active', () => {
-    test('displays the correct download status', () => {
+    test('displays the correct download information', () => {
       render(
         <DownloadItem
           downloadId="download-id"
@@ -63,7 +45,31 @@ describe('DownloadItem component', () => {
         />
       )
 
-      expect(screen.getByText('Downloading')).toBeInTheDocument()
+      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+      expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
+      expect(screen.getByTestId('download-item-spinner')).toBeInTheDocument()
+      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Downloading')
+      expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('0 of 1 files done in 0 seconds')
+    })
+
+    describe('when more files are loading', () => {
+      test('displays the correct download information', () => {
+        render(
+          <DownloadItem
+            downloadId="download-id"
+            downloadName="download-name"
+            progress={progressObj}
+            loadingMoreFiles
+            state="ACTIVE"
+          />
+        )
+
+        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+        expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
+        expect(screen.getByTestId('download-item-spinner')).toBeInTheDocument()
+        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Downloading')
+        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('0 files done in 0 seconds (determining file count)')
+      })
     })
 
     describe('when clicking a primary action button', () => {
@@ -75,7 +81,7 @@ describe('DownloadItem component', () => {
               isActive: true,
               isPrimary: true,
               callback: jest.fn(),
-              icon: null
+              icon: FaPause
             }
           ]
         ]
@@ -107,14 +113,14 @@ describe('DownloadItem component', () => {
               isActive: true,
               isPrimary: true,
               callback: jest.fn(),
-              icon: null
+              icon: FaPause
             },
             {
               label: 'test-label-2',
               isActive: true,
               isPrimary: false,
               callback: jest.fn(),
-              icon: null
+              icon: FaPause
             }
           ]
         ]
@@ -143,7 +149,7 @@ describe('DownloadItem component', () => {
               isActive: true,
               isPrimary: true,
               callback: jest.fn(),
-              icon: null
+              icon: FaPause
             }
           ]
         ]
@@ -173,7 +179,7 @@ describe('DownloadItem component', () => {
                 isActive: true,
                 isPrimary: false,
                 callback: jest.fn(),
-                icon: null
+                icon: FaPause
               }
             ]
           ]
@@ -200,7 +206,7 @@ describe('DownloadItem component', () => {
   })
 
   describe('when a download is paused', () => {
-    test('displays the correct download status', () => {
+    test('displays the correct download information', () => {
       render(
         <DownloadItem
           downloadId="download-id"
@@ -210,22 +216,34 @@ describe('DownloadItem component', () => {
         />
       )
 
-      expect(screen.getByText('Paused')).toBeInTheDocument()
+      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+      expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
+      expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
+      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Paused')
+      expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('0 of 1 files done in 0 seconds')
     })
   })
 
   describe('when a download is completed', () => {
-    test('displays the correct download status', () => {
+    test('displays the correct download information', () => {
       render(
         <DownloadItem
           downloadId="download-id"
           downloadName="download-name"
-          progress={progressObj}
+          progress={{
+            ...progressObj,
+            finishedFiles: 1,
+            percent: 100
+          }}
           state="COMPLETED"
         />
       )
 
-      expect(screen.getByText('Completed')).toBeInTheDocument()
+      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+      expect(screen.getByTestId('download-item-percent')).toHaveTextContent('100%')
+      expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
+      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Completed')
+      expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 1 files done in 0 seconds')
     })
   })
 })

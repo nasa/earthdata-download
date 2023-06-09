@@ -1,4 +1,5 @@
 const humanizedDownloadStates = {
+  PENDING: 'Initializing',
   ACTIVE: 'Downloading',
   COMPLETED: 'Completed',
   PAUSED: 'Paused',

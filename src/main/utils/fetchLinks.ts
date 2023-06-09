@@ -7,8 +7,6 @@ import initializeDownload from './initializeDownload'
 
 import downloadStates from '../../app/constants/downloadStates'
 
-// import beginDownload from '../eventHandlers/beginDownload'
-
 // TODO? find a way to still use test downloads
 // const { downloads } = require('../../test-download-files.json')
 // const { downloads } = require('../../test-download-files-one-collection.json')
@@ -44,12 +42,6 @@ const fetchLinks = async ({
   token,
   appWindow
 }) => {
-  // TODO add docs file(s) for this request/response format
-  // Fetch the first page of links from `url`
-
-  // If the response contains a `cursor`, append it to the URL parameters and keep requesting until no items come back
-  // If the response does not contain a `cursor` increment the pageNum parameter and keep requesting until no items come back
-
   const now = new Date()
     .toISOString()
     .replace(/(:|-)/g, '')
@@ -57,6 +49,12 @@ const fetchLinks = async ({
     .split('.')[0]
 
   const downloadIdWithTime = `${downloadId.replaceAll('.', '\\.')}-${now}`
+
+  // Create a download in the store with the first page of links
+  store.set(`downloads.${downloadIdWithTime}`, {
+    loadingMoreFiles: true,
+    state: downloadStates.pending
+  })
 
   let finished = false
   let pageNum = 1
@@ -108,12 +106,7 @@ const fetchLinks = async ({
 
       // If this is the first response back, create a download in the store
       if (pageNum === 1) {
-        // Create a download in the store with the first page of links
-        store.set(`downloads.${downloadIdWithTime}`, {
-          state: downloadStates.pending,
-          loadingMoreFiles: !done,
-          files: formatLinks(links)
-        })
+        store.set(`downloads.${downloadIdWithTime}.files`, formatLinks(links))
 
         // Initialize download will let the renderer process know to start a download
         initializeDownload({
@@ -131,13 +124,19 @@ const fetchLinks = async ({
         })
       }
 
-      if (done) finished = true
+      finished = done
       cursor = responseCursor
       pageNum += 1
     }
   } catch (error) {
-    // TODO what do we need to do here?
-    console.log('🚀 ~ file: fetchLinks.ts:43 ~ fetchLinks ~ error:', error)
+    const download = store.get(`downloads.${downloadIdWithTime}`)
+
+    store.set(`downloads.${downloadIdWithTime}`, {
+      ...download,
+      loadingMoreFiles: false,
+      state: downloadStates.error,
+      error: error.message
+    })
   }
 }
 

@@ -1,5 +1,9 @@
 # Earthdata Download
 
+![Version](https://img.shields.io/github/v/release/nasa/earthdata-download?display_name=tag&label=Version&sort=semver)
+![Build Status](https://github.com/nasa/earthdata-download/workflows/CI/badge.svg?branch=main)
+[![codecov](https://codecov.io/gh/nasa/earthdata-download/branch/main/graph/badge.svg?token=W6E082B30M)](https://codecov.io/gh/nasa/earthdata-download)
+
 This README briefly describes how to bootstrap the Earthdata Download project. For more information about Earthdata Download, check out the `/docs` directory.
 
 ## Development

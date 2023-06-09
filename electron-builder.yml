@@ -5,6 +5,7 @@ directories:
 files:
   - dist-electron
   - dist
+artifactName: ${productName}-${arch}.${ext}
 mac:
   target:
     - target: default

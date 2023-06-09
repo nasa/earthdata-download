@@ -84,6 +84,7 @@ const Dialog = ({
                 className="IconButton"
                 aria-label="Close"
                 Icon={FaTimes}
+                dataTestId="dialog-button-close"
               >
                 Close
               </Button>

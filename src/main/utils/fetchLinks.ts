@@ -95,6 +95,7 @@ const fetchLinks = async ({
 
       const {
         cursor: responseCursor,
+        done,
         links = []
       } = jsonResponse
 
@@ -110,7 +111,7 @@ const fetchLinks = async ({
         // Create a download in the store with the first page of links
         store.set(`downloads.${downloadIdWithTime}`, {
           state: downloadStates.pending,
-          loadingMoreFiles: true,
+          loadingMoreFiles: !done,
           files: formatLinks(links)
         })
 
@@ -130,6 +131,7 @@ const fetchLinks = async ({
         })
       }
 
+      if (done) finished = true
       cursor = responseCursor
       pageNum += 1
     }

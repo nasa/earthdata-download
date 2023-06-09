@@ -47,7 +47,9 @@ import * as styles from './Downloads.module.scss'
  */
 const Downloads = ({
   // eslint-disable-next-line no-unused-vars
-  setCurrentPage
+  setCurrentPage,
+  hasActiveDownload,
+  setHasActiveDownload
 }) => {
   const {
     beginDownload,
@@ -69,7 +71,6 @@ const Downloads = ({
   const [runningDownloads, setRunningDownloads] = useState([])
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
-  const [hasActiveDownload, setHasActiveDownload] = useState(false)
   const [hasPausedDownload, setHasPausedDownload] = useState(false)
   const [totalDownloadFiles, setTotalDownloadFiles] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
@@ -455,9 +456,13 @@ const Downloads = ({
     </>
   )
 }
-
 Downloads.propTypes = {
-  setCurrentPage: PropTypes.func.isRequired
+  setCurrentPage: PropTypes.func.isRequired,
+  hasActiveDownload: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.number
+  ]).isRequired,
+  setHasActiveDownload: PropTypes.func.isRequired
 }
 
 export default Downloads

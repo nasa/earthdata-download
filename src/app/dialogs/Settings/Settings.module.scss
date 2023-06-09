@@ -1,0 +1,55 @@
+.location {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--size__500);
+}
+
+.downloadLocationLabel {
+  margin-bottom: var(--size__150);
+  color: var(--color__text--normal);
+}
+
+.downloadLocationWrapper {
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.downloadLocationButton {
+  display: flex;
+  max-width: 90%;
+  flex-grow: 0;
+  flex-shrink: 1;
+  align-items: center;
+  padding: var(--size__250) var(--size__500);
+  border: 1px solid var(--color__black--150);
+  background-color: var(--color__black--100);
+  color: var(--color__text--dark);
+  font-size: 0.925rem;
+  font-weight: 500;
+  transition: background-color 150ms var(--animation__spring);
+
+  &:hover {
+    background-color: var(--color__black--150);
+    color: var(--color__black--900);
+  }
+}
+
+.downloadLocationText {
+  color: var(--color__text--dark);
+}
+
+.downloadLocationIcon {
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-right: var(--size__150);
+  color: var(--color__black--500);
+}
+
+.settingsClearDefaultDownload {
+  width: 20%;
+  color: var(--color__text--dark);
+  
+}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom'
 
 import Layout from '../Layout'
 
@@ -125,6 +126,21 @@ describe('Layout component', () => {
     await user.click(screen.getByTestId('layout-button-settings'))
 
     expect(Settings).toHaveBeenCalledTimes(1)
+  })
+
+  test('Settings dialog modal can be escaped using Radix close', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ElectronApiContext.Provider value={{ isMac: true }}>
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    await user.click(screen.getByTestId('layout-button-settings'))
+
+    expect(Settings).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId('dialog-button-close')).toBeInTheDocument()
   })
 
   test('renders the settings button on a mac', () => {

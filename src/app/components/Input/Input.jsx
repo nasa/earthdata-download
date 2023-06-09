@@ -7,6 +7,7 @@ const Input = ({
   type,
   placeholder,
   onChange,
+  onBlur,
   value,
   label
 }) => (
@@ -14,7 +15,15 @@ const Input = ({
     <RadixLabel.Root className={styles.labelRoot}>
       {label}
     </RadixLabel.Root>
-    <input data-testid="input-test-id" className={styles.input} value={value} type={type} placeholder={placeholder} onChange={onChange} min="1" />
+    <input
+      data-testid="input-test-id"
+      className={styles.input}
+      value={value}
+      type={type}
+      placeholder={placeholder}
+      onChange={onChange}
+      onBlur={onBlur}
+    />
   </div>
 )
 
@@ -27,7 +36,8 @@ Input.propTypes = {
   type: PropTypes.string.isRequired,
   placeholder: PropTypes.number,
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.number.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired,
   label: PropTypes.string
 }
 

@@ -7,15 +7,17 @@ import Input from '../Input'
 
 describe('Input component', () => {
   test('renders an Input', () => {
-    // const onChangeMock = jest.fn()
-    const value = 10
+    const onChangeMock = jest.fn()
+    const onBlur = jest.fn()
+    const value = 'mock-value'
     const mockLabel = 'mockLabel'
     render(
       <Input
         type="number"
-        onChange={() => {}}
+        onChange={onChangeMock}
         value={value}
         label={mockLabel}
+        onBlur={onBlur}
       />
     )
 

@@ -44,7 +44,7 @@ const Settings = ({
     setPreferenceFieldValue,
     getPreferenceFieldValue
   } = useContext(ElectronApiContext)
-  const [concurrentDownloads, setConcurrentDownloads] = useState(5)
+  const [concurrentDownloads, setConcurrentDownloads] = useState('5')
   const [defaultDownloadLocation, setDefaultDownloadLocation] = useState()
 
   const onClearDefaultDownload = () => {
@@ -56,13 +56,39 @@ const Settings = ({
     chooseDownloadLocation()
   }
 
-  const onSetConcurrentDownloads = (event) => {
+  const onChangeConcurrentDownloads = (event) => {
     const { value } = event.target
-    const valueNum = parseInt(value, 10)
-    if (valueNum > 0) {
-      setConcurrentDownloads(valueNum)
-      setPreferenceFieldValue('concurrentDownloads', valueNum)
+    // if value is non numerical and can't be parsed as an integer return 0
+    const valueNumeric = parseInt(value, 10) || 0
+    if (value === '') {
+      setConcurrentDownloads('')
+      return
     }
+    // Allow set if non-decimal value and > 0 allow setting of the text field
+    if (valueNumeric > 0 && value.indexOf('.') < 0) {
+      setConcurrentDownloads(valueNumeric.toString())
+    }
+  }
+  // Event occurs when element loses focus, write to preferences.json
+  const onBlurConcurrentDownloads = async (event) => {
+    const { value } = event.target
+    // If empty string is entered and the input field is exited, restore the label with the set concurrentDownloads
+    if (value === '') {
+      const concurrentDownloadsPreference = await getPreferenceFieldValue('concurrentDownloads')
+      setConcurrentDownloads(concurrentDownloadsPreference.toString())
+      return
+    }
+
+    const valueNumeric = parseInt(value, 10)
+    if (valueNumeric > 0) {
+      setPreferenceFieldValue('concurrentDownloads', valueNumeric)
+    }
+  }
+
+  const onSetDownloadLocation = (event, info) => {
+    const { downloadLocation: newDownloadLocation } = info
+    setDefaultDownloadLocation(newDownloadLocation)
+    setPreferenceFieldValue('defaultDownloadLocation', newDownloadLocation)
   }
 
   useEffect(
@@ -76,17 +102,14 @@ const Settings = ({
   )
 
   useEffect(() => {
-    const fetchConcurrency = async () => { setConcurrentDownloads(await getPreferenceFieldValue('concurrentDownloads')) }
+    const fetchConcurrency = async () => {
+      const concurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
+      setConcurrentDownloads(concurrentDownloads.toString())
+    }
     fetchConcurrency()
   }, [setConcurrentDownloads])
 
-  const onSetDownloadLocation = (event, info) => {
-    const { downloadLocation: newDownloadLocation } = info
-    setDefaultDownloadLocation(newDownloadLocation)
-    setPreferenceFieldValue('defaultDownloadLocation', newDownloadLocation)
-  }
-
-  // Handle the response from the setConcurrentDownloads func
+  // Handle the response from the setDownloadLocation
   useEffect(() => {
     setDownloadLocation(true, onSetDownloadLocation)
     return () => {
@@ -105,10 +128,11 @@ const Settings = ({
       {defaultDownloadLocation}
 
       <Input
-        type="number"
-        onChange={onSetConcurrentDownloads}
+        type="text"
+        onChange={onChangeConcurrentDownloads}
         value={concurrentDownloads}
         label="Set Concurrency"
+        onBlur={onBlurConcurrentDownloads}
       />
 
       <button

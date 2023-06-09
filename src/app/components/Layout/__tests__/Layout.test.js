@@ -14,7 +14,7 @@ jest.mock('../../../pages/DownloadHistory/DownloadHistory', () => jest.fn(({ chi
     {children}
   </mock-DownloadHistory>
 )))
-jest.mock('../../../pages/Settings/Settings', () => jest.fn(({ children }) => (
+jest.mock('../../../dialogs/Settings/Settings', () => jest.fn(({ children }) => (
   <mock-Settings data-testid="Settings">
     {children}
   </mock-Settings>
@@ -24,7 +24,7 @@ import { ElectronApiContext } from '../../../context/ElectronApiContext'
 
 import Downloads from '../../../pages/Downloads/Downloads'
 import DownloadHistory from '../../../pages/DownloadHistory/DownloadHistory'
-import Settings from '../../../pages/Settings/Settings'
+import Settings from '../../../dialogs/Settings/Settings'
 
 describe('Layout component', () => {
   test('renders the downloads page', () => {

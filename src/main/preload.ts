@@ -11,6 +11,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   clearDefaultDownload: () => ipcRenderer.send('clearDefaultDownload'),
   deleteCookies: () => ipcRenderer.send('deleteCookies'),
   sendToLogin: (data) => ipcRenderer.send('sendToLogin', data),
+  setPreferenceFieldValue: (field, value) => ipcRenderer.send('setPreferenceFieldValue', field, value),
+  getPreferenceFieldValue: (field) => ipcRenderer.invoke('getPreferenceFieldValue', field),
 
   pauseDownloadItem: (data) => ipcRenderer.send('pauseDownloadItem', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),

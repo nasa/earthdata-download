@@ -7,7 +7,12 @@ import Downloads from '../Downloads'
 
 describe('Downloads component', () => {
   test('renders the downloads page', () => {
+    // props
     const setCurrentPage = jest.fn()
+    const setHasActiveDownload = jest.fn()
+    const hasActiveDownload = false
+
+    // context functions
     const beginDownload = jest.fn()
     const initializeDownload = jest.fn()
     const setDownloadLocation = jest.fn()
@@ -35,7 +40,11 @@ describe('Downloads component', () => {
         }
       }
       >
-        <Downloads setCurrentPage={setCurrentPage} />
+        <Downloads
+          setCurrentPage={setCurrentPage}
+          hasActiveDownload={hasActiveDownload}
+          setHasActiveDownload={setHasActiveDownload}
+        />
       </ElectronApiContext.Provider>
     )
 

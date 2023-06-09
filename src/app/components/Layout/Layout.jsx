@@ -7,11 +7,12 @@ import {
   VscChromeMinimize,
   VscChromeClose
 } from 'react-icons/vsc'
+
+import Dialog from '../Dialog/Dialog'
 import Button from '../Button/Button'
 import DownloadHistory from '../../pages/DownloadHistory/DownloadHistory'
 import Downloads from '../../pages/Downloads/Downloads'
-import Settings from '../../pages/Settings/Settings'
-
+import Settings from '../../dialogs/Settings/Settings'
 import { PAGES } from '../../constants/pages'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
@@ -42,23 +43,24 @@ const Layout = () => {
   const onWindowMaximized = (event, windowMaximized) => {
     setIsWindowMaximized(windowMaximized)
   }
+  const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
+  const [hasActiveDownload, setHasActiveDownload] = useState(false)
 
   let pageComponent
 
   switch (currentPage) {
     case PAGES.downloads:
       pageComponent = (
-        <Downloads setCurrentPage={setCurrentPage} />
+        <Downloads
+          setCurrentPage={setCurrentPage}
+          hasActiveDownload={hasActiveDownload}
+          setHasActiveDownload={setHasActiveDownload}
+        />
       )
       break
     case PAGES.downloadHistory:
       pageComponent = (
         <DownloadHistory setCurrentPage={setCurrentPage} />
-      )
-      break
-    case PAGES.settings:
-      pageComponent = (
-        <Settings />
       )
       break
     default:
@@ -140,7 +142,7 @@ const Layout = () => {
           <Button
             className={styles.settingsButton}
             Icon={FaCog}
-            onClick={() => setCurrentPage(PAGES.settings)}
+            onClick={() => setSettingsDialogIsOpen(true)}
             dataTestId="layout-button-settings"
           >
             Settings
@@ -211,6 +213,18 @@ const Layout = () => {
       </header>
       <main className={styles.main}>
         {pageComponent}
+        <Dialog
+          open={settingsDialogIsOpen}
+          setOpen={setSettingsDialogIsOpen}
+          showTitle
+          title="Edit Settings"
+          TitleIcon={FaCog}
+          closeButton
+        >
+          <Settings
+            hasActiveDownloads={hasActiveDownload}
+          />
+        </Dialog>
       </main>
     </div>
   )

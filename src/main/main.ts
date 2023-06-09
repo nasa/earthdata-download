@@ -21,9 +21,20 @@ import reportProgress from './eventHandlers/reportProgress'
 import resumeDownloadItem from './eventHandlers/resumeDownloadItem'
 import sendToLogin from './eventHandlers/sendToLogin'
 import willDownload from './eventHandlers/willDownload'
+import setPreferenceFieldValue from './eventHandlers/setPreferenceFieldValue'
+import getPreferenceFieldValue from './eventHandlers/getPreferenceFieldValue'
 
 import CurrentDownloadItems from './utils/currentDownloadItems'
+<<<<<<< HEAD
 import windowStateKeeper from './utils/windowStateKeeper'
+=======
+import downloadStates from '../app/constants/downloadStates'
+
+// const { downloads } = require('../../test-download-files.json')
+// const { downloads } = require('../../test-download-files-one-collection.json')
+const { downloads } = require('../../test-download-files-one-file.json')
+
+>>>>>>> 63ad569 (EDD-17: Add Settings modal; needs styling)
 import EddDatabase from './utils/database/EddDatabase'
 
 const userDataPath = app.getPath('userData')
@@ -157,6 +168,22 @@ const createWindow = async () => {
 
   ipcMain.on('deleteCookies', async () => {
     await session.defaultSession.clearStorageData()
+  })
+
+  ipcMain.on('setPreferenceFieldValue', (event, field, value) => {
+    setPreferenceFieldValue({
+      store,
+      field,
+      value
+    })
+  })
+
+  ipcMain.handle('getPreferenceFieldValue', (event, field) => {
+    const value = getPreferenceFieldValue({
+      store,
+      field
+    })
+    return value
   })
 
   appWindow.webContents.once('did-finish-load', () => {

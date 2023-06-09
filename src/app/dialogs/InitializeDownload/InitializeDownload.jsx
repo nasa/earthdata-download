@@ -129,6 +129,7 @@ const InitializeDownload = ({
           variant="danger"
           Icon={FaBan}
           onClick={onCancel}
+          dataTestId="initialize-download-cancel-download"
         >
           Cancel
         </Button>

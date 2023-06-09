@@ -12,18 +12,19 @@ import Store from 'electron-store'
 import storageSchema from './storageSchema.json'
 
 import beginDownload from './eventHandlers/beginDownload'
+import cancelDownloadItem from './eventHandlers/cancelDownloadItem'
 import chooseDownloadLocation from './eventHandlers/chooseDownloadLocation'
 import clearDefaultDownload from './eventHandlers/clearDefaultDownload'
 import copyDownloadPath from './eventHandlers/copyDownloadPath'
 import openDownloadFolder from './eventHandlers/openDownloadFolder'
 import openUrl from './eventHandlers/openUrl'
+import pauseDownloadItem from './eventHandlers/pauseDownloadItem'
 import reportProgress from './eventHandlers/reportProgress'
+import resumeDownloadItem from './eventHandlers/resumeDownloadItem'
 import willDownload from './eventHandlers/willDownload'
-import windowStateKeeper from './utils/windowStateKeeper'
 
 import CurrentDownloadItems from './utils/currentDownloadItems'
-
-import downloadStates from '../app/constants/downloadStates'
+import windowStateKeeper from './utils/windowStateKeeper'
 
 const store = new Store({
   // TODO set this key before publishing application
@@ -136,61 +137,27 @@ const createWindow = () => {
   })
 
   ipcMain.on('pauseDownloadItem', (event, info) => {
-    const { downloadId, name } = info
-
-    currentDownloadItems.pauseItem(downloadId, name)
-
-    if (downloadId && !name) store.set(`downloads.${downloadId.replaceAll('.', '\\.')}.state`, downloadStates.paused)
-
-    if (!downloadId) {
-      const downloads = store.get('downloads')
-      Object.keys(downloads).forEach((downloadId) => {
-        const download = downloads[downloadId]
-        const { state } = download
-
-        const newState = state === downloadStates.active ? downloadStates.paused : state
-        download.state = newState
-      })
-      store.set('downloads', downloads)
-    }
+    pauseDownloadItem({
+      currentDownloadItems,
+      info,
+      store
+    })
   })
 
   ipcMain.on('cancelDownloadItem', (event, info) => {
-    const { downloadId, name } = info
-
-    if (downloadId) {
-      store.set(`downloads.${downloadId.replaceAll('.', '\\.')}.state`, downloadStates.completed)
-    }
-
-    currentDownloadItems.cancelItem(downloadId, name)
-
-    // Cancelling a download will remove it from the list of downloads
-    // TODO how will this work when cancelling a granule download? I don't think we want to remove single items from a provided list of links
-    if (downloadId && !name) store.delete(`downloads.${downloadId.replaceAll('.', '\\.')}`)
-
-    if (!downloadId) store.delete('downloads')
+    cancelDownloadItem({
+      currentDownloadItems,
+      info,
+      store
+    })
   })
 
   ipcMain.on('resumeDownloadItem', (event, info) => {
-    const { downloadId, name } = info
-
-    currentDownloadItems.resumeItem(downloadId, name)
-
-    if (downloadId && !name) store.set(`downloads.${downloadId.replaceAll('.', '\\.')}.state`, downloadStates.active)
-
-    if (!downloadId) {
-      const downloads = store.get('downloads')
-
-      Object.keys(downloads).forEach((downloadId) => {
-        const download = downloads[downloadId]
-        const { state } = download
-
-        const newState = state === downloadStates.paused ? downloadStates.active : state
-        download.state = newState
-      })
-
-      store.set('downloads', downloads)
-    }
+    resumeDownloadItem({
+      currentDownloadItems,
+      info,
+      store
+    })
   })
 
   // Set up an interval to report progress to the renderer process every 1s

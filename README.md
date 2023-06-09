@@ -36,9 +36,24 @@ To build the installers run one of the following, matching your operating system
     npm run dist:win
     npm run dist:linux
 
+## Create a Release
+
+To create a new release, first ensure you bump the `version` in [package.json](package.json) and run `npm install` as part of your pull request.
+
+After your PR has been merged, create a new tag that matches your package.json `version`, prepended by the letter `v`
+
+    git tag -a "v1.4.2" -m "v1.4.2 Release"
+
+And push that tag to GitHub
+
+    git push --tags
+
+That will trigger the Build/Release workflow, and create a new draft release matching your `version`.
+
 ## Documentation
 
 - [Introduction](docs/README.md)
+- [Use EDD for Your Application](docs/USE_EDD.md)
 
 ## License
 

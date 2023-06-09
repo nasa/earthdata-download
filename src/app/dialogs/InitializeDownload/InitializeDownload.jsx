@@ -49,7 +49,11 @@ const InitializeDownload = ({
   onCloseChooseLocationModal,
   setDownloadIds
 }) => {
-  const { beginDownload, chooseDownloadLocation } = useContext(ElectronApiContext)
+  const {
+    beginDownload,
+    cancelDownloadItem,
+    chooseDownloadLocation
+  } = useContext(ElectronApiContext)
   const [makeDefaultDownloadLocation, setMakeDefaultDownloadLocation] = useState(true)
 
   // Send a message to the main process to show the open dialog
@@ -66,6 +70,12 @@ const InitializeDownload = ({
     })
 
     setDownloadIds(null)
+    onCloseChooseLocationModal()
+  }
+
+  const onCancel = () => {
+    // TODO Can we add an undo functionality?
+    downloadIds.forEach((downloadId) => cancelDownloadItem({ downloadId }))
     onCloseChooseLocationModal()
   }
 
@@ -118,12 +128,7 @@ const InitializeDownload = ({
           size="lg"
           variant="danger"
           Icon={FaBan}
-          onClick={
-            // TODO Do we need to do any other cleanup with the download id here?
-            // TODO Can we add an undo functionality?
-            // TODO remove downloadIds from store
-            onCloseChooseLocationModal
-          }
+          onClick={onCancel}
         >
           Cancel
         </Button>

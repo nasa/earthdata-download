@@ -8,8 +8,8 @@ import {
   VscChromeClose
 } from 'react-icons/vsc'
 
-import Dialog from '../Dialog/Dialog'
 import Button from '../Button/Button'
+import Dialog from '../Dialog/Dialog'
 import DownloadHistory from '../../pages/DownloadHistory/DownloadHistory'
 import Downloads from '../../pages/Downloads/Downloads'
 import Settings from '../../dialogs/Settings/Settings'

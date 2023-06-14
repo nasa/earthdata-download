@@ -24,8 +24,7 @@ describe('fetchLinks', () => {
   test('does not download links from untrusted sources', async () => {
     const appWindow = {}
     const downloadId = 'shortName_versionId'
-    const getLinks =
-      'http://malicious:3000/granule_links?id=300&flattenLinks=true&linkTypes=data'
+    const getLinks = 'http://malicious:3000/granule_links?id=300&flattenLinks=true&linkTypes=data'
 
     const store = {
       set: jest.fn(),
@@ -49,16 +48,13 @@ describe('fetchLinks', () => {
     expect(entry).toHaveProperty('loadingMoreFiles', false)
     expect(entry).toHaveProperty('state', 'ERROR')
     expect(entry).toHaveProperty('error')
-    expect(entry.error).toMatch(
-      /^the link \[.*\] is from an untrusted source.*/i
-    )
+    expect(entry.error).toMatch(/^the host \[.*\] is not a trusted source.*/i)
   })
 
   test('loads the links and calls initializeDownload', async () => {
     const appWindow = {}
     const downloadId = 'shortName_versionId'
-    const getLinks =
-      'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
+    const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
     const store = {
       set: jest.fn(),
       get: jest.fn().mockReturnValueOnce({
@@ -172,8 +168,7 @@ describe('fetchLinks', () => {
   test('saves the error on error', async () => {
     const appWindow = {}
     const downloadId = 'shortName_versionId'
-    const getLinks =
-      'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
+    const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
     const store = {
       set: jest.fn(),
       get: jest.fn().mockReturnValueOnce({

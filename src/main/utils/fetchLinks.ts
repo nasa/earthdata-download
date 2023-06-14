@@ -31,7 +31,7 @@ import packageDetails from '../../../package.json'
 
 const isTrustedLink = (link: string) => {
   const host = link
-    .replace(/^https?\:\/\//i, '')
+    .replace(/^https?:\/\//i, '')
     .split('/')
     .at(0)
     ?.toLowerCase()

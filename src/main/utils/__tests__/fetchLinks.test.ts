@@ -21,34 +21,44 @@ beforeEach(() => {
 })
 
 describe('fetchLinks', () => {
-  test('does not download links from untrusted sources', async () => {
-    const appWindow = {}
-    const downloadId = 'shortName_versionId'
-    const getLinks = 'http://malicious:3000/granule_links?id=300&flattenLinks=true&linkTypes=data'
+  [
+    'http://malicious:3000/granule_links?id=300&flattenLinks=true&linkTypes=data',
+    'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data',
+    'https://tricksy:3001/granule_links?id=302&flattenLinks=true&linkTypes=data',
+    'ftp://sneaky/granule_links?id=304',
+    'sftp://fictitious:1234/granule_links?id=305',
+    'sftp://fictitious/granule_links?id=306',
+    'file:///noprotocol:5431/granule_links?id=307',
+    '://noprotocol:5431/granule_links?id=308'
+  ].forEach((badLink) => {
+    test(`does not download links from untrusted sources: [${badLink}]`, async () => {
+      const appWindow = {}
+      const downloadId = 'shortName_versionId'
 
-    const store = {
-      set: jest.fn(),
-      get: jest.fn()
-    }
+      const store = {
+        set: jest.fn(),
+        get: jest.fn()
+      }
 
-    const token = 'Bearer mock-token'
+      const token = 'Bearer mock-token'
 
-    await fetchLinks({
-      appWindow,
-      downloadId,
-      getLinks,
-      store,
-      token
+      await fetchLinks({
+        appWindow,
+        downloadId,
+        getLinks: badLink,
+        store,
+        token
+      })
+
+      const title = store.set.mock.calls[0][0]
+      const entry = store.set.mock.calls[0][1]
+
+      expect(title).toEqual('downloads.shortName_versionId-20230501_000000')
+      expect(entry).toHaveProperty('loadingMoreFiles', false)
+      expect(entry).toHaveProperty('state', 'ERROR')
+      expect(entry).toHaveProperty('error')
+      expect(entry.error).toMatch(/^the host \[.*\] is not a trusted source.*/i)
     })
-
-    const title = store.set.mock.calls[0][0]
-    const entry = store.set.mock.calls[0][1]
-
-    expect(title).toEqual('downloads.shortName_versionId-20230501_000000')
-    expect(entry).toHaveProperty('loadingMoreFiles', false)
-    expect(entry).toHaveProperty('state', 'ERROR')
-    expect(entry).toHaveProperty('error')
-    expect(entry.error).toMatch(/^the host \[.*\] is not a trusted source.*/i)
   })
 
   test('loads the links and calls initializeDownload', async () => {

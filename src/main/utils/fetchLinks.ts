@@ -30,6 +30,13 @@ import packageDetails from '../../../package.json'
 // console.log('🚀 ~ file: main.ts:59 ~ pendingDownloads ~ pendingDownloads:', pendingDownloads)
 
 const isTrustedLink = (link: string) => {
+  const protocolMatch = /^([a-z]*):\/\/\.*/i.exec(link)
+  const protocol = protocolMatch?.at(1)?.toLowerCase()
+
+  if (!protocolMatch || (protocol !== 'http' && protocol !== 'https')) {
+    return false
+  }
+
   const host = link
     .replace(/^https?:\/\//i, '')
     .split('/')

@@ -7,6 +7,9 @@ import initializeDownload from './initializeDownload'
 
 import downloadStates from '../../app/constants/downloadStates'
 
+import trustedSources from '../../../trustedSources.json'
+import packageDetails from '../../../package.json'
+
 // TODO? find a way to still use test downloads
 // const { downloads } = require('../../test-download-files.json')
 // const { downloads } = require('../../test-download-files-one-collection.json')
@@ -25,6 +28,18 @@ import downloadStates from '../../app/constants/downloadStates'
 //   }
 // }), {})
 // console.log('🚀 ~ file: main.ts:59 ~ pendingDownloads ~ pendingDownloads:', pendingDownloads)
+
+const isTrustedLink = (link: string) => {
+  const host = link
+    .replace(/^https?\:\/\//i, '')
+    .split('/')
+    .at(0)
+    ?.toLowerCase()
+    ?.split(':')
+    ?.at(0)
+  console.debug(`Checking [${host}] for matching trusted host`)
+  return !!trustedSources[host]
+}
 
 /**
  * Fetches links for the given downloadId, adds links to the store.
@@ -49,6 +64,15 @@ const fetchLinks = async ({
     .split('.')[0]
 
   const downloadIdWithTime = `${downloadId.replaceAll('.', '\\.')}-${now}`
+
+  if (!isTrustedLink(getLinks)) {
+    store.set(`downloads.${downloadIdWithTime}`, {
+      loadingMoreFiles: false,
+      state: downloadStates.error,
+      error: `The host [${getLinks}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
+    })
+    return
+  }
 
   // Create a download in the store with the first page of links
   store.set(`downloads.${downloadIdWithTime}`, {
@@ -91,11 +115,7 @@ const fetchLinks = async ({
       // eslint-disable-next-line no-await-in-loop
       const jsonResponse = await response.json()
 
-      const {
-        cursor: responseCursor,
-        done,
-        links = []
-      } = jsonResponse
+      const { cursor: responseCursor, done, links = [] } = jsonResponse
 
       // If no links exist, set `loadingMoreFiles` to false and exit the loop
       if (links.length === 0) {

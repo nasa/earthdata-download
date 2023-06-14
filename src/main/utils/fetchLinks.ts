@@ -7,7 +7,7 @@ import initializeDownload from './initializeDownload'
 
 import downloadStates from '../../app/constants/downloadStates'
 
-import trustedSources from '../../../trustedSources.json'
+import trustedSources from '../trustedSources.json'
 import packageDetails from '../../../package.json'
 
 // TODO? find a way to still use test downloads

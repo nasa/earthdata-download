@@ -21,44 +21,103 @@ beforeEach(() => {
 })
 
 describe('fetchLinks', () => {
-  [
-    'http://malicious:3000/granule_links?id=300&flattenLinks=true&linkTypes=data',
-    'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data',
-    'https://tricksy:3001/granule_links?id=302&flattenLinks=true&linkTypes=data',
-    'ftp://sneaky/granule_links?id=304',
-    'sftp://fictitious:1234/granule_links?id=305',
-    'sftp://fictitious/granule_links?id=306',
-    'file:///noprotocol:5431/granule_links?id=307',
-    '://noprotocol:5431/granule_links?id=308',
-    'noprotocol/granule_links?id=309'
-  ].forEach((badLink) => {
-    test(`does not download links from untrusted sources: [${badLink}]`, async () => {
-      const appWindow = {}
-      const downloadId = 'shortName_versionId'
+  afterEach(() => {
+    jest.resetModules()
+  })
 
-      const store = {
-        set: jest.fn(),
-        get: jest.fn()
-      }
+  test.each(
+    [
+      'http://malicious:3000/granule_links?id=300&flattenLinks=true&linkTypes=data',
+      'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data',
+      'https://tricksy:3001/granule_links?id=302&flattenLinks=true&linkTypes=data',
+      'ftp://sneaky/granule_links?id=304',
+      'sftp://fictitious:1234/granule_links?id=305',
+      'sftp://fictitious/granule_links?id=306',
+      'file:///noprotocol:5431/granule_links?id=307',
+      '://noprotocol:5431/granule_links?id=308',
+      'noprotocol/granule_links?id=309'
+    ]
+  )('does not download links from untrusted sources: [%s]', async (badLink) => {
+    const appWindow = {}
+    const downloadId = 'shortName_versionId'
 
-      const token = 'Bearer mock-token'
+    const store = {
+      set: jest.fn(),
+      get: jest.fn()
+    }
 
-      await fetchLinks({
-        appWindow,
-        downloadId,
-        getLinks: badLink,
-        store,
-        token
-      })
+    const token = 'Bearer mock-token'
 
-      const [[title, entry]] = store.set.mock.calls
-
-      expect(title).toEqual('downloads.shortName_versionId-20230501_000000')
-      expect(entry).toHaveProperty('loadingMoreFiles', false)
-      expect(entry).toHaveProperty('state', 'ERROR')
-      expect(entry).toHaveProperty('error')
-      expect(entry.error).toMatch(/^the host \[.*\] is not a trusted source.*/i)
+    await fetchLinks({
+      appWindow,
+      downloadId,
+      getLinks: badLink,
+      store,
+      token
     })
+
+    const [[title, entry]] = store.set.mock.calls
+
+    expect(title).toEqual('downloads.shortName_versionId-20230501_000000')
+    expect(entry).toHaveProperty('loadingMoreFiles', false)
+    expect(entry).toHaveProperty('state', 'ERROR')
+    expect(entry).toHaveProperty('error')
+    expect(entry.error).toMatch(/^the host \[.*\] is not a trusted source.*/i)
+  })
+
+  test.each([
+    ['bad cursor type', { cursor: 1234, links: ['https://example.com/file1.png'] }],
+    ['bad links type', { cursor: 'abc', links: 'https://example.com/file1.png' }],
+    ['bad done type', { done: 'yes', cursor: 'abc', links: 'https://example.com/file1.png' }],
+    ['missing links', { cursor: 'abc' }],
+    ['empty response', '']])('halts on invalid JSON response: %s', async ([, badLink]) => {
+    const appWindow = {}
+    const downloadId = 'shortName_versionId'
+    const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
+    const store = {
+      set: jest.fn(),
+      get: jest.fn()
+    }
+
+    const token = 'Bearer mock-token'
+
+    const page1Response = {
+      json: jest.fn().mockReturnValue({
+        cursor: 'mock-cursor',
+        links: ['https://example.com/file1.png']
+      })
+    }
+    const page2Response = {
+      json: jest.fn().mockReturnValue(badLink)
+    }
+    const page3Response = {
+      json: jest.fn().mockReturnValue({
+        cursor: null,
+        links: []
+      })
+    }
+
+    fetch
+      .mockImplementationOnce(() => page1Response)
+      .mockImplementationOnce(() => page2Response)
+      .mockImplementation(() => page3Response)
+
+    await fetchLinks({
+      appWindow,
+      downloadId,
+      getLinks,
+      store,
+      token
+    })
+
+    const [, , [title, entry]] = store.set.mock.calls
+
+    expect(title).toEqual('downloads.shortName_versionId-20230501_000000')
+    expect(entry).toHaveProperty('loadingMoreFiles', false)
+    expect(entry).toHaveProperty('state', 'ERROR')
+    expect(entry).toHaveProperty('error', 'The returned data does not match the expected schema.')
+
+    expect(fetch).toHaveBeenCalledTimes(2)
   })
 
   test('loads the links and calls initializeDownload', async () => {

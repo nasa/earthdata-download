@@ -1,25 +1,25 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "cursor": {
-      "type": "string",
+      "anyOf": [{ "type": "string" }, { "type": "null" }],
       "description": "Cursor value to paginate results."
     },
     "done": {
-      "type": "boolean",
+      "anyOf": [{ "type": "boolean" }, { "type": "null" }],
       "description": "Flag for whether there are more results available or not."
     },
     "links": {
       "type": "array",
-      "items": [
-        {
-          "type": "string",
-          "description": "A link",
-          "pattern": "^https?://.*"
-        }
-      ]
+      "items": {
+        "type": "string",
+        "description": "A link",
+        "pattern": "^https?://.*"
+      },
+      "minItems": 0,
+      "uniqueItems": true
     }
   },
   "required": ["links"]

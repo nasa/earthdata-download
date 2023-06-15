@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import fetch from 'node-fetch'
+import Ajv from 'ajv'
 
 import formatLinks from './formatLinks'
 import initializeDownload from './initializeDownload'
@@ -8,7 +9,10 @@ import initializeDownload from './initializeDownload'
 import downloadStates from '../../app/constants/downloadStates'
 
 import trustedSources from '../trustedSources.json'
+import getLinksSchema from '../getLinksSchema.json'
 import packageDetails from '../../../package.json'
+
+const ajv = new Ajv()
 
 // TODO? find a way to still use test downloads
 // const { downloads } = require('../../test-download-files.json')
@@ -57,18 +61,8 @@ const isTrustedLink = (link: string) => {
  * @param {String} params.token Token for use when fetching links
  * @param {Object} params.appWindow Electron window instance
  */
-const fetchLinks = async ({
-  downloadId,
-  getLinks,
-  store,
-  token,
-  appWindow
-}) => {
-  const now = new Date()
-    .toISOString()
-    .replace(/(:|-)/g, '')
-    .replace('T', '_')
-    .split('.')[0]
+const fetchLinks = async ({ downloadId, getLinks, store, token, appWindow }) => {
+  const now = new Date().toISOString().replace(/(:|-)/g, '').replace('T', '_').split('.')[0]
 
   const downloadIdWithTime = `${downloadId.replaceAll('.', '\\.')}-${now}`
 
@@ -121,6 +115,18 @@ const fetchLinks = async ({
 
       // eslint-disable-next-line no-await-in-loop
       const jsonResponse = await response.json()
+
+      const validateGetLinks = ajv.compile(getLinksSchema)
+      const valid = validateGetLinks(jsonResponse)
+      if (!valid) {
+        console.error(validateGetLinks.errors)
+        store.set(`downloads.${downloadIdWithTime}`, {
+          loadingMoreFiles: false,
+          state: downloadStates.error,
+          error: 'The returned data does not match the expected schema.'
+        })
+        return
+      }
 
       const { cursor: responseCursor, done, links = [] } = jsonResponse
 

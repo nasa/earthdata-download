@@ -13,6 +13,7 @@ After the first page of links is received EDD will start the download. This will
 ## Expected Response
 
 It is very imported that your API returns the correct response to EDD
+The response schema is located at [getLinksSchema.json](../src/main/getLinksSchema.json).
 
 ### Response Fields
 

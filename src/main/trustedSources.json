@@ -1,8 +1,7 @@
 {
-  "127.0.0.1": {
-    "notes": "development"
-  },
-  "localhost": {
-    "notes": "development"
-  }
+  "127.0.0.1": { "notes": "development" },
+  "localhost": { "notes": "development" },
+  "d53njncz5taqi.cloudfront.net": { "notes": "Corresponds to search.earthdata.nasa.gov" },
+  "dycghwhsgr9el.cloudfront.net": { "notes": "Corresponds to search.uat.earthdata.nasa.gov" },
+  "d30czzksj9a4kf.cloudfront.net": { "notes": "Corresponds to search.sit.earthdata.nasa.gov" }
 }

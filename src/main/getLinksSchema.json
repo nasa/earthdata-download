@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "cursor": {
+      "type": "string",
+      "description": "Cursor value to paginate results."
+    },
+    "done": {
+      "type": "boolean",
+      "description": "Flag for whether there are more results available or not."
+    },
+    "links": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "description": "A link",
+          "pattern": "^https?://.*"
+        }
+      ]
+    }
+  },
+  "required": ["links"]
+}

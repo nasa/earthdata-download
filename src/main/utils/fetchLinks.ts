@@ -61,8 +61,11 @@ const isTrustedLink = (link: string) => {
  * @param {String} params.token Token for use when fetching links
  * @param {Object} params.appWindow Electron window instance
  */
-const fetchLinks = async ({ downloadId, getLinks, store, token, appWindow }) => {
-  const now = new Date().toISOString().replace(/(:|-)/g, '').replace('T', '_').split('.')[0]
+const fetchLinks = async ({
+  downloadId, getLinks, store, token, appWindow
+}) => {
+  const now = new Date().toISOString().replace(/(:|-)/g, '').replace('T', '_')
+    .split('.')[0]
 
   const downloadIdWithTime = `${downloadId.replaceAll('.', '\\.')}-${now}`
 

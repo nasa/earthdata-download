@@ -29,7 +29,8 @@ describe('fetchLinks', () => {
     'sftp://fictitious:1234/granule_links?id=305',
     'sftp://fictitious/granule_links?id=306',
     'file:///noprotocol:5431/granule_links?id=307',
-    '://noprotocol:5431/granule_links?id=308'
+    '://noprotocol:5431/granule_links?id=308',
+    'noprotocol/granule_links?id=309'
   ].forEach((badLink) => {
     test(`does not download links from untrusted sources: [${badLink}]`, async () => {
       const appWindow = {}
@@ -50,8 +51,7 @@ describe('fetchLinks', () => {
         token
       })
 
-      const title = store.set.mock.calls[0][0]
-      const entry = store.set.mock.calls[0][1]
+      const [[title, entry]] = store.set.mock.calls
 
       expect(title).toEqual('downloads.shortName_versionId-20230501_000000')
       expect(entry).toHaveProperty('loadingMoreFiles', false)

@@ -51,7 +51,7 @@ const DownloadItem = ({
   actionsList
 }) => {
   const {
-    percent,
+    percent = 0,
     finishedFiles,
     totalFiles,
     totalTime

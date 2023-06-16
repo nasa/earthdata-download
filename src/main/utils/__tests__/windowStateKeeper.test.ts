@@ -1,12 +1,12 @@
 import windowStateKeeper from '../windowStateKeeper'
 
 describe('windowStateKeeper', () => {
-  test('returns the default window state', () => {
-    const store = {
-      has: jest.fn().mockReturnValue(false)
+  test('returns the default window state', async () => {
+    const database = {
+      getPreferences: jest.fn().mockReturnValue('{}')
     }
 
-    const windowState = windowStateKeeper(store)
+    const windowState = await windowStateKeeper(database)
 
     expect(windowState).toEqual(expect.objectContaining({
       height: 600,
@@ -17,18 +17,19 @@ describe('windowStateKeeper', () => {
     }))
   })
 
-  test('returns the saved window state', () => {
-    const store = {
-      has: jest.fn().mockReturnValue(true),
-      get: jest.fn().mockReturnValue({
-        x: 0,
-        y: 0,
-        width: 900,
-        height: 700
+  test('returns the saved window state', async () => {
+    const database = {
+      getPreferences: jest.fn().mockReturnValue({
+        windowState: JSON.stringify({
+          x: 0,
+          y: 0,
+          width: 900,
+          height: 700
+        })
       })
     }
 
-    const windowState = windowStateKeeper(store)
+    const windowState = await windowStateKeeper(database)
 
     expect(windowState).toEqual(expect.objectContaining({
       height: 700,
@@ -39,17 +40,18 @@ describe('windowStateKeeper', () => {
     }))
   })
 
-  test.skip('saves the window state ', () => {
+  test.skip('saves the window state ', async () => {
     // Skipped because I'm not sure how to test window events with my mock window object, and can't figure out how to use a real electron BrowserWindow
-    const store = {
-      has: jest.fn().mockReturnValue(true),
-      get: jest.fn().mockReturnValue({
-        x: 0,
-        y: 0,
-        width: 900,
-        height: 700
+    const database = {
+      getPreferences: jest.fn().mockReturnValue({
+        windowState: JSON.stringify({
+          x: 0,
+          y: 0,
+          width: 900,
+          height: 700
+        })
       }),
-      set: jest.fn()
+      setPreferences: jest.fn()
     }
 
     const window = {
@@ -63,7 +65,7 @@ describe('windowStateKeeper', () => {
       // on: jest.fn()
     }
 
-    const windowState = windowStateKeeper(store)
+    const windowState = await windowStateKeeper(database)
 
     // TODO how do I fire an event on my mocked window.
     // Or how do I use a real BrowserWindow, not mocked by electronMock.js?
@@ -71,6 +73,7 @@ describe('windowStateKeeper', () => {
 
     // window.on()
 
-    expect(store.set).toHaveBeenCalledTimes(1)
+    expect(database.setPreferences).toHaveBeenCalledTimes(1)
+    expect(database.setPreferences).toHaveBeenCalledWith(1)
   })
 })

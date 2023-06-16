@@ -6,24 +6,23 @@ import { app } from 'electron'
  * Sends a message to the renderer process to start a download for the given downloadIds.
  * @param {Object} params
  * @param {Object} params.appWindow Electron window instance
+ * @param {Object} params.database `EddDatabase` instance
  * @param {Array} params.downloadIds Download IDs to be initialized
- * @param {Object} params.store `electron-store` instance
  */
-const initializeDownload = ({
+const initializeDownload = async ({
   appWindow,
-  downloadIds,
-  store
+  database,
+  downloadIds
 }) => {
   if (downloadIds.length > 0) {
     // Default the download location to the user's `downloads` foler
     let location = app.getPath('downloads')
 
-    // Pull preferences out of the store
-    const preferences = store.get('preferences')
+    // Pull preferences out of the database
     const {
       defaultDownloadLocation,
       lastDownloadLocation
-    } = preferences
+    } = await database.getPreferences()
 
     // If there is a lastDownloadLocation, use that location
     if (lastDownloadLocation) {

@@ -3,14 +3,17 @@ import MockDate from 'mockdate'
 import onDone from '../onDone'
 import startNextDownload from '../startNextDownload'
 
-jest.mock('../startNextDownload')
+jest.mock('../startNextDownload', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00.000')
 })
 
 describe('onDone', () => {
-  test('updates the store and calls startNextDownload for a completed download', () => {
+  test('updates the database and calls startNextDownload for a completed download', async () => {
     const currentDownloadItems = {
       removeItem: jest.fn()
     }
@@ -21,51 +24,50 @@ describe('onDone', () => {
       getTotalBytes: jest.fn().mockReturnValue(100)
     }
     const state = 'completed'
-    const store = {
-      get: jest.fn().mockReturnValue({
-        // storeItem
-        url: 'http://example.com/mock-filename.png',
-        state: 'ACTIVE',
-        percent: 42,
-        timeStart: 1684029600000
+    const database = {
+      getFileWhere: jest.fn().mockResolvedValue({
+        id: 123
       }),
-      set: jest.fn()
+      updateFile: jest.fn()
     }
 
-    onDone({
+    await onDone({
       currentDownloadItems,
+      database,
       downloadId,
       downloadIdContext: {},
       item,
       state,
-      store,
       webContents: {}
     })
 
     expect(currentDownloadItems.removeItem).toHaveBeenCalledTimes(1)
     expect(currentDownloadItems.removeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
-    expect(store.set).toHaveBeenCalledTimes(1)
-    expect(store.set).toHaveBeenCalledWith('downloads.mock-download-id.files.mock-filename\\.png', {
-      errors: undefined,
+    expect(database.getFileWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileWhere).toHaveBeenCalledWith({
+      downloadId: 'mock-download-id',
+      filename: 'mock-filename.png'
+    })
+
+    expect(database.updateFile).toHaveBeenCalledTimes(1)
+    expect(database.updateFile).toHaveBeenCalledWith(123, {
       percent: 100,
       state: 'COMPLETED',
-      timeEnd: 1684029600000,
-      timeStart: 1684029600000,
-      url: 'http://example.com/mock-filename.png'
+      timeEnd: 1684029600000
     })
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
     expect(startNextDownload).toHaveBeenCalledWith({
       currentDownloadItems,
+      database,
       downloadId: 'mock-download-id',
       downloadIdContext: {},
-      store,
       webContents: {}
     })
   })
 
-  test('updates the store and calls startNextDownload for an interrupted download', () => {
+  test('updates the database and calls startNextDownload for an interrupted download', async () => {
     const currentDownloadItems = {
       removeItem: jest.fn()
     }
@@ -76,51 +78,51 @@ describe('onDone', () => {
       getTotalBytes: jest.fn().mockReturnValue(100)
     }
     const state = 'interrupted'
-    const store = {
-      get: jest.fn().mockReturnValue({
-        // storeItem
-        url: 'http://example.com/mock-filename.png',
-        state: 'ACTIVE',
-        percent: 42,
-        timeStart: 1684029600000
+    const database = {
+      getFileWhere: jest.fn().mockResolvedValue({
+        id: 123
       }),
-      set: jest.fn()
+      updateFile: jest.fn()
     }
 
-    onDone({
+    await onDone({
       currentDownloadItems,
+      database,
       downloadId,
       downloadIdContext: {},
       item,
       state,
-      store,
       webContents: {}
     })
 
     expect(currentDownloadItems.removeItem).toHaveBeenCalledTimes(1)
     expect(currentDownloadItems.removeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
-    expect(store.set).toHaveBeenCalledTimes(1)
-    expect(store.set).toHaveBeenCalledWith('downloads.mock-download-id.files.mock-filename\\.png', {
+    expect(database.getFileWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileWhere).toHaveBeenCalledWith({
+      downloadId: 'mock-download-id',
+      filename: 'mock-filename.png'
+    })
+
+    expect(database.updateFile).toHaveBeenCalledTimes(1)
+    expect(database.updateFile).toHaveBeenCalledWith(123, {
       errors: undefined,
       percent: 0,
       state: 'ERROR',
-      timeEnd: 1684029600000,
-      timeStart: 1684029600000,
-      url: 'http://example.com/mock-filename.png'
+      timeEnd: 1684029600000
     })
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
     expect(startNextDownload).toHaveBeenCalledWith({
       currentDownloadItems,
+      database,
       downloadId: 'mock-download-id',
       downloadIdContext: {},
-      store,
       webContents: {}
     })
   })
 
-  test('updates the store and calls startNextDownload for a cancelled download', () => {
+  test('updates the database and calls startNextDownload for a cancelled download', async () => {
     const currentDownloadItems = {
       removeItem: jest.fn()
     }
@@ -131,38 +133,38 @@ describe('onDone', () => {
       getTotalBytes: jest.fn().mockReturnValue(100)
     }
     const state = 'cancelled'
-    const store = {
-      get: jest.fn().mockReturnValue({
-        // storeItem
-        url: 'http://example.com/mock-filename.png',
-        state: 'ACTIVE',
-        percent: 42,
-        timeStart: 1684029600000
+    const database = {
+      getFileWhere: jest.fn().mockResolvedValue({
+        id: 123
       }),
-      set: jest.fn()
+      updateFile: jest.fn()
     }
 
-    onDone({
+    await onDone({
       currentDownloadItems,
+      database,
       downloadId,
       downloadIdContext: {},
       item,
       state,
-      store,
       webContents: {}
     })
 
     expect(currentDownloadItems.removeItem).toHaveBeenCalledTimes(1)
     expect(currentDownloadItems.removeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
-    expect(store.set).toHaveBeenCalledTimes(1)
-    expect(store.set).toHaveBeenCalledWith('downloads.mock-download-id.files.mock-filename\\.png', {
+    expect(database.getFileWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileWhere).toHaveBeenCalledWith({
+      downloadId: 'mock-download-id',
+      filename: 'mock-filename.png'
+    })
+
+    expect(database.updateFile).toHaveBeenCalledTimes(1)
+    expect(database.updateFile).toHaveBeenCalledWith(123, {
       errors: undefined,
       percent: 0,
       state: 'PENDING',
-      timeEnd: 1684029600000,
-      timeStart: 1684029600000,
-      url: 'http://example.com/mock-filename.png'
+      timeEnd: 1684029600000
     })
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
@@ -170,8 +172,46 @@ describe('onDone', () => {
       currentDownloadItems,
       downloadId: 'mock-download-id',
       downloadIdContext: {},
-      store,
+      database,
       webContents: {}
     })
+  })
+
+  test('does not update the database if the file is not in the database', async () => {
+    const currentDownloadItems = {
+      removeItem: jest.fn()
+    }
+    const downloadId = 'mock-download-id'
+    const item = {
+      getFilename: jest.fn().mockReturnValue('mock-filename.png'),
+      getReceivedBytes: jest.fn().mockReturnValue(42),
+      getTotalBytes: jest.fn().mockReturnValue(100),
+      cancel: jest.fn()
+    }
+    const state = 'progressing'
+    const database = {
+      getFileWhere: jest.fn().mockResolvedValue(undefined),
+      updateFile: jest.fn(),
+      updateDownloadById: jest.fn()
+    }
+
+    await onDone({
+      currentDownloadItems,
+      database,
+      downloadId,
+      downloadIdContext: {},
+      item,
+      state,
+      webContents: {}
+    })
+
+    expect(database.getFileWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileWhere).toHaveBeenCalledWith({
+      downloadId: 'mock-download-id',
+      filename: 'mock-filename.png'
+    })
+
+    expect(database.updateFile).toHaveBeenCalledTimes(0)
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
   })
 })

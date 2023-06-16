@@ -10,23 +10,17 @@ beforeEach(() => {
 
 describe('clearDefaultDownload', () => {
   test('clears the default download location from preferences', () => {
-    const store = {
-      set: jest.fn(),
-      get: jest.fn().mockReturnValue({
-        defaultDownloadLocation: '/mock/default/location',
-        lastDownloadLocation: '/mock/last/location'
-      })
+    const database = {
+      setPreferences: jest.fn()
     }
 
     clearDefaultDownload({
-      store
+      database
     })
 
-    expect(store.get).toHaveBeenCalledTimes(1)
-    expect(store.set).toHaveBeenCalledTimes(1)
-    expect(store.set).toHaveBeenCalledWith('preferences', {
-      defaultDownloadLocation: undefined,
-      lastDownloadLocation: '/mock/last/location'
+    expect(database.setPreferences).toHaveBeenCalledTimes(1)
+    expect(database.setPreferences).toHaveBeenCalledWith({
+      defaultDownloadLocation: null
     })
   })
 })

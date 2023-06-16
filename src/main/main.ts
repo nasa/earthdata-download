@@ -7,9 +7,6 @@ import {
   shell
 } from 'electron'
 import path from 'path'
-import Store from 'electron-store'
-
-import storageSchema from './storageSchema.json'
 
 import beginDownload from './eventHandlers/beginDownload'
 import cancelDownloadItem from './eventHandlers/cancelDownloadItem'
@@ -26,20 +23,10 @@ import willDownload from './eventHandlers/willDownload'
 import CurrentDownloadItems from './utils/currentDownloadItems'
 import windowStateKeeper from './utils/windowStateKeeper'
 
-const store = new Store({
-  // TODO set this key before publishing application
-  // encryptionKey: 'this key only obscures the data',
-  name: 'preferences',
-  schema: storageSchema,
-  defaults: {
-    preferences: {
-      concurrentDownloads: 5
-    }
-  }
-})
+import EddDatabase from './utils/database/EddDatabase'
 
-// Uncomment this line to delete your local storage
-// store.clear()
+const userDataPath = app.getPath('userData')
+const database = new EddDatabase(userDataPath)
 
 const currentDownloadItems = new CurrentDownloadItems()
 
@@ -50,8 +37,11 @@ let appWindow
 // so that within willDownload we can associate the DownloadItem instance with the correct download.
 const downloadIdContext = {}
 
-const createWindow = () => {
-  const windowState = windowStateKeeper(store)
+const createWindow = async () => {
+  // Ensure the database is up to date
+  await database.migrateDatabase()
+
+  const windowState = await windowStateKeeper(database)
 
   appWindow = new BrowserWindow({
     width: windowState.width,
@@ -81,19 +71,13 @@ const createWindow = () => {
     appWindow.loadFile('dist/index.html')
   }
 
-  appWindow.webContents.session.on('will-download', (event, item, webContents) => {
-    const url = item.getURL()
-    const downloadId = downloadIdContext[url]
-
-    delete downloadIdContext[url]
-
-    willDownload({
-      downloadIdContext,
+  appWindow.webContents.session.on('will-download', async (event, item, webContents) => {
+    await willDownload({
       currentDownloadItems,
-      downloadId,
+      database,
+      downloadIdContext,
       event,
       item,
-      store,
       webContents
     })
   })
@@ -128,20 +112,19 @@ const createWindow = () => {
     })
   })
 
-  ipcMain.on('beginDownload', (event, info) => {
-    beginDownload({
+  ipcMain.on('beginDownload', async (event, info) => {
+    await beginDownload({
+      database,
       downloadIdContext,
       currentDownloadItems,
       info,
-      store,
       webContents: appWindow.webContents
     })
   })
 
-  ipcMain.on('clearDefaultDownload', () => {
-    clearDefaultDownload({
-      store,
-      appWindow
+  ipcMain.on('clearDefaultDownload', async () => {
+    await clearDefaultDownload({
+      database
     })
   })
 
@@ -153,34 +136,34 @@ const createWindow = () => {
     if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })
   })
 
-  ipcMain.on('pauseDownloadItem', (event, info) => {
-    pauseDownloadItem({
+  ipcMain.on('pauseDownloadItem', async (event, info) => {
+    await pauseDownloadItem({
+      database,
       currentDownloadItems,
-      info,
-      store
+      info
     })
   })
 
-  ipcMain.on('cancelDownloadItem', (event, info) => {
-    cancelDownloadItem({
+  ipcMain.on('cancelDownloadItem', async (event, info) => {
+    await cancelDownloadItem({
+      database,
       currentDownloadItems,
-      info,
-      store
+      info
     })
   })
 
-  ipcMain.on('resumeDownloadItem', (event, info) => {
-    resumeDownloadItem({
+  ipcMain.on('resumeDownloadItem', async (event, info) => {
+    await resumeDownloadItem({
+      database,
       currentDownloadItems,
-      info,
-      store
+      info
     })
   })
 
   // Set up an interval to report progress to the renderer process every 1s
-  const reportProgressInterval = setInterval(() => {
-    reportProgress({
-      store,
+  const reportProgressInterval = setInterval(async () => {
+    await reportProgress({
+      database,
       webContents: appWindow.webContents
     })
   }, 1000)
@@ -192,15 +175,15 @@ const createWindow = () => {
 
   ipcMain.on('openDownloadFolder', (event, info) => {
     openDownloadFolder({
-      info,
-      store
+      database,
+      info
     })
   })
 
   ipcMain.on('copyDownloadPath', (event, info) => {
     copyDownloadPath({
-      info,
-      store
+      database,
+      info
     })
   })
 
@@ -225,12 +208,12 @@ app.on('window-all-closed', () => {
   }
 })
 
-app.on('activate', () => {
+app.on('activate', async () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
 
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    await createWindow()
   }
 })
 
@@ -247,7 +230,7 @@ const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
   app.quit()
 } else {
-  app.on('second-instance', (event, commandLine) => {
+  app.on('second-instance', async (event, commandLine) => {
     // Someone tried to run a second instance, we should focus our window.
     if (appWindow) {
       if (appWindow.isMinimized()) appWindow.restore()
@@ -258,24 +241,28 @@ if (!gotTheLock) {
 
     const url = commandLine.pop().slice(0, -1)
 
-    openUrl({
+    await openUrl({
+      appWindow,
+      currentDownloadItems,
+      database,
       deepLink: url,
-      store,
-      appWindow
+      downloadIdContext
     })
   })
 
   // Create window, load the rest of the app, etc...
-  app.whenReady().then(() => {
-    createWindow()
+  app.whenReady().then(async () => {
+    await createWindow()
   })
 
   // Handle the protocol. In this case, we choose to show an Error Box.
-  app.on('open-url', (event, url) => {
-    openUrl({
+  app.on('open-url', async (event, url) => {
+    await openUrl({
+      appWindow,
+      currentDownloadItems,
+      database,
       deepLink: url,
-      store,
-      appWindow
+      downloadIdContext
     })
   })
 }

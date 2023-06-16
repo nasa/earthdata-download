@@ -3,37 +3,34 @@
 import downloadStates from '../../app/constants/downloadStates'
 
 /**
- * Pauses a download and updates the store state
+ * Pauses a download and updates the database
  * @param {Object} params
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
+ * @param {Object} params.database `EddDatabase` instance
  * @param {Object} params.info `info` parameter from ipc message
- * @param {Object} params.store `electron-store` instance
  */
-const pauseDownloadItem = ({
+const pauseDownloadItem = async ({
   currentDownloadItems,
-  info,
-  store
+  database,
+  info
 }) => {
   const { downloadId, name } = info
 
   currentDownloadItems.pauseItem(downloadId, name)
 
-  if (downloadId && !name) store.set(`downloads.${downloadId.replaceAll('.', '\\.')}.state`, downloadStates.paused)
+  if (downloadId && !name) {
+    await database.updateDownloadById(downloadId, {
+      state: downloadStates.paused
+    })
+  }
 
   if (!downloadId) {
-    const downloads = store.get('downloads')
-
-    Object.keys(downloads).forEach((downloadId) => {
-      const download = downloads[downloadId]
-      const { state } = download
-
-      const newState = state === downloadStates.active || state === downloadStates.pending
-        ? downloadStates.paused
-        : state
-      download.state = newState
+    await database.updateDownloadsWhereIn([
+      'state',
+      [downloadStates.active, downloadStates.pending]
+    ], {
+      state: downloadStates.paused
     })
-
-    store.set('downloads', downloads)
   }
 }
 

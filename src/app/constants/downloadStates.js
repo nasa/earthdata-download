@@ -1,5 +1,6 @@
 const downloadStates = {
   pending: 'PENDING',
+  starting: 'STARTING',
   active: 'ACTIVE',
   paused: 'PAUSED',
   interrupted: 'INTERRUPTED',

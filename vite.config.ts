@@ -27,6 +27,12 @@ export default defineConfig(({ command }) => {
               viteRequire()
             ],
             build: {
+              rollupOptions: {
+                external: [
+                  'sqlite3',
+                  'knex'
+                ]
+              },
               sourcemap,
               minify: isBuild
             }

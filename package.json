@@ -15,6 +15,7 @@
     "prestart": "rm -rf dist-electron/ dist/",
     "start": "vite",
     "dev:test": "NODE_ENV=playwright vite",
+    "rebuild": "electron-rebuild -f -w sqlite3",
     "prebuild": "rm -rf dist-electron/ dist/",
     "build": "vite build",
     "preview": "vite preview",
@@ -38,7 +39,8 @@
     "dist": "electron-builder -mwlc",
     "dist:mac": "electron-builder -mc",
     "dist:win": "electron-builder -wc",
-    "dist:linux": "electron-builder -lc"
+    "dist:linux": "electron-builder -lc",
+    "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
     "@babel/eslint-parser": "^7.21.3",
@@ -49,18 +51,20 @@
     "@radix-ui/react-tooltip": "^1.0.5",
     "@radix-ui/react-visually-hidden": "^1.0.2",
     "ajv": "^8.12.0",
+    "array-foreach-async": "^1.0.1",
     "classnames": "^2.3.2",
-    "electron-store": "^8.1.0",
     "eslint-config-airbnb": "^19.0.4",
     "humanize-duration": "^3.28.0",
     "inter-ui": "^3.19.3",
+    "knex": "^2.4.2",
     "node-fetch": "^3.3.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-middle-ellipsis": "^1.2.2",
-    "simplebar-react": "^3.2.4"
+    "simplebar-react": "^3.2.4",
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.21.0",
@@ -68,6 +72,7 @@
     "@babel/preset-env": "^7.21.4",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.5",
+    "@electron/rebuild": "^3.2.13",
     "@istanbuljs/nyc-config-babel": "^3.0.0",
     "@playwright/test": "^1.32.3",
     "@testing-library/jest-dom": "^5.16.5",
@@ -90,6 +95,7 @@
     "jest-environment-jsdom": "^29.5.0",
     "jest-junit": "^16.0.0",
     "jsdoc": "^4.0.2",
+    "mock-knex": "^0.4.12",
     "mockdate": "^3.0.5",
     "nyc": "^15.1.0",
     "playwright": "^1.32.3",

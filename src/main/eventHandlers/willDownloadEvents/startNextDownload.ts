@@ -1,25 +1,26 @@
 // @ts-nocheck
 
+import 'array-foreach-async'
+
 import downloadStates from '../../../app/constants/downloadStates'
 
 /**
  * Starts the next download when a download completes
  * @param {Object} params
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
+ * @param {Object} params.database `EddDatabase` instance
  * @param {String} params.downloadId downloadId of the DownloadItem being downloaded
  * @param {Object} params.downloadIdContext Object where we can associated a newly created download to a downloadId
- * @param {Object} params.store `electron-store` instance
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
-const startNextDownload = ({
+const startNextDownload = async ({
   currentDownloadItems,
-  downloadId,
+  database,
   downloadIdContext,
-  store,
   webContents
 }) => {
   // Get the concurrentDownloads from preferences
-  const concurrentDownloads = store.get('preferences.concurrentDownloads')
+  const { concurrentDownloads } = await database.getPreferences()
 
   // Get number of running downloads
   const numberOfRunningDownloads = currentDownloadItems.getNumberOfDownloads()
@@ -27,47 +28,59 @@ const startNextDownload = ({
   // For available number of downloads, find the next `active` download with `pending` files and start downloading
   let numberDownloadsToStart = concurrentDownloads - numberOfRunningDownloads
 
+  // https://eslint.org/docs/latest/rules/no-await-in-loop#when-not-to-use-it
+  /* eslint-disable no-await-in-loop */
   while (numberDownloadsToStart > 0) {
-    const allDownloads = store.get('downloads')
+    const activeDownloads = await database.getDownloadsWhere({
+      state: downloadStates.active
+    })
 
-    const activeDownloadIds = Object.keys(allDownloads)
-      // eslint-disable-next-line arrow-body-style
-      .filter((nextDownloadId) => allDownloads[nextDownloadId].state === downloadStates.active)
-
-    if (activeDownloadIds.length === 0) return
+    if (activeDownloads.length === 0) return
 
     let startedFile = false
 
     // Find the next pending file within all active downloads
-    activeDownloadIds.forEach((activeDownloadId) => {
+    await activeDownloads.forEachAsync(async (activeDownload) => {
       // If a file has already been started in this loop, don't look for another file to start
       if (startedFile) return
 
-      const { files: nextActiveDownloadFiles } = allDownloads[activeDownloadId]
-      const nextActiveDownloadPendingFile = Object.entries(nextActiveDownloadFiles)
-        .find(([, values]) => values.state === downloadStates.pending)
+      const { id: activeDownloadId, downloadLocation } = activeDownload
+      const nextActiveDownloadPendingFiles = await database.getFilesWhere({
+        downloadId: activeDownloadId,
+        state: downloadStates.pending
+      })
 
       // If a pending file was found, start it downloading
-      if (nextActiveDownloadPendingFile) {
-        const [nextFilename] = nextActiveDownloadPendingFile
-        const { url } = nextActiveDownloadFiles[nextFilename]
+      if (nextActiveDownloadPendingFiles.length > 0) {
+        const [nextActiveDownloadPendingFile] = nextActiveDownloadPendingFiles
+        const {
+          id: fileId,
+          url
+        } = nextActiveDownloadPendingFile
 
-        store.set(`downloads.${activeDownloadId.replaceAll('.', '\\.')}.files.${nextFilename.replaceAll('.', '\\.')}.state`, downloadStates.active)
+        // The file might not actually start download before the next time through this loop
+        // Setting the file to `starting` ensures we start a new file if we need to
+        await database.updateFile(fileId, {
+          state: downloadStates.starting
+        })
 
         // eslint-disable-next-line no-param-reassign
-        downloadIdContext[url] = activeDownloadId.replaceAll('.', '\\.')
+        downloadIdContext[url] = {
+          downloadId: activeDownloadId,
+          downloadLocation,
+          fileId
+        }
         webContents.downloadURL(url)
 
         startedFile = true
       } else {
-        const nextNotCompletedFile = Object.entries(nextActiveDownloadFiles)
-          .find(([, values]) => values.state !== downloadStates.completed)
+        const nextActiveNotCompletedFiles = await database.getNotCompletedFilesByDownloadId(
+          activeDownloadId
+        )
 
-        // If no more files in the download are not completed, set the timeEnd and state for the download in the store
-        if (!nextNotCompletedFile) {
-          const storeDownload = store.get(`downloads.${downloadId}`)
-          store.set(`downloads.${downloadId}`, {
-            ...storeDownload,
+        // If no more files in the download are not completed, set the timeEnd and state for the download in the database
+        if (nextActiveNotCompletedFiles.length === 0) {
+          await database.updateDownloadById(activeDownloadId, {
             timeEnd: new Date().getTime(),
             state: downloadStates.completed
           })
@@ -83,6 +96,7 @@ const startNextDownload = ({
       numberDownloadsToStart = 0
     }
   }
+  /* eslint-enable no-await-in-loop */
 }
 
 export default startNextDownload

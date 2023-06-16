@@ -5,6 +5,9 @@ directories:
 files:
   - dist-electron
   - dist
+extraResources:
+  - migrations/*
+  - seeds/*
 artifactName: ${productName}-${arch}.${ext}
 mac:
   target:

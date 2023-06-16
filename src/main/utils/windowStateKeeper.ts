@@ -1,19 +1,22 @@
 // @ts-nocheck
 
 /**
- * Keeps the current window state (size/location) update in the preferences store. So the window
+ * Keeps the current window state (size/location) update in the database. So the window
  * will open in the same place as the user last had it open.
  * https://medium.com/@hql287/persisting-windows-state-in-electron-using-javascript-closure-17fc0821d37
- * @param {Object} store `electron-store` instance
+ * @param {Object} database `EddDatabase` instance
  */
-const windowStateKeeper = (store) => {
+const windowStateKeeper = async (database) => {
   let appWindow
   let windowState
 
-  function setBounds() {
-    // Restore from store
-    if (store.has('preferences.windowState')) {
-      windowState = store.get('preferences.windowState')
+  async function setBounds() {
+    // Restore from database
+    const preferences = await database.getPreferences()
+    const { windowState: windowStateString } = preferences
+
+    if (windowStateString) {
+      windowState = JSON.parse(windowStateString)
       return
     }
 
@@ -33,7 +36,7 @@ const windowStateKeeper = (store) => {
 
     windowState.isMaximized = appWindow.isMaximized()
 
-    store.set('preferences.windowState', windowState)
+    database.setPreferences({ windowState: JSON.stringify(windowState) })
   }
 
   function track(trackedWindow) {
@@ -44,7 +47,7 @@ const windowStateKeeper = (store) => {
     })
   }
 
-  setBounds()
+  await setBounds()
 
   return ({
     x: windowState.x,

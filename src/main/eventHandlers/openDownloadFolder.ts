@@ -5,19 +5,20 @@ import { shell } from 'electron'
 /**
  * Opens the download folder associated with the given download ID.
  * @param {Object} params The params object.
- * @param {Object} params.store The store object.
+ * @param {Object} params.database `EddDatabase` instance
  * @param {String} params.info.downloadId The download ID.
  */
-const openDownloadFolder = ({
-  info,
-  store
+const openDownloadFolder = async ({
+  database,
+  info
 }) => {
   const {
     downloadId
   } = info
 
-  const folderPath = store.get(`downloads.${downloadId}.downloadLocation`)
-  shell.openPath(folderPath)
+  const { downloadLocation } = await database.getDownloadById(downloadId)
+
+  shell.openPath(downloadLocation)
 }
 
 export default openDownloadFolder

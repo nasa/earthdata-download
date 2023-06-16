@@ -8,19 +8,22 @@ jest.mock('electronShell', () => ({
 }))
 
 describe('openDownloadFolder', () => {
-  test('opens the download folder using shell.openPath', () => {
+  test('opens the download folder using shell.openPath', async () => {
     const info = {
       downloadId: 'shortName_version-1-20230514_012554'
     }
 
-    const folderPath = '/mock/location/shortName_version-1-20230514_012554'
+    const downloadLocation = '/mock/location/shortName_version-1-20230514_012554'
 
-    const store = {
-      get: jest.fn().mockReturnValue(folderPath)
+    const database = {
+      getDownloadById: jest.fn().mockReturnValue({ downloadLocation })
     }
 
-    openDownloadFolder({ info, store })
+    await openDownloadFolder({ database, info })
 
-    expect(shell.openPath).toHaveBeenCalledWith(folderPath)
+    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadById).toHaveBeenCalledWith('shortName_version-1-20230514_012554')
+
+    expect(shell.openPath).toHaveBeenCalledWith(downloadLocation)
   })
 })

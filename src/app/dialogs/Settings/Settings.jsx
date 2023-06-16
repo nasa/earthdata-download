@@ -74,14 +74,14 @@ const Settings = ({
   const onBlurConcurrentDownloads = async (event) => {
     const { value } = event.target
     // If empty string is entered and the input field is exited, restore the label with the set concurrentDownloads
-    if (value === '') {
+    if (!value) {
       const concurrentDownloadsPreference = await getPreferenceFieldValue('concurrentDownloads')
       setConcurrentDownloads(concurrentDownloadsPreference.toString())
       return
     }
 
     const valueNumeric = parseInt(value, 10)
-    if (valueNumeric > 0) {
+    if (!Number.isNaN(valueNumeric) && valueNumeric > 0) {
       setPreferenceFieldValue('concurrentDownloads', valueNumeric)
     }
   }
@@ -181,7 +181,7 @@ const Settings = ({
       { hasActiveDownloads
         ? (
           <div className={styles.activeDownloadsWarn} data-testid="settings-hasActiveDownloads">
-            Currently running Downloads
+            Pending Downloads update to settings will only apply to new downloads
           </div>
         )
         : (

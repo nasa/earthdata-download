@@ -223,6 +223,7 @@ const Layout = () => {
         >
           <Settings
             hasActiveDownloads={hasActiveDownload}
+            settingsDialogIsOpen={settingsDialogIsOpen}
           />
         </Dialog>
       </main>

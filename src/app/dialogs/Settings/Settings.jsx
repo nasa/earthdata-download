@@ -36,7 +36,8 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
  * )
  */
 const Settings = ({
-  hasActiveDownloads
+  hasActiveDownloads,
+  settingsDialogIsOpen
 }) => {
   const {
     chooseDownloadLocation,
@@ -44,7 +45,7 @@ const Settings = ({
     setPreferenceFieldValue,
     getPreferenceFieldValue
   } = useContext(ElectronApiContext)
-  const [concurrentDownloads, setConcurrentDownloads] = useState('5')
+  const [concurrentDownloads, setConcurrentDownloads] = useState('')
   const [defaultDownloadLocation, setDefaultDownloadLocation] = useState()
 
   const onClearDefaultDownload = () => {
@@ -117,6 +118,16 @@ const Settings = ({
     }
   }, [])
 
+  useEffect(() => {
+    // handle edge case where change is made to the concurrency field but, exits
+    if (settingsDialogIsOpen === false) {
+      const valueNumeric = parseInt(concurrentDownloads.toString(), 10)
+      if (valueNumeric > 0) {
+        setPreferenceFieldValue('concurrentDownloads', valueNumeric)
+      }
+    }
+  }, [settingsDialogIsOpen])
+
   return (
     <div>
       Number of Concurrent Downloads:
@@ -185,7 +196,8 @@ Settings.propTypes = {
   hasActiveDownloads: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.number
-  ]).isRequired
+  ]).isRequired,
+  settingsDialogIsOpen: PropTypes.bool.isRequired
 }
 
 export default Settings

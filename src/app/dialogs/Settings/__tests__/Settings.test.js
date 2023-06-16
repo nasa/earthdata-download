@@ -1,37 +1,38 @@
+/* eslint-disable react/jsx-closing-tag-location */
 import React from 'react'
 
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
-import { act } from 'react-dom/test-utils'
 
 import Settings from '../Settings'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 
-const setup = (hasActiveDownloads) => {
+const setup = (hasActiveDownloads, settingsDialogIsOpen) => {
   // we need to mock hasActiveDownloads to render warning
   const mockHasActiveDownloads = hasActiveDownloads
+  const mockSettingsDialogIsOpen = settingsDialogIsOpen
   const chooseDownloadLocation = jest.fn()
   const setDownloadLocation = jest.fn()
   const setPreferenceFieldValue = jest.fn()
   const getPreferenceFieldValue = () => 5
-  act(() => {
-    render(
-      <ElectronApiContext.Provider value={{
-        chooseDownloadLocation,
-        setDownloadLocation,
-        setPreferenceFieldValue,
-        getPreferenceFieldValue
-      }}
-      >
-        <Settings
-          hasActiveDownloads={mockHasActiveDownloads}
-        />
-      </ElectronApiContext.Provider>
-    )
-  })
+  const { rerender } = render(
+    <ElectronApiContext.Provider value={{
+      chooseDownloadLocation,
+      setDownloadLocation,
+      setPreferenceFieldValue,
+      getPreferenceFieldValue
+    }}
+    >
+      <Settings
+        hasActiveDownloads={mockHasActiveDownloads}
+        settingsDialogIsOpen={mockSettingsDialogIsOpen}
+      />
+    </ElectronApiContext.Provider>
+  )
 
   return {
+    rerender,
     chooseDownloadLocation,
     setDownloadLocation,
     setPreferenceFieldValue,
@@ -42,7 +43,8 @@ const setup = (hasActiveDownloads) => {
 describe('Settings dialog', () => {
   test('renders the Settings modal page including the element if there are active downloads', async () => {
     const hasActiveDownloads = true
-    setup(hasActiveDownloads)
+    const settingsDialogIsOpen = true
+    setup(hasActiveDownloads, settingsDialogIsOpen)
     await waitFor(() => {
       expect(screen.getByTestId('settings-hasActiveDownloads')).toBeInTheDocument()
     })
@@ -50,7 +52,8 @@ describe('Settings dialog', () => {
 
   test('renders the Settings modal page excluding active downloads', async () => {
     const hasActiveDownloads = false
-    setup(hasActiveDownloads)
+    const settingsDialogIsOpen = true
+    setup(hasActiveDownloads, settingsDialogIsOpen)
     await waitFor(() => {
     // Can't use getByTestId, that returns an error instead of null
       expect(screen.queryByTestId('settings-hasActiveDownloads')).not.toBeInTheDocument()
@@ -60,8 +63,9 @@ describe('Settings dialog', () => {
   test('Clicking the download location sends a message to the main process', async () => {
     const user = userEvent.setup()
     const hasActiveDownloads = true
+    const settingsDialogIsOpen = true
 
-    const { chooseDownloadLocation } = setup(hasActiveDownloads)
+    const { chooseDownloadLocation } = setup(hasActiveDownloads, settingsDialogIsOpen)
 
     await user.click(screen.getByTestId('initialize-download-location'))
 
@@ -74,7 +78,8 @@ describe('Settings dialog', () => {
   test('Clicking on the `Clear default download location` sends a message to the main process', async () => {
     const user = userEvent.setup()
     const hasActiveDownloads = true
-    const { setPreferenceFieldValue } = setup(hasActiveDownloads)
+    const settingsDialogIsOpen = true
+    const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
 
     await user.click(screen.getByTestId('settings-clear-default-download'))
 
@@ -87,8 +92,9 @@ describe('Settings dialog', () => {
   test('Typing into the input field for the concurrency will trigger a call to main process', async () => {
     const user = userEvent.setup()
     const hasActiveDownloads = true
+    const settingsDialogIsOpen = true
 
-    const { setPreferenceFieldValue } = setup(hasActiveDownloads)
+    const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
 
     await user.type(screen.getByTestId('input-test-id'), '{backspace}')
     await user.type(screen.getByTestId('input-test-id'), '3')
@@ -105,7 +111,8 @@ describe('Settings dialog', () => {
   test('Typing a value < 1 or characters into the text field will result in no calls', async () => {
     const user = userEvent.setup()
     const hasActiveDownloads = true
-    const { setPreferenceFieldValue } = setup(hasActiveDownloads)
+    const settingsDialogIsOpen = true
+    const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
     await user.type(screen.getByTestId('input-test-id'), '{backspace}')
     await user.type(screen.getByTestId('input-test-id'), '-')
     await user.type(screen.getByTestId('input-test-id'), 'a')
@@ -122,7 +129,8 @@ describe('Settings dialog', () => {
   test('Deleting the value in the field and leaving focus will not call a store change', async () => {
     const user = userEvent.setup()
     const hasActiveDownloads = true
-    const { setPreferenceFieldValue } = setup(hasActiveDownloads)
+    const settingsDialogIsOpen = true
+    const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
     await user.type(screen.getByTestId('input-test-id'), '{backspace}')
     // trigger blur by leaving the text field
     await user.tab()
@@ -130,6 +138,48 @@ describe('Settings dialog', () => {
     await waitFor(() => {
     // leaving the text field empty will not update the store
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(0)
+    })
+  })
+
+  test('Changing the concurrency field and then closing dialog still causes change to store', async () => {
+    const setDownloadLocation = jest.fn()
+    const setPreferenceFieldValue = jest.fn()
+    const getPreferenceFieldValue = () => 5
+
+    // render
+    const { rerender } = render(
+      <ElectronApiContext.Provider value={{
+        setDownloadLocation,
+        setPreferenceFieldValue,
+        getPreferenceFieldValue
+      }}
+      >
+        <Settings
+          hasActiveDownloads={false}
+          settingsDialogIsOpen
+        />
+      </ElectronApiContext.Provider>
+    )
+    const user = userEvent.setup()
+    await user.type(screen.getByTestId('input-test-id'), '{backspace}')
+    await user.type(screen.getByTestId('input-test-id'), '6')
+
+    // re-render
+    rerender(<ElectronApiContext.Provider value={{
+      setDownloadLocation,
+      setPreferenceFieldValue,
+      getPreferenceFieldValue
+    }}
+    >
+      <Settings
+        hasActiveDownloads={false}
+        settingsDialogIsOpen={false}
+      />
+    </ElectronApiContext.Provider>)
+
+    await waitFor(() => {
+      expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
+      expect(setPreferenceFieldValue).toHaveBeenCalledWith('concurrentDownloads', 6)
     })
   })
 })

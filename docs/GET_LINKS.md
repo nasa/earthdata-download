@@ -1,6 +1,6 @@
 # Get Links Request
 
-The [`getLinks` query parameter](README.md) is used as a way for EDD to fetch the download links from a web application.
+The [`getLinks` query parameter](./USE_EDD.md) is used as a way for EDD to fetch the download links from a web application.
 
 EDD will send a `GET` request to the provided URL.
 

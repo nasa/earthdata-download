@@ -25,19 +25,17 @@ describe('fetchLinks', () => {
     jest.resetModules()
   })
 
-  test.each(
-    [
-      'http://malicious:3000/granule_links?id=300&flattenLinks=true&linkTypes=data',
-      'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data',
-      'https://tricksy:3001/granule_links?id=302&flattenLinks=true&linkTypes=data',
-      'ftp://sneaky/granule_links?id=304',
-      'sftp://fictitious:1234/granule_links?id=305',
-      'sftp://fictitious/granule_links?id=306',
-      'file:///noprotocol:5431/granule_links?id=307',
-      '://noprotocol:5431/granule_links?id=308',
-      'noprotocol/granule_links?id=309'
-    ]
-  )('does not download links from untrusted sources: [%s]', async (badLink) => {
+  test.each([
+    'http://malicious:3000/granule_links?id=300&flattenLinks=true&linkTypes=data',
+    'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data',
+    'https://tricksy:3001/granule_links?id=302&flattenLinks=true&linkTypes=data',
+    'ftp://sneaky/granule_links?id=304',
+    'sftp://fictitious:1234/granule_links?id=305',
+    'sftp://fictitious/granule_links?id=306',
+    'file:///file:5431/granule_links?id=307',
+    '://noprotocol:5431/granule_links?id=308',
+    'noprotocol/granule_links?id=309'
+  ])('does not download links from untrusted sources: [%s]', async (badLink) => {
     const appWindow = {}
     const downloadId = 'shortName_versionId'
 
@@ -47,6 +45,14 @@ describe('fetchLinks', () => {
     }
 
     const token = 'Bearer mock-token'
+
+    const standardResponse = {
+      json: jest.fn().mockReturnValue({
+        cursor: 'mock-cursor',
+        links: ['https://example.com/file1.png']
+      })
+    }
+    fetch.mockImplementation(() => standardResponse)
 
     await fetchLinks({
       appWindow,
@@ -63,6 +69,9 @@ describe('fetchLinks', () => {
     expect(entry).toHaveProperty('state', 'ERROR')
     expect(entry).toHaveProperty('error')
     expect(entry.error).toMatch(/^the host \[.*\] is not a trusted source.*/i)
+
+    // we should not have fetched anything
+    expect(fetch).toHaveBeenCalledTimes(0)
   })
 
   test.each([
@@ -70,7 +79,8 @@ describe('fetchLinks', () => {
     ['bad links type', { cursor: 'abc', links: 'https://example.com/file1.png' }],
     ['bad done type', { done: 'yes', cursor: 'abc', links: 'https://example.com/file1.png' }],
     ['missing links', { cursor: 'abc' }],
-    ['empty response', '']])('halts on invalid JSON response: %s', async ([, badLink]) => {
+    ['empty response', '']
+  ])('halts on invalid JSON response: %s', async ([, badResponse]) => {
     const appWindow = {}
     const downloadId = 'shortName_versionId'
     const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
@@ -88,7 +98,7 @@ describe('fetchLinks', () => {
       })
     }
     const page2Response = {
-      json: jest.fn().mockReturnValue(badLink)
+      json: jest.fn().mockReturnValue(badResponse)
     }
     const page3Response = {
       json: jest.fn().mockReturnValue({
@@ -196,38 +206,29 @@ describe('fetchLinks', () => {
     )
 
     expect(store.set).toHaveBeenCalledTimes(4)
-    expect(store.set).toHaveBeenCalledWith(
-      'downloads.shortName_versionId-20230501_000000',
-      {
-        loadingMoreFiles: true,
-        state: 'PENDING'
+    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000', {
+      loadingMoreFiles: true,
+      state: 'PENDING'
+    })
+    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000.files', {
+      'file1.png': {
+        percent: 0,
+        state: 'PENDING',
+        url: 'https://example.com/file1.png'
       }
-    )
-    expect(store.set).toHaveBeenCalledWith(
-      'downloads.shortName_versionId-20230501_000000.files',
-      {
-        'file1.png': {
-          percent: 0,
-          state: 'PENDING',
-          url: 'https://example.com/file1.png'
-        }
+    })
+    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000.files', {
+      'file1.png': {
+        percent: 0,
+        state: 'PENDING',
+        url: 'https://example.com/file1.png'
+      },
+      'file2.png': {
+        percent: 0,
+        state: 'PENDING',
+        url: 'https://example.com/file2.png'
       }
-    )
-    expect(store.set).toHaveBeenCalledWith(
-      'downloads.shortName_versionId-20230501_000000.files',
-      {
-        'file1.png': {
-          percent: 0,
-          state: 'PENDING',
-          url: 'https://example.com/file1.png'
-        },
-        'file2.png': {
-          percent: 0,
-          state: 'PENDING',
-          url: 'https://example.com/file2.png'
-        }
-      }
-    )
+    })
     expect(store.set).toHaveBeenCalledWith(
       'downloads.shortName_versionId-20230501_000000.loadingMoreFiles',
       false
@@ -280,32 +281,24 @@ describe('fetchLinks', () => {
     expect(initializeDownload).toHaveBeenCalledTimes(0)
 
     expect(store.get).toHaveBeenCalledTimes(1)
-    expect(store.get).toHaveBeenCalledWith(
-      'downloads.shortName_versionId-20230501_000000'
-    )
+    expect(store.get).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000')
 
     expect(store.set).toHaveBeenCalledTimes(2)
-    expect(store.set).toHaveBeenCalledWith(
-      'downloads.shortName_versionId-20230501_000000',
-      {
-        loadingMoreFiles: true,
-        state: 'PENDING'
-      }
-    )
-    expect(store.set).toHaveBeenCalledWith(
-      'downloads.shortName_versionId-20230501_000000',
-      {
-        files: {
-          'file1.png': {
-            percent: 0,
-            state: 'PENDING',
-            url: 'https://example.com/file1.png'
-          }
-        },
-        loadingMoreFiles: false,
-        state: 'ERROR',
-        error: 'error'
-      }
-    )
+    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000', {
+      loadingMoreFiles: true,
+      state: 'PENDING'
+    })
+    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000', {
+      files: {
+        'file1.png': {
+          percent: 0,
+          state: 'PENDING',
+          url: 'https://example.com/file1.png'
+        }
+      },
+      loadingMoreFiles: false,
+      state: 'ERROR',
+      error: 'error'
+    })
   })
 })

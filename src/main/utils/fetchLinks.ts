@@ -3,7 +3,6 @@
 import fetch from 'node-fetch'
 import Ajv from 'ajv'
 
-import formatLinks from './formatLinks'
 import initializeDownload from './initializeDownload'
 
 import downloadStates from '../../app/constants/downloadStates'
@@ -53,36 +52,47 @@ const isTrustedLink = (link: string) => {
 }
 
 /**
- * Fetches links for the given downloadId, adds links to the store.
+ * Fetches links for the given downloadId, adds links to the database.
  * @param {Object} params
+ * @param {Object} params.appWindow Electron window instance
+ * @param {Object} params.database `EddDatabase` instance
  * @param {Object} params.downloadId Download ID to add links to
  * @param {String} params.getLinks URL used to fetch links
- * @param {Object} params.store `electron-store` instance
  * @param {String} params.token Token for use when fetching links
- * @param {Object} params.appWindow Electron window instance
  */
 const fetchLinks = async ({
-  downloadId, getLinks, store, token, appWindow
+  appWindow,
+  database,
+  downloadId: downloadIdWithoutTime,
+  getLinks,
+  reAuthUrl,
+  token
 }) => {
   const now = new Date().toISOString().replace(/(:|-)/g, '').replace('T', '_')
     .split('.')[0]
 
-  const downloadIdWithTime = `${downloadId.replaceAll('.', '\\.')}-${now}`
+  const downloadId = `${downloadIdWithoutTime}-${now}`
 
+  // Create a download in the database
+  await database.createDownload(downloadId, {
+    loadingMoreFiles: true,
+    reAuthUrl,
+    state: downloadStates.pending,
+    createdAt: new Date().getTime()
+  })
+
+  // If the getLinks URL is not trusted, don't fetch the links
   if (!isTrustedLink(getLinks)) {
-    store.set(`downloads.${downloadIdWithTime}`, {
+    await database.updateDownloadById(downloadId, {
       loadingMoreFiles: false,
       state: downloadStates.error,
-      error: `The host [${getLinks}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
+      errors: [{
+        message: `The host [${getLinks}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
+      }]
     })
+
     return
   }
-
-  // Create a download in the store with the first page of links
-  store.set(`downloads.${downloadIdWithTime}`, {
-    loadingMoreFiles: true,
-    state: downloadStates.pending
-  })
 
   let finished = false
   let pageNum = 1
@@ -91,6 +101,8 @@ const fetchLinks = async ({
   let response
 
   try {
+    // https://eslint.org/docs/latest/rules/no-await-in-loop#when-not-to-use-it
+    /* eslint-disable no-await-in-loop */
     while (!finished) {
       // node-fetch doesn't play nice with `localhost`, replace it with 127.0.0.1 for local dev
       let updatedUrl = getLinks.replace('localhost', '127.0.0.1')
@@ -119,15 +131,20 @@ const fetchLinks = async ({
       // eslint-disable-next-line no-await-in-loop
       const jsonResponse = await response.json()
 
+      // If the response is not valid, don't add the links to the database
       const validateGetLinks = ajv.compile(getLinksSchema)
       const valid = validateGetLinks(jsonResponse)
       if (!valid) {
-        console.error(validateGetLinks.errors)
-        store.set(`downloads.${downloadIdWithTime}`, {
+        await database.updateDownloadById(downloadId, {
           loadingMoreFiles: false,
           state: downloadStates.error,
-          error: 'The returned data does not match the expected schema.'
+          errors: [{
+            message: 'The returned data does not match the expected schema.'
+          }]
         })
+
+        console.error(validateGetLinks.errors)
+
         return
       }
 
@@ -136,27 +153,24 @@ const fetchLinks = async ({
       // If no links exist, set `loadingMoreFiles` to false and exit the loop
       if (links.length === 0) {
         finished = true
-        store.set(`downloads.${downloadIdWithTime}.loadingMoreFiles`, false)
+
+        await database.updateDownloadById(downloadId, {
+          loadingMoreFiles: false
+        })
+
         return
       }
 
-      // If this is the first response back, create a download in the store
-      if (pageNum === 1) {
-        store.set(`downloads.${downloadIdWithTime}.files`, formatLinks(links))
+      // Add the links to the download
+      await database.addLinksByDownloadId(downloadId, links)
 
+      // If this is the first response back, create a download in the database
+      if (pageNum === 1) {
         // Initialize download will let the renderer process know to start a download
         initializeDownload({
           appWindow,
-          downloadIds: [downloadIdWithTime],
-          store
-        })
-      } else {
-        // Append more links to the existing links in the store
-        const currentFiles = store.get(`downloads.${downloadIdWithTime}.files`)
-
-        store.set(`downloads.${downloadIdWithTime}.files`, {
-          ...currentFiles,
-          ...formatLinks(links)
+          downloadIds: [downloadId],
+          database
         })
       }
 
@@ -164,14 +178,12 @@ const fetchLinks = async ({
       cursor = responseCursor
       pageNum += 1
     }
+    /* eslint-enable no-await-in-loop */
   } catch (error) {
-    const download = store.get(`downloads.${downloadIdWithTime}`)
-
-    store.set(`downloads.${downloadIdWithTime}`, {
-      ...download,
+    await database.updateDownloadById(downloadId, {
       loadingMoreFiles: false,
       state: downloadStates.error,
-      error: error.message
+      errors: JSON.stringify(error)
     })
   }
 }

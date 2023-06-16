@@ -4,69 +4,56 @@ import beginDownload from '../beginDownload'
 import CurrentDownloadItems from '../../utils/currentDownloadItems'
 import startNextDownload from '../willDownloadEvents/startNextDownload'
 
-jest.mock('../willDownloadEvents/startNextDownload')
+jest.mock('../willDownloadEvents/startNextDownload', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
 
 beforeEach(() => {
   MockDate.set('2023-05-01')
+
+  jest.clearAllMocks()
 })
 
 describe('beginDownload', () => {
-  test('updates the store with the new information', () => {
+  test('updates the database with the new information', async () => {
     const downloadIdContext = {}
     const info = {
       downloadIds: ['mock-id'],
       downloadLocation: '/mock/location',
       makeDefaultDownloadLocation: false
     }
-    const store = {
-      set: jest.fn(),
-      get: jest.fn()
-        .mockReturnValueOnce({
-          concurrentDownloads: 5
-        })
-        .mockReturnValueOnce({
-          files: {
-            'mock-url': {
-              name: undefined,
-              percent: 0,
-              state: 'ACTIVE',
-              url: 'mock-url'
-            }
-          },
-          state: 'PENDING'
-        })
+    const database = {
+      setPreferences: jest.fn(),
+      getDownloadById: jest.fn().mockResolvedValue({ state: 'PENDING' }),
+      updateDownloadById: jest.fn()
     }
     const webContents = {
       downloadURL: jest.fn()
     }
 
-    beginDownload({
+    await beginDownload({
       downloadIdContext,
       currentDownloadItems: new CurrentDownloadItems(),
       info,
-      store,
+      database,
       webContents
     })
 
-    expect(store.get).toHaveBeenCalledTimes(2)
-    expect(store.set).toHaveBeenCalledTimes(2)
-    expect(store.set).toHaveBeenCalledWith('preferences', {
+    expect(database.setPreferences).toHaveBeenCalledTimes(1)
+    expect(database.setPreferences).toHaveBeenCalledWith({
       defaultDownloadLocation: undefined,
-      lastDownloadLocation: '/mock/location',
-      concurrentDownloads: 5
+      lastDownloadLocation: '/mock/location'
     })
-    expect(store.set).toHaveBeenCalledWith('downloads.mock-id', {
+
+    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadById).toHaveBeenCalledWith('mock-id')
+
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.updateDownloadById).toHaveBeenCalledWith('mock-id', {
       downloadLocation: '/mock/location/mock-id',
-      timeStart: 1682899200000,
-      files: {
-        'mock-url': {
-          name: undefined,
-          percent: 0,
-          state: 'ACTIVE',
-          url: 'mock-url'
-        }
-      },
-      state: 'ACTIVE'
+      state: 'ACTIVE',
+      timeStart: 1682899200000
     })
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
@@ -78,62 +65,44 @@ describe('beginDownload', () => {
     )
   })
 
-  test('updates the store with defaultDownloadLocation', () => {
+  test('updates the database with defaultDownloadLocation', async () => {
     const downloadIdContext = {}
     const info = {
       downloadIds: ['mock-id'],
       downloadLocation: '/mock/location',
       makeDefaultDownloadLocation: true
     }
-    const store = {
-      set: jest.fn(),
-      get: jest.fn()
-        .mockReturnValueOnce({
-          concurrentDownloads: 5
-        })
-        .mockReturnValueOnce({
-          files: {
-            'mock-url': {
-              name: undefined,
-              percent: 0,
-              state: 'ACTIVE',
-              url: 'mock-url'
-            }
-          },
-          state: 'PENDING'
-        })
+    const database = {
+      setPreferences: jest.fn(),
+      getDownloadById: jest.fn().mockResolvedValue({ state: 'PENDING' }),
+      updateDownloadById: jest.fn()
     }
     const webContents = {
       downloadURL: jest.fn()
     }
 
-    beginDownload({
+    await beginDownload({
       downloadIdContext,
       currentDownloadItems: new CurrentDownloadItems(),
       info,
-      store,
+      database,
       webContents
     })
 
-    expect(store.get).toHaveBeenCalledTimes(2)
-    expect(store.set).toHaveBeenCalledTimes(2)
-    expect(store.set).toHaveBeenCalledWith('preferences', {
+    expect(database.setPreferences).toHaveBeenCalledTimes(1)
+    expect(database.setPreferences).toHaveBeenCalledWith({
       defaultDownloadLocation: '/mock/location',
-      lastDownloadLocation: '/mock/location',
-      concurrentDownloads: 5
+      lastDownloadLocation: '/mock/location'
     })
-    expect(store.set).toHaveBeenCalledWith('downloads.mock-id', {
+
+    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadById).toHaveBeenCalledWith('mock-id')
+
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.updateDownloadById).toHaveBeenCalledWith('mock-id', {
       downloadLocation: '/mock/location/mock-id',
-      timeStart: 1682899200000,
-      files: {
-        'mock-url': {
-          name: undefined,
-          percent: 0,
-          state: 'ACTIVE',
-          url: 'mock-url'
-        }
-      },
-      state: 'ACTIVE'
+      state: 'ACTIVE',
+      timeStart: 1682899200000
     })
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
@@ -143,5 +112,42 @@ describe('beginDownload', () => {
         downloadIdContext: {}
       })
     )
+  })
+
+  test('does not call startNextDownload if no downloads should be started', async () => {
+    const downloadIdContext = {}
+    const info = {
+      downloadIds: ['mock-id'],
+      downloadLocation: '/mock/location',
+      makeDefaultDownloadLocation: false
+    }
+    const database = {
+      setPreferences: jest.fn(),
+      getDownloadById: jest.fn().mockResolvedValue({ state: 'ACTIVE' }),
+      updateDownloadById: jest.fn()
+    }
+    const webContents = {
+      downloadURL: jest.fn()
+    }
+
+    await beginDownload({
+      downloadIdContext,
+      currentDownloadItems: new CurrentDownloadItems(),
+      info,
+      database,
+      webContents
+    })
+
+    expect(database.setPreferences).toHaveBeenCalledTimes(1)
+    expect(database.setPreferences).toHaveBeenCalledWith({
+      defaultDownloadLocation: undefined,
+      lastDownloadLocation: '/mock/location'
+    })
+
+    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadById).toHaveBeenCalledWith('mock-id')
+
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
+    expect(startNextDownload).toHaveBeenCalledTimes(0)
   })
 })

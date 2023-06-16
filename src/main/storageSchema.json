@@ -44,6 +44,10 @@
       }
     }
   },
+  "token": {
+    "type": "string",
+    "description": "EDL token to use for download."
+  },
   "downloads": {
     "type": "object",
     "patternProperties": {
@@ -54,6 +58,10 @@
           "downloadLocation": {
             "type": "string",
             "description": "Download location used for this download."
+          },
+          "reAuthUrl": {
+            "type": "string",
+            "description": "URL to use if the user needs to be re-authenticated."
           },
           "state": {
             "type": "string",

@@ -2,7 +2,7 @@ import resumeDownloadItem from '../resumeDownloadItem'
 
 describe('resumeDownloadItem', () => {
   describe('when downloadId and name are provided', () => {
-    test('calls currentDownloadItems.resumeItem', () => {
+    test('calls currentDownloadItems.resumeItem', async () => {
       const currentDownloadItems = {
         resumeItem: jest.fn()
       }
@@ -10,169 +10,140 @@ describe('resumeDownloadItem', () => {
         downloadId: 'mock-download-id',
         name: 'mock-filename.png'
       }
-      const store = {}
+      const database = {
+        getAllDownloads: jest.fn(),
+        getFileCountWhere: jest.fn(),
+        updateDownloadById: jest.fn()
+      }
 
-      resumeDownloadItem({
+      await resumeDownloadItem({
         currentDownloadItems,
-        info,
-        store
+        database,
+        info
       })
 
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
+
+      expect(database.getAllDownloads).toHaveBeenCalledTimes(0)
+      expect(database.getFileCountWhere).toHaveBeenCalledTimes(0)
+      expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
     })
   })
 
   describe('when only downloadId is provided', () => {
     describe('when the download does not have files', () => {
-      test('calls currentDownloadItems.resumeItem and updates the store', () => {
+      test('calls currentDownloadItems.resumeItem and updates the database', async () => {
         const currentDownloadItems = {
           resumeItem: jest.fn()
         }
         const info = {
           downloadId: 'mock-download-id'
         }
-        const store = {
-          get: jest.fn()
-            .mockReturnValue({
-              files: {}
-            }),
-          set: jest.fn()
+        const database = {
+          getAllDownloads: jest.fn(),
+          getFileCountWhere: jest.fn().mockResolvedValue(0),
+          updateDownloadById: jest.fn()
         }
 
-        resumeDownloadItem({
+        await resumeDownloadItem({
           currentDownloadItems,
-          info,
-          store
+          database,
+          info
         })
 
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
-        expect(store.get).toHaveBeenCalledTimes(1)
-        expect(store.get).toHaveBeenCalledWith('downloads.mock-download-id')
+        expect(database.getAllDownloads).toHaveBeenCalledTimes(0)
 
-        expect(store.set).toHaveBeenCalledTimes(1)
-        expect(store.set).toHaveBeenCalledWith('downloads.mock-download-id.state', 'PENDING')
+        expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
+        expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
+
+        expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+        expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: 'PENDING' })
       })
     })
 
     describe('when the download has files', () => {
-      test('calls currentDownloadItems.resumeItem and updates the store', () => {
+      test('calls currentDownloadItems.resumeItem and updates the database', async () => {
         const currentDownloadItems = {
           resumeItem: jest.fn()
         }
         const info = {
           downloadId: 'mock-download-id'
         }
-        const store = {
-          get: jest.fn()
-            .mockReturnValue({
-              files: {
-                'file1.png': {
-                  url: 'http://example.com/file1.png',
-                  state: 'ACTIVE',
-                  percent: 42
-                }
-              }
-            }),
-          set: jest.fn()
+        const database = {
+          getAllDownloads: jest.fn(),
+          getFileCountWhere: jest.fn().mockResolvedValue(1),
+          updateDownloadById: jest.fn()
         }
 
-        resumeDownloadItem({
+        await resumeDownloadItem({
           currentDownloadItems,
-          info,
-          store
+          database,
+          info
         })
 
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
-        expect(store.get).toHaveBeenCalledTimes(1)
-        expect(store.get).toHaveBeenCalledWith('downloads.mock-download-id')
+        expect(database.getAllDownloads).toHaveBeenCalledTimes(0)
 
-        expect(store.set).toHaveBeenCalledTimes(1)
-        expect(store.set).toHaveBeenCalledWith('downloads.mock-download-id.state', 'ACTIVE')
+        expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
+        expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
+
+        expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+        expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: 'ACTIVE' })
       })
     })
   })
 
   describe('when no downloadId or name is provided', () => {
-    test('calls currentDownloadItems.resumeItem and updates the store', () => {
+    test('calls currentDownloadItems.resumeItem and updates the database', async () => {
       const currentDownloadItems = {
         resumeItem: jest.fn()
       }
       const info = {}
-      const store = {
-        get: jest.fn()
-          .mockReturnValue({
-            download1: {
-              files: {
-                'file1.png': {
-                  url: 'http://example.com/file1.png',
-                  state: 'COMPLETE',
-                  percent: 100
-                }
-              },
-              state: 'COMPLETE'
-            },
-            download2: {
-              files: {
-                'file2.png': {
-                  url: 'http://example.com/file2.png',
-                  state: 'PAUSED',
-                  percent: 42
-                }
-              },
-              state: 'PAUSED'
-            },
-            download3: {
-              files: {},
-              state: 'PAUSED'
-            }
-          }),
-        set: jest.fn()
+      const database = {
+        getAllDownloads: jest.fn().mockResolvedValue([{
+          id: 'download1',
+          state: 'COMPLETE'
+        }, {
+          id: 'download2',
+          state: 'PAUSED'
+        }, {
+          id: 'download3',
+          files: {},
+          state: 'PAUSED'
+        }]),
+        getFileCountWhere: jest.fn()
+          .mockResolvedValueOnce(1)
+          .mockResolvedValueOnce(1)
+          .mockResolvedValueOnce(0),
+        updateDownloadById: jest.fn()
       }
 
-      resumeDownloadItem({
+      await resumeDownloadItem({
         currentDownloadItems,
-        info,
-        store
+        database,
+        info
       })
 
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith(undefined, undefined)
 
-      expect(store.get).toHaveBeenCalledTimes(1)
-      expect(store.get).toHaveBeenCalledWith('downloads')
+      expect(database.getAllDownloads).toHaveBeenCalledTimes(1)
 
-      expect(store.set).toHaveBeenCalledTimes(1)
-      expect(store.set).toHaveBeenCalledWith('downloads', {
-        download1: {
-          files: {
-            'file1.png': {
-              percent: 100,
-              state: 'COMPLETE',
-              url: 'http://example.com/file1.png'
-            }
-          },
-          state: 'COMPLETE'
-        },
-        download2: {
-          files: {
-            'file2.png': {
-              percent: 42,
-              state: 'PAUSED',
-              url: 'http://example.com/file2.png'
-            }
-          },
-          state: 'ACTIVE'
-        },
-        download3: {
-          files: {},
-          state: 'PENDING'
-        }
-      })
+      expect(database.getFileCountWhere).toHaveBeenCalledTimes(3)
+      expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'download1' })
+      expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'download2' })
+      expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'download3' })
+
+      expect(database.updateDownloadById).toHaveBeenCalledTimes(3)
+      expect(database.updateDownloadById).toHaveBeenCalledWith('download1', { state: 'COMPLETE' })
+      expect(database.updateDownloadById).toHaveBeenCalledWith('download2', { state: 'ACTIVE' })
+      expect(database.updateDownloadById).toHaveBeenCalledWith('download3', { state: 'PENDING' })
     })
   })
 })

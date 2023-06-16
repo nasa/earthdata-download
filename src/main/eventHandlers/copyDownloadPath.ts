@@ -5,19 +5,20 @@ import { clipboard } from 'electron'
 /**
  * Copies the file(s) downloaded path to the clipboard.
  * @param {Object} params The params object.
- * @param {Object} params.store The store object.
+ * @param {Object} params.database `EddDatabase` instance
  * @param {String} params.info.downloadId The download ID.
  */
-const copyDownloadPath = ({
-  info,
-  store
+const copyDownloadPath = async ({
+  database,
+  info
 }) => {
   const {
     downloadId
   } = info
 
-  const folderPath = store.get(`downloads.${downloadId}.downloadLocation`)
-  clipboard.writeText(folderPath)
+  const { downloadLocation } = await database.getDownloadById(downloadId)
+
+  clipboard.writeText(downloadLocation)
 }
 
 export default copyDownloadPath

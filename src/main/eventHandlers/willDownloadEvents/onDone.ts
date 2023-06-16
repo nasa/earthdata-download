@@ -7,31 +7,41 @@ import startNextDownload from './startNextDownload'
  * Handles the DownloadItem 'done' event
  * @param {Object} params
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
- * @param {String} params.downloadId downloadId of the DownloadItem being downloaded
+ * @param {Object} params.database `EddDatabase` instance
  * @param {Object} params.downloadIdContext Object where we can associated a newly created download to a downloadId
  * @param {Object} params.item Electron DownloadItem class instance
- * @param {String} params.state Updated state of the DownloadItem
- * @param {Object} params.store `electron-store` instance
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
+ * @param {String} params.downloadId downloadId of the DownloadItem being downloaded
+ * @param {String} params.state Updated state of the DownloadItem
  */
-const onDone = ({
+const onDone = async ({
   currentDownloadItems,
+  database,
   downloadId,
   downloadIdContext,
   item,
   state,
-  store,
   webContents
 }) => {
-  const name = item.getFilename()
-  // Escape the `.` character in the file name for interacting with the store
-  const storeName = name.replaceAll('.', '\\.')
+  const filename = item.getFilename()
 
-  // Get the download item from the store
-  const storeItem = store.get(`downloads.${downloadId}.files.${storeName}`)
+  // Get the download item from the database
+  const file = await database.getFileWhere({
+    filename,
+    downloadId
+  })
+
+  // If the file is not found in the database, cancel the download
+  if (!file) {
+    return
+  }
+
+  const {
+    id: fileId
+  } = file
 
   // Remove the item from the currentDownloadItems
-  currentDownloadItems.removeItem(downloadId, name)
+  currentDownloadItems.removeItem(downloadId, filename)
 
   // TODO EDD-16, figure out if there are any errors available here
   const errors = undefined
@@ -50,22 +60,20 @@ const onDone = ({
       break
   }
 
-  // Update the state in the store
-  if (storeItem) {
-    store.set(`downloads.${downloadId}.files.${storeName}`, {
-      ...storeItem,
-      timeEnd: new Date().getTime(),
-      state: updatedState,
-      percent: updatedState === downloadStates.completed ? 100 : 0,
-      errors
-    })
-  }
+  // Update the state in the database
+  await database.updateFile(fileId, {
+    timeEnd: new Date().getTime(),
+    state: updatedState,
+    percent: updatedState === downloadStates.completed ? 100 : 0,
+    errors
+  })
 
-  startNextDownload({
+  // Start the next download
+  await startNextDownload({
     currentDownloadItems,
+    database,
     downloadId,
     downloadIdContext,
-    store,
     webContents
   })
 }

@@ -10,7 +10,6 @@ jest.mock('node-fetch', () => ({
   __esModule: true,
   default: jest.fn()
 }))
-
 jest.mock('../initializeDownload', () => ({
   __esModule: true,
   default: jest.fn()
@@ -23,6 +22,171 @@ beforeEach(() => {
 describe('fetchLinks', () => {
   afterEach(() => {
     jest.resetModules()
+  })
+
+  test('loads the links and calls initializeDownload', async () => {
+    const appWindow = {}
+    const downloadId = 'shortName_versionId'
+    const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
+    const database = {
+      createDownload: jest.fn(),
+      updateDownloadById: jest.fn(),
+      addLinksByDownloadId: jest.fn()
+    }
+    const token = 'Bearer mock-token'
+
+    const page1Response = {
+      json: jest.fn().mockReturnValue({
+        cursor: 'mock-cursor',
+        links: [
+          'https://example.com/file1.png'
+        ]
+      })
+    }
+    const page2Response = {
+      json: jest.fn().mockReturnValue({
+        cursor: null,
+        links: [
+          'https://example.com/file2.png'
+        ]
+      })
+    }
+    const page3Response = {
+      json: jest.fn().mockReturnValue({
+        cursor: null,
+        links: []
+      })
+    }
+
+    fetch
+      .mockImplementationOnce(() => page1Response)
+      .mockImplementationOnce(() => page2Response)
+      .mockImplementationOnce(() => page3Response)
+
+    await fetchLinks({
+      appWindow,
+      database,
+      downloadId,
+      getLinks,
+      reAuthUrl: '',
+      token
+    })
+
+    expect(fetch).toHaveBeenCalledTimes(3)
+    expect(fetch).toHaveBeenCalledWith(
+      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
+      {
+        headers: {
+          Authorization: 'Bearer mock-token'
+        },
+        method: 'get'
+      }
+    )
+    expect(fetch).toHaveBeenCalledWith(
+      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&cursor=mock-cursor',
+      {
+        headers: {
+          Authorization: 'Bearer mock-token'
+        },
+        method: 'get'
+      }
+    )
+
+    expect(database.createDownload).toHaveBeenCalledTimes(1)
+    expect(database.createDownload).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      {
+        createdAt: 1682899200000,
+        loadingMoreFiles: true,
+        reAuthUrl: '',
+        state: 'PENDING'
+      }
+    )
+
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.updateDownloadById).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      {
+        loadingMoreFiles: false
+      }
+    )
+
+    expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(2)
+    expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      ['https://example.com/file1.png']
+    )
+    expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      ['https://example.com/file2.png']
+    )
+
+    expect(initializeDownload).toHaveBeenCalledTimes(1)
+    expect(initializeDownload).toHaveBeenCalledWith(expect.objectContaining({
+      downloadIds: ['shortName_versionId-20230501_000000']
+    }))
+  })
+
+  test('saves the error on error', async () => {
+    const appWindow = {}
+    const downloadId = 'shortName_versionId'
+    const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
+    const database = {
+      createDownload: jest.fn(),
+      updateDownloadById: jest.fn(),
+      addLinksByDownloadId: jest.fn()
+    }
+    const token = 'Bearer mock-token'
+
+    fetch
+      .mockImplementationOnce(() => {
+        throw new Error('error')
+      })
+
+    await fetchLinks({
+      appWindow,
+      database,
+      downloadId,
+      getLinks,
+      reAuthUrl: '',
+      token
+    })
+
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(fetch).toHaveBeenCalledWith(
+      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
+      {
+        headers: {
+          Authorization: 'Bearer mock-token'
+        },
+        method: 'get'
+      }
+    )
+
+    expect(database.createDownload).toHaveBeenCalledTimes(1)
+    expect(database.createDownload).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      {
+        createdAt: 1682899200000,
+        loadingMoreFiles: true,
+        reAuthUrl: '',
+        state: 'PENDING'
+      }
+    )
+
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.updateDownloadById).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      {
+        errors: '{}',
+        loadingMoreFiles: false,
+        state: 'ERROR'
+      }
+    )
+
+    expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(0)
+
+    expect(initializeDownload).toHaveBeenCalledTimes(0)
   })
 
   test.each([
@@ -39,9 +203,10 @@ describe('fetchLinks', () => {
     const appWindow = {}
     const downloadId = 'shortName_versionId'
 
-    const store = {
-      set: jest.fn(),
-      get: jest.fn()
+    const database = {
+      createDownload: jest.fn(),
+      updateDownloadById: jest.fn(),
+      addLinksByDownloadId: jest.fn()
     }
 
     const token = 'Bearer mock-token'
@@ -56,19 +221,38 @@ describe('fetchLinks', () => {
 
     await fetchLinks({
       appWindow,
+      database,
       downloadId,
       getLinks: badLink,
-      store,
+      reAuthUrl: '',
       token
     })
 
-    const [[title, entry]] = store.set.mock.calls
+    expect(database.createDownload).toHaveBeenCalledTimes(1)
+    expect(database.createDownload).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      {
+        createdAt: 1682899200000,
+        loadingMoreFiles: true,
+        reAuthUrl: '',
+        state: 'PENDING'
+      }
+    )
 
-    expect(title).toEqual('downloads.shortName_versionId-20230501_000000')
-    expect(entry).toHaveProperty('loadingMoreFiles', false)
-    expect(entry).toHaveProperty('state', 'ERROR')
-    expect(entry).toHaveProperty('error')
-    expect(entry.error).toMatch(/^the host \[.*\] is not a trusted source.*/i)
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.updateDownloadById).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      {
+        errors: [{
+          message: `The host [${badLink}] is not a trusted source and Earthdata Downloader will not continue.
+If you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
+        }],
+        loadingMoreFiles: false,
+        state: 'ERROR'
+      }
+    )
+
+    expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(0)
 
     // we should not have fetched anything
     expect(fetch).toHaveBeenCalledTimes(0)
@@ -84,9 +268,10 @@ describe('fetchLinks', () => {
     const appWindow = {}
     const downloadId = 'shortName_versionId'
     const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
-    const store = {
-      set: jest.fn(),
-      get: jest.fn()
+    const database = {
+      createDownload: jest.fn(),
+      updateDownloadById: jest.fn(),
+      addLinksByDownloadId: jest.fn()
     }
 
     const token = 'Bearer mock-token'
@@ -114,191 +299,42 @@ describe('fetchLinks', () => {
 
     await fetchLinks({
       appWindow,
+      database,
       downloadId,
       getLinks,
-      store,
+      reAuthUrl: '',
       token
     })
 
-    const [, , [title, entry]] = store.set.mock.calls
+    expect(database.createDownload).toHaveBeenCalledTimes(1)
+    expect(database.createDownload).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      {
+        createdAt: 1682899200000,
+        loadingMoreFiles: true,
+        reAuthUrl: '',
+        state: 'PENDING'
+      }
+    )
 
-    expect(title).toEqual('downloads.shortName_versionId-20230501_000000')
-    expect(entry).toHaveProperty('loadingMoreFiles', false)
-    expect(entry).toHaveProperty('state', 'ERROR')
-    expect(entry).toHaveProperty('error', 'The returned data does not match the expected schema.')
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.updateDownloadById).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      {
+        errors: [{
+          message: 'The returned data does not match the expected schema.'
+        }],
+        loadingMoreFiles: false,
+        state: 'ERROR'
+      }
+    )
+
+    expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(1)
+    expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
+      'shortName_versionId-20230501_000000',
+      ['https://example.com/file1.png']
+    )
 
     expect(fetch).toHaveBeenCalledTimes(2)
-  })
-
-  test('loads the links and calls initializeDownload', async () => {
-    const appWindow = {}
-    const downloadId = 'shortName_versionId'
-    const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
-    const store = {
-      set: jest.fn(),
-      get: jest.fn().mockReturnValueOnce({
-        'file1.png': {
-          percent: 0,
-          state: 'PENDING',
-          url: 'https://example.com/file1.png'
-        }
-      })
-    }
-    const token = 'Bearer mock-token'
-
-    const page1Response = {
-      json: jest.fn().mockReturnValue({
-        cursor: 'mock-cursor',
-        links: ['https://example.com/file1.png']
-      })
-    }
-    const page2Response = {
-      json: jest.fn().mockReturnValue({
-        cursor: null,
-        links: ['https://example.com/file2.png']
-      })
-    }
-    const page3Response = {
-      json: jest.fn().mockReturnValue({
-        cursor: null,
-        links: []
-      })
-    }
-
-    fetch
-      .mockImplementationOnce(() => page1Response)
-      .mockImplementationOnce(() => page2Response)
-      .mockImplementationOnce(() => page3Response)
-
-    await fetchLinks({
-      appWindow,
-      downloadId,
-      getLinks,
-      store,
-      token
-    })
-
-    expect(fetch).toHaveBeenCalledTimes(3)
-    expect(fetch).toHaveBeenCalledWith(
-      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
-      {
-        headers: {
-          Authorization: 'Bearer mock-token'
-        },
-        method: 'get'
-      }
-    )
-    expect(fetch).toHaveBeenCalledWith(
-      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&cursor=mock-cursor',
-      {
-        headers: {
-          Authorization: 'Bearer mock-token'
-        },
-        method: 'get'
-      }
-    )
-
-    expect(initializeDownload).toHaveBeenCalledTimes(1)
-    expect(initializeDownload).toHaveBeenCalledWith(
-      expect.objectContaining({
-        downloadIds: ['shortName_versionId-20230501_000000']
-      })
-    )
-
-    expect(store.set).toHaveBeenCalledTimes(4)
-    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000', {
-      loadingMoreFiles: true,
-      state: 'PENDING'
-    })
-    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000.files', {
-      'file1.png': {
-        percent: 0,
-        state: 'PENDING',
-        url: 'https://example.com/file1.png'
-      }
-    })
-    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000.files', {
-      'file1.png': {
-        percent: 0,
-        state: 'PENDING',
-        url: 'https://example.com/file1.png'
-      },
-      'file2.png': {
-        percent: 0,
-        state: 'PENDING',
-        url: 'https://example.com/file2.png'
-      }
-    })
-    expect(store.set).toHaveBeenCalledWith(
-      'downloads.shortName_versionId-20230501_000000.loadingMoreFiles',
-      false
-    )
-  })
-
-  test('saves the error on error', async () => {
-    const appWindow = {}
-    const downloadId = 'shortName_versionId'
-    const getLinks = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
-    const store = {
-      set: jest.fn(),
-      get: jest.fn().mockReturnValueOnce({
-        loadingMoreFiles: true,
-        state: 'PENDING',
-        files: {
-          'file1.png': {
-            percent: 0,
-            state: 'PENDING',
-            url: 'https://example.com/file1.png'
-          }
-        }
-      })
-    }
-    const token = 'Bearer mock-token'
-
-    fetch.mockImplementationOnce(() => {
-      throw new Error('error')
-    })
-
-    await fetchLinks({
-      appWindow,
-      downloadId,
-      getLinks,
-      store,
-      token
-    })
-
-    expect(fetch).toHaveBeenCalledTimes(1)
-    expect(fetch).toHaveBeenCalledWith(
-      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
-      {
-        headers: {
-          Authorization: 'Bearer mock-token'
-        },
-        method: 'get'
-      }
-    )
-
-    expect(initializeDownload).toHaveBeenCalledTimes(0)
-
-    expect(store.get).toHaveBeenCalledTimes(1)
-    expect(store.get).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000')
-
-    expect(store.set).toHaveBeenCalledTimes(2)
-    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000', {
-      loadingMoreFiles: true,
-      state: 'PENDING'
-    })
-    expect(store.set).toHaveBeenCalledWith('downloads.shortName_versionId-20230501_000000', {
-      files: {
-        'file1.png': {
-          percent: 0,
-          state: 'PENDING',
-          url: 'https://example.com/file1.png'
-        }
-      },
-      loadingMoreFiles: false,
-      state: 'ERROR',
-      error: 'error'
-    })
   })
 })

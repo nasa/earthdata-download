@@ -2,68 +2,70 @@
 
 import downloadStates from '../../app/constants/downloadStates'
 
-const reportProgress = ({
-  store,
+/**
+ *
+ * @param params
+ * @returns
+ */
+const reportProgress = async ({
+  database,
   webContents
 }) => {
-  // Pull download status for each download in the store
-  const downloads = store.get('downloads')
+  // Pull download status for each download in the database
+  const downloads = await database.getAllDownloads()
 
-  if (!downloads) {
+  if (downloads.length === 0) {
     webContents.send('reportProgress', { progress: [] })
-    return false
+    return
   }
 
-  const progress = Object.keys(downloads)
-    // Show the newest downloads first
-    .sort((a, b) => {
-      if (downloads[a].timeStart > downloads[b].timeStart) return -1
+  const promises = downloads.map(async (download) => {
+    const {
+      id: downloadId,
+      loadingMoreFiles,
+      name: downloadName = downloadId,
+      state,
+      timeEnd,
+      timeStart
+    } = download
+    const files = await database.getFilesWhere({ downloadId })
 
-      return 1
-    })
-    .map((downloadId) => {
-      const download = downloads[downloadId]
+    const totalFiles = Object.keys(files).length
+    const finishedFiles = Object.entries(files)
+      .filter(([, values]) => values.state === downloadStates.completed).length
 
-      const {
-        files = {},
-        loadingMoreFiles,
-        name: downloadName = downloadId,
-        state,
-        timeEnd,
-        timeStart
-      } = download
+    let percent = 0
 
-      const totalFiles = Object.keys(files).length
-      const finishedFiles = Object.entries(files)
-        .filter(([, values]) => values.state === downloadStates.completed).length
+    if (totalFiles > 0) {
+      percent = Math.floor((finishedFiles / totalFiles) * 100)
+    }
 
-      const percent = Math.floor((finishedFiles / totalFiles) * 100)
+    const now = new Date().getTime()
 
-      const now = new Date().getTime()
+    const lastTime = timeEnd || now
 
-      const lastTime = timeEnd || now
+    const totalTime = Math.ceil((lastTime - timeStart) / 1000)
 
-      const totalTime = Math.ceil((lastTime - timeStart) / 1000)
+    const progress = {
+      percent,
+      finishedFiles,
+      totalFiles,
+      totalTime
+    }
 
-      const progress = {
-        percent,
-        finishedFiles,
-        totalFiles,
-        totalTime
-      }
+    return {
+      downloadId,
+      downloadName,
+      // Sqlite booleans are actually integers 1/0
+      loadingMoreFiles: loadingMoreFiles === 1,
+      progress,
+      state
+    }
+  })
 
-      return {
-        downloadId,
-        downloadName,
-        loadingMoreFiles,
-        progress,
-        state
-      }
-    })
+  const progress = await Promise.all(promises)
 
   webContents.send('reportProgress', { progress })
-
-  return true
 }
 
 export default reportProgress

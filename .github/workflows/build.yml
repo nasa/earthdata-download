@@ -37,11 +37,9 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Electron Builder Action
-        uses: samuelmeuli/action-electron-builder@v1.6.0
+        uses: macrouch/action-electron-builder@v1.6.1
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)

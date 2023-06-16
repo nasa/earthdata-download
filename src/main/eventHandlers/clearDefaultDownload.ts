@@ -3,18 +3,12 @@
 /**
  * Clears the default download from the user preferences
  * @param {Object} params
- * @param {Object} params.store `electron-store` instance
+ * @param {Object} params.database `EddDatabase` instance
  */
-const clearDefaultDownload = ({
-  store
+const clearDefaultDownload = async ({
+  database
 }) => {
-  const preferences = store.get('preferences')
-
-  // Remove the defaultDownloadLocation from the store
-  store.set('preferences', {
-    ...preferences,
-    defaultDownloadLocation: undefined
-  })
+  await database.setPreferences({ defaultDownloadLocation: null })
 }
 
 export default clearDefaultDownload

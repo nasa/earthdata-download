@@ -8,17 +8,22 @@ jest.mock('electronClipboard', () => ({
 }))
 
 describe('copyDownloadPath', () => {
-  test('copies the download path to the clipboard using clipboard.writeText', () => {
+  test('copies the download path to the clipboard using clipboard.writeText', async () => {
     const info = {
       downloadId: 'shortName_version-1-20230514_012554'
     }
 
-    const store = {
-      get: jest.fn().mockReturnValue('/mock/location/shortName_version-1-20230514_012554')
+    const downloadLocation = '/mock/location/shortName_version-1-20230514_012554'
+
+    const database = {
+      getDownloadById: jest.fn().mockReturnValue({ downloadLocation })
     }
 
-    copyDownloadPath({ info, store })
+    await copyDownloadPath({ database, info })
 
-    expect(clipboard.writeText).toHaveBeenCalledWith('/mock/location/shortName_version-1-20230514_012554')
+    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadById).toHaveBeenCalledWith('shortName_version-1-20230514_012554')
+
+    expect(clipboard.writeText).toHaveBeenCalledWith(downloadLocation)
   })
 })

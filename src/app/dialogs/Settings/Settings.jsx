@@ -17,6 +17,7 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
 /**
  * @typedef {Object} InitializeDownloadProps
  * @property {Boolean} hasActiveDownloads A boolean representing flag if user has downloads in active state
+ * @property {Boolean} settingsDialogIsOpen A boolean representing flag if the settings modal is open or closed
  */
 
 /**
@@ -26,11 +27,13 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
  * @example <caption>Render a Settings dialog.</caption>
  *
  * const [hasActiveDownload, setHasActiveDownload] = useState(false)
+ * const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
  *
  * return (
  *  <Dialog {...dialogProps}>
  *    <Settings
  *      hasActiveDownload = {hasActiveDownload}
+ *      setSettingsDialogIsOpen = {settingsDialogIsOpen}
  *    />
  *  </Dialog>
  * )
@@ -119,7 +122,7 @@ const Settings = ({
   }, [])
 
   useEffect(() => {
-    // handle edge case where change is made to the concurrency field but, exits
+    // Handle edge case where change is made to the concurrency field but, exits
     if (settingsDialogIsOpen === false) {
       const valueNumeric = parseInt(concurrentDownloads.toString(), 10)
       if (valueNumeric > 0) {

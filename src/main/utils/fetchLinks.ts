@@ -49,7 +49,7 @@ const isTrustedLink = (link: string) => {
     ?.split(':')
     ?.at(0)
   console.debug(`Checking [${host}] for matching trusted host`)
-  return !!trustedSources[host]
+  return host in trustedSources
 }
 
 /**

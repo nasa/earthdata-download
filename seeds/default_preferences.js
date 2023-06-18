@@ -1,7 +1,6 @@
 exports.seed = async function (knex) {
-  // Deletes ALL existing entries
-  await knex('preferences').del()
+  // Inserts preferences if it doesn't exist
   await knex('preferences').insert([
     { id: 1, concurrentDownloads: 5 }
-  ])
+  ]).onConflict().ignore()
 }

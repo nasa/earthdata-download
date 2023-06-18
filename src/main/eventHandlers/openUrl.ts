@@ -1,13 +1,13 @@
 // @ts-nocheck
 
 import fetchLinks from '../utils/fetchLinks'
-// import startNextDownload from './willDownloadEvents/startNextDownload'
+import restartAuthDownload from '../utils/restartAuthDownload'
 
-// const setToken = ({
-//   store,
+// const setToken = async ({
+//   database,
 //   webContents
 // }) => {
-//   const token = store.get('token')
+//   const token = await database.getToken()
 //   console.log('🚀 ~ file: openUrl.ts:11 ~ token:', token)
 
 //   webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
@@ -31,8 +31,8 @@ const openUrl = async ({
   appWindow,
   // currentDownloadItems,
   database,
-  deepLink
-  // downloadIdContext
+  deepLink,
+  downloadIdContext
 }) => {
   const url = new URL(deepLink)
   const {
@@ -56,26 +56,23 @@ const openUrl = async ({
     })
   }
 
-  // if (hostname === 'reAuthCallback') {
-  //   const token = searchParams.get('token')
-  //   const downloadId = searchParams.get('downloadId')
+  // TODO not being used as of I&A
+  if (hostname === 'reAuthCallback') {
+    const token = searchParams.get('token')
+    const fileId = searchParams.get('fileId')
 
-  //   store.set('token', token)
+    await database.setToken(token)
 
-  //   setToken({
-  //     store,
-  //     webContents: appWindow.webContents
-  //   })
+    // TODO need to put the download into an 'auth' state
+    // instead of startNextDownload, need to restart the 'auth'/'starting' download
 
-  //   await startNextDownload({
-  //     currentDownloadItems,
-  //     database,
-  //     downloadId,
-  //     downloadIdContext,
-  //     store,
-  //     webContents: appWindow.webContents
-  //   })
-  // }
+    await restartAuthDownload({
+      database,
+      downloadIdContext,
+      fileId,
+      webContents: appWindow.webContents
+    })
+  }
 }
 
 export default openUrl

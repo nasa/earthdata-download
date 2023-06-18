@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   beginDownload: (data) => ipcRenderer.send('beginDownload', data),
   chooseDownloadLocation: () => ipcRenderer.send('chooseDownloadLocation'),
   clearDefaultDownload: () => ipcRenderer.send('clearDefaultDownload'),
+  deleteCookies: () => ipcRenderer.send('deleteCookies'),
 
   pauseDownloadItem: (data) => ipcRenderer.send('pauseDownloadItem', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),

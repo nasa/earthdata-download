@@ -9,15 +9,21 @@ import { ElectronApiContext } from '../../../context/ElectronApiContext'
 
 const setup = () => {
   const clearDefaultDownload = jest.fn()
+  const deleteCookies = jest.fn()
 
   render(
-    <ElectronApiContext.Provider value={{ clearDefaultDownload }}>
+    <ElectronApiContext.Provider value={{
+      clearDefaultDownload,
+      deleteCookies
+    }}
+    >
       <Settings />
     </ElectronApiContext.Provider>
   )
 
   return {
-    clearDefaultDownload
+    clearDefaultDownload,
+    deleteCookies
   }
 }
 
@@ -36,5 +42,15 @@ describe('Settings component', () => {
     await user.click(screen.getByTestId('settings-clear-default-download'))
 
     expect(clearDefaultDownload).toHaveBeenCalledTimes(1)
+  })
+
+  test('clicking on the `Delete cookies` sends a message to the main process', async () => {
+    const user = userEvent.setup()
+
+    const { deleteCookies } = setup()
+
+    await user.click(screen.getByTestId('settings-delete-cookies'))
+
+    expect(deleteCookies).toHaveBeenCalledTimes(1)
   })
 })

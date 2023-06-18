@@ -168,7 +168,11 @@ const DownloadItem = ({
                   {' '}
                   files
                   {
-                    (state !== downloadStates.pending && totalFiles > 0) && (
+                    (
+                      state !== downloadStates.pending
+                      && state !== downloadStates.waitingForAuth
+                      && totalFiles > 0
+                    ) && (
                       <>
                         {' '}
                         done in
@@ -182,6 +186,14 @@ const DownloadItem = ({
                       <>
                         {' '}
                         (determining file count)
+                      </>
+                    )
+                  }
+                  {
+                    state === downloadStates.waitingForAuth && (
+                      <>
+                        {' '}
+                        (waiting for authorization)
                       </>
                     )
                   }

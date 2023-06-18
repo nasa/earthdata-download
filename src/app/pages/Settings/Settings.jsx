@@ -15,11 +15,17 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
  * )
  */
 const Settings = () => {
-  const { clearDefaultDownload } = useContext(ElectronApiContext)
+  const {
+    clearDefaultDownload,
+    deleteCookies
+  } = useContext(ElectronApiContext)
 
   // Send a message to the clear the default download location
   const onClearDefaultDownload = () => {
     clearDefaultDownload()
+  }
+  const onDeleteCookies = () => {
+    deleteCookies()
   }
 
   return (
@@ -33,6 +39,15 @@ const Settings = () => {
         dataTestId="settings-clear-default-download"
       >
         Clear default download location
+      </Button>
+
+      <Button
+        size="lg"
+        Icon={FaBan}
+        onClick={onDeleteCookies}
+        dataTestId="settings-delete-cookies"
+      >
+        Delete cookies
       </Button>
     </div>
   )

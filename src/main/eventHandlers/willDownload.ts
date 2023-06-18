@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { shell } from 'electron'
+// import { shell } from 'electron'
 import path from 'path'
 
 import onDone from './willDownloadEvents/onDone'
@@ -11,8 +11,15 @@ import downloadStates from '../../app/constants/downloadStates'
 /**
  * Handles the DownloadItem events
  * @param {Object} params
+ * @param {Object} params.authWindow Electron BrowserWindow instance used for EDL auth redirects
+ * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
+ * @param {Object} params.database `EddDatabase` instance
+ * @param {Object} params.downloadIdContext Object where we can associated a newly created download to a downloadId
+ * @param {Object} params.item Electron DownloadItem class instance
+ * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
 const willDownload = async ({
+  authWindow,
   currentDownloadItems,
   database,
   downloadIdContext,
@@ -43,11 +50,6 @@ const willDownload = async ({
   // eslint-disable-next-line no-param-reassign
   delete downloadIdContext[originalUrl]
 
-  // Pull the reAuthUrl for this downloadId from the database
-  const {
-    reAuthUrl
-  } = await database.getDownloadById(downloadId)
-
   const urlChain = item.getURLChain()
   const lastUrl = urlChain.pop()
 
@@ -56,13 +58,25 @@ const willDownload = async ({
     item.cancel()
 
     await database.updateDownloadById(downloadId, {
-      state: downloadStates.pending,
+      state: downloadStates.waitingForAuth,
       timeStart: null
     })
 
-    console.log('REDIRECT TO URS HERE')
-    // TODO how to redirect to browser
-    shell.openExternal(reAuthUrl)
+    let newState = downloadStates.waitingForAuth
+    if (authWindow.isVisible()) {
+      // If we are already waiting on auth, set the file to pending
+      newState = downloadStates.pending
+    } else {
+      authWindow.loadURL(lastUrl)
+      authWindow.show()
+    }
+
+    await database.updateFile(fileId, {
+      state: newState,
+      timeStart: null
+    })
+
+    return
   }
 
   // Add the DownloadItem to the currentDownloadItems

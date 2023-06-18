@@ -18,12 +18,7 @@ class EddDatabase {
    */
   async migrateDatabase() {
     await this.db.migrate.latest()
-
-    const data = await this.getPreferences()
-
-    if (!data || Object.keys(data).length === 0) {
-      await this.db.seed.run()
-    }
+    await this.db.seed.run()
   }
 
   /* Preferences */
@@ -43,6 +38,17 @@ class EddDatabase {
     return this.db('preferences').update(data).where({ id: this.preferencesId }).returning()
   }
 
+  /* Token */
+
+  // TODO Not using token table as of I&A
+  async getToken() {
+    return this.db('token').where({ id: this.tokenId }).first()
+  }
+
+  async setToken(token) {
+    return this.db('token').update({ token }).where({ id: this.tokenId }).returning()
+  }
+
   /* Downloads */
 
   /**
@@ -50,14 +56,6 @@ class EddDatabase {
    */
   async getAllDownloads() {
     return this.db('downloads').select().orderBy('createdAt', 'desc')
-  }
-
-  /**
-   * Returns the selected downloads.
-   * @param {Object} where Knex `where` object to select downloads.
-   */
-  async getDownloadsWhere(where) {
-    return this.db('downloads').select().where(where).orderBy('createdAt', 'desc')
   }
 
   /**
@@ -126,6 +124,40 @@ class EddDatabase {
   }
 
   /**
+   * Returns the file that is in the waitingForAuth state, and matches the domain provided
+   * @param {String} domain URL to use in the whereLike clause
+   */
+  async getFileWaitingForAuthWhereUrlLike(domain) {
+    return this.db('files')
+      .select()
+      .where({ state: downloadStates.waitingForAuth })
+      .whereLike('url', `%${domain}%`)
+      .first()
+  }
+
+  /**
+   * Returns files in the pending state, with the optional fileId included. Limited results by the limit parameter
+   * @param {Number} limit Number of files to return
+   * @param {Number} fileId ID of files to update.
+   */
+  async getFilesToStart(limit, fileId) {
+    let call = this.db('files')
+      .select()
+      .where({ state: downloadStates.pending })
+
+    // If a fileId was provided, add it to the query
+    if (fileId) {
+      call = call.orWhere({ id: fileId })
+    }
+
+    call = call.orderBy('createdAt', 'asc')
+      .limit(limit)
+
+    // Execute the full query and return the value
+    return call
+  }
+
+  /**
    * Returns the selected files.
    * @param {Object} where Knex `where` object to select downloads.
    */
@@ -146,11 +178,18 @@ class EddDatabase {
   }
 
   /**
-   * Returns files that are not in the `COMPLETED` state for the given downloadId.
-   * @param {String} downloadId ID of download to find files.
+   * Returns count of files that are not in the `completed` state for the given downloadId
+   * @param {String} downloadId Id of the download to add files.
    */
-  async getNotCompletedFilesByDownloadId(downloadId) {
-    return this.db('files').select().where({ downloadId }).whereNot({ state: downloadStates.completed })
+  async getNotCompletedFilesCountByDownloadId(downloadId) {
+    const [result] = await this.db('files')
+      .count('id')
+      .where({ downloadId })
+      .whereNot({ state: downloadStates.completed })
+
+    const { 'count(`id`)': number } = result
+
+    return number
   }
 
   /**

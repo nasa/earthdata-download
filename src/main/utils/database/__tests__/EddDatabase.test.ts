@@ -60,6 +60,8 @@ describe('EddDatabase', () => {
             name: '20230613195457_create_downloads.js'
           }, {
             name: '20230613195511_create_files.js'
+          }, {
+            name: '20230616233921_create_token.js'
           }])
         } else if (step === 5) {
           // select `name` from `knex_migrations` order by `id` asc'
@@ -75,71 +77,15 @@ describe('EddDatabase', () => {
           // 13 - COMMIT
           query.response()
         } else if (step === 14) {
-          // this.getPreferences()
-          expect(query.sql).toEqual('select * from `preferences` where `id` = ? limit ?')
-          expect(query.bindings).toEqual([1, 1])
-          query.response([])
-        } else if (step === 15) {
-          // running the seed, delete all preferences
-          expect(query.sql).toEqual('delete from `preferences`')
-          expect(query.bindings).toEqual([])
-          query.response([])
-        } else if (step === 16) {
           // running the seed, inserting preferences
-          expect(query.sql).toEqual('insert into `preferences` (`concurrentDownloads`, `id`) values (?, ?)')
+          expect(query.sql).toEqual('insert into `preferences` (`concurrentDownloads`, `id`) values (?, ?) on conflict do nothing')
           expect(query.bindings).toEqual([5, 1])
           query.response([])
-        } else {
-          query.response()
-        }
-      })
-
-      const database = new EddDatabase('./')
-
-      await database.migrateDatabase()
-    })
-
-    test('runs the migrations and does not run seeds if preferences data is already present', async () => {
-      dbTracker.on('query', (query, step) => {
-        if (step === 1 || step === 2 || step === 7 || step === 8) {
-          // knex_migrations, knex_migrations_lock
-          query.response([{ type: 'table' }])
-        } else if (step === 3 || step === 9) {
-          // select * from `knex_migrations_lock`
-          query.response([{
-            index: 1,
-            isLocked: 0
-          }])
-        } else if (step === 4 || step === 10) {
-          // select `name` from `knex_migrations` order by `id` asc'
-          query.response([{
-            name: '20230613175153_create_preferences.js'
-          }, {
-            name: '20230613195457_create_downloads.js'
-          }, {
-            name: '20230613195511_create_files.js'
-          }])
-        } else if (step === 5) {
-          // select `name` from `knex_migrations` order by `id` asc'
-          query.response()
-        } else if (step === 6 || step === 12) {
-          // update `knex_migrations_lock` set `is_locked` = ?'
-          query.response(1)
-        } else if (step === 11) {
-          // select max(`batch`) as `max_batch` from `knex_migrations`
-          query.response([{ 'max(`batch`)': 1 }])
-        } else if (step === 7 || step === 13) {
-          // 7 - BEGIN
-          // 13 - COMMIT
-          query.response()
-        } else if (step === 14) {
-          // this.getPreferences()
-          expect(query.sql).toEqual('select * from `preferences` where `id` = ? limit ?')
-          expect(query.bindings).toEqual([1, 1])
-          query.response([{ concurrentDownloads: 5 }])
         } else if (step === 15) {
-          // preferences were returned, should not run seeds, so no more steps should happen
-          expect(query.sql).toEqual('this should fail if any more steps happen')
+          // running the seed, inserting token
+          expect(query.sql).toEqual('insert into `token` (`id`, `token`) values (?, ?) on conflict do nothing')
+          expect(query.bindings).toEqual([1, null])
+          query.response([])
         } else {
           query.response()
         }
@@ -193,6 +139,44 @@ describe('EddDatabase', () => {
     })
   })
 
+  describe('getToken', () => {
+    test('returns the token data', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select * from `token` where `id` = ? limit ?')
+        expect(query.bindings).toEqual([1, 1])
+
+        query.response('mock-token')
+      })
+      const database = new EddDatabase('./')
+
+      const result = await database.getToken()
+
+      expect(result).toEqual('mock-token')
+    })
+  })
+
+  describe('setToken', () => {
+    test('sets the token data', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('update `token` set `token` = ? where `id` = ?')
+        expect(query.bindings).toEqual(['mock-token', 1])
+
+        query.response({
+          id: 1,
+          token: 'mock-token'
+        })
+      })
+      const database = new EddDatabase('./')
+
+      const result = await database.setToken('mock-token')
+
+      expect(result).toEqual({
+        id: 1,
+        token: 'mock-token'
+      })
+    })
+  })
+
   describe('getAllDownloads', () => {
     test('returns all downloads', async () => {
       dbTracker.on('query', (query) => {
@@ -208,32 +192,6 @@ describe('EddDatabase', () => {
       const database = new EddDatabase('./')
 
       const result = await database.getAllDownloads()
-
-      expect(result).toEqual([{
-        id: 'mock-download-1'
-      }, {
-        id: 'mock-download-2'
-      }])
-    })
-  })
-
-  describe('getDownloadsWhere', () => {
-    test('returns requested downloads', async () => {
-      dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select * from `downloads` where `state` = ? order by `createdAt` desc')
-        expect(query.bindings).toEqual([downloadStates.active])
-
-        query.response([{
-          id: 'mock-download-1'
-        }, {
-          id: 'mock-download-2'
-        }])
-      })
-      const database = new EddDatabase('./')
-
-      const result = await database.getDownloadsWhere({
-        state: downloadStates.active
-      })
 
       expect(result).toEqual([{
         id: 'mock-download-1'
@@ -392,6 +350,85 @@ describe('EddDatabase', () => {
     })
   })
 
+  describe('getFileWaitingForAuthWhereUrlLike', () => {
+    test('returns requested file', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select * from `files` where `state` = ? and `url` like ? limit ?')
+        expect(query.bindings).toEqual([
+          downloadStates.waitingForAuth,
+          '%example.com%',
+          1
+        ])
+
+        query.response({
+          id: 'mock-file-1',
+          url: 'http://example.com/example.png'
+        })
+      })
+      const database = new EddDatabase('./')
+
+      const result = await database.getFileWaitingForAuthWhereUrlLike('example.com')
+
+      expect(result).toEqual({
+        id: 'mock-file-1',
+        url: 'http://example.com/example.png'
+      })
+    })
+  })
+
+  describe('getFilesToStart', () => {
+    test('returns requested files', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select * from `files` where `state` = ? order by `createdAt` asc limit ?')
+        expect(query.bindings).toEqual([
+          downloadStates.pending,
+          2
+        ])
+
+        query.response([{
+          id: 123
+        }, {
+          id: 456
+        }])
+      })
+      const database = new EddDatabase('./')
+
+      const result = await database.getFilesToStart(2)
+
+      expect(result).toEqual([{
+        id: 123
+      }, {
+        id: 456
+      }])
+    })
+
+    test('returns requested files when a fileId is provided', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select * from `files` where `state` = ? or (`id` = ?) order by `createdAt` asc limit ?')
+        expect(query.bindings).toEqual([
+          downloadStates.pending,
+          123,
+          2
+        ])
+
+        query.response([{
+          id: 123
+        }, {
+          id: 456
+        }])
+      })
+      const database = new EddDatabase('./')
+
+      const result = await database.getFilesToStart(2, 123)
+
+      expect(result).toEqual([{
+        id: 123
+      }, {
+        id: 456
+      }])
+    })
+  })
+
   describe('getFilesWhere', () => {
     test('returns requested files', async () => {
       dbTracker.on('query', (query) => {
@@ -434,30 +471,24 @@ describe('EddDatabase', () => {
     })
   })
 
-  describe('getNotCompletedFilesByDownloadId', () => {
-    test('returns requested files', async () => {
+  describe('getNotCompletedFilesCountByDownloadId', () => {
+    test('returns requested file count', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select * from `files` where `downloadId` = ? and not `state` = ?')
+        expect(query.sql).toEqual('select count(`id`) from `files` where `downloadId` = ? and not `state` = ?')
         expect(query.bindings).toEqual([
-          {
-            downloadId: 'mock-download-1'
-          },
-          'COMPLETED'
+          'mock-download-1',
+          downloadStates.completed
         ])
 
-        query.response({
-          id: 'mock-download-1'
-        })
+        query.response([
+          { 'count(`id`)': 5 }
+        ])
       })
       const database = new EddDatabase('./')
 
-      const result = await database.getNotCompletedFilesByDownloadId({
-        downloadId: 'mock-download-1'
-      })
+      const result = await database.getNotCompletedFilesCountByDownloadId('mock-download-1')
 
-      expect(result).toEqual({
-        id: 'mock-download-1'
-      })
+      expect(result).toEqual(5)
     })
   })
 

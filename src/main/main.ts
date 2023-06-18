@@ -4,6 +4,7 @@ import {
   app,
   BrowserWindow,
   ipcMain,
+  session,
   shell
 } from 'electron'
 import path from 'path'
@@ -12,6 +13,7 @@ import beginDownload from './eventHandlers/beginDownload'
 import cancelDownloadItem from './eventHandlers/cancelDownloadItem'
 import chooseDownloadLocation from './eventHandlers/chooseDownloadLocation'
 import clearDefaultDownload from './eventHandlers/clearDefaultDownload'
+import cookiesChanged from './eventHandlers/cookiesChanged'
 import copyDownloadPath from './eventHandlers/copyDownloadPath'
 import openDownloadFolder from './eventHandlers/openDownloadFolder'
 import openUrl from './eventHandlers/openUrl'
@@ -22,7 +24,6 @@ import willDownload from './eventHandlers/willDownload'
 
 import CurrentDownloadItems from './utils/currentDownloadItems'
 import windowStateKeeper from './utils/windowStateKeeper'
-
 import EddDatabase from './utils/database/EddDatabase'
 
 const userDataPath = app.getPath('userData')
@@ -31,6 +32,7 @@ const database = new EddDatabase(userDataPath)
 const currentDownloadItems = new CurrentDownloadItems()
 
 let appWindow
+let authWindow
 
 // `downloadIdContext` holds the downloadId for a new file beginning to download.
 // `beginDownload`, or `willDownload` will save the downloadId associated with a new URL
@@ -58,6 +60,11 @@ const createWindow = async () => {
       preload: path.join(__dirname, 'preload.js')
     }
   })
+  authWindow = new BrowserWindow({
+    width: windowState.width,
+    height: windowState.height,
+    show: false
+  })
 
   windowState.track(appWindow)
 
@@ -71,8 +78,23 @@ const createWindow = async () => {
     appWindow.loadFile('dist/index.html')
   }
 
+  // TODO Not used as of I&A
+  // appWindow.webContents.session.webRequest.onBeforeSendHeaders(async (details, callback) => {
+  //   // appWindow.webContents.session.webRequest.onBeforeSendHeaders(async (details, callback) => {
+  //   console.log('🚀 ~ file: main.ts:84 ~ details.requestHeaders:', details.requestHeaders)
+
+  //   const { token } = await database.getToken()
+  //   // console.log('🚀 ~ file: main.ts:83 ~ appWindow.webContents.session.webRequest.onBeforeSendHeaders ~ token:', token)
+
+  //   // eslint-disable-next-line no-param-reassign
+  //   details.requestHeaders.Authorization = token
+  //   // delete details.requestHeaders['Authorization']
+  //   callback({ requestHeaders: details.requestHeaders })
+  // })
+
   appWindow.webContents.session.on('will-download', async (event, item, webContents) => {
     await willDownload({
+      authWindow,
       currentDownloadItems,
       database,
       downloadIdContext,
@@ -126,6 +148,10 @@ const createWindow = async () => {
     await clearDefaultDownload({
       database
     })
+  })
+
+  ipcMain.on('deleteCookies', async () => {
+    await session.defaultSession.clearStorageData()
   })
 
   appWindow.webContents.once('did-finish-load', () => {
@@ -191,6 +217,18 @@ const createWindow = async () => {
   appWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
+  })
+
+  session.defaultSession.cookies.on('changed', async (event, cookie, cause, removed) => {
+    await cookiesChanged({
+      currentDownloadItems,
+      authWindow,
+      database,
+      downloadIdContext,
+      cookie,
+      removed,
+      webContents: appWindow.webContents
+    })
   })
 }
 

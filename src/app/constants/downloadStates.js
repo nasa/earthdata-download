@@ -1,11 +1,12 @@
 const downloadStates = {
+  active: 'ACTIVE',
+  completed: 'COMPLETED',
+  error: 'ERROR',
+  interrupted: 'INTERRUPTED',
+  paused: 'PAUSED',
   pending: 'PENDING',
   starting: 'STARTING',
-  active: 'ACTIVE',
-  paused: 'PAUSED',
-  interrupted: 'INTERRUPTED',
-  error: 'ERROR',
-  completed: 'COMPLETED'
+  waitingForAuth: 'WAITING_FOR_AUTH'
 }
 
 export default downloadStates

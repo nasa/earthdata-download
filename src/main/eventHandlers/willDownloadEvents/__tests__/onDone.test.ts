@@ -2,8 +2,14 @@ import MockDate from 'mockdate'
 
 import onDone from '../onDone'
 import startNextDownload from '../startNextDownload'
+import finishDownload from '../finishDownload'
 
 jest.mock('../startNextDownload', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
+jest.mock('../finishDownload', () => ({
   __esModule: true,
   default: jest.fn(() => {})
 }))
@@ -65,6 +71,12 @@ describe('onDone', () => {
       downloadIdContext: {},
       webContents: {}
     })
+
+    expect(finishDownload).toHaveBeenCalledTimes(1)
+    expect(finishDownload).toHaveBeenCalledWith({
+      database,
+      downloadId: 'mock-download-id'
+    })
   })
 
   test('updates the database and calls startNextDownload for an interrupted download', async () => {
@@ -119,6 +131,12 @@ describe('onDone', () => {
       downloadId: 'mock-download-id',
       downloadIdContext: {},
       webContents: {}
+    })
+
+    expect(finishDownload).toHaveBeenCalledTimes(1)
+    expect(finishDownload).toHaveBeenCalledWith({
+      database,
+      downloadId: 'mock-download-id'
     })
   })
 
@@ -175,6 +193,12 @@ describe('onDone', () => {
       database,
       webContents: {}
     })
+
+    expect(finishDownload).toHaveBeenCalledTimes(1)
+    expect(finishDownload).toHaveBeenCalledWith({
+      database,
+      downloadId: 'mock-download-id'
+    })
   })
 
   test('does not update the database if the file is not in the database', async () => {
@@ -213,5 +237,8 @@ describe('onDone', () => {
 
     expect(database.updateFile).toHaveBeenCalledTimes(0)
     expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
+
+    expect(startNextDownload).toHaveBeenCalledTimes(0)
+    expect(finishDownload).toHaveBeenCalledTimes(0)
   })
 })

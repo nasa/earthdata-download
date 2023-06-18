@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../../app/constants/downloadStates'
+// import startNextDownload from './startNextDownload'
 
 /**
  * Handles the DownloadItem 'updated' event

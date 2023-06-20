@@ -15,12 +15,18 @@ contextBridge.exposeInMainWorld('electronApi', {
   cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
   openDownloadFolder: (data) => ipcRenderer.send('openDownloadFolder', data),
   copyDownloadPath: (data) => ipcRenderer.send('copyDownloadPath', data),
+  closeWindow: () => ipcRenderer.send('closeWindow'),
+  minimizeWindow: () => ipcRenderer.send('minimizeWindow'),
+  maximizeWindow: () => ipcRenderer.send('maximizeWindow'),
 
   // Messages to be received by the renderer process
   initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'off']('initializeDownload', callback),
   setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'off']('setDownloadLocation', callback),
   reportProgress: (on, callback) => ipcRenderer[on ? 'on' : 'off']('reportProgress', callback),
+  windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'off']('windowsLinuxTitleBar', callback),
 
   // System values for renderer
-  isMac: process.platform === 'darwin'
+  isMac: process.platform === 'darwin',
+  isWin: process.platform === 'win32',
+  isLinux: process.platform === 'linux'
 })

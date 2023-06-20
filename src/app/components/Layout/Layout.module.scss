@@ -23,10 +23,10 @@ body {
   color: #FFF;
   gap: 0 0;
   grid-area: header;
-  grid-template: "actions navigation ." 100% / 1fr auto 1fr;
+  grid-template: "actions ." 100% / 1fr auto;
 
   &.isMac {
-    grid-template: ". navigation actions" 100% / 1fr auto 1fr;
+    grid-template: ". actions" 100% / auto 1fr;
   }
 }
 
@@ -93,4 +93,44 @@ body {
   background-color: var(--color__black--050);
   grid-area: main;
   overflow-y: auto;
+}
+
+.windowsWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--color__black--650);
+  padding-left: var(--size__200);
+}
+
+.windowsButtons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: var(--size__200);
+  color: var(--color__black--650);
+}
+
+.windowsClose{
+  &:hover{
+    background:  var(--color__red--500);
+  }
+}
+
+.minMaxCloseButton {
+  composes: navButton;
+  &.isLinux {
+    background-color: var(--color__blue--600);
+    border-radius: 50px;
+    font-size: 12px;
+    max-width: 20px;
+    max-height: 20px;
+    margin: 5px;
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color__blue--700);
+    }
+  }
 }

@@ -62,14 +62,7 @@ const createWindow = () => {
     y: windowState.y,
     show: false,
     title: 'Earthdata Download',
-    // TODO we want to use hiddenInset, but windows buttons aren't visible. We'll need to manually add the windows buttons, and send messages to the main process to perform the button actions.
-    // titleBarStyle: 'hiddenInset',
-    titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: '#2A81BB',
-      symbolColor: '#FCFCFC',
-      height: 39
-    },
+    titleBarStyle: 'hiddenInset',
     frame: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
@@ -103,6 +96,30 @@ const createWindow = () => {
       store,
       webContents
     })
+  })
+
+  // Title bar click event handler
+  appWindow.on('resize', () => {
+    appWindow.webContents.send('windowsLinuxTitleBar', appWindow.isMaximized())
+  })
+
+  // Maximize the Windows OS layout
+  ipcMain.on('maximizeWindow', () => {
+    if (appWindow.isMaximized()) {
+      appWindow.unmaximize()
+    } else {
+      appWindow.maximize()
+    }
+  })
+
+  // Minimize the Windows OS layout
+  ipcMain.on('minimizeWindow', () => {
+    appWindow.minimize()
+  })
+
+  // Close the Windows OS layout
+  ipcMain.on('closeWindow', () => {
+    appWindow.close()
   })
 
   ipcMain.on('chooseDownloadLocation', () => {

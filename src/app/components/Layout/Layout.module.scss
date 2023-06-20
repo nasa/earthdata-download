@@ -100,8 +100,8 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  color: var(--color__black--650);
   padding-left: var(--size__200);
+  color: var(--color__black--650);
 }
 
 .windowsButtons {
@@ -121,13 +121,15 @@ body {
 
 .minMaxCloseButton {
   composes: navButton;
+
   &.isLinux {
-    background-color: var(--color__blue--600);
-    border-radius: 50px;
-    font-size: 12px;
     max-width: 20px;
     max-height: 20px;
+    border-radius: 50px;
     margin: 5px;
+    background-color: var(--color__blue--600);
+    font-size: 12px;
+
     &:hover,
     &:focus-visible {
       background-color: var(--color__blue--700);

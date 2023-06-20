@@ -30,7 +30,15 @@ import Settings from '../../../pages/Settings/Settings'
 describe('Layout component', () => {
   test('renders the downloads page', () => {
     render(
-      <ElectronApiContext.Provider value={{ isMac: true }}>
+      <ElectronApiContext.Provider value={{
+        isWin: false,
+        windowsLinuxTitleBar: jest.fn(),
+        isMac: true,
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
         <Layout />
       </ElectronApiContext.Provider>
     )
@@ -43,7 +51,15 @@ describe('Layout component', () => {
     const user = userEvent.setup()
 
     render(
-      <ElectronApiContext.Provider value={{ isMac: true }}>
+      <ElectronApiContext.Provider value={{
+        isWin: false,
+        windowsLinuxTitleBar: jest.fn(),
+        isMac: true,
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
         <Layout />
       </ElectronApiContext.Provider>
     )
@@ -64,7 +80,15 @@ describe('Layout component', () => {
     const user = userEvent.setup()
 
     render(
-      <ElectronApiContext.Provider value={{ isMac: true }}>
+      <ElectronApiContext.Provider value={{
+        isWin: false,
+        windowsLinuxTitleBar: jest.fn(),
+        isMac: true,
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
         <Layout />
       </ElectronApiContext.Provider>
     )
@@ -80,7 +104,15 @@ describe('Layout component', () => {
     const user = userEvent.setup()
 
     render(
-      <ElectronApiContext.Provider value={{ isMac: true }}>
+      <ElectronApiContext.Provider value={{
+        isWin: false,
+        windowsLinuxTitleBar: jest.fn(),
+        isMac: true,
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
         <Layout />
       </ElectronApiContext.Provider>
     )
@@ -94,7 +126,15 @@ describe('Layout component', () => {
 
   test('renders the settings button on a mac', () => {
     render(
-      <ElectronApiContext.Provider value={{ isMac: true }}>
+      <ElectronApiContext.Provider value={{
+        isWin: false,
+        windowsLinuxTitleBar: jest.fn(),
+        isMac: true,
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
         <Layout />
       </ElectronApiContext.Provider>
     )
@@ -106,11 +146,19 @@ describe('Layout component', () => {
 
   test('renders the settings button on windows', () => {
     render(
-      <ElectronApiContext.Provider value={{ isMac: false }}>
+      <ElectronApiContext.Provider value={{
+        isWin: true,
+        windowsLinuxTitleBar: jest.fn(),
+        isMac: false,
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
         <Layout />
       </ElectronApiContext.Provider>
     )
 
-    expect(screen.getByTestId('layout-header').className).not.toContain('isMac')
+    expect(screen.getByTestId('windows-layout-header').className).not.toContain('isMac')
   })
 })

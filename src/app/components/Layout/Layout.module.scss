@@ -95,7 +95,7 @@ body {
   overflow-y: auto;
 }
 
-.windowsWrapper {
+.windowWrapper {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -104,7 +104,7 @@ body {
   color: var(--color__black--650);
 }
 
-.windowsButtons {
+.windowButtons {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -113,7 +113,7 @@ body {
   color: var(--color__black--650);
 }
 
-.windowsClose{
+.windowClose{
   &:hover{
     background:  var(--color__red--500);
   }

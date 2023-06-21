@@ -72,23 +72,21 @@ const Layout = () => {
 
   return (
     <div className={styles.wrapper}>
-      {
-        isMac && (
-          <header
-            data-testid="layout-header"
-            className={
-              classNames(
-                [
-                  styles.header,
-                  {
-                    [styles.isMac]: isMac
-                  }
-                ]
-              )
-            }
-          >
-            {/* Hiding nav buttons until EDD-18 */}
-            {/* <nav className={styles.nav}>
+      <header
+        data-testid="layout-header"
+        className={
+          classNames(
+            [
+              styles.header,
+              {
+                [styles.isMac]: isMac
+              }
+            ]
+          )
+        }
+      >
+        {/* Hiding nav buttons until EDD-18 */}
+        {/* <nav className={styles.nav}>
           <Button
             className={
               classNames(
@@ -124,101 +122,90 @@ const Layout = () => {
             Download History
           </Button>
         </nav> */}
-            <section className={styles.actions}>
-              <Button
-                className={styles.settingsButton}
-                Icon={FaCog}
-                onClick={() => setCurrentPage(PAGES.settings)}
-                dataTestId="layout-button-settings"
-              >
-                Settings
-              </Button>
-            </section>
-          </header>
-        )
-      }
-      {
-        (isWin || isLinux) && (
-          <header
-            data-testid="windows-layout-header"
-            className={
-              classNames(
-                [
-                  styles.header,
-                  {
-                    [styles.isWin]: isWin
-                  }
-                ]
-              )
-            }
+        <section
+          className={
+            classNames(
+              [
+                {
+                  [styles.actions]: isMac,
+                  [styles.windowWrapper]: isWin || isLinux
+                }
+              ]
+            )
+          }
+        >
+          <Button
+            className={styles.settingsButton}
+            Icon={FaCog}
+            onClick={() => setCurrentPage(PAGES.settings)}
+            dataTestId="layout-button-settings"
           >
-            <div className={styles.windowsWrapper}>
-              <Button
-                className={styles.settingsButton}
-                Icon={FaCog}
-                onClick={() => setCurrentPage(PAGES.settings)}
-                dataTestId="layout-button-settings"
-              >
-                Settings
-              </Button>
-            </div>
-            <div className={styles.windowsButtons}>
-              <Button
-                className={
-                  classNames(
-                    [
-                      styles.minMaxCloseButton,
-                      {
-                        [styles.isLinux]: isLinux
-                      }
-                    ]
-                  )
-                }
-                onClick={() => minimizeWindow()}
-                Icon={VscChromeMinimize}
-                hideLabel
-              >
-                minimize
-              </Button>
-              <Button
-                className={
-                  classNames(
-                    [
-                      styles.minMaxCloseButton,
-                      {
-                        [styles.isLinux]: isLinux
-                      }
-                    ]
-                  )
-                }
-                onClick={() => { maximizeWindow() }}
-                Icon={isWindowMaximized && isWin ? VscChromeRestore : VscChromeMaximize}
-                hideLabel
-              >
-                maximize/restore
-              </Button>
-              <Button
-                className={
-                  classNames(
-                    [
-                      styles.minMaxCloseButton,
-                      styles.windowsClose,
-                      {
-                        [styles.isLinux]: isLinux
-                      }
-                    ]
-                  )
-                }
-                onClick={() => closeWindow()}
-                Icon={VscChromeClose}
-                hideLabel
-              >
-                close
-              </Button>
-            </div>
-          </header>
-        )
-      }
+            Settings
+          </Button>
+        </section>
+        {(isWin || isLinux) && (
+          <div
+            data-testid="window-buttons"
+            className={styles.windowButtons}
+          >
+            <Button
+              className={
+                classNames(
+                  [
+                    styles.minMaxCloseButton,
+                    {
+                      [styles.isLinux]: isLinux
+                    }
+                  ]
+                )
+              }
+              onClick={minimizeWindow}
+              dataTestId="minimize-window"
+              Icon={VscChromeMinimize}
+              hideLabel
+            >
+              Minimize
+            </Button>
+            <Button
+              className={
+                classNames(
+                  [
+                    styles.minMaxCloseButton,
+                    {
+                      [styles.isLinux]: isLinux
+                    }
+                  ]
+                )
+              }
+              onClick={maximizeWindow}
+              dataTestId="maximize-restore-window"
+              Icon={isWindowMaximized && isWin ? VscChromeRestore : VscChromeMaximize}
+              hideLabel
+            >
+              Maximize/Restore
+            </Button>
+            <Button
+              className={
+                classNames(
+                  [
+                    styles.minMaxCloseButton,
+                    styles.windowClose,
+                    {
+                      [styles.isLinux]: isLinux
+                    }
+                  ]
+                )
+              }
+              onClick={closeWindow}
+              dataTestId="close-window"
+              Icon={VscChromeClose}
+              hideLabel
+            >
+              Close
+            </Button>
+          </div>
+        )}
+      </header>
       <main className={styles.main}>
         {pageComponent}
       </main>

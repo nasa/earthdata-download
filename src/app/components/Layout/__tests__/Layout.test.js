@@ -1,6 +1,8 @@
 import React from 'react'
 
-import { render, screen } from '@testing-library/react'
+import {
+  render, screen
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import Layout from '../Layout'
@@ -32,8 +34,9 @@ describe('Layout component', () => {
     render(
       <ElectronApiContext.Provider value={{
         isWin: false,
-        windowsLinuxTitleBar: jest.fn(),
         isMac: true,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
         closeWindow: jest.fn(),
         minimizeWindow: jest.fn(),
         maximizeWindow: jest.fn()
@@ -53,8 +56,9 @@ describe('Layout component', () => {
     render(
       <ElectronApiContext.Provider value={{
         isWin: false,
-        windowsLinuxTitleBar: jest.fn(),
         isMac: true,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
         closeWindow: jest.fn(),
         minimizeWindow: jest.fn(),
         maximizeWindow: jest.fn()
@@ -82,8 +86,9 @@ describe('Layout component', () => {
     render(
       <ElectronApiContext.Provider value={{
         isWin: false,
-        windowsLinuxTitleBar: jest.fn(),
         isMac: true,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
         closeWindow: jest.fn(),
         minimizeWindow: jest.fn(),
         maximizeWindow: jest.fn()
@@ -106,8 +111,9 @@ describe('Layout component', () => {
     render(
       <ElectronApiContext.Provider value={{
         isWin: false,
-        windowsLinuxTitleBar: jest.fn(),
         isMac: true,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
         closeWindow: jest.fn(),
         minimizeWindow: jest.fn(),
         maximizeWindow: jest.fn()
@@ -128,8 +134,9 @@ describe('Layout component', () => {
     render(
       <ElectronApiContext.Provider value={{
         isWin: false,
-        windowsLinuxTitleBar: jest.fn(),
         isMac: true,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
         closeWindow: jest.fn(),
         minimizeWindow: jest.fn(),
         maximizeWindow: jest.fn()
@@ -148,8 +155,9 @@ describe('Layout component', () => {
     render(
       <ElectronApiContext.Provider value={{
         isWin: true,
-        windowsLinuxTitleBar: jest.fn(),
         isMac: false,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
         closeWindow: jest.fn(),
         minimizeWindow: jest.fn(),
         maximizeWindow: jest.fn()
@@ -159,6 +167,161 @@ describe('Layout component', () => {
       </ElectronApiContext.Provider>
     )
 
-    expect(screen.getByTestId('windows-layout-header').className).not.toContain('isMac')
+    expect(screen.getByTestId('layout-header').className).not.toContain('isMac')
+  })
+
+  test('renders the window buttons on Windows', () => {
+    render(
+      <ElectronApiContext.Provider value={{
+        isWin: true,
+        isMac: false,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    expect(screen.getByTestId('window-buttons').className).toContain('windowButtons')
+  })
+
+  // Skipping this for now as we do not know how to check the event onWindowMaximize
+  test.skip('renders a restore button on Windows when the window is maximized', async () => {
+    const user = userEvent.setup()
+    const maximizeWindowMock = jest.fn()
+
+    render(
+      <ElectronApiContext.Provider
+        value={{
+          isWin: false,
+          isMac: false,
+          isLinux: true,
+          windowsLinuxTitleBar: jest.fn(),
+          closeWindow: jest.fn(),
+          minimizeWindow: jest.fn(),
+          maximizeWindow: maximizeWindowMock
+        }}
+      >
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    await user.click(screen.getByTestId('maximize-restore-window'))
+
+    expect(maximizeWindowMock).toHaveBeenCalledTimes(1)
+  })
+
+  test('renders the window buttons on Linux', () => {
+    render(
+      <ElectronApiContext.Provider value={{
+        isWin: false,
+        isMac: false,
+        isLinux: true,
+        windowsLinuxTitleBar: jest.fn(),
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    expect(screen.getByTestId('window-buttons').className).toContain('windowButtons')
+  })
+
+  test('does not render the window buttons on Mac', () => {
+    render(
+      <ElectronApiContext.Provider value={{
+        isWin: false,
+        isMac: true,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    expect(screen.getByTestId('layout-header').className).not.toContain('windowButtons')
+  })
+
+  test('clicking the close button sends a message to the main process', async () => {
+    const user = userEvent.setup()
+    const closeWindowMock = jest.fn()
+
+    render(
+      <ElectronApiContext.Provider value={{
+        isWin: true,
+        windowsLinuxTitleBar: jest.fn(),
+        isMac: false,
+        isLinux: false,
+        closeWindow: closeWindowMock,
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    await user.click(screen.getByTestId('close-window'))
+
+    expect(closeWindowMock).toHaveBeenCalledTimes(1)
+  })
+
+  test('clicking the maximize/restore button sends a message to the main process', async () => {
+    const user = userEvent.setup()
+    const maximizeWindowMock = jest.fn()
+
+    render(
+      <ElectronApiContext.Provider value={{
+        isWin: true,
+        isMac: false,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: maximizeWindowMock
+      }}
+      >
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    await user.click(screen.getByTestId('maximize-restore-window'))
+
+    expect(maximizeWindowMock).toHaveBeenCalledTimes(1)
+  })
+
+  test('clicking the minimize button sends a message to the main process', async () => {
+    const user = userEvent.setup()
+    const minimizeWindowMock = jest.fn()
+
+    render(
+      <ElectronApiContext.Provider value={{
+        isWin: true,
+        isMac: false,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
+        closeWindow: jest.fn(),
+        minimizeWindow: minimizeWindowMock,
+        maximizeWindow: jest.fn()
+      }}
+      >
+        <Layout />
+      </ElectronApiContext.Provider>
+    )
+
+    await user.click(screen.getByTestId('minimize-window'))
+
+    expect(minimizeWindowMock).toHaveBeenCalledTimes(1)
   })
 })

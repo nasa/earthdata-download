@@ -2,7 +2,10 @@ import React, { useContext, useEffect, useState } from 'react'
 import classNames from 'classnames'
 import { FaCog } from 'react-icons/fa'
 import {
-  VscChromeRestore, VscChromeMaximize, VscChromeMinimize, VscChromeClose
+  VscChromeRestore,
+  VscChromeMaximize,
+  VscChromeMinimize,
+  VscChromeClose
 } from 'react-icons/vsc'
 import Button from '../Button/Button'
 import DownloadHistory from '../../pages/DownloadHistory/DownloadHistory'

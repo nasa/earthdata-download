@@ -6,13 +6,12 @@
  * @param {Object} params.store `electron-store` instance
  * @param {string} params.field Name of the preferences field
  */
-const getPreferenceFieldValue = ({
-  store,
+const getPreferenceFieldValue = async ({
+  database,
   field
 }) => {
-  const preferences = store.get('preferences')
-  const { [field]: fieldValue } = preferences
-  return fieldValue
+  const preferenceFieldValue = await database.getPreferencesByField(field)
+  return preferenceFieldValue
 }
 
 export default getPreferenceFieldValue

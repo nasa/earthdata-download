@@ -52,8 +52,8 @@ const Settings = ({
   const [defaultDownloadLocation, setDefaultDownloadLocation] = useState()
 
   const onClearDefaultDownload = () => {
-    setDefaultDownloadLocation(undefined)
-    setPreferenceFieldValue('defaultDownloadLocation', undefined)
+    setDefaultDownloadLocation(null)
+    setPreferenceFieldValue('defaultDownloadLocation', null)
   }
 
   const onSetChooseDownloadLocation = () => {
@@ -108,6 +108,7 @@ const Settings = ({
   useEffect(() => {
     const fetchConcurrency = async () => {
       const concurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
+      console.log('🚀 ~ file: Settings.jsx:111 ~ fetchConcurrency ~ concurrentDownloads:', concurrentDownloads)
       setConcurrentDownloads(concurrentDownloads.toString())
     }
     fetchConcurrency()

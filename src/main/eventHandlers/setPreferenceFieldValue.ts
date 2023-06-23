@@ -6,15 +6,17 @@
  * @param {Object} params.store `electron-store` instance
  * @param {Object} params.field user defined concurrent downloads
  */
-const setPreferenceFieldValue = ({
-  store,
+const setPreferenceFieldValue = async ({
+  database,
   field,
   value
 }) => {
-  const preferences = store.get('preferences')
+  console.log('🚀 ~ file: setPreferenceFieldValue.ts:14 ~ database:', database)
+  // const preferences = store.get('preferences')
+  const preferences = await database.getPreferences()
+  console.log('🚀 ~ file: setPreferenceFieldValue.ts:16 ~ preferences:', preferences)
   // Write to the preferences the user defined field and value
-  store.set('preferences', {
-    ...preferences,
+  database.setPreferences({
     [field]: value
   })
 }

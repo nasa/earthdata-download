@@ -115,6 +115,25 @@ describe('EddDatabase', () => {
     })
   })
 
+  // todo get this test running
+  describe('getPreferencesByField', () => {
+    test.skip('returns the preferences data', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select * from `preferences` where `id` = ? limit ?')
+        expect(query.bindings).toEqual([1, 1])
+
+        query.response({
+          concurrentDownloads: 5
+        })
+      })
+      const database = new EddDatabase('./')
+
+      const result = await database.getPreferencesByField('concurrentDownloads')
+
+      expect(result).toEqual(5)
+    })
+  })
+
   describe('setPreferences', () => {
     test('sets the preferences data', async () => {
       dbTracker.on('query', (query) => {

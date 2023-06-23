@@ -85,7 +85,7 @@ describe('Settings dialog', () => {
 
     await waitFor(() => {
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
-      expect(setPreferenceFieldValue).toHaveBeenCalledWith('defaultDownloadLocation', undefined)
+      expect(setPreferenceFieldValue).toHaveBeenCalledWith('defaultDownloadLocation', null)
     })
   })
 

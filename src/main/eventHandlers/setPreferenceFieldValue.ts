@@ -11,11 +11,6 @@ const setPreferenceFieldValue = async ({
   field,
   value
 }) => {
-  console.log('🚀 ~ file: setPreferenceFieldValue.ts:14 ~ database:', database)
-  // const preferences = store.get('preferences')
-  const preferences = await database.getPreferences()
-  console.log('🚀 ~ file: setPreferenceFieldValue.ts:16 ~ preferences:', preferences)
-  // Write to the preferences the user defined field and value
   database.setPreferences({
     [field]: value
   })

@@ -108,7 +108,6 @@ const Settings = ({
   useEffect(() => {
     const fetchConcurrency = async () => {
       const concurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
-      console.log('🚀 ~ file: Settings.jsx:111 ~ fetchConcurrency ~ concurrentDownloads:', concurrentDownloads)
       setConcurrentDownloads(concurrentDownloads.toString())
     }
     fetchConcurrency()
@@ -124,7 +123,7 @@ const Settings = ({
 
   useEffect(() => {
     // Handle edge case where change is made to the concurrency field but, exits
-    if (settingsDialogIsOpen === false) {
+    if (!settingsDialogIsOpen) {
       const valueNumeric = parseInt(concurrentDownloads.toString(), 10)
       if (valueNumeric > 0) {
         setPreferenceFieldValue('concurrentDownloads', valueNumeric)

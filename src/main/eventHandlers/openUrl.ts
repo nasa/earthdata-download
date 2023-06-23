@@ -1,22 +1,8 @@
 // @ts-nocheck
 
 import fetchLinks from '../utils/fetchLinks'
-import restartAuthDownload from '../utils/restartAuthDownload'
-
-// const setToken = async ({
-//   database,
-//   webContents
-// }) => {
-//   const token = await database.getToken()
-//   console.log('🚀 ~ file: openUrl.ts:11 ~ token:', token)
-
-//   webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-//     // eslint-disable-next-line no-param-reassign
-//     details.requestHeaders.Authorization = `Bearer ${token}`
-//     // delete details.requestHeaders['Authorization']
-//     callback({ requestHeaders: details.requestHeaders })
-//   })
-// }
+import startNextDownload from '../utils/startNextDownload'
+import downloadStates from '../../app/constants/downloadStates'
 
 /**
  * Parses `deepLink` for info and fetches download links
@@ -25,14 +11,16 @@ import restartAuthDownload from '../utils/restartAuthDownload'
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {Object} params.database `EddDatabase` instance
  * @param {String} params.deepLink URL used to open EDD
- * @param {Object} params.downloadIdContext Object where we can associated a newly created download to a downloadId
+ * @param {Object} params.downloadIdContext Object where we can associate a newly created download to a downloadId
+ * @param {Object} params.downloadsWaitingForAuth Object where we can mark a downloadId as waiting for authentication
  */
 const openUrl = async ({
   appWindow,
-  // currentDownloadItems,
+  currentDownloadItems,
   database,
   deepLink,
-  downloadIdContext
+  downloadIdContext,
+  downloadsWaitingForAuth
 }) => {
   const url = new URL(deepLink)
   const {
@@ -40,33 +28,45 @@ const openUrl = async ({
     searchParams
   } = url
 
+  // Start a new download
   if (hostname === 'startDownload') {
     const getLinks = searchParams.get('getLinks')
     const downloadId = searchParams.get('downloadId')
     const token = searchParams.get('token')
-    const reAuthUrl = searchParams.get('reAuthUrl')
+    const authUrl = searchParams.get('authUrl')
 
     fetchLinks({
       appWindow,
       database,
       downloadId,
       getLinks,
-      reAuthUrl,
+      authUrl,
       token
     })
   }
 
-  // TODO not being used as of I&A
-  if (hostname === 'reAuthCallback') {
+  // User has re-authenticated, save the new token and start the download
+  if (hostname === 'authCallback') {
     const token = searchParams.get('token')
     const fileId = searchParams.get('fileId')
 
+    // Save the new token in the database
     await database.setToken(token)
 
-    // TODO need to put the download into an 'auth' state
-    // instead of startNextDownload, need to restart the 'auth'/'starting' download
+    const { downloadId } = await database.getFileWhere({ id: fileId })
 
-    await restartAuthDownload({
+    // Remove the download from `downloadsWaitingForAuth`
+    // eslint-disable-next-line no-param-reassign
+    delete downloadsWaitingForAuth[downloadId]
+
+    // Update the download to be active
+    await database.updateDownloadById(downloadId, {
+      state: downloadStates.active
+    })
+
+    // Restart the fileId that was waitingForAuth
+    await startNextDownload({
+      currentDownloadItems,
       database,
       downloadIdContext,
       fileId,

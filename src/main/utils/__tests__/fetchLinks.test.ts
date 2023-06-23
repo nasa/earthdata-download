@@ -68,7 +68,7 @@ describe('fetchLinks', () => {
       database,
       downloadId,
       getLinks,
-      reAuthUrl: '',
+      authUrl: '',
       token
     })
 
@@ -98,7 +98,7 @@ describe('fetchLinks', () => {
       {
         createdAt: 1682899200000,
         loadingMoreFiles: true,
-        reAuthUrl: '',
+        authUrl: '',
         state: 'PENDING'
       }
     )
@@ -148,7 +148,7 @@ describe('fetchLinks', () => {
       database,
       downloadId,
       getLinks,
-      reAuthUrl: '',
+      authUrl: '',
       token
     })
 
@@ -169,7 +169,7 @@ describe('fetchLinks', () => {
       {
         createdAt: 1682899200000,
         loadingMoreFiles: true,
-        reAuthUrl: '',
+        authUrl: '',
         state: 'PENDING'
       }
     )
@@ -224,7 +224,7 @@ describe('fetchLinks', () => {
       database,
       downloadId,
       getLinks: badLink,
-      reAuthUrl: '',
+      authUrl: '',
       token
     })
 
@@ -234,7 +234,7 @@ describe('fetchLinks', () => {
       {
         createdAt: 1682899200000,
         loadingMoreFiles: true,
-        reAuthUrl: '',
+        authUrl: '',
         state: 'PENDING'
       }
     )
@@ -302,7 +302,7 @@ If you wish to have this link included in the list of trusted sources please con
       database,
       downloadId,
       getLinks,
-      reAuthUrl: '',
+      authUrl: '',
       token
     })
 
@@ -312,7 +312,7 @@ If you wish to have this link included in the list of trusted sources please con
       {
         createdAt: 1682899200000,
         loadingMoreFiles: true,
-        reAuthUrl: '',
+        authUrl: '',
         state: 'PENDING'
       }
     )

@@ -13,7 +13,6 @@ import beginDownload from './eventHandlers/beginDownload'
 import cancelDownloadItem from './eventHandlers/cancelDownloadItem'
 import chooseDownloadLocation from './eventHandlers/chooseDownloadLocation'
 import clearDefaultDownload from './eventHandlers/clearDefaultDownload'
-import cookiesChanged from './eventHandlers/cookiesChanged'
 import copyDownloadPath from './eventHandlers/copyDownloadPath'
 import openDownloadFolder from './eventHandlers/openDownloadFolder'
 import openUrl from './eventHandlers/openUrl'
@@ -38,6 +37,10 @@ let authWindow
 // `beginDownload`, or `willDownload` will save the downloadId associated with a new URL
 // so that within willDownload we can associate the DownloadItem instance with the correct download.
 const downloadIdContext = {}
+
+// `downloadsWaitingForAuth` holds downloadIds when that download is waiting for authentication.
+// This allows us to only try getting auth for 1 file, and not open too many auth windows
+const downloadsWaitingForAuth = {}
 
 const createWindow = async () => {
   // Ensure the database is up to date
@@ -78,19 +81,26 @@ const createWindow = async () => {
     appWindow.loadFile('dist/index.html')
   }
 
-  // TODO Not used as of I&A
-  // appWindow.webContents.session.webRequest.onBeforeSendHeaders(async (details, callback) => {
-  //   // appWindow.webContents.session.webRequest.onBeforeSendHeaders(async (details, callback) => {
-  //   console.log('🚀 ~ file: main.ts:84 ~ details.requestHeaders:', details.requestHeaders)
+  // TODO Remove this after electron supports adding headers to downloadURL()
+  // https://github.com/electron/electron/pull/38785 has been merged, waiting for a release
+  appWindow.webContents.session.webRequest.onBeforeSendHeaders(async (details, callback) => {
+    const { token } = await database.getToken()
 
-  //   const { token } = await database.getToken()
-  //   // console.log('🚀 ~ file: main.ts:83 ~ appWindow.webContents.session.webRequest.onBeforeSendHeaders ~ token:', token)
+    let bearerToken
+    if (token) {
+      bearerToken = `Bearer ${token}`
+    } else {
+      // If we have no token in the database, clear the cookie data that is saved by providers downloads
+      await session.defaultSession.clearStorageData()
+    }
 
-  //   // eslint-disable-next-line no-param-reassign
-  //   details.requestHeaders.Authorization = token
-  //   // delete details.requestHeaders['Authorization']
-  //   callback({ requestHeaders: details.requestHeaders })
-  // })
+    callback({
+      requestHeaders: {
+        ...details.requestHeaders,
+        Authorization: bearerToken
+      }
+    })
+  })
 
   appWindow.webContents.session.on('will-download', async (event, item, webContents) => {
     await willDownload({
@@ -98,6 +108,7 @@ const createWindow = async () => {
       currentDownloadItems,
       database,
       downloadIdContext,
+      downloadsWaitingForAuth,
       event,
       item,
       webContents
@@ -218,18 +229,6 @@ const createWindow = async () => {
     shell.openExternal(url)
     return { action: 'deny' }
   })
-
-  session.defaultSession.cookies.on('changed', async (event, cookie, cause, removed) => {
-    await cookiesChanged({
-      currentDownloadItems,
-      authWindow,
-      database,
-      downloadIdContext,
-      cookie,
-      removed,
-      webContents: appWindow.webContents
-    })
-  })
 }
 
 // This method will be called when Electron has finished
@@ -284,7 +283,8 @@ if (!gotTheLock) {
       currentDownloadItems,
       database,
       deepLink: url,
-      downloadIdContext
+      downloadIdContext,
+      downloadsWaitingForAuth
     })
   })
 
@@ -300,7 +300,8 @@ if (!gotTheLock) {
       currentDownloadItems,
       database,
       deepLink: url,
-      downloadIdContext
+      downloadIdContext,
+      downloadsWaitingForAuth
     })
   })
 }

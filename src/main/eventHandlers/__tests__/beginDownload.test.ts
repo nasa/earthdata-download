@@ -2,9 +2,9 @@ import MockDate from 'mockdate'
 
 import beginDownload from '../beginDownload'
 import CurrentDownloadItems from '../../utils/currentDownloadItems'
-import startNextDownload from '../willDownloadEvents/startNextDownload'
+import startNextDownload from '../../utils/startNextDownload'
 
-jest.mock('../willDownloadEvents/startNextDownload', () => ({
+jest.mock('../../utils/startNextDownload', () => ({
   __esModule: true,
   default: jest.fn(() => {})
 }))

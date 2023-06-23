@@ -40,7 +40,6 @@ class EddDatabase {
 
   /* Token */
 
-  // TODO Not using token table as of I&A
   async getToken() {
     return this.db('token').where({ id: this.tokenId }).first()
   }
@@ -219,6 +218,29 @@ class EddDatabase {
         url
       }
     }))
+  }
+
+  /**
+   * Returns the files progress for the given downloadId
+   * @param {String} downloadId ID of download to return progress
+   */
+  async getDownloadFilesProgressByDownloadId(downloadId) {
+    const [result] = await this.db('files')
+      .sum({
+        // Return the sum of the `percent` column as `percentSum`
+        percentSum: 'percent'
+      })
+      .count({
+        // Return the count of the `id` column as `totalFiles`
+        totalFiles: 'id',
+        // Return the count of the `state` column when the value is `COMPLETED` as `finishedFiles`
+        finishedFiles: this.db.raw('CASE "state" WHEN "COMPLETED" THEN 1 ELSE NULL END')
+      })
+      .where({
+        downloadId
+      })
+
+    return result
   }
 }
 

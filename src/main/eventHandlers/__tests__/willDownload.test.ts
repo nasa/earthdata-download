@@ -1,6 +1,13 @@
+import { shell } from 'electron'
 import MockDate from 'mockdate'
 
 import willDownload from '../willDownload'
+
+jest.mock('electronShell', () => ({
+  shell: {
+    openExternal: jest.fn()
+  }
+}))
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
@@ -8,11 +15,6 @@ beforeEach(() => {
 
 describe('willDownload', () => {
   test('starts the download', async () => {
-    const authWindow = {
-      isVisible: jest.fn(),
-      loadURL: jest.fn(),
-      show: jest.fn()
-    }
     const currentDownloadItems = {
       addItem: jest.fn()
     }
@@ -27,6 +29,7 @@ describe('willDownload', () => {
         fileId: 123
       }
     }
+    const downloadsWaitingForAuth = {}
     const item = {
       getFilename: jest.fn().mockReturnValue('mock-filename.png'),
       setSavePath: jest.fn(),
@@ -39,10 +42,10 @@ describe('willDownload', () => {
     }
 
     await willDownload({
-      authWindow,
       currentDownloadItems,
       database,
       downloadIdContext,
+      downloadsWaitingForAuth,
       item,
       webContents
     })
@@ -59,20 +62,16 @@ describe('willDownload', () => {
   })
 
   test('does not start the download without a downloadId', async () => {
-    const authWindow = {
-      isVisible: jest.fn(),
-      loadURL: jest.fn(),
-      show: jest.fn()
-    }
     const currentDownloadItems = {
       addItem: jest.fn()
     }
     const database = {
-      getDownloadById: jest.fn().mockResolvedValue({ reAuthUrl: '' }),
+      getDownloadById: jest.fn().mockResolvedValue({ authUrl: '' }),
       updateDownloadById: jest.fn(),
       updateFile: jest.fn()
     }
     const downloadIdContext = {}
+    const downloadsWaitingForAuth = {}
     const item = {
       getFilename: jest.fn().mockReturnValue('mock-filename.png'),
       setSavePath: jest.fn(),
@@ -86,10 +85,10 @@ describe('willDownload', () => {
     }
 
     await willDownload({
-      authWindow,
       currentDownloadItems,
       database,
       downloadIdContext,
+      downloadsWaitingForAuth,
       item,
       webContents
     })
@@ -104,15 +103,13 @@ describe('willDownload', () => {
 
   describe('when the download needs auth', () => {
     test('opens the authWindow', async () => {
-      const authWindow = {
-        isVisible: jest.fn().mockReturnValue(false),
-        loadURL: jest.fn(),
-        show: jest.fn()
-      }
       const currentDownloadItems = {
         addItem: jest.fn()
       }
       const database = {
+        getDownloadById: jest.fn().mockResolvedValue({
+          authUrl: 'http://example.com/login'
+        }),
         updateDownloadById: jest.fn(),
         updateFile: jest.fn()
       }
@@ -123,6 +120,7 @@ describe('willDownload', () => {
           fileId: 123
         }
       }
+      const downloadsWaitingForAuth = {}
       const item = {
         getFilename: jest.fn().mockReturnValue('mock-filename.png'),
         setSavePath: jest.fn(),
@@ -137,10 +135,10 @@ describe('willDownload', () => {
       }
 
       await willDownload({
-        authWindow,
         currentDownloadItems,
         database,
         downloadIdContext,
+        downloadsWaitingForAuth,
         item,
         webContents
       })
@@ -148,19 +146,14 @@ describe('willDownload', () => {
       expect(item.setSavePath).toHaveBeenCalledTimes(1)
       expect(item.setSavePath).toHaveBeenCalledWith('/mock/location/shortName_version-1-20230514_012554/mock-filename.png')
 
-      expect(authWindow.isVisible).toHaveBeenCalledTimes(1)
-
-      expect(authWindow.loadURL).toHaveBeenCalledTimes(1)
-      expect(authWindow.loadURL).toHaveBeenCalledWith('http://urs.earthdata.nasa.gov/oauth/authorize?mock=params')
-
-      expect(authWindow.show).toHaveBeenCalledTimes(1)
+      expect(shell.openExternal).toHaveBeenCalledTimes(1)
+      expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/login?fileId=123')
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith(
         'shortName_version-1-20230514_012554',
         {
-          state: 'WAITING_FOR_AUTH',
-          timeStart: null
+          state: 'WAITING_FOR_AUTH'
         }
       )
 
@@ -173,15 +166,13 @@ describe('willDownload', () => {
 
     describe('when the auth window is already open', () => {
       test('opens the authWindow', async () => {
-        const authWindow = {
-          isVisible: jest.fn().mockReturnValue(true),
-          loadURL: jest.fn(),
-          show: jest.fn()
-        }
         const currentDownloadItems = {
           addItem: jest.fn()
         }
         const database = {
+          getDownloadById: jest.fn().mockResolvedValue({
+            authUrl: 'http://example.com/login'
+          }),
           updateDownloadById: jest.fn(),
           updateFile: jest.fn()
         }
@@ -191,6 +182,9 @@ describe('willDownload', () => {
             downloadLocation: '/mock/location/shortName_version-1-20230514_012554',
             fileId: 123
           }
+        }
+        const downloadsWaitingForAuth = {
+          'shortName_version-1-20230514_012554': true
         }
         const item = {
           getFilename: jest.fn().mockReturnValue('mock-filename.png'),
@@ -206,10 +200,10 @@ describe('willDownload', () => {
         }
 
         await willDownload({
-          authWindow,
           currentDownloadItems,
           database,
           downloadIdContext,
+          downloadsWaitingForAuth,
           item,
           webContents
         })
@@ -217,17 +211,13 @@ describe('willDownload', () => {
         expect(item.setSavePath).toHaveBeenCalledTimes(1)
         expect(item.setSavePath).toHaveBeenCalledWith('/mock/location/shortName_version-1-20230514_012554/mock-filename.png')
 
-        expect(authWindow.isVisible).toHaveBeenCalledTimes(1)
-
-        expect(authWindow.loadURL).toHaveBeenCalledTimes(0)
-        expect(authWindow.show).toHaveBeenCalledTimes(0)
+        expect(shell.openExternal).toHaveBeenCalledTimes(0)
 
         expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
         expect(database.updateDownloadById).toHaveBeenCalledWith(
           'shortName_version-1-20230514_012554',
           {
-            state: 'WAITING_FOR_AUTH',
-            timeStart: null
+            state: 'WAITING_FOR_AUTH'
           }
         )
 

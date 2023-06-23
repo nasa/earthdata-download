@@ -136,11 +136,6 @@ const Settings = ({
       Number of Concurrent Downloads:
       {' '}
       {concurrentDownloads}
-      <br />
-      Download location:
-      {' '}
-      {defaultDownloadLocation}
-
       <Input
         type="text"
         onChange={onChangeConcurrentDownloads}
@@ -149,15 +144,6 @@ const Settings = ({
         onBlur={onBlurConcurrentDownloads}
       />
 
-      <button
-        className={styles.downloadLocationButton}
-        type="button"
-        onClick={onSetChooseDownloadLocation}
-        data-testid="initialize-download-location"
-        aria-label="Choose another folder"
-      >
-        Select Download Location
-      </button>
       <span className={styles.downloadLocationWrapper}>
         <FaFolder />
         <VisuallyHidden>
@@ -172,6 +158,16 @@ const Settings = ({
           </span>
         </MiddleEllipsis>
       </span>
+
+      <Button
+        className={styles.downloadLocationButton}
+        type="button"
+        onClick={onSetChooseDownloadLocation}
+        data-testid="initialize-download-location"
+        aria-label="Choose another folder"
+      >
+        Select Download Location
+      </Button>
 
       <Button
         size="md"

@@ -14,6 +14,8 @@ const Input = ({
   <div className={styles.div}>
     <RadixLabel.Root className={styles.labelRoot}>
       {label}
+      {' '}
+      {' '}
     </RadixLabel.Root>
     <input
       data-testid="input-test-id"

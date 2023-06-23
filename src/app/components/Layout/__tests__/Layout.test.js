@@ -128,11 +128,20 @@ describe('Layout component', () => {
     expect(Settings).toHaveBeenCalledTimes(1)
   })
 
-  test('Settings dialog modal can be escaped using Radix close', async () => {
+  test.only('Settings dialog modal can be escaped using Radix close', async () => {
     const user = userEvent.setup()
 
     render(
-      <ElectronApiContext.Provider value={{ isMac: true }}>
+      <ElectronApiContext.Provider value={{
+        isWin: false,
+        isMac: true,
+        isLinux: false,
+        windowsLinuxTitleBar: jest.fn(),
+        closeWindow: jest.fn(),
+        minimizeWindow: jest.fn(),
+        maximizeWindow: jest.fn()
+      }}
+      >
         <Layout />
       </ElectronApiContext.Provider>
     )

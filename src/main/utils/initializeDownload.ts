@@ -15,7 +15,7 @@ const initializeDownload = async ({
   downloadIds
 }) => {
   if (downloadIds.length > 0) {
-    // Default the download location to the user's `downloads` foler
+    // Default the download location to the user's `downloads` folder
     let location = app.getPath('downloads')
 
     // Pull preferences out of the database

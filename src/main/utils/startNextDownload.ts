@@ -2,14 +2,14 @@
 
 import 'array-foreach-async'
 
-import downloadStates from '../../../app/constants/downloadStates'
+import downloadStates from '../../app/constants/downloadStates'
 
 /**
  * Starts the next download when a download completes
  * @param {Object} params
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {Object} params.database `EddDatabase` instance
- * @param {Object} params.downloadIdContext Object where we can associated a newly created download to a downloadId
+ * @param {Object} params.downloadIdContext Object where we can associate a newly created download to a downloadId
  * @param {Number} params.fileId Optional file ID to start downloading
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
@@ -22,6 +22,7 @@ const startNextDownload = async ({
 }) => {
   // Get the concurrentDownloads from preferences
   const { concurrentDownloads } = await database.getPreferences()
+  const { token } = await database.getToken()
 
   // Get number of running downloads
   const numberOfRunningDownloads = currentDownloadItems.getNumberOfDownloads()
@@ -54,7 +55,15 @@ const startNextDownload = async ({
       downloadLocation,
       fileId
     }
-    webContents.downloadURL(url)
+
+    let bearerToken
+    if (token) bearerToken = `Bearer ${token}`
+
+    webContents.downloadURL(url, {
+      headers: {
+        Authorization: bearerToken
+      }
+    })
   })
 
   await Promise.all(promises)

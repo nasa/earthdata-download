@@ -13,25 +13,10 @@ import packageDetails from '../../../package.json'
 
 const ajv = new Ajv()
 
-// TODO? find a way to still use test downloads
-// const { downloads } = require('../../test-download-files.json')
-// const { downloads } = require('../../test-download-files-one-collection.json')
-// const { downloads } = require('../../test-download-files-one-file.json')
-
-// const today = new Date()
-//   .toISOString()
-//   .replace(/(:|-)/g, '')
-//   .replace('T', '_')
-//   .split('.')[0]
-
-// const pendingDownloads = downloads.reduce((map, download) => ({
-//   ...map,
-//   [`${download.id}-${today}`]: {
-//     ...download
-//   }
-// }), {})
-// console.log('🚀 ~ file: main.ts:59 ~ pendingDownloads ~ pendingDownloads:', pendingDownloads)
-
+/**
+ * Tests a link against the trustedSources.json file
+ * @param {String} link Link to test
+ */
 const isTrustedLink = (link: string) => {
   const protocolMatch = /^([a-z]*):\/\/\.*/i.exec(link)
   const protocol = protocolMatch?.at(1)?.toLowerCase()
@@ -65,7 +50,7 @@ const fetchLinks = async ({
   database,
   downloadId: downloadIdWithoutTime,
   getLinks,
-  reAuthUrl,
+  authUrl,
   token
 }) => {
   const now = new Date().toISOString().replace(/(:|-)/g, '').replace('T', '_')
@@ -76,7 +61,7 @@ const fetchLinks = async ({
   // Create a download in the database
   await database.createDownload(downloadId, {
     loadingMoreFiles: true,
-    reAuthUrl,
+    authUrl,
     state: downloadStates.pending,
     createdAt: new Date().getTime()
   })

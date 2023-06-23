@@ -4,7 +4,7 @@ exports.up = function (knex) {
       table.string('id').primary().notNullable()
       table.string('state').notNullable()
       table.string('downloadLocation')
-      table.string('reAuthUrl')
+      table.string('authUrl')
       table.boolean('loadingMoreFiles')
       table.timestamp('createdAt')
       table.timestamp('timeStart')

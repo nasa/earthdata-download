@@ -1,10 +1,10 @@
 import MockDate from 'mockdate'
 
 import onDone from '../onDone'
-import startNextDownload from '../startNextDownload'
+import startNextDownload from '../../../utils/startNextDownload'
 import finishDownload from '../finishDownload'
 
-jest.mock('../startNextDownload', () => ({
+jest.mock('../../../utils/startNextDownload', () => ({
   __esModule: true,
   default: jest.fn(() => {})
 }))

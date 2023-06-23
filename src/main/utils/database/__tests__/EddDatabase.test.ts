@@ -546,4 +546,28 @@ describe('EddDatabase', () => {
       ])
     })
   })
+
+  describe('getDownloadFilesProgressByDownloadId', () => {
+    test('updates the requested file', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select sum(`percent`) as `percentSum`, count(`id`) as `totalFiles`, count(CASE "state" WHEN "COMPLETED" THEN 1 ELSE NULL END) as `finishedFiles` from `files` where `downloadId` = ?')
+        expect(query.bindings).toEqual(['mock-download-1'])
+
+        query.response([{
+          percentSum: 42,
+          totalFiles: 10,
+          finishedFiles: 0
+        }])
+      })
+      const database = new EddDatabase('./')
+
+      const result = await database.getDownloadFilesProgressByDownloadId('mock-download-1')
+
+      expect(result).toEqual({
+        percentSum: 42,
+        totalFiles: 10,
+        finishedFiles: 0
+      })
+    })
+  })
 })

@@ -4,6 +4,8 @@
 ![Build Status](https://github.com/nasa/earthdata-download/workflows/CI/badge.svg?branch=main)
 [![codecov](https://codecov.io/gh/nasa/earthdata-download/branch/main/graph/badge.svg?token=W6E082B30M)](https://codecov.io/gh/nasa/earthdata-download)
 
+**Interested in integrating your application with Earthdata Download? [Look at the docs](docs/USE_EDD.md)!
+
 This README briefly describes how to bootstrap the Earthdata Download project. For more information about Earthdata Download, check out the `/docs` directory.
 
 ## Development
@@ -32,6 +34,8 @@ To build the jsdoc documentation:
 
     # Outputs documentation in the `docs/jsdoc` directory
 
+The SQLite database file used in Earthdata Download can be found in the `app.getPath('userData')` directory. [app.getPath documentation](https://www.electronjs.org/docs/latest/api/app#appgetpathname)
+
 ## Building
 
 To build the installers run one of the following, matching your operating system:
@@ -57,7 +61,7 @@ That will trigger the Build/Release workflow, and create a new draft release mat
 ## Documentation
 
 - [Introduction](docs/README.md)
-- [Use EDD for Your Application](docs/USE_EDD.md)
+- [Use Earthdata Download for Your Application](docs/USE_EDD.md)
 
 ## License
 

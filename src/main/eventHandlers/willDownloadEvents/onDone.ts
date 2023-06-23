@@ -2,7 +2,7 @@
 
 import downloadStates from '../../../app/constants/downloadStates'
 import finishDownload from './finishDownload'
-import startNextDownload from './startNextDownload'
+import startNextDownload from '../../utils/startNextDownload'
 
 /**
  * Handles the DownloadItem 'done' event
@@ -10,7 +10,7 @@ import startNextDownload from './startNextDownload'
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {Object} params.database `EddDatabase` instance
  * @param {String} params.downloadId downloadId of the DownloadItem being downloaded
- * @param {Object} params.downloadIdContext Object where we can associated a newly created download to a downloadId
+ * @param {Object} params.downloadIdContext Object where we can associate a newly created download to a downloadId
  * @param {Object} params.item Electron DownloadItem class instance
  * @param {String} params.state Updated state of the DownloadItem
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents

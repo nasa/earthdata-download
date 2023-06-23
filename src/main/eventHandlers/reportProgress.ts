@@ -1,11 +1,10 @@
 // @ts-nocheck
 
-import downloadStates from '../../app/constants/downloadStates'
-
 /**
- *
- * @param params
- * @returns
+ * Reports current progress on downloads
+ * @param {Object} params
+ * @param {Object} params.database `EddDatabase` instance
+ * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
 const reportProgress = async ({
   database,
@@ -28,16 +27,17 @@ const reportProgress = async ({
       timeEnd,
       timeStart
     } = download
-    const files = await database.getFilesWhere({ downloadId })
-
-    const totalFiles = Object.keys(files).length
-    const finishedFiles = Object.entries(files)
-      .filter(([, values]) => values.state === downloadStates.completed).length
+    const {
+      percentSum,
+      totalFiles,
+      finishedFiles
+    } = await database.getDownloadFilesProgressByDownloadId(downloadId)
 
     let percent = 0
 
     if (totalFiles > 0) {
-      percent = Math.floor((finishedFiles / totalFiles) * 100)
+      // Round to 1 decimal place
+      percent = Math.round((percentSum / totalFiles) * 10) / 10
     }
 
     const now = new Date().getTime()

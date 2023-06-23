@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-// import { shell } from 'electron'
+import { shell } from 'electron'
 import path from 'path'
 
 import onDone from './willDownloadEvents/onDone'
@@ -11,18 +11,18 @@ import downloadStates from '../../app/constants/downloadStates'
 /**
  * Handles the DownloadItem events
  * @param {Object} params
- * @param {Object} params.authWindow Electron BrowserWindow instance used for EDL auth redirects
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {Object} params.database `EddDatabase` instance
- * @param {Object} params.downloadIdContext Object where we can associated a newly created download to a downloadId
+ * @param {Object} params.downloadIdContext Object where we can associate a newly created download to a downloadId
+ * @param {Object} params.downloadsWaitingForAuth Object where we can mark a downloadId as waiting for authentication
  * @param {Object} params.item Electron DownloadItem class instance
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
 const willDownload = async ({
-  authWindow,
   currentDownloadItems,
   database,
   downloadIdContext,
+  downloadsWaitingForAuth,
   item,
   webContents
 }) => {
@@ -58,17 +58,24 @@ const willDownload = async ({
     item.cancel()
 
     await database.updateDownloadById(downloadId, {
-      state: downloadStates.waitingForAuth,
-      timeStart: null
+      state: downloadStates.waitingForAuth
     })
 
     let newState = downloadStates.waitingForAuth
-    if (authWindow.isVisible()) {
-      // If we are already waiting on auth, set the file to pending
+
+    if (downloadsWaitingForAuth[downloadId]) {
+      // A file is already waiting for auth, don't open the authUrl
       newState = downloadStates.pending
     } else {
-      authWindow.loadURL(lastUrl)
-      authWindow.show()
+      // eslint-disable-next-line no-param-reassign
+      downloadsWaitingForAuth[downloadId] = true
+      const download = await database.getDownloadById(downloadId)
+
+      const {
+        authUrl
+      } = download
+
+      shell.openExternal(`${authUrl}?fileId=${fileId}`)
     }
 
     await database.updateFile(fileId, {

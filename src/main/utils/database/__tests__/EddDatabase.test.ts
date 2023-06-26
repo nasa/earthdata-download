@@ -350,32 +350,6 @@ describe('EddDatabase', () => {
     })
   })
 
-  describe('getFileWaitingForAuthWhereUrlLike', () => {
-    test('returns requested file', async () => {
-      dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select * from `files` where `state` = ? and `url` like ? limit ?')
-        expect(query.bindings).toEqual([
-          downloadStates.waitingForAuth,
-          '%example.com%',
-          1
-        ])
-
-        query.response({
-          id: 'mock-file-1',
-          url: 'http://example.com/example.png'
-        })
-      })
-      const database = new EddDatabase('./')
-
-      const result = await database.getFileWaitingForAuthWhereUrlLike('example.com')
-
-      expect(result).toEqual({
-        id: 'mock-file-1',
-        url: 'http://example.com/example.png'
-      })
-    })
-  })
-
   describe('getFilesToStart', () => {
     test('returns requested files', async () => {
       dbTracker.on('query', (query) => {

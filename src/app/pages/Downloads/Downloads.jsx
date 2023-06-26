@@ -14,12 +14,13 @@ import {
 import classNames from 'classnames'
 
 import downloadStates from '../../constants/downloadStates'
-import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
+import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
 import createVariantClassName from '../../utils/createVariantName'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import InitializeDownload from '../../dialogs/InitializeDownload/InitializeDownload'
+
 import Button from '../../components/Button/Button'
 import Dialog from '../../components/Dialog/Dialog'
 import ListPage from '../../components/ListPage/ListPage'
@@ -49,15 +50,16 @@ const Downloads = ({
 }) => {
   const {
     beginDownload,
+    cancelDownloadItem,
+    copyDownloadPath,
     initializeDownload,
-    setDownloadLocation,
+    openDownloadFolder,
     pauseDownloadItem,
     reportProgress,
     resumeDownloadItem,
-    cancelDownloadItem,
-    openDownloadFolder,
-    copyDownloadPath
+    setDownloadLocation
   } = useContext(ElectronApiContext)
+
   const [downloadIds, setDownloadIds] = useState(null)
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
@@ -352,17 +354,17 @@ const Downloads = ({
                 <span className={styles.derivedStatus}>
                   {
                     derivedStateFromDownloads === downloadStates.active && (
-                      humanizedDownloadStates[downloadStates.active]
+                      getHumanizedDownloadStates(downloadStates.active)
                     )
                   }
                   {
                     derivedStateFromDownloads === downloadStates.paused && (
-                      humanizedDownloadStates[downloadStates.paused]
+                      getHumanizedDownloadStates(downloadStates.paused)
                     )
                   }
                   {
                     derivedStateFromDownloads === downloadStates.completed && (
-                      humanizedDownloadStates[downloadStates.completed]
+                      getHumanizedDownloadStates(downloadStates.completed)
                     )
                   }
                 </span>

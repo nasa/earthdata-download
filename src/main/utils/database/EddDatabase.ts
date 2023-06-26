@@ -123,37 +123,25 @@ class EddDatabase {
   }
 
   /**
-   * Returns the file that is in the waitingForAuth state, and matches the domain provided
-   * @param {String} domain URL to use in the whereLike clause
-   */
-  async getFileWaitingForAuthWhereUrlLike(domain) {
-    return this.db('files')
-      .select()
-      .where({ state: downloadStates.waitingForAuth })
-      .whereLike('url', `%${domain}%`)
-      .first()
-  }
-
-  /**
    * Returns files in the pending state, with the optional fileId included. Limited results by the limit parameter
    * @param {Number} limit Number of files to return
    * @param {Number} fileId ID of files to update.
    */
   async getFilesToStart(limit, fileId) {
-    let call = this.db('files')
+    let query = this.db('files')
       .select()
       .where({ state: downloadStates.pending })
 
     // If a fileId was provided, add it to the query
     if (fileId) {
-      call = call.orWhere({ id: fileId })
+      query = query.orWhere({ id: fileId })
     }
 
-    call = call.orderBy('createdAt', 'asc')
+    query = query.orderBy('createdAt', 'asc')
       .limit(limit)
 
     // Execute the full query and return the value
-    return call
+    return query
   }
 
   /**

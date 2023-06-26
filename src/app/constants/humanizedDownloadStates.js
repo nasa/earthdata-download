@@ -1,10 +1,22 @@
+import downloadStates from './downloadStates'
+
 const humanizedDownloadStates = {
-  PENDING: 'Initializing',
-  ACTIVE: 'Downloading',
-  COMPLETED: 'Completed',
-  PAUSED: 'Paused',
-  INTERRUPTED: 'Interrupted',
-  ERROR: 'Errored'
+  [downloadStates.active]: 'Downloading',
+  [downloadStates.completed]: 'Completed',
+  [downloadStates.error]: 'Errored',
+  [downloadStates.interrupted]: 'Interrupted',
+  [downloadStates.paused]: 'Paused',
+  [downloadStates.pending]: 'Initializing'
 }
 
-export default humanizedDownloadStates
+const getHumanizedDownloadStates = (state, percent = 0) => {
+  if (state === downloadStates.waitingForAuth) {
+    if (percent > 0) return humanizedDownloadStates[downloadStates.interrupted]
+
+    return humanizedDownloadStates[downloadStates.pending]
+  }
+
+  return humanizedDownloadStates[state]
+}
+
+export default getHumanizedDownloadStates

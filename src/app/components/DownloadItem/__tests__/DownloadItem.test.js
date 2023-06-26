@@ -6,26 +6,55 @@ import userEvent from '@testing-library/user-event'
 import { FaPause } from 'react-icons/fa'
 
 import DownloadItem from '../DownloadItem'
+import { ElectronApiContext } from '../../../context/ElectronApiContext'
+import downloadStates from '../../../constants/downloadStates'
 
-const progressObj = {
+const progress = {
   percent: 0,
   finishedFiles: 0,
   totalFiles: 1,
   totalTime: 0
 }
 
+const setup = (overrideProps) => {
+  const sendToLogin = jest.fn()
+  const showWaitingForLoginDialog = jest.fn()
+
+  const props = {
+    downloadId: 'download-id',
+    downloadName: 'download-name',
+    progress,
+    loadingMoreFiles: false,
+    state: downloadStates.active,
+    ...overrideProps
+  }
+
+  render(
+    <ElectronApiContext.Provider
+      value={
+        {
+          sendToLogin,
+          showWaitingForLoginDialog
+        }
+      }
+    >
+      <DownloadItem {...props} />
+    </ElectronApiContext.Provider>
+  )
+
+  return {
+    sendToLogin,
+    showWaitingForLoginDialog
+  }
+}
+
 describe('DownloadItem component', () => {
   describe('when a download is pending', () => {
     test('displays the correct download information', () => {
-      render(
-        <DownloadItem
-          downloadId="download-id"
-          downloadName="download-name"
-          progress={progressObj}
-          loadingMoreFiles
-          state="PENDING"
-        />
-      )
+      setup({
+        state: downloadStates.pending,
+        loadingMoreFiles: true
+      })
 
       expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
       expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
@@ -36,14 +65,7 @@ describe('DownloadItem component', () => {
 
   describe('when a download is active', () => {
     test('displays the correct download information', () => {
-      render(
-        <DownloadItem
-          downloadId="download-id"
-          downloadName="download-name"
-          progress={progressObj}
-          state="ACTIVE"
-        />
-      )
+      setup()
 
       expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
       expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
@@ -54,15 +76,9 @@ describe('DownloadItem component', () => {
 
     describe('when more files are loading', () => {
       test('displays the correct download information', () => {
-        render(
-          <DownloadItem
-            downloadId="download-id"
-            downloadName="download-name"
-            progress={progressObj}
-            loadingMoreFiles
-            state="ACTIVE"
-          />
-        )
+        setup({
+          loadingMoreFiles: true
+        })
 
         expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
         expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
@@ -86,15 +102,9 @@ describe('DownloadItem component', () => {
           ]
         ]
 
-        render(
-          <DownloadItem
-            downloadId="download-id"
-            downloadName="download-name"
-            progress={progressObj}
-            state="ACTIVE"
-            actionsList={actionsList}
-          />
-        )
+        setup({
+          actionsList
+        })
 
         const testButton = screen.getByText('test-label')
 
@@ -125,15 +135,9 @@ describe('DownloadItem component', () => {
           ]
         ]
 
-        render(
-          <DownloadItem
-            downloadId="download-id"
-            downloadName="download-name"
-            progress={progressObj}
-            state="ACTIVE"
-            actionsList={actionsList}
-          />
-        )
+        setup({
+          actionsList
+        })
 
         expect(screen.queryByText('test-label-1')).toBeInTheDocument()
         expect(screen.queryByText('test-label-2')).not.toBeInTheDocument()
@@ -154,15 +158,10 @@ describe('DownloadItem component', () => {
           ]
         ]
 
-        render(
-          <DownloadItem
-            downloadId="download-id"
-            downloadName="download-name"
-            progress={progressObj}
-            state="ACTIVE"
-            actionsList={actionsList}
-          />
-        )
+        setup({
+          actionsList
+        })
+
         const dropdownTrigger = screen.getByTestId('dropdown-trigger')
 
         await userEvent.click(dropdownTrigger)
@@ -184,15 +183,10 @@ describe('DownloadItem component', () => {
             ]
           ]
 
-          render(
-            <DownloadItem
-              downloadId="download-id"
-              downloadName="download-name"
-              progress={progressObj}
-              state="ACTIVE"
-              actionsList={actionsList}
-            />
-          )
+          setup({
+            actionsList
+          })
+
           const dropdownTrigger = screen.getByTestId('dropdown-trigger')
 
           await userEvent.click(dropdownTrigger)
@@ -207,14 +201,9 @@ describe('DownloadItem component', () => {
 
   describe('when a download is paused', () => {
     test('displays the correct download information', () => {
-      render(
-        <DownloadItem
-          downloadId="download-id"
-          downloadName="download-name"
-          progress={progressObj}
-          state="PAUSED"
-        />
-      )
+      setup({
+        state: downloadStates.paused
+      })
 
       expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
       expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
@@ -226,24 +215,77 @@ describe('DownloadItem component', () => {
 
   describe('when a download is completed', () => {
     test('displays the correct download information', () => {
-      render(
-        <DownloadItem
-          downloadId="download-id"
-          downloadName="download-name"
-          progress={{
-            ...progressObj,
-            finishedFiles: 1,
-            percent: 100
-          }}
-          state="COMPLETED"
-        />
-      )
+      setup({
+        progress: {
+          ...progress,
+          finishedFiles: 1,
+          percent: 100
+        },
+        state: downloadStates.completed
+      })
 
       expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
       expect(screen.getByTestId('download-item-percent')).toHaveTextContent('100%')
       expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
       expect(screen.getByTestId('download-item-state')).toHaveTextContent('Completed')
       expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 1 files done in 0 seconds')
+    })
+  })
+
+  describe('when a download is waiting for authentication', () => {
+    describe('when the download has not started yet', () => {
+      test('displays the correct download information', () => {
+        setup({
+          state: downloadStates.waitingForAuth
+        })
+
+        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+        expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
+        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Initializing')
+        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('Waiting for log in with Earthdata Login (More Info)')
+      })
+    })
+
+    describe('when the download has some progress', () => {
+      test('displays the correct download information', () => {
+        setup({
+          progress: {
+            ...progress,
+            finishedFiles: 1,
+            totalFiles: 2,
+            percent: 50
+          },
+          state: downloadStates.waitingForAuth
+        })
+
+        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+        expect(screen.getByTestId('download-item-percent')).toHaveTextContent('50%')
+        expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
+        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Interrupted')
+        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 2 files Waiting for log in with Earthdata Login (More Info)')
+      })
+    })
+
+    describe('when clicking a primary action button', () => {
+      test('sends a message to the main process', async () => {
+        const { sendToLogin } = setup({
+          progress: {
+            ...progress,
+            finishedFiles: 1,
+            totalFiles: 2,
+            percent: 50
+          },
+          state: downloadStates.waitingForAuth
+        })
+
+        const loginButton = screen.getByTestId('download-item-log-in')
+
+        await userEvent.click(loginButton)
+
+        expect(sendToLogin).toHaveBeenCalledTimes(1)
+        expect(sendToLogin).toHaveBeenCalledWith({ downloadId: 'download-name', forceLogin: true })
+      })
     })
   })
 })

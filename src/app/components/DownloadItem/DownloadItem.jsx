@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import {
   FaCheckCircle,
+  FaLock,
   FaSpinner
 } from 'react-icons/fa'
 import humanizeDuration from 'humanize-duration'
@@ -15,9 +16,13 @@ import createVariantClassName from '../../utils/createVariantName'
 import Tooltip from '../Tooltip/Tooltip'
 
 import downloadStates from '../../constants/downloadStates'
-import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
+import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
+
+import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import commafy from '../../utils/commafy'
+import Dialog from '../Dialog/Dialog'
+import WaitingForLogin from '../../dialogs/InitializeDownload/WaitingForLogin'
 
 /**
  * @typedef {Object} DownloadItemProps
@@ -51,6 +56,27 @@ const DownloadItem = ({
   actionsList
 }) => {
   const {
+    sendToLogin,
+    showWaitingForLoginDialog
+  } = useContext(ElectronApiContext)
+
+  const [waitingForLoginDialogIsOpen, setWaitingForLoginDialogIsOpen] = useState(false)
+
+  const onShowWaitingForLoginDialog = (event, info) => {
+    const { showDialog } = info
+    setWaitingForLoginDialogIsOpen(showDialog)
+  }
+
+  // Setup event listeners
+  useEffect(() => {
+    showWaitingForLoginDialog(true, onShowWaitingForLoginDialog)
+
+    return () => {
+      showWaitingForLoginDialog(false, onShowWaitingForLoginDialog)
+    }
+  }, [])
+
+  const {
     percent = 0,
     finishedFiles,
     totalFiles,
@@ -58,6 +84,30 @@ const DownloadItem = ({
   } = progress
 
   const primaryActions = []
+  if (state === downloadStates.waitingForAuth) {
+    primaryActions.push(
+      <Tooltip
+        content="Log In with Earthdata Login"
+        key="LogIn"
+      >
+        <Button
+          className={styles.action}
+          size="sm"
+          Icon={FaLock}
+          onClick={() => sendToLogin({
+            downloadId: downloadName,
+            forceLogin: true
+            // TODO EDD-13, might want to be able to send a fileId as well
+            // fileId
+          })}
+          data-testid="download-item-log-in"
+        >
+          Log In
+        </Button>
+      </Tooltip>
+    )
+  }
+
   if (actionsList) {
     actionsList.forEach((actionGroup) => {
       actionGroup.forEach((action) => {
@@ -83,16 +133,46 @@ const DownloadItem = ({
     })
   }
 
+  const shouldShowProgress = (state !== downloadStates.pending)
+    && (percent > 0 || state !== downloadStates.waitingForAuth)
+
+  const shouldShowTime = state !== downloadStates.pending
+    && state !== downloadStates.waitingForAuth
+    && totalFiles > 0
+
+  let stateForClassName = state
+
+  if (state === downloadStates.waitingForAuth && percent === 0) {
+    // If waitingForAuth and no progress has been made, show the `pending` state
+    stateForClassName = downloadStates.pending
+  } else if (state === downloadStates.waitingForAuth) {
+    // If waitingForAuth and some progress has been made, show the `interrupted` state
+    stateForClassName = downloadStates.interrupted
+  }
+
   return (
     <li
       className={
         classNames([
           styles.wrapper,
-          styles[createVariantClassName(state)]
+          styles[createVariantClassName(stateForClassName)]
         ])
       }
       data-testid="download-item"
     >
+      <Dialog
+        open={waitingForLoginDialogIsOpen}
+        setOpen={setWaitingForLoginDialogIsOpen}
+        showTitle
+        title="You must log in with Earthdata Login to download this data."
+        TitleIcon={FaLock}
+      >
+        <WaitingForLogin
+          downloadId={downloadName}
+          // TODO EDD-13, might want to be able to send a fileId as well
+          // fileId={fileId}
+        />
+      </Dialog>
       <div
         className={styles.innerWrapper}
         onClick={() => {}}
@@ -109,7 +189,7 @@ const DownloadItem = ({
         <div className={styles.meta}>
           <div className={styles.metaPrimary}>
             {
-              (state !== downloadStates.pending && totalFiles > 0) && (
+              shouldShowProgress && (
                 <div
                   className={styles.percentComplete}
                   data-testid="download-item-percent"
@@ -120,7 +200,7 @@ const DownloadItem = ({
               )
             }
             {
-              humanizedDownloadStates[state] && (
+              getHumanizedDownloadStates(state, percent) && (
                 <div
                   className={styles.displayStatus}
                   data-testid="download-item-state"
@@ -143,7 +223,7 @@ const DownloadItem = ({
                       <FaCheckCircle className={styles.statusDescriptionIcon} />
                     )
                   }
-                  {humanizedDownloadStates[state]}
+                  {getHumanizedDownloadStates(state, percent)}
                 </div>
               )
             }
@@ -153,31 +233,35 @@ const DownloadItem = ({
                   className={styles.statusDescription}
                   data-testid="download-item-status-description"
                 >
-                  {commafy(finishedFiles)}
                   {
-                    !loadingMoreFiles && (
+                    shouldShowProgress && (
                       <>
+                        {commafy(finishedFiles)}
+                        {
+                        !loadingMoreFiles && (
+                          <>
+                            {' '}
+                            of
+                            {' '}
+                            {commafy(totalFiles)}
+                          </>
+                        )
+                      }
                         {' '}
-                        of
-                        {' '}
-                        {commafy(totalFiles)}
+                        files
                       </>
                     )
                   }
-                  {' '}
-                  files
                   {
                     (
-                      state !== downloadStates.pending
-                      && state !== downloadStates.waitingForAuth
-                      && totalFiles > 0
-                    ) && (
-                      <>
-                        {' '}
-                        done in
-                        {' '}
-                        {humanizeDuration(totalTime * 1000)}
-                      </>
+                      shouldShowTime && (
+                        <>
+                          {' '}
+                          done in
+                          {' '}
+                          {humanizeDuration(totalTime * 1000)}
+                        </>
+                      )
                     )
                   }
                   {
@@ -192,7 +276,13 @@ const DownloadItem = ({
                     state === downloadStates.waitingForAuth && (
                       <>
                         {' '}
-                        (waiting for authorization)
+                        Waiting for log in with Earthdata Login
+                        {' '}
+                        <Tooltip
+                          content="This download requires authentication with Earthdata Login. If your browser did not automatically open, click Log In"
+                        >
+                          <span>(More Info)</span>
+                        </Tooltip>
                       </>
                     )
                   }

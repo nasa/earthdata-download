@@ -3,8 +3,8 @@
 /**
  * gets the concurrency download from the user preferences
  * @param {Object} params
- * @param {Object} params.store `electron-store` instance
- * @param {string} params.field Name of the preferences field
+ * @param {Object} params.database `EddDatabase` instance
+ * @param {String} params.field Name of the preferences field
  */
 const getPreferenceFieldValue = async ({
   database,

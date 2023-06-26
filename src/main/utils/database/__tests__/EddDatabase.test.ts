@@ -115,9 +115,8 @@ describe('EddDatabase', () => {
     })
   })
 
-  // todo get this test running
   describe('getPreferencesByField', () => {
-    test.skip('returns the preferences data', async () => {
+    test('returns the preferences data', async () => {
       dbTracker.on('query', (query) => {
         expect(query.sql).toEqual('select * from `preferences` where `id` = ? limit ?')
         expect(query.bindings).toEqual([1, 1])

@@ -128,7 +128,7 @@ describe('Layout component', () => {
     expect(Settings).toHaveBeenCalledTimes(1)
   })
 
-  test.only('Settings dialog modal can be escaped using Radix close', async () => {
+  test('Settings dialog modal can be escaped using Radix close', async () => {
     const user = userEvent.setup()
 
     render(

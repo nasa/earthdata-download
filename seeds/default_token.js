@@ -1,4 +1,4 @@
-exports.seed = async function (knex) {
+exports.seed = async (knex) => {
   // Inserts token if it doesn't exist
   await knex('token').insert([
     { id: 1, token: null }

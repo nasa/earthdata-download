@@ -1,0 +1,12 @@
+.content {
+  padding: 0 var(--size__500);
+  margin-bottom: var(--size__500)
+}
+
+.actions {
+  margin-right: var(--size__200);
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

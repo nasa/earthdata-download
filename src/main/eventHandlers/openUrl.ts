@@ -13,6 +13,7 @@ import downloadStates from '../../app/constants/downloadStates'
  * @param {String} params.deepLink URL used to open EDD
  * @param {Object} params.downloadIdContext Object where we can associate a newly created download to a downloadId
  * @param {Object} params.downloadsWaitingForAuth Object where we can mark a downloadId as waiting for authentication
+ * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
 const openUrl = async ({
   appWindow,
@@ -20,7 +21,8 @@ const openUrl = async ({
   database,
   deepLink,
   downloadIdContext,
-  downloadsWaitingForAuth
+  downloadsWaitingForAuth,
+  webContents
 }) => {
   const url = new URL(deepLink)
   const {
@@ -45,7 +47,7 @@ const openUrl = async ({
     })
   }
 
-  // User has re-authenticated, save the new token and start the download
+  // User has been authenticated, save the new token and start the download
   if (hostname === 'authCallback') {
     const token = searchParams.get('token')
     const fileId = searchParams.get('fileId')
@@ -63,6 +65,8 @@ const openUrl = async ({
     await database.updateDownloadById(downloadId, {
       state: downloadStates.active
     })
+
+    webContents.send('showWaitingForLoginDialog', { showDialog: false })
 
     // Restart the fileId that was waitingForAuth
     await startNextDownload({

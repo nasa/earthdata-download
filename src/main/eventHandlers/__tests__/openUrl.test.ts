@@ -71,6 +71,9 @@ describe('openUrl', () => {
         updateDownloadById: jest.fn()
       }
       const downloadsWaitingForAuth = {}
+      const webContents = {
+        send: jest.fn()
+      }
 
       await openUrl({
         appWindow,
@@ -78,7 +81,8 @@ describe('openUrl', () => {
         database,
         deepLink,
         downloadIdContext: {},
-        downloadsWaitingForAuth
+        downloadsWaitingForAuth,
+        webContents
       })
 
       expect(database.setToken).toHaveBeenCalledTimes(1)
@@ -90,7 +94,13 @@ describe('openUrl', () => {
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith('downloadId1', { state: downloadStates.active })
 
+      expect(webContents.send).toHaveBeenCalledTimes(1)
+      expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', { showDialog: false })
+
       expect(startNextDownload).toHaveBeenCalledTimes(1)
+      expect(startNextDownload).toHaveBeenCalledWith(expect.objectContaining({
+        fileId: '1234'
+      }))
     })
   })
 })

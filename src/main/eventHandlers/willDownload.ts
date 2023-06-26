@@ -1,7 +1,8 @@
 // @ts-nocheck
 
-import { shell } from 'electron'
 import path from 'path'
+
+import sendToLogin from './sendToLogin'
 
 import onDone from './willDownloadEvents/onDone'
 import onUpdated from './willDownloadEvents/onUpdated'
@@ -61,26 +62,14 @@ const willDownload = async ({
       state: downloadStates.waitingForAuth
     })
 
-    let newState = downloadStates.waitingForAuth
-
-    if (downloadsWaitingForAuth[downloadId]) {
-      // A file is already waiting for auth, don't open the authUrl
-      newState = downloadStates.pending
-    } else {
-      // eslint-disable-next-line no-param-reassign
-      downloadsWaitingForAuth[downloadId] = true
-      const download = await database.getDownloadById(downloadId)
-
-      const {
-        authUrl
-      } = download
-
-      shell.openExternal(`${authUrl}?fileId=${fileId}`)
-    }
-
-    await database.updateFile(fileId, {
-      state: newState,
-      timeStart: null
+    await sendToLogin({
+      database,
+      downloadsWaitingForAuth,
+      info: {
+        downloadId,
+        fileId
+      },
+      webContents
     })
 
     return

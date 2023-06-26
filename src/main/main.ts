@@ -20,6 +20,7 @@ import pauseDownloadItem from './eventHandlers/pauseDownloadItem'
 import retryDownloadItem from './eventHandlers/retryDownloadItem'
 import reportProgress from './eventHandlers/reportProgress'
 import resumeDownloadItem from './eventHandlers/resumeDownloadItem'
+import sendToLogin from './eventHandlers/sendToLogin'
 import willDownload from './eventHandlers/willDownload'
 
 import CurrentDownloadItems from './utils/currentDownloadItems'
@@ -32,7 +33,6 @@ const database = new EddDatabase(userDataPath)
 const currentDownloadItems = new CurrentDownloadItems()
 
 let appWindow
-let authWindow
 
 // `downloadIdContext` holds the downloadId for a new file beginning to download.
 // `beginDownload`, or `willDownload` will save the downloadId associated with a new URL
@@ -63,11 +63,6 @@ const createWindow = async () => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
-  })
-  authWindow = new BrowserWindow({
-    width: windowState.width,
-    height: windowState.height,
-    show: false
   })
 
   windowState.track(appWindow)
@@ -105,7 +100,6 @@ const createWindow = async () => {
 
   appWindow.webContents.session.on('will-download', async (event, item, webContents) => {
     await willDownload({
-      authWindow,
       currentDownloadItems,
       database,
       downloadIdContext,
@@ -221,17 +215,26 @@ const createWindow = async () => {
     if (reportProgressInterval) clearInterval(reportProgressInterval)
   })
 
-  ipcMain.on('openDownloadFolder', (event, info) => {
-    openDownloadFolder({
+  ipcMain.on('openDownloadFolder', async (event, info) => {
+    await openDownloadFolder({
       database,
       info
     })
   })
 
-  ipcMain.on('copyDownloadPath', (event, info) => {
-    copyDownloadPath({
+  ipcMain.on('copyDownloadPath', async (event, info) => {
+    await copyDownloadPath({
       database,
       info
+    })
+  })
+
+  ipcMain.on('sendToLogin', async (event, info) => {
+    await sendToLogin({
+      database,
+      downloadsWaitingForAuth,
+      info,
+      webContents: appWindow.webContents
     })
   })
 
@@ -295,7 +298,8 @@ if (!gotTheLock) {
       database,
       deepLink: url,
       downloadIdContext,
-      downloadsWaitingForAuth
+      downloadsWaitingForAuth,
+      webContents: appWindow.webContents
     })
   })
 
@@ -312,7 +316,8 @@ if (!gotTheLock) {
       database,
       deepLink: url,
       downloadIdContext,
-      downloadsWaitingForAuth
+      downloadsWaitingForAuth,
+      webContents: appWindow.webContents
     })
   })
 }

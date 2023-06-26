@@ -17,7 +17,7 @@ import {
 import classNames from 'classnames'
 
 import downloadStates from '../../constants/downloadStates'
-import humanizedDownloadStates from '../../constants/humanizedDownloadStates'
+import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
 import createVariantClassName from '../../utils/createVariantName'
 
@@ -54,16 +54,17 @@ const Downloads = ({
 }) => {
   const {
     beginDownload,
+    cancelDownloadItem,
+    copyDownloadPath,
     initializeDownload,
-    setDownloadLocation,
+    openDownloadFolder,
     pauseDownloadItem,
     reportProgress,
     retryDownloadItem,
     resumeDownloadItem,
-    cancelDownloadItem,
-    openDownloadFolder,
-    copyDownloadPath
+    setDownloadLocation
   } = useContext(ElectronApiContext)
+
   const [downloadIds, setDownloadIds] = useState(null)
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
@@ -457,22 +458,22 @@ const Downloads = ({
                 <span className={styles.derivedStatus}>
                   {
                     derivedStateFromDownloads === downloadStates.active && (
-                      humanizedDownloadStates[downloadStates.active]
+                      getHumanizedDownloadStates(downloadStates.active)
                     )
                   }
                   {
                     derivedStateFromDownloads === downloadStates.paused && (
-                      humanizedDownloadStates[downloadStates.paused]
+                      getHumanizedDownloadStates(downloadStates.paused)
                     )
                   }
                   {
                     derivedStateFromDownloads === downloadStates.completed && (
-                      humanizedDownloadStates[downloadStates.completed]
+                      getHumanizedDownloadStates(downloadStates.completed)
                     )
                   }
                   {
                     derivedStateFromDownloads === downloadStates.error && (
-                      humanizedDownloadStates[downloadStates.error]
+                      getHumanizedDownloadStates[downloadStates.error]
                     )
                   }
                 </span>

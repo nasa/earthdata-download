@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-closing-tag-location */
 import React from 'react'
 
 import { render, screen, waitFor } from '@testing-library/react'
@@ -165,17 +164,19 @@ describe('Settings dialog', () => {
     await user.type(screen.getByTestId('input-test-id'), '6')
 
     // re-render
-    rerender(<ElectronApiContext.Provider value={{
-      setDownloadLocation,
-      setPreferenceFieldValue,
-      getPreferenceFieldValue
-    }}
-    >
-      <Settings
-        hasActiveDownloads={false}
-        settingsDialogIsOpen={false}
-      />
-    </ElectronApiContext.Provider>)
+    rerender(
+      <ElectronApiContext.Provider value={{
+        setDownloadLocation,
+        setPreferenceFieldValue,
+        getPreferenceFieldValue
+      }}
+      >
+        <Settings
+          hasActiveDownloads={false}
+          settingsDialogIsOpen={false}
+        />
+      </ElectronApiContext.Provider>
+    )
 
     await waitFor(() => {
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)

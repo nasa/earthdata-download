@@ -30,8 +30,12 @@ class EddDatabase {
     return this.db('preferences').where({ id: this.preferencesId }).first()
   }
 
+  /**
+   * Sets the given preferences.
+   * @param {Object} field specified preferences field to be retrieved
+   */
   async getPreferencesByField(field) {
-    const preferences = await this.db('preferences').where({ id: this.preferencesId }).first()
+    const preferences = await this.db('preferences').where({ id: this.preferencesId }).first().select(field)
     const { [field]: fieldValue } = preferences
     return fieldValue
   }

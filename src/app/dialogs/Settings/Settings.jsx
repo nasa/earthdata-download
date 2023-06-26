@@ -62,20 +62,24 @@ const Settings = ({
 
   const onChangeConcurrentDownloads = (event) => {
     const { value } = event.target
+
     // if value is non numerical and can't be parsed as an integer return 0
     const valueNumeric = parseInt(value, 10) || 0
     if (value === '') {
       setConcurrentDownloads('')
       return
     }
+
     // Allow set if non-decimal value and > 0 allow setting of the text field
     if (valueNumeric > 0 && value.indexOf('.') < 0) {
       setConcurrentDownloads(valueNumeric.toString())
     }
   }
+
   // Event occurs when element loses focus, write to preferences.json
   const onBlurConcurrentDownloads = async (event) => {
     const { value } = event.target
+
     // If empty string is entered and the input field is exited, restore the label with the set concurrentDownloads
     if (!value) {
       const concurrentDownloadsPreference = await getPreferenceFieldValue('concurrentDownloads')
@@ -95,22 +99,19 @@ const Settings = ({
     setPreferenceFieldValue('defaultDownloadLocation', newDownloadLocation)
   }
 
-  useEffect(
-    () => {
-      const fetchDefaultDownloadLocation = async () => {
-        setDefaultDownloadLocation(await getPreferenceFieldValue('defaultDownloadLocation'))
-      }
-      fetchDefaultDownloadLocation()
-    },
-    [setDefaultDownloadLocation]
-  )
+  useEffect(() => {
+    const fetchDefaultDownloadLocation = async () => {
+      setDefaultDownloadLocation(await getPreferenceFieldValue('defaultDownloadLocation'))
+    }
+    fetchDefaultDownloadLocation()
+  }, [setDefaultDownloadLocation])
 
   useEffect(() => {
-    const fetchConcurrency = async () => {
+    const fetchConcurrentDownloads = async () => {
       const concurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
       setConcurrentDownloads(concurrentDownloads.toString())
     }
-    fetchConcurrency()
+    fetchConcurrentDownloads()
   }, [setConcurrentDownloads])
 
   // Handle the response from the setDownloadLocation
@@ -140,7 +141,7 @@ const Settings = ({
         type="text"
         onChange={onChangeConcurrentDownloads}
         value={concurrentDownloads}
-        label="Set Concurrency"
+        label="Set Concurrent Downloads"
         onBlur={onBlurConcurrentDownloads}
       />
 

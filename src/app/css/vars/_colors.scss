@@ -1,11 +1,12 @@
 @use "sass:meta";
 
-$color__white: #fcfcfc;
-$color__gray: #848e94;
-$color__black: #000e16;
+$color__white: #FCFCFC;
+$color__gray: #848E94;
+$color__black: #000E16;
 $color__blue: #2A81BB;
 $color__green: #27AE60;
 $color__red: #ED2B38;
+$color__yellow: #CA0;
 
 // Black
 $color__black--050: #{mix($color__white, $color__gray, 90%)};
@@ -90,6 +91,27 @@ $color__red--800: #{mix($color__black, $color__red, 60%)};
 $color__red--850: #{mix($color__black, $color__red, 70%)};
 $color__red--900: #{mix($color__black, $color__red, 80%)};
 $color__red--950: #{mix($color__black, $color__red, 90%)};
+
+// Yellow
+$color__yellow--050: #{mix($color__white, $color__yellow, 90%)};
+$color__yellow--100: #{mix($color__white, $color__yellow, 80%)};
+$color__yellow--150: #{mix($color__white, $color__yellow, 70%)};
+$color__yellow--200: #{mix($color__white, $color__yellow, 60%)};
+$color__yellow--250: #{mix($color__white, $color__yellow, 50%)};
+$color__yellow--300: #{mix($color__white, $color__yellow, 40%)};
+$color__yellow--350: #{mix($color__white, $color__yellow, 30%)};
+$color__yellow--400: #{mix($color__white, $color__yellow, 20%)};
+$color__yellow--450: #{mix($color__white, $color__yellow, 10%)};
+$color__yellow--500: #{mix($color__white, $color__yellow,  0%)};
+$color__yellow--550: #{mix($color__black, $color__yellow, 10%)};
+$color__yellow--600: #{mix($color__black, $color__yellow, 20%)};
+$color__yellow--650: #{mix($color__black, $color__yellow, 30%)};
+$color__yellow--700: #{mix($color__black, $color__yellow, 40%)};
+$color__yellow--750: #{mix($color__black, $color__yellow, 50%)};
+$color__yellow--800: #{mix($color__black, $color__yellow, 60%)};
+$color__yellow--850: #{mix($color__black, $color__yellow, 70%)};
+$color__yellow--900: #{mix($color__black, $color__yellow, 80%)};
+$color__yellow--950: #{mix($color__black, $color__yellow, 90%)};
 
 :root {
   --color__white: #{meta.inspect($color__white)};
@@ -182,6 +204,27 @@ $color__red--950: #{mix($color__black, $color__red, 90%)};
   --color__red--850: #{meta.inspect($color__red--850)};
   --color__red--900: #{meta.inspect($color__red--900)};
   --color__red--950: #{meta.inspect($color__red--950)};
+
+  // Yellow
+  --color__yellow--050: #{meta.inspect($color__yellow--050)};
+  --color__yellow--100: #{meta.inspect($color__yellow--100)};
+  --color__yellow--150: #{meta.inspect($color__yellow--150)};
+  --color__yellow--200: #{meta.inspect($color__yellow--200)};
+  --color__yellow--250: #{meta.inspect($color__yellow--250)};
+  --color__yellow--300: #{meta.inspect($color__yellow--300)};
+  --color__yellow--350: #{meta.inspect($color__yellow--350)};
+  --color__yellow--400: #{meta.inspect($color__yellow--400)};
+  --color__yellow--450: #{meta.inspect($color__yellow--450)};
+  --color__yellow--500: #{meta.inspect($color__yellow--500)};
+  --color__yellow--550: #{meta.inspect($color__yellow--550)};
+  --color__yellow--600: #{meta.inspect($color__yellow--600)};
+  --color__yellow--650: #{meta.inspect($color__yellow--650)};
+  --color__yellow--700: #{meta.inspect($color__yellow--700)};
+  --color__yellow--750: #{meta.inspect($color__yellow--750)};
+  --color__yellow--800: #{meta.inspect($color__yellow--800)};
+  --color__yellow--850: #{meta.inspect($color__yellow--850)};
+  --color__yellow--900: #{meta.inspect($color__yellow--900)};
+  --color__yellow--950: #{meta.inspect($color__yellow--950)};
 
   // Text colors
   --color__text--lighter: var(--color__black--400);

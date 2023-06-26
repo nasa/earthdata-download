@@ -22,7 +22,6 @@ In order to have your web application launch the Earthdata Download application,
 
 This link will start a new download in Earthdata Download.
 
-
     earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgranule_links%3Fid%3D42%26flattenLinks%3Dtrue%26linkTypes%3Ddata&downloadId=shortName_versionId&token=Bearer mock-token
 
 #### Query Parameters

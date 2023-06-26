@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   chooseDownloadLocation: () => ipcRenderer.send('chooseDownloadLocation'),
   clearDefaultDownload: () => ipcRenderer.send('clearDefaultDownload'),
   deleteCookies: () => ipcRenderer.send('deleteCookies'),
+  sendToLogin: (data) => ipcRenderer.send('sendToLogin', data),
 
   pauseDownloadItem: (data) => ipcRenderer.send('pauseDownloadItem', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),
@@ -22,8 +23,9 @@ contextBridge.exposeInMainWorld('electronApi', {
 
   // Messages to be received by the renderer process
   initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'off']('initializeDownload', callback),
-  setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'off']('setDownloadLocation', callback),
   reportProgress: (on, callback) => ipcRenderer[on ? 'on' : 'off']('reportProgress', callback),
+  setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'off']('setDownloadLocation', callback),
+  showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'off']('showWaitingForLoginDialog', callback),
   windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'off']('windowsLinuxTitleBar', callback),
 
   // System values for renderer

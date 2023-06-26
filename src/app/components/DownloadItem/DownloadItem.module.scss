@@ -42,6 +42,12 @@
     color: var(--color__blue--700);
   }
 
+  .isInterrupted & {
+    border: 1px solid var(--color__yellow--350);
+    background-color: var(--color__yellow--050);
+    color: var(--color__yellow--700);
+  }
+
   .isCompleted &:hover,
   .isCompleted &:focus-visible  {
     border: 1px solid var(--color__green--500);
@@ -54,6 +60,13 @@
     border: 1px solid var(--color__blue--500);
     background-color: var(--color__blue--100);
     color: var(--color__blue--850);
+  }
+
+  .isInterrupted &:hover,
+  .isInterrupted &:focus-visible  {
+    border: 1px solid var(--color__yellow--500);
+    background-color: var(--color__yellow--100);
+    color: var(--color__yellow--850);
   }
 
   .wrapper:first-child & {

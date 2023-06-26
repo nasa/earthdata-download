@@ -118,7 +118,7 @@ describe('EddDatabase', () => {
   describe('getPreferencesByField', () => {
     test('returns the preferences data', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select * from `preferences` where `id` = ? limit ?')
+        expect(query.sql).toEqual('select concurrentDownloads from `preferences` where `id` = ? limit ?')
         expect(query.bindings).toEqual([1, 1])
 
         query.response({

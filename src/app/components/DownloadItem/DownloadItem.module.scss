@@ -164,6 +164,30 @@
   }
 }
 
+.statusInformation {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.statusInformationTooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--size__150);
+  color: var(--color__black--600);
+  cursor: default;
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--color__black--700);
+  }
+}
+
+.statusInformationIcon {
+  margin-right: var(--size__050);
+}
+
 .metaSecondary {
   position: fixed;
   display: flex;

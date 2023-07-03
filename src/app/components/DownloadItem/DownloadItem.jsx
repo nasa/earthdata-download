@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import {
   FaCheckCircle,
+  FaInfoCircle,
   FaLock,
   FaSpinner
 } from 'react-icons/fa'
@@ -87,8 +88,9 @@ const DownloadItem = ({
   if (state === downloadStates.waitingForAuth) {
     primaryActions.push(
       <Tooltip
-        content="Log In with Earthdata Login"
         key="LogIn"
+        content="Log In with Earthdata Login"
+        delayDuration={300}
       >
         <Button
           className={styles.action}
@@ -113,7 +115,11 @@ const DownloadItem = ({
       actionGroup.forEach((action) => {
         primaryActions.push(
           (action.isActive && action.isPrimary) && (
-            <Tooltip content={action.label} key={action.label}>
+            <Tooltip
+              key={action.label}
+              content={action.label}
+              delayDuration={300}
+            >
               <Button
                 className={styles.action}
                 size="sm"
@@ -233,59 +239,64 @@ const DownloadItem = ({
                   className={styles.statusDescription}
                   data-testid="download-item-status-description"
                 >
-                  {
-                    shouldShowProgress && (
-                      <>
-                        {commafy(finishedFiles)}
-                        {
-                        !loadingMoreFiles && (
-                          <>
-                            {' '}
-                            of
-                            {' '}
-                            {commafy(totalFiles)}
-                          </>
-                        )
-                      }
-                        {' '}
-                        files
-                      </>
-                    )
-                  }
-                  {
-                    (
-                      shouldShowTime && (
+                  <p className={styles.statusInformation}>
+                    {
+                      shouldShowProgress && (
                         <>
+                          {commafy(finishedFiles)}
+                          {
+                          !loadingMoreFiles && (
+                            <>
+                              {' '}
+                              of
+                              {' '}
+                              {commafy(totalFiles)}
+                            </>
+                          )
+                        }
                           {' '}
-                          done in
-                          {' '}
-                          {humanizeDuration(totalTime * 1000)}
+                          files
                         </>
                       )
-                    )
-                  }
-                  {
-                    loadingMoreFiles && (
-                      <>
-                        {' '}
-                        (determining file count)
-                      </>
-                    )
-                  }
-                  {
-                    state === downloadStates.waitingForAuth && (
-                      <>
-                        {' '}
-                        Waiting for log in with Earthdata Login
-                        {' '}
-                        <Tooltip
-                          content="This download requires authentication with Earthdata Login. If your browser did not automatically open, click Log In"
-                        >
-                          <span>(More Info)</span>
-                        </Tooltip>
-                      </>
-                    )
-                  }
+                    }
+                    {
+                      (
+                        shouldShowTime && (
+                          <>
+                            {' '}
+                            done in
+                            {' '}
+                            {humanizeDuration(totalTime * 1000)}
+                          </>
+                        )
+                      )
+                    }
+                    {
+                      loadingMoreFiles && (
+                        <>
+                          {' '}
+                          (determining file count)
+                        </>
+                      )
+                    }
+                    {
+                      state === downloadStates.waitingForAuth && (
+                        <>
+                          {' '}
+                          Waiting for log in with Earthdata Login
+                          {' '}
+                          <Tooltip
+                            content="This download requires authentication with Earthdata Login. If your browser did not automatically open, click Log In"
+                          >
+                            <span className={styles.statusInformationTooltip}>
+                              <FaInfoCircle className={styles.statusInformationIcon} />
+                              <span>More Info</span>
+                            </span>
+                          </Tooltip>
+                        </>
+                      )
+                    }
+                  </p>
                 </div>
               )
             }

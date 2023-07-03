@@ -57,6 +57,11 @@
   white-space: normal;
 }
 
+.triggerWrapper {
+  display: inline-flex;
+  cursor: pointer;
+}
+
 [data-radix-popper-content-wrapper] {
   pointer-events: none;
   user-select: none;

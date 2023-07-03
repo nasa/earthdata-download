@@ -13,10 +13,11 @@ import * as styles from './ListPage.module.scss'
 /**
  * @typedef {Object} ListPageProps
  * @property {React.ReactNode} [actions] An optional React node which is displayed when an empty state is visible.
- * @property {String} emptyMessage A string which is displayed as the description when an empty state is visibile.
+ * @property {String} emptyMessage A string which is displayed as the description when an empty state is visible.
  * @property {React.ReactNode} [header] An optional React node which is displayed as the header for the page.
  * @property {Function} [Icon] An optional react-icons icon.
  * @property {Array} items An array of React nodes
+ * @property {React.ReactNode} [errorToasts] An optional React node which is displayed when a download item is an an error state.
  */
 
 /**
@@ -33,6 +34,7 @@ import * as styles from './ListPage.module.scss'
  *     emptyMessage={"You have nothing to show!"}
  *     Icon={FaQuestionCircle}
  *     items={[]}
+ *     errorToasts={}
  *   />
  * )
  */
@@ -41,7 +43,8 @@ const ListPage = ({
   emptyMessage,
   header,
   Icon,
-  items
+  items,
+  errorToasts
 }) => {
   const scrollableNodeRef = useRef(null)
   const [hasScrolledList, setHasScrolledList] = useState(false)
@@ -114,6 +117,11 @@ const ListPage = ({
             </div>
           )
       }
+      {
+        errorToasts && (
+          errorToasts
+        )
+      }
     </section>
   )
 }
@@ -122,7 +130,8 @@ ListPage.defaultProps = {
   actions: null,
   emptyMessage: null,
   header: null,
-  Icon: null
+  Icon: null,
+  errorToasts: null
 }
 
 ListPage.propTypes = {
@@ -130,7 +139,8 @@ ListPage.propTypes = {
   emptyMessage: PropTypes.string,
   header: PropTypes.node,
   items: PropTypes.arrayOf(PropTypes.node).isRequired,
-  Icon: PropTypes.func
+  Icon: PropTypes.func,
+  errorToasts: PropTypes.node
 }
 
 export default ListPage

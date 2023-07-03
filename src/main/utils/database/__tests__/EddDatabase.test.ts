@@ -60,7 +60,10 @@ describe('EddDatabase', () => {
             name: '20230613195457_create_downloads.js'
           }, {
             name: '20230613195511_create_files.js'
-          }])
+          }, {
+            name: '20230623200927_add_num_errors_column.js'
+          }
+          ])
         } else if (step === 5) {
           // select `name` from `knex_migrations` order by `id` asc'
           query.response()
@@ -118,6 +121,8 @@ describe('EddDatabase', () => {
             name: '20230613195457_create_downloads.js'
           }, {
             name: '20230613195511_create_files.js'
+          }, {
+            name: '20230623200927_add_num_errors_column.js'
           }])
         } else if (step === 5) {
           // select `name` from `knex_migrations` order by `id` asc'

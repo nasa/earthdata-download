@@ -4,7 +4,7 @@ const humanizedDownloadStates = {
   COMPLETED: 'Completed',
   PAUSED: 'Paused',
   INTERRUPTED: 'Interrupted',
-  ERROR: 'Errored'
+  ERROR: 'An error occurred'
 }
 
 export default humanizedDownloadStates

@@ -5,9 +5,12 @@ import {
   FaCheckCircle,
   FaClipboard,
   FaDownload,
+  FaExclamationCircle,
   FaFolderOpen,
+  FaInfoCircle,
   FaPause,
   FaPlay,
+  FaRedo,
   FaSearch,
   FaSpinner
 } from 'react-icons/fa'
@@ -20,10 +23,12 @@ import createVariantClassName from '../../utils/createVariantName'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import InitializeDownload from '../../dialogs/InitializeDownload/InitializeDownload'
+import MoreErrorInfo from '../../dialogs/MoreErrorInfo/MoreErrorInfo'
 import Button from '../../components/Button/Button'
 import Dialog from '../../components/Dialog/Dialog'
 import ListPage from '../../components/ListPage/ListPage'
 import DownloadItem from '../../components/DownloadItem/DownloadItem'
+import Toast from '../../components/Toast/Toast'
 
 import * as styles from './Downloads.module.scss'
 
@@ -53,6 +58,7 @@ const Downloads = ({
     setDownloadLocation,
     pauseDownloadItem,
     reportProgress,
+    retryDownloadItem,
     resumeDownloadItem,
     cancelDownloadItem,
     openDownloadFolder,
@@ -62,11 +68,14 @@ const Downloads = ({
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
   const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
+  const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
   const [runningDownloads, setRunningDownloads] = useState([])
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
+  const [allDownloadsError, setAllDownloadsError] = useState(false)
   const [hasActiveDownload, setHasActiveDownload] = useState(false)
   const [hasPausedDownload, setHasPausedDownload] = useState(false)
+  const [hasErrorDownload, setHasErrorDownload] = useState(false)
   const [totalDownloadFiles, setTotalDownloadFiles] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
   const [
@@ -127,9 +136,13 @@ const Downloads = ({
     cancelDownloadItem({ downloadId })
   }
 
+  const onRetryDownloadItem = (downloadId) => {
+    retryDownloadItem({ downloadId })
+  }
+
   const onReportProgress = (event, info) => {
-    const { progress } = info
-    setRunningDownloads(progress)
+    const { progress, errorInfo } = info
+    setRunningDownloads(progress, errorInfo)
   }
 
   // Setup event listeners
@@ -159,12 +172,20 @@ const Downloads = ({
     setAllDownloadsCompleted(runningDownloads.length && runningDownloads.every(
       ({ state }) => state === downloadStates.completed
     ))
+    setAllDownloadsError(runningDownloads.length && runningDownloads.every(
+      ({ state }) => state === downloadStates.error || state === downloadStates.completed
+    ))
     setHasActiveDownload(runningDownloads.length && runningDownloads.some(
       ({ state }) => state === downloadStates.active
     ))
     setHasPausedDownload(runningDownloads.length && runningDownloads.some(
       ({ state }) => state === downloadStates.paused
     ))
+
+    setHasErrorDownload(runningDownloads.length && runningDownloads.some(
+      ({ numErrors }) => (numErrors > 0 && !hasPausedDownload)
+    ))
+
     setTotalDownloadFiles(runningDownloads.length && runningDownloads.reduce(
       (acc, cur) => cur.progress.totalFiles + acc,
       0
@@ -194,7 +215,67 @@ const Downloads = ({
     if (hasPausedDownload) {
       setDerivedStateFromDownloads(downloadStates.paused)
     }
+
+    if (hasErrorDownload) {
+      setDerivedStateFromDownloads(downloadStates.error)
+    }
   }, [runningDownloads])
+
+  // Create the array of error toasts from error info reported from the main process
+  const errorToasts = runningDownloads.map((runningDownload) => {
+    const {
+      downloadId,
+      errorInfo,
+      numErrors
+    } = runningDownload
+
+    if (numErrors === 0) {
+      return null
+    }
+    const errorMessage = `${errorInfo.length} error${errorInfo.length === 1 ? '' : 's'} occurred downloading `
+
+    const action = (
+      <Button
+        className={styles.button}
+        size="sm"
+        Icon={FaInfoCircle}
+        variant="danger"
+        onClick={() => setMoreErrorInfoIsOpen(true)}
+      >
+        More Info
+        <Dialog
+          open={moreErrorInfoIsOpen}
+          setOpen={setMoreErrorInfoIsOpen}
+          showTitle
+          title="An error occurred when downloading a file"
+          TitleIcon={FaInfoCircle}
+          closeButton
+        >
+          <MoreErrorInfo
+            downloadId={downloadId}
+            collectionErrorInfo={errorInfo}
+          />
+        </Dialog>
+      </Button>
+    )
+    return (
+      hasErrorDownload && (
+        <Toast
+          className={styles.toast}
+          open={hasErrorDownload}
+          closeButton
+          key={downloadId}
+          variant="foreground"
+          action={action}
+        >
+          <div className={styles.errorMessage}>
+            {errorMessage}
+            <b>{downloadId}</b>
+          </div>
+        </Toast>
+      )
+    )
+  })
 
   // Create the downloadItems array from the runningDownloads reported from the main process
   const downloadItems = runningDownloads.map((runningDownload) => {
@@ -210,10 +291,12 @@ const Downloads = ({
 
     const shouldShowPause = [
       downloadStates.pending,
+      downloadStates.error,
       downloadStates.active
     ].includes(state)
     const shouldShowResume = [
       downloadStates.paused,
+      downloadStates.error,
       downloadStates.interrupted
     ].includes(state)
     const shouldShowCancel = [
@@ -225,6 +308,7 @@ const Downloads = ({
     ].includes(state)
     const shouldDisableOpenFolder = finishedFiles === 0
     const isComplete = state === downloadStates.completed
+    const shouldShowError = state === downloadStates.error
 
     const actionsList = [
       [
@@ -237,7 +321,7 @@ const Downloads = ({
         },
         {
           label: 'Resume Download',
-          isActive: shouldShowResume,
+          isActive: shouldShowResume && !shouldShowPause,
           isPrimary: !isComplete,
           callback: () => onResumeDownloadItem(downloadId, downloadName),
           icon: FaPlay
@@ -266,6 +350,22 @@ const Downloads = ({
           isPrimary: isComplete,
           callback: () => onCopyDownloadPath(downloadId),
           icon: FaClipboard
+        }
+      ],
+      [
+        {
+          label: 'Restart Download',
+          isActive: true,
+          isPrimary: false,
+          callback: () => onRetryDownloadItem(downloadId),
+          icon: FaInfoCircle
+        },
+        {
+          label: 'View Error Info',
+          isActive: shouldShowError,
+          isPrimary: false,
+          callback: () => setMoreErrorInfoIsOpen(true),
+          icon: FaInfoCircle
         }
       ]
     ]
@@ -349,6 +449,11 @@ const Downloads = ({
                     <FaCheckCircle className={styles.derivedStatusIcon} />
                   )
                 }
+                {
+                  derivedStateFromDownloads === downloadStates.error && (
+                    <FaExclamationCircle className={styles.derivedStatusIcon} />
+                  )
+                }
                 <span className={styles.derivedStatus}>
                   {
                     derivedStateFromDownloads === downloadStates.active && (
@@ -365,6 +470,11 @@ const Downloads = ({
                       humanizedDownloadStates[downloadStates.completed]
                     )
                   }
+                  {
+                    derivedStateFromDownloads === downloadStates.error && (
+                      humanizedDownloadStates[downloadStates.error]
+                    )
+                  }
                 </span>
                 <span className={styles.humanizedStatus}>
                   {totalCompletedFiles}
@@ -378,11 +488,24 @@ const Downloads = ({
               </div>
               <div className={styles.listHeaderSecondary}>
                 {
+                  allDownloadsError && (
+                    <Button
+                      className={styles.button}
+                      size="sm"
+                      Icon={FaRedo}
+                      variant="danger"
+                      onClick={() => onRetryDownloadItem()}
+                    >
+                      Restart All
+                    </Button>
+                  )
+                }
+                {
                   !allDownloadsCompleted
                     ? (
                       <>
                         {
-                          !allDownloadsPaused
+                          !allDownloadsError && (!allDownloadsPaused
                             ? (
                               <Button
                                 className={styles.headerButton}
@@ -402,7 +525,7 @@ const Downloads = ({
                               >
                                 Resume All
                               </Button>
-                            )
+                            ))
                         }
                         <Button
                           className={styles.button}
@@ -426,13 +549,14 @@ const Downloads = ({
                         Clear Downloads
                       </Button>
                     )
-                  }
+                }
               </div>
             </div>
           )
         }
         Icon={FaDownload}
         items={downloadItems}
+        errorToasts={errorToasts}
       />
     </>
   )

@@ -15,19 +15,22 @@ describe('reportProgress', () => {
           downloadLocation: '/mock/location/shortName_version-1-20230520_012000',
           loadingMoreFiles: 1,
           timeStart: 1684027555379,
-          state: 'PENDING'
+          state: 'PENDING',
+          errorInfo: []
         }, {
           id: 'shortName_version-1-20230514_012999',
           downloadLocation: '/mock/location/shortName_version-1-20230514_012999',
           loadingMoreFiles: 0,
           timeStart: 1684027555379,
-          state: 'ACTIVE'
+          state: 'ACTIVE',
+          errorInfo: [],
         }, {
           id: 'shortName_version-1-20230514_012554',
           downloadLocation: '/mock/location/shortName_version-1-20230514_012554',
           loadingMoreFiles: 0,
           timeStart: 1684027555382,
-          state: 'ACTIVE'
+          state: 'ACTIVE',
+          errorInfo: []
         }]),
       getFilesWhere: jest.fn()
         .mockResolvedValueOnce([])
@@ -122,7 +125,8 @@ describe('reportProgress', () => {
           url: 'https://stsci-opo.org/STScI-01GK2KMYS6HADS6ND8NRHG53RP.png',
           state: 'PENDING',
           percent: 0
-        }])
+        }]),
+      updateDownloadById: jest.fn()
     }
     const webContents = {
       send: jest.fn()
@@ -143,6 +147,7 @@ describe('reportProgress', () => {
       progress: [{
         downloadId: 'shortName_version-1-20230520_012000',
         downloadName: 'shortName_version-1-20230520_012000',
+        errorInfo: [],
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -154,6 +159,7 @@ describe('reportProgress', () => {
       }, {
         downloadId: 'shortName_version-1-20230514_012999',
         downloadName: 'shortName_version-1-20230514_012999',
+        errorInfo: [],
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 0,
@@ -165,6 +171,7 @@ describe('reportProgress', () => {
       }, {
         downloadId: 'shortName_version-1-20230514_012554',
         downloadName: 'shortName_version-1-20230514_012554',
+        errorInfo: [],
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 2,
@@ -188,6 +195,6 @@ describe('reportProgress', () => {
     await reportProgress({ database, webContents })
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
-    expect(webContents.send).toHaveBeenCalledWith('reportProgress', { progress: [] })
+    expect(webContents.send).toHaveBeenCalledWith('reportProgress', { progress: [], errorInfo: [] })
   })
 })

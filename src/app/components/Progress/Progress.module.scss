@@ -33,6 +33,10 @@
     background-color: var(--color__green--350);
   }
 
+  .isError & {
+    background-color: var(--color__red--350);
+  }
+
   &::after {
     position: absolute;
     z-index: 1;

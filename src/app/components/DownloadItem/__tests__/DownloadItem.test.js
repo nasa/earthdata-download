@@ -19,7 +19,6 @@ describe('DownloadItem component', () => {
     test('displays the correct download information', () => {
       render(
         <DownloadItem
-          downloadId="download-id"
           downloadName="download-name"
           progress={progressObj}
           loadingMoreFiles
@@ -38,7 +37,6 @@ describe('DownloadItem component', () => {
     test('displays the correct download information', () => {
       render(
         <DownloadItem
-          downloadId="download-id"
           downloadName="download-name"
           progress={progressObj}
           state="ACTIVE"
@@ -56,7 +54,6 @@ describe('DownloadItem component', () => {
       test('displays the correct download information', () => {
         render(
           <DownloadItem
-            downloadId="download-id"
             downloadName="download-name"
             progress={progressObj}
             loadingMoreFiles
@@ -88,7 +85,6 @@ describe('DownloadItem component', () => {
 
         render(
           <DownloadItem
-            downloadId="download-id"
             downloadName="download-name"
             progress={progressObj}
             state="ACTIVE"
@@ -127,7 +123,6 @@ describe('DownloadItem component', () => {
 
         render(
           <DownloadItem
-            downloadId="download-id"
             downloadName="download-name"
             progress={progressObj}
             state="ACTIVE"
@@ -156,7 +151,6 @@ describe('DownloadItem component', () => {
 
         render(
           <DownloadItem
-            downloadId="download-id"
             downloadName="download-name"
             progress={progressObj}
             state="ACTIVE"
@@ -186,7 +180,6 @@ describe('DownloadItem component', () => {
 
           render(
             <DownloadItem
-              downloadId="download-id"
               downloadName="download-name"
               progress={progressObj}
               state="ACTIVE"
@@ -209,7 +202,6 @@ describe('DownloadItem component', () => {
     test('displays the correct download information', () => {
       render(
         <DownloadItem
-          downloadId="download-id"
           downloadName="download-name"
           progress={progressObj}
           state="PAUSED"
@@ -228,7 +220,6 @@ describe('DownloadItem component', () => {
     test('displays the correct download information', () => {
       render(
         <DownloadItem
-          downloadId="download-id"
           downloadName="download-name"
           progress={{
             ...progressObj,
@@ -244,6 +235,24 @@ describe('DownloadItem component', () => {
       expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
       expect(screen.getByTestId('download-item-state')).toHaveTextContent('Completed')
       expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 1 files done in 0 seconds')
+    })
+  })
+
+  describe('when a download is errored', () => {
+    test('displays the correct download information', () => {
+      render(
+        <DownloadItem
+          downloadName="download-name"
+          progress={progressObj}
+          state="ERROR"
+        />
+      )
+
+      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+      expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
+      expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
+      expect(screen.getByTestId('download-item-state')).toHaveTextContent('An error occurred')
+      expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('More Info')
     })
   })
 })

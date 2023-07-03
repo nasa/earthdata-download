@@ -53,7 +53,8 @@ describe('beginDownload', () => {
     expect(database.updateDownloadById).toHaveBeenCalledWith('mock-id', {
       downloadLocation: '/mock/location/mock-id',
       state: 'ACTIVE',
-      timeStart: 1682899200000
+      timeStart: 1682899200000,
+      numErrors: 0
     })
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
@@ -102,7 +103,8 @@ describe('beginDownload', () => {
     expect(database.updateDownloadById).toHaveBeenCalledWith('mock-id', {
       downloadLocation: '/mock/location/mock-id',
       state: 'ACTIVE',
-      timeStart: 1682899200000
+      timeStart: 1682899200000,
+      numErrors: 0
     })
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)

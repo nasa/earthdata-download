@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import {
   FaCheckCircle,
+  FaInfoCircle,
   FaSpinner
 } from 'react-icons/fa'
 import humanizeDuration from 'humanize-duration'
@@ -148,7 +149,7 @@ const DownloadItem = ({
               )
             }
             {
-              state !== downloadStates.pending && (
+              (state !== downloadStates.pending && state !== downloadStates.error) && (
                 <div
                   className={styles.statusDescription}
                   data-testid="download-item-status-description"
@@ -184,6 +185,18 @@ const DownloadItem = ({
                       </>
                     )
                   }
+                </div>
+              )
+            }
+            {
+              state === downloadStates.error && (
+                <div
+                  className={styles.statusDescription}
+                  data-testid="download-item-status-description"
+                >
+                  <FaInfoCircle />
+                  {' '}
+                  More Info
                 </div>
               )
             }

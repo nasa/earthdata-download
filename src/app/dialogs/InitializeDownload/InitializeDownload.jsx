@@ -85,6 +85,7 @@ const InitializeDownload = ({
         <span className={styles.downloadLocationLabel}>Download files to</span>
         <Tooltip
           content="Change the selected download location"
+          delayDuration={300}
         >
           <button
             className={styles.downloadLocationButton}

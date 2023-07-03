@@ -6,9 +6,11 @@ import * as styles from './Tooltip.module.scss'
 
 /**
  * @typedef {Object} TooltipProps
+ * @property {React.ReactNode} [additionalContent]  A React node to be used as the additional content for the tooltip.
  * @property {React.ReactNode} children A React node to be wrapped in the tooltip trigger.
  * @property {React.ReactNode} content A React node to be used as the content for the tooltip.
- * @property {React.ReactNode} [additionalContent]  A React node to be used as the additional content for the tooltip.
+ * @property {Number} delayDuration A number representing the tooltip delay in milliseconds.
+ * @property {Boolean} open A boolean representing the "open" state of the tooltip.
 */
 
 /**
@@ -30,6 +32,7 @@ const Tooltip = ({
   additionalContent,
   children,
   content,
+  delayDuration,
   open
 }) => {
   const conditionalRootProps = {}
@@ -37,7 +40,7 @@ const Tooltip = ({
   if (open) conditionalRootProps.open = true
 
   return (
-    <RadixTooltip.Provider delayDuration={300}>
+    <RadixTooltip.Provider delayDuration={delayDuration}>
       <RadixTooltip.Root {...conditionalRootProps}>
         <RadixTooltip.Trigger asChild>
           {children}
@@ -65,11 +68,13 @@ const Tooltip = ({
 
 Tooltip.defaultProps = {
   additionalContent: null,
+  delayDuration: 0,
   open: undefined
 }
 
 Tooltip.propTypes = {
   additionalContent: PropTypes.node,
+  delayDuration: PropTypes.number,
   children: PropTypes.node.isRequired,
   content: PropTypes.node.isRequired,
   open: PropTypes.bool

@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import {
   FaCheckCircle,
   FaInfoCircle,
-  FaLock,
+  FaSignInAlt,
   FaSpinner
 } from 'react-icons/fa'
 import humanizeDuration from 'humanize-duration'
@@ -57,7 +57,6 @@ const DownloadItem = ({
   actionsList
 }) => {
   const {
-    sendToLogin,
     showWaitingForLoginDialog
   } = useContext(ElectronApiContext)
 
@@ -85,30 +84,6 @@ const DownloadItem = ({
   } = progress
 
   const primaryActions = []
-  if (state === downloadStates.waitingForAuth) {
-    primaryActions.push(
-      <Tooltip
-        key="LogIn"
-        content="Log In with Earthdata Login"
-        delayDuration={300}
-      >
-        <Button
-          className={styles.action}
-          size="sm"
-          Icon={FaLock}
-          onClick={() => sendToLogin({
-            downloadId: downloadName,
-            forceLogin: true
-            // TODO EDD-13, might want to be able to send a fileId as well
-            // fileId
-          })}
-          data-testid="download-item-log-in"
-        >
-          Log In
-        </Button>
-      </Tooltip>
-    )
-  }
 
   if (actionsList) {
     actionsList.forEach((actionGroup) => {
@@ -127,6 +102,7 @@ const DownloadItem = ({
                 hideLabel
                 onClick={action.callback}
                 variant={action.variant}
+                dataTestId={`download-item-${action.label}`}
               >
                 {
                   action.label
@@ -171,7 +147,7 @@ const DownloadItem = ({
         setOpen={setWaitingForLoginDialogIsOpen}
         showTitle
         title="You must log in with Earthdata Login to download this data."
-        TitleIcon={FaLock}
+        TitleIcon={FaSignInAlt}
       >
         <WaitingForLogin
           downloadId={downloadName}

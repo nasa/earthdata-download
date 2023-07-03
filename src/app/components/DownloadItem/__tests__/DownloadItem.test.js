@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 
-import { FaPause } from 'react-icons/fa'
+import { FaPause, FaSignInAlt } from 'react-icons/fa'
 
 import DownloadItem from '../DownloadItem'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
@@ -17,7 +17,6 @@ const progress = {
 }
 
 const setup = (overrideProps) => {
-  const sendToLogin = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
 
   const props = {
@@ -33,7 +32,6 @@ const setup = (overrideProps) => {
     <ElectronApiContext.Provider
       value={
         {
-          sendToLogin,
           showWaitingForLoginDialog
         }
       }
@@ -43,7 +41,6 @@ const setup = (overrideProps) => {
   )
 
   return {
-    sendToLogin,
     showWaitingForLoginDialog
   }
 }
@@ -243,7 +240,7 @@ describe('DownloadItem component', () => {
         expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
         expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
         expect(screen.getByTestId('download-item-state')).toHaveTextContent('Initializing')
-        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('Waiting for log in with Earthdata Login (More Info)')
+        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('Waiting for log in with Earthdata Login More Info')
       })
     })
 
@@ -263,13 +260,30 @@ describe('DownloadItem component', () => {
         expect(screen.getByTestId('download-item-percent')).toHaveTextContent('50%')
         expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
         expect(screen.getByTestId('download-item-state')).toHaveTextContent('Interrupted')
-        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 2 files Waiting for log in with Earthdata Login (More Info)')
+        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 2 files Waiting for log in with Earthdata Login More Info')
       })
     })
 
     describe('when clicking a primary action button', () => {
       test('sends a message to the main process', async () => {
-        const { sendToLogin } = setup({
+        const sendToLogin = jest.fn()
+        const actionsList = [
+          [
+            {
+              label: 'Log In with Earthdata Login',
+              isActive: true,
+              isPrimary: true,
+              callback: sendToLogin,
+              icon: FaSignInAlt
+            }
+          ]
+        ]
+
+        setup({
+          actionsList
+        })
+        setup({
+          actionsList,
           progress: {
             ...progress,
             finishedFiles: 1,
@@ -279,12 +293,11 @@ describe('DownloadItem component', () => {
           state: downloadStates.waitingForAuth
         })
 
-        const loginButton = screen.getByTestId('download-item-log-in')
+        const loginButton = screen.getAllByTestId('download-item-Log In with Earthdata Login')[0]
 
         await userEvent.click(loginButton)
 
         expect(sendToLogin).toHaveBeenCalledTimes(1)
-        expect(sendToLogin).toHaveBeenCalledWith({ downloadId: 'download-name', forceLogin: true })
       })
     })
   })

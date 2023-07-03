@@ -204,7 +204,7 @@ const DownloadItem = ({
               )
             }
             {
-              state !== downloadStates.pending && (
+              (state !== downloadStates.pending && state !== downloadStates.error) && (
                 <div
                   className={styles.statusDescription}
                   data-testid="download-item-status-description"
@@ -267,6 +267,30 @@ const DownloadItem = ({
                       )
                     }
                   </p>
+                </div>
+              )
+            }
+            {
+              state === downloadStates.error && (
+                <div
+                  className={styles.statusDescription}
+                  data-testid="download-item-status-description"
+                >
+                  <FaInfoCircle />
+                  {' '}
+                  More Info
+                </div>
+              )
+            }
+            {
+              state === downloadStates.error && (
+                <div
+                  className={styles.statusDescription}
+                  data-testid="download-item-status-description"
+                >
+                  <FaInfoCircle />
+                  {' '}
+                  More Info
                 </div>
               )
             }

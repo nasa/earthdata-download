@@ -21,6 +21,10 @@
   .isCompleted & {
     color: var(--color__green--600);
   }
+
+  .isError & {
+    color: var(--color__red--600);
+  }
 }
 
 .emptyActionButton {

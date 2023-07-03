@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   pauseDownloadItem: (data) => ipcRenderer.send('pauseDownloadItem', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),
   cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
+  retryDownloadItem: (data) => ipcRenderer.send('retryDownloadItem', data),
   openDownloadFolder: (data) => ipcRenderer.send('openDownloadFolder', data),
   copyDownloadPath: (data) => ipcRenderer.send('copyDownloadPath', data),
   closeWindow: () => ipcRenderer.send('closeWindow'),

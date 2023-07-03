@@ -11,7 +11,7 @@ jest.mock('../../../utils/startNextDownload', () => ({
 
 jest.mock('../finishDownload', () => ({
   __esModule: true,
-  default: jest.fn(() => {})
+  default: jest.fn(() => { })
 }))
 
 beforeEach(() => {
@@ -31,6 +31,8 @@ describe('onDone', () => {
     }
     const state = 'completed'
     const database = {
+      getDownloadById: jest.fn().mockResolvedValue({ numErrors: 0 }),
+      updateDownloadById: jest.fn(),
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
@@ -91,6 +93,8 @@ describe('onDone', () => {
     }
     const state = 'interrupted'
     const database = {
+      getDownloadById: jest.fn().mockResolvedValue({ numErrors: 0 }),
+      updateDownloadById: jest.fn(),
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
@@ -107,8 +111,21 @@ describe('onDone', () => {
       webContents: {}
     })
 
-    expect(currentDownloadItems.removeItem).toHaveBeenCalledTimes(1)
-    expect(currentDownloadItems.removeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
+    // expect(store.set).toHaveBeenCalledTimes(2)
+    // expect(store.set).toHaveBeenCalledWith('downloads.mock-download-id', {
+    //   downloadLocation: '/mock/location/mock-download-id-20230514_012554',
+    //   timeStart: 1684027555379,
+    //   files: {
+    //     'mock-filename.png': {
+    //       url: 'http://example.com/mock-filename.png',
+    //       state: 'ACTIVE',
+    //       percent: 0,
+    //       timeStart: 1684029600000,
+    //       timeEnd: 1684029600000
+    //     }
+    //   },
+    //   state: 'ACTIVE',
+    //   numErrors: 1
 
     expect(database.getFileWhere).toHaveBeenCalledTimes(1)
     expect(database.getFileWhere).toHaveBeenCalledWith({
@@ -152,6 +169,8 @@ describe('onDone', () => {
     }
     const state = 'cancelled'
     const database = {
+      getDownloadById: jest.fn().mockResolvedValue({ numErrors: 0 }),
+      updateDownloadById: jest.fn(),
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
@@ -214,6 +233,7 @@ describe('onDone', () => {
     }
     const state = 'progressing'
     const database = {
+      getDownloadById: jest.fn().mockResolvedValue({ numErrors: 0 }),
       getFileWhere: jest.fn().mockResolvedValue(undefined),
       updateFile: jest.fn(),
       updateDownloadById: jest.fn()

@@ -32,6 +32,64 @@ describe('reportProgress', () => {
           state: 'ACTIVE',
           errorInfo: []
         }]),
+      getFilesWhere: jest.fn()
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{
+          id: 'STScI-01GHBZC0XR0DCJFZY0QXEH215V.png',
+          downloadId: 'shortName_version-1-20230514_012999',
+          url: 'https://stsci-opo.org/STScI-01GHBZC0XR0DCJFZY0QXEH215V.png',
+          state: 'PENDING',
+          percent: 0
+        }, {
+          id: 'STScI-01GGWD12YEES5K5163RJFYQT20.png',
+          downloadId: 'shortName_version-1-20230514_012999',
+          url: 'https://stsci-opo.org/STScI-01GGWD12YEES5K5163RJFYQT20.png',
+          state: 'PENDING',
+          percent: 0
+        }, {
+          id: 'STScI-01GGF8H15VZ09MET9HFBRQX4S3.png',
+          downloadId: 'shortName_version-1-20230514_012999',
+          url: 'https://stsci-opo.org/STScI-01GGF8H15VZ09MET9HFBRQX4S3.png',
+          state: 'PENDING',
+          percent: 0
+        }, {
+          id: 'STScI-01GA76Q01D09HFEV174SVMQDMV.png',
+          downloadId: 'shortName_version-1-20230514_012999',
+          url: 'https://stsci-opo.org/STScI-01GA76Q01D09HFEV174SVMQDMV.png',
+          state: 'PENDING',
+          percent: 0
+        }, {
+          id: 'STScI-01G9G4J23CDPVNGCYDJRZTTJQN.png',
+          downloadId: 'shortName_version-1-20230514_012999',
+          url: 'https://stsci-opo.org/STScI-01G9G4J23CDPVNGCYDJRZTTJQN.png',
+          state: 'PENDING',
+          percent: 0
+        }, {
+          id: 'STScI-01GS80QTFKXCEJEBGKV9SBEDJP.png',
+          downloadId: 'shortName_version-1-20230514_012999',
+          url: 'https://stsci-opo.org/STScI-01GS80QTFKXCEJEBGKV9SBEDJP.png',
+          state: 'PENDING',
+          percent: 0
+        }, {
+          id: 'STScI-01GWQDPJTF1MY8ZGN4WBMWMACJ.png',
+          downloadId: 'shortName_version-1-20230514_012999',
+          url: 'https://stsci-opo.org/STScI-01GWQDPJTF1MY8ZGN4WBMWMACJ.png',
+          state: 'PENDING',
+          percent: 0
+        }])
+        .mockResolvedValueOnce([{
+          id: 'STScI-01GTYAME8Q4353E2WQQH2965S5.png',
+          downloadId: 'shortName_version-1-20230514_012554',
+          url: 'https://stsci-opo.org/STScI-01GTYAME8Q4353E2WQQH2965S5.png',
+          state: 'COMPLETED',
+          percent: 100
+        }, {
+          id: 'STScI-01G8H1K2BCNATEZSKVRN9Z69SR.png',
+          downloadId: 'shortName_version-1-20230514_012554',
+          url: 'https://stsci-opo.org/STScI-01G8H1K2BCNATEZSKVRN9Z69SR.png',
+          state: 'ACTIVE',
+          errorInfo: []
+        }]),
       getDownloadFilesProgressByDownloadId: jest.fn()
         .mockResolvedValueOnce({
           percentSum: null,

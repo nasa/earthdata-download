@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { FaLock } from 'react-icons/fa'
+import { FaSignInAlt } from 'react-icons/fa'
 
 import Button from '../../components/Button/Button'
 
@@ -47,7 +47,7 @@ const WaitingForLogin = ({
         <Button
           className={styles.actions}
           size="lg"
-          Icon={FaLock}
+          Icon={FaSignInAlt}
           onClick={() => sendToLogin({
             downloadId,
             forceLogin: true

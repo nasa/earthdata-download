@@ -12,6 +12,7 @@ import {
   FaPlay,
   FaRedo,
   FaSearch,
+  FaSignInAlt,
   FaSpinner
 } from 'react-icons/fa'
 import classNames from 'classnames'
@@ -62,6 +63,7 @@ const Downloads = ({
     reportProgress,
     retryDownloadItem,
     resumeDownloadItem,
+    sendToLogin,
     setDownloadLocation
   } = useContext(ElectronApiContext)
 
@@ -305,14 +307,28 @@ const Downloads = ({
       downloadStates.paused,
       downloadStates.active,
       downloadStates.error,
-      downloadStates.interrupted
+      downloadStates.interrupted,
+      downloadStates.waitingForAuth
     ].includes(state)
     const shouldDisableOpenFolder = finishedFiles === 0
     const isComplete = state === downloadStates.completed
+    const shouldShowLogin = state === downloadStates.waitingForAuth
     const shouldShowError = state === downloadStates.error
 
     const actionsList = [
       [
+        {
+          label: 'Log In with Earthdata Login',
+          isActive: shouldShowLogin,
+          isPrimary: shouldShowLogin,
+          callback: () => sendToLogin({
+            downloadId: downloadName,
+            forceLogin: true
+            // TODO EDD-13, might want to be able to send a fileId as well
+            // fileId
+          }),
+          icon: FaSignInAlt
+        },
         {
           label: 'Pause Download',
           isActive: shouldShowPause,

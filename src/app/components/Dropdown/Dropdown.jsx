@@ -59,7 +59,10 @@ const Dropdown = ({
 
   return (
     <RadixDropdown.Root modal="false">
-      <Tooltip content="More Actions">
+      <Tooltip
+        content="More Actions"
+        delayDuration={300}
+      >
         <RadixDropdown.Trigger asChild className={styles.trigger}>
           <Button
             data-testid="dropdown-trigger"

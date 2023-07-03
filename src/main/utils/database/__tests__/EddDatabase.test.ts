@@ -62,7 +62,10 @@ describe('EddDatabase', () => {
             name: '20230613195511_create_files.js'
           }, {
             name: '20230616233921_create_token.js'
-          }])
+          }, {
+            name: '20230623200927_add_num_errors_column.js'
+          }
+          ])
         } else if (step === 5) {
           // select `name` from `knex_migrations` order by `id` asc'
           query.response()

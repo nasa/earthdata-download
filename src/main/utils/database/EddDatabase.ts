@@ -199,6 +199,14 @@ class EddDatabase {
   }
 
   /**
+ * Deletes the given file.
+ * @param {Number} fileId ID of files to update.
+ */
+  async deleteFile(fileId) {
+    return this.db('files').delete().where({ id: fileId })
+  }
+
+  /**
    * Adds links (files) to the given download.
    * @param {String} downloadId Id of the download to add files.
    * @param {Array} links List of URLs to add as files.

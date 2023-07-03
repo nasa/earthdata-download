@@ -134,6 +134,7 @@ const Button = forwardRef(({
 Button.displayName = 'Button'
 
 Button.defaultProps = {
+  children: null,
   className: null,
   dataTestId: null,
   disabled: false,
@@ -153,8 +154,9 @@ Button.propTypes = {
   className: PropTypes.string,
   children: PropTypes.oneOfType([
     PropTypes.func,
-    PropTypes.string
-  ]).isRequired,
+    PropTypes.string,
+    PropTypes.node
+  ]),
   dataTestId: PropTypes.string,
   disabled: PropTypes.bool,
   hideLabel: PropTypes.bool,

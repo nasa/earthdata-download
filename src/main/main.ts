@@ -16,6 +16,7 @@ import copyDownloadPath from './eventHandlers/copyDownloadPath'
 import openDownloadFolder from './eventHandlers/openDownloadFolder'
 import openUrl from './eventHandlers/openUrl'
 import pauseDownloadItem from './eventHandlers/pauseDownloadItem'
+import retryDownloadItem from './eventHandlers/retryDownloadItem'
 import reportProgress from './eventHandlers/reportProgress'
 import resumeDownloadItem from './eventHandlers/resumeDownloadItem'
 import sendToLogin from './eventHandlers/sendToLogin'
@@ -195,6 +196,16 @@ const createWindow = async () => {
       database,
       currentDownloadItems,
       info
+    })
+  })
+
+  ipcMain.on('retryDownloadItem', (event, info) => {
+    retryDownloadItem({
+      database,
+      downloadIdContext,
+      currentDownloadItems,
+      info,
+      webContents: appWindow.webContents
     })
   })
 

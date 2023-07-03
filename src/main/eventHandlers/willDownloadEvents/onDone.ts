@@ -32,6 +32,8 @@ const onDone = async ({
     downloadId
   })
 
+  const download = await database.getDownloadById(downloadId)
+
   // If the file is not found in the database, cancel the download
   if (!file) {
     return
@@ -40,12 +42,7 @@ const onDone = async ({
   const {
     id: fileId
   } = file
-
-  // Remove the item from the currentDownloadItems
-  currentDownloadItems.removeItem(downloadId, filename)
-
-  // TODO EDD-16, figure out if there are any errors available here
-  const errors = undefined
+  console.log(state)
 
   let updatedState
   switch (state) {
@@ -55,7 +52,6 @@ const onDone = async ({
     case 'interrupted':
       updatedState = downloadStates.error
       break
-
     default:
       updatedState = downloadStates.completed
       break
@@ -65,9 +61,18 @@ const onDone = async ({
   await database.updateFile(fileId, {
     timeEnd: new Date().getTime(),
     state: updatedState,
-    percent: updatedState === downloadStates.completed ? 100 : 0,
-    errors
+    percent: updatedState === downloadStates.completed ? 100 : 0
   })
+
+  if (updatedState !== downloadStates.error) {
+    // Remove the item from the currentDownloadItems
+    currentDownloadItems.removeItem(downloadId, filename)
+  } else {
+    const { numErrors } = download
+    await database.updateDownloadById(downloadId, {
+      numErrors: numErrors + 1
+    })
+  }
 
   // Start the next download
   await startNextDownload({

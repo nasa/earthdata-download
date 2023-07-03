@@ -14,7 +14,7 @@ const reportProgress = async ({
   const downloads = await database.getAllDownloads()
 
   if (downloads.length === 0) {
-    webContents.send('reportProgress', { progress: [] })
+    webContents.send('reportProgress', { progress: [], errorInfo: [] })
     return
   }
 
@@ -23,15 +23,18 @@ const reportProgress = async ({
       id: downloadId,
       loadingMoreFiles,
       name: downloadName = downloadId,
+      numErrors,
       state,
       timeEnd,
       timeStart
     } = download
+
     const {
       percentSum,
       totalFiles,
       finishedFiles
     } = await database.getDownloadFilesProgressByDownloadId(downloadId)
+    const files = await database.getFilesWhere({ downloadId })
 
     let percent = 0
 
@@ -53,11 +56,33 @@ const reportProgress = async ({
       totalTime
     }
 
+    const errorInfo = []
+    if (state === downloadStates.error) {
+      Object.keys(files).forEach((itemName) => {
+        const { state: itemState, url } = files[itemName]
+        if (itemState === downloadStates.error) {
+          errorInfo.push({
+            itemName,
+            url
+          })
+        }
+      })
+    }
+
+    // Set state depending on if there are errored or active downloads remaining
+    if (numErrors > 0 && !pausedFiles) {
+      await database.updateDownloadById(downloadId, { state: downloadStates.error })
+    } else if (activeFiles) {
+      await database.updateDownloadById(downloadId, { state: downloadStates.active })
+    }
+
     return {
       downloadId,
       downloadName,
+      errorInfo,
       // Sqlite booleans are actually integers 1/0
       loadingMoreFiles: loadingMoreFiles === 1,
+      numErrors,
       progress,
       state
     }

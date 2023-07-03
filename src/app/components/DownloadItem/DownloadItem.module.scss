@@ -47,6 +47,12 @@
     background-color: var(--color__yellow--050);
     color: var(--color__yellow--700);
   }
+  
+  .isError & {
+    border: 1px solid var(--color__red--350);
+    background-color: var(--color__red--050);
+    color: var(--color__red--700);
+  }
 
   .isCompleted &:hover,
   .isCompleted &:focus-visible  {
@@ -67,6 +73,13 @@
     border: 1px solid var(--color__yellow--500);
     background-color: var(--color__yellow--100);
     color: var(--color__yellow--850);
+  }
+  
+  .isError &:hover,
+  .isError &:focus-visible  {
+    border: 1px solid var(--color__red--500);
+    background-color: var(--color__red--100);
+    color: var(--color__red--850);
   }
 
   .wrapper:first-child & {
@@ -91,6 +104,10 @@
     color: var(--color__green--700);
   }
 
+  .isError & {
+    color: var(--color__red--700);
+  }
+
   .innerWrapper:hover &,
   .innerWrapper:focus-visible & {
     .isActive & {
@@ -99,6 +116,10 @@
 
     .isCompleted & {
       color: var(--color__green--850);
+    }
+
+    .isError & {
+      color: var(--color__red--850);
     }
   }
 }
@@ -243,6 +264,15 @@
       background-color: var(--color__blue--150);
     }
   }
+
+  // .isError & {
+  //   background-color: var(--color__red--100);
+
+  //   .wrapper:hover & {
+  //     background-color: var(--color__red--150);
+  //   }
+  // }
+
 }
 
 @keyframes metaSecondaryShow {

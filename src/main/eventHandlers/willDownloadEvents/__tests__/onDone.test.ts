@@ -11,7 +11,7 @@ jest.mock('../../../utils/startNextDownload', () => ({
 
 jest.mock('../finishDownload', () => ({
   __esModule: true,
-  default: jest.fn(() => {})
+  default: jest.fn(() => { })
 }))
 
 beforeEach(() => {

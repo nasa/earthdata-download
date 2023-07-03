@@ -38,6 +38,11 @@ const reportProgress = async ({
     const activeFiles = Object.entries(files)
       .filter(([, values]) => values.state === downloadStates.active).length
 
+    const pausedFiles = Object.entries(files)
+      .filter(([, values]) => values.state === downloadStates.paused).length
+    const activeFiles = Object.entries(files)
+      .filter(([, values]) => values.state === downloadStates.active).length
+
     let percent = 0
 
     if (totalFiles > 0) {

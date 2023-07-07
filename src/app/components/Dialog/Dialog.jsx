@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { FaTimes } from 'react-icons/fa'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -7,7 +7,6 @@ import classNames from 'classnames'
 
 import * as styles from './Dialog.module.scss'
 import Button from '../Button/Button'
-import Tooltip from '../Tooltip/Tooltip'
 
 /**
  * @typedef {Object} DialogProps

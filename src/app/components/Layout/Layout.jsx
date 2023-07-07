@@ -143,7 +143,6 @@ const Layout = () => {
             className={styles.settingsButton}
             Icon={FaCog}
             onClick={() => setSettingsDialogIsOpen(true)}
-            dataTestId="layout-button-settings"
           >
             Settings
           </Button>
@@ -168,6 +167,7 @@ const Layout = () => {
               dataTestId="minimize-window"
               Icon={VscChromeMinimize}
               hideLabel
+              hideTooltip
             >
               Minimize
             </Button>
@@ -186,6 +186,7 @@ const Layout = () => {
               dataTestId="maximize-restore-window"
               Icon={isWindowMaximized && isWin ? VscChromeRestore : VscChromeMaximize}
               hideLabel
+              hideTooltip
             >
               Maximize/Restore
             </Button>
@@ -205,6 +206,7 @@ const Layout = () => {
               dataTestId="close-window"
               Icon={VscChromeClose}
               hideLabel
+              hideTooltip
             >
               Close
             </Button>

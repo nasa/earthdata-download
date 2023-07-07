@@ -90,25 +90,19 @@ const DownloadItem = ({
       actionGroup.forEach((action) => {
         primaryActions.push(
           (action.isActive && action.isPrimary) && (
-            <Tooltip
+            <Button
+              className={styles.action}
               key={action.label}
-              content={action.label}
-              delayDuration={300}
+              size="sm"
+              Icon={action.icon}
+              hideLabel
+              onClick={action.callback}
+              variant={action.variant}
+              dataTestId={`download-item-${action.label}`}
+              tooltipDelayDuration={300}
             >
-              <Button
-                className={styles.action}
-                size="sm"
-                Icon={action.icon}
-                hideLabel
-                onClick={action.callback}
-                variant={action.variant}
-                dataTestId={`download-item-${action.label}`}
-              >
-                {
-                  action.label
-                }
-              </Button>
-            </Tooltip>
+              {action.label}
+            </Button>
           )
         )
       })

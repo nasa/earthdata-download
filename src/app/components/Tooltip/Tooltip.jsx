@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import * as RadixTooltip from '@radix-ui/react-tooltip'
 
@@ -28,20 +28,20 @@ import * as styles from './Tooltip.module.scss'
  *   </Tooltip>
  * )
  */
-const Tooltip = ({
+const Tooltip = forwardRef(({
   additionalContent,
   children,
   content,
   delayDuration,
   open
-}) => {
+}, ref) => {
   const conditionalRootProps = {}
 
   if (open) conditionalRootProps.open = true
 
   return (
     <RadixTooltip.Provider delayDuration={delayDuration}>
-      <RadixTooltip.Root {...conditionalRootProps}>
+      <RadixTooltip.Root {...conditionalRootProps} ref={ref}>
         <RadixTooltip.Trigger asChild>
           {children}
         </RadixTooltip.Trigger>
@@ -64,7 +64,9 @@ const Tooltip = ({
       </RadixTooltip.Root>
     </RadixTooltip.Provider>
   )
-}
+})
+
+Tooltip.displayName = 'Tooltip'
 
 Tooltip.defaultProps = {
   additionalContent: null,

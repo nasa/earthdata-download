@@ -99,7 +99,7 @@ describe('Dialog component', () => {
   })
 
   describe('when closeButton is defined', () => {
-    test('renders a description', () => {
+    test.only('renders a close button', () => {
       render(
         <Dialog
           open
@@ -109,7 +109,9 @@ describe('Dialog component', () => {
         </Dialog>
       )
 
-      expect(screen.queryByLabelText('Close')).toBeInTheDocument()
+      screen.debug()
+
+      expect(screen.queryByLabel('Close')).toBeInTheDocument()
     })
   })
 })

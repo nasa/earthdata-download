@@ -5,7 +5,10 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
 import Settings from '../Settings'
+
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
+
+const currentlyDownloadingText = 'Files currently downloading will not be affected by changes to settings'
 
 const setup = (
   hasActiveDownloads,
@@ -53,19 +56,23 @@ describe('Settings dialog', () => {
   test('renders the Settings modal page including the element if there are active downloads', async () => {
     const hasActiveDownloads = true
     const settingsDialogIsOpen = true
+
     setup(hasActiveDownloads, settingsDialogIsOpen)
+
     await waitFor(() => {
-      expect(screen.getByTestId('settings-hasActiveDownloads')).toBeInTheDocument()
+      expect(screen.getByText('Files currently downloading will not be affected by changes to settings')).toBeInTheDocument()
     })
   })
 
   test('renders the Settings modal page excluding active downloads', async () => {
     const hasActiveDownloads = false
     const settingsDialogIsOpen = true
+
     setup(hasActiveDownloads, settingsDialogIsOpen)
+
     await waitFor(() => {
     // Can't use getByTestId, that returns an error instead of null
-      expect(screen.queryByTestId('settings-hasActiveDownloads')).not.toBeInTheDocument()
+      expect(screen.queryByText(currentlyDownloadingText)).not.toBeInTheDocument()
     })
   })
 
@@ -76,7 +83,7 @@ describe('Settings dialog', () => {
 
     const { chooseDownloadLocation } = setup(hasActiveDownloads, settingsDialogIsOpen)
 
-    const setDownloadLocation = await screen.findByTestId('initialize-download-location')
+    const setDownloadLocation = await screen.findByText('Choose download location')
 
     await user.click(setDownloadLocation)
 
@@ -89,9 +96,11 @@ describe('Settings dialog', () => {
     const user = userEvent.setup()
     const hasActiveDownloads = true
     const settingsDialogIsOpen = true
-    const getPreferenceFieldValueMock = jest.fn().mockReturnValue(undefined)
-      .mockReturnValueOnce('/test/location/')
-      .mockReturnValueOnce(5)
+    const getPreferenceFieldValueMock = jest.fn((field) => {
+      if (field === 'concurrentDownloads') return 5
+      if (field === 'defaultDownloadLocation') return '/test/location/'
+      return null
+    })
 
     const { setPreferenceFieldValue } = setup(
       hasActiveDownloads,
@@ -99,12 +108,12 @@ describe('Settings dialog', () => {
       getPreferenceFieldValueMock
     )
 
-    const clearDownloadLocationButton = await screen.findByTestId('settings-clear-default-download')
+    const clearDownloadLocationButton = await screen.findByText('Clear download location')
 
     await user.click(clearDownloadLocationButton)
 
     await waitFor(() => {
-      screen.getByTestId('initialize-download-location')
+      screen.getByText('Choose download location')
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
       expect(setPreferenceFieldValue).toHaveBeenCalledWith('defaultDownloadLocation', null)
     })

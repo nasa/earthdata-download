@@ -10,6 +10,7 @@ import MiddleEllipsis from 'react-middle-ellipsis'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
+import Alert from '../../components/Alert/Alert'
 import Button from '../../components/Button/Button'
 import FormRow from '../../components/FormRow/FormRow'
 import Input from '../../components/Input/Input'
@@ -34,10 +35,7 @@ import * as styles from './Settings.module.scss'
  *
  * return (
  *  <Dialog {...dialogProps}>
- *    <Settings
- *      hasActiveDownload = {hasActiveDownload}
- *      setSettingsDialogIsOpen = {settingsDialogIsOpen}
- *    />
+ *    <div>This is a dialog</div>
  *  </Dialog>
  * )
  */
@@ -142,6 +140,16 @@ const Settings = ({
 
   return (
     <div>
+      {
+        hasActiveDownloads && (
+          <Alert
+            className={styles.activeDownloadAlert}
+            variant="warning"
+          >
+            Files currently downloading will not be affected by changes to settings
+          </Alert>
+        )
+      }
       <FormRow
         label="Download Location"
         description="Set the location where you would like to download your files. With a download location set, you will not be prompted to chose a location before a download begins."
@@ -158,7 +166,6 @@ const Settings = ({
                     className={styles.downloadLocationButton}
                     type="button"
                     onClick={onSetChooseDownloadLocation}
-                    data-testid="initialize-download-location"
                     aria-label="Choose another folder"
                   >
                     <span className={downloadLocationInputClassNames}>
@@ -177,19 +184,16 @@ const Settings = ({
                     </span>
                   </button>
                 </Tooltip>
-                <Tooltip content="Clear download location">
-                  <Button
-                    className={styles.clearDownloadLocationButton}
-                    onClick={onClearDefaultDownload}
-                    Icon={FaBan}
-                    variant="danger"
-                    size="lg"
-                    hideLabel
-                    dataTestId="settings-clear-default-download"
-                  >
-                    Clear download location
-                  </Button>
-                </Tooltip>
+                <Button
+                  className={styles.clearDownloadLocationButton}
+                  onClick={onClearDefaultDownload}
+                  Icon={FaBan}
+                  variant="danger"
+                  size="lg"
+                  hideLabel
+                >
+                  Clear download location
+                </Button>
               </div>
             )
             : (
@@ -198,10 +202,9 @@ const Settings = ({
                 size="lg"
                 Icon={FaFolder}
                 onClick={onSetChooseDownloadLocation}
-                data-testid="initialize-download-location"
                 aria-label="Choose another folder"
               >
-                Set download location
+                Choose download location
               </Button>
             )
         }
@@ -219,25 +222,12 @@ const Settings = ({
           onBlur={onBlurConcurrentDownloads}
         />
       </FormRow>
-      { hasActiveDownloads
-        ? (
-          <div className={styles.activeDownloadsWarn} data-testid="settings-hasActiveDownloads">
-            Pending Downloads update to settings will only apply to new downloads
-          </div>
-        )
-        : (
-          null
-        )}
-
     </div>
   )
 }
 
 Settings.propTypes = {
-  hasActiveDownloads: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.number
-  ]).isRequired,
+  hasActiveDownloads: PropTypes.bool.isRequired,
   settingsDialogIsOpen: PropTypes.bool.isRequired
 }
 

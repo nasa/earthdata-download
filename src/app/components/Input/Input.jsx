@@ -26,7 +26,6 @@ import * as styles from './Input.module.scss'
  *   />
  * )
  */
-
 const Input = ({
   id,
   label,

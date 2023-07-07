@@ -46,8 +46,6 @@ import * as styles from './Downloads.module.scss'
  * )
  */
 const Downloads = ({
-  // eslint-disable-next-line no-unused-vars
-  setCurrentPage,
   hasActiveDownload,
   setHasActiveDownload
 }) => {
@@ -158,18 +156,18 @@ const Downloads = ({
   useEffect(() => {
     // TODO Consider improving how we are determining these states. For downloads with
     // many files, this method may not be ideal.
-    setAllDownloadsPaused(runningDownloads.length && runningDownloads.every(
+    setAllDownloadsPaused(!!(runningDownloads.length && runningDownloads.every(
       ({ state }) => (state === downloadStates.paused || state === downloadStates.completed)
-    ))
-    setAllDownloadsCompleted(runningDownloads.length && runningDownloads.every(
+    )))
+    setAllDownloadsCompleted(!!(runningDownloads.length && runningDownloads.every(
       ({ state }) => state === downloadStates.completed
-    ))
-    setHasActiveDownload(runningDownloads.length && runningDownloads.some(
+    )))
+    setHasActiveDownload(!!(runningDownloads.length && runningDownloads.some(
       ({ state }) => state === downloadStates.active
-    ))
-    setHasPausedDownload(runningDownloads.length && runningDownloads.some(
+    )))
+    setHasPausedDownload(!!(runningDownloads.length && runningDownloads.some(
       ({ state }) => state === downloadStates.paused
-    ))
+    )))
     setTotalDownloadFiles(runningDownloads.length && runningDownloads.reduce(
       (acc, cur) => cur.progress.totalFiles + acc,
       0
@@ -457,7 +455,6 @@ const Downloads = ({
   )
 }
 Downloads.propTypes = {
-  setCurrentPage: PropTypes.func.isRequired,
   hasActiveDownload: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.number

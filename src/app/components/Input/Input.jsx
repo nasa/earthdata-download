@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as RadixLabel from '@radix-ui/react-label'
 import * as styles from './Input.module.scss'
 
 /**
@@ -10,7 +9,6 @@ import * as styles from './Input.module.scss'
  * @property {Function} onChange A function to be called when change to the input is made
  * @property {Function} onBlur A function to be called when focus on the input is lost
  * @property {String} value The value the input currently displays
- * @property {String} label The text for the label of the input field
 
 /**
  * Renders a `Input` component
@@ -30,42 +28,39 @@ import * as styles from './Input.module.scss'
  */
 
 const Input = ({
-  type,
-  placeholder,
+  id,
+  label,
   onChange,
   onBlur,
-  value,
-  label
+  placeholder,
+  type,
+  value
 }) => (
-  <div className={styles.div}>
-    <RadixLabel.Root className={styles.labelRoot}>
-      {label}
-      {' '}
-    </RadixLabel.Root>
-    <input
-      data-testid="input-test-id"
-      className={styles.input}
-      value={value}
-      type={type}
-      placeholder={placeholder}
-      onChange={onChange}
-      onBlur={onBlur}
-    />
-  </div>
+  <input
+    id={id}
+    name={id}
+    aria-label={label}
+    className={styles.input}
+    value={value}
+    type={type}
+    placeholder={placeholder}
+    onChange={onChange}
+    onBlur={onBlur}
+  />
 )
 
 Input.defaultProps = {
-  placeholder: null,
-  label: null
+  placeholder: null
 }
 
 Input.propTypes = {
-  type: PropTypes.string.isRequired,
-  placeholder: PropTypes.number,
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
-  label: PropTypes.string
+  placeholder: PropTypes.number,
+  type: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired
 }
 
 export default Input

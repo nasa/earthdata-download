@@ -1,19 +1,22 @@
 import React, { useContext, useState, useEffect } from 'react'
 import {
+  FaBan,
   FaFolder
 } from 'react-icons/fa'
 import PropTypes from 'prop-types'
-
-import MiddleEllipsis from 'react-middle-ellipsis'
+import classNames from 'classnames'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import MiddleEllipsis from 'react-middle-ellipsis'
+
+import { ElectronApiContext } from '../../context/ElectronApiContext'
+
+import Button from '../../components/Button/Button'
+import FormRow from '../../components/FormRow/FormRow'
+import Input from '../../components/Input/Input'
+import Tooltip from '../../components/Tooltip/Tooltip'
 
 import * as styles from './Settings.module.scss'
 
-import Input from '../../components/Input/Input'
-
-import Button from '../../components/Button/Button'
-
-import { ElectronApiContext } from '../../context/ElectronApiContext'
 /**
  * @typedef {Object} InitializeDownloadProps
  * @property {Boolean} hasActiveDownloads A boolean representing flag if user has downloads in active state
@@ -52,8 +55,8 @@ const Settings = ({
   const [defaultDownloadLocation, setDefaultDownloadLocation] = useState()
 
   const onClearDefaultDownload = () => {
-    setDefaultDownloadLocation(null)
     setPreferenceFieldValue('defaultDownloadLocation', null)
+    setDefaultDownloadLocation(null)
   }
 
   const onSetChooseDownloadLocation = () => {
@@ -104,7 +107,7 @@ const Settings = ({
       setDefaultDownloadLocation(await getPreferenceFieldValue('defaultDownloadLocation'))
     }
     fetchDefaultDownloadLocation()
-  }, [setDefaultDownloadLocation])
+  }, [])
 
   useEffect(() => {
     const fetchConcurrentDownloads = async () => {
@@ -112,7 +115,7 @@ const Settings = ({
       setConcurrentDownloads(concurrentDownloads.toString())
     }
     fetchConcurrentDownloads()
-  }, [setConcurrentDownloads])
+  }, [])
 
   // Handle the response from the setDownloadLocation
   useEffect(() => {
@@ -132,52 +135,90 @@ const Settings = ({
     }
   }, [settingsDialogIsOpen])
 
+  const downloadLocationInputClassNames = classNames([
+    'input',
+    styles.downloadLocationInputWrapper
+  ])
+
   return (
     <div>
-      Number of Concurrent Downloads:
-      {' '}
-      {concurrentDownloads}
-      <Input
-        type="text"
-        onChange={onChangeConcurrentDownloads}
-        value={concurrentDownloads}
-        label="Set Concurrent Downloads"
-        onBlur={onBlurConcurrentDownloads}
-      />
-
-      <span className={styles.downloadLocationWrapper}>
-        <FaFolder />
-        <VisuallyHidden>
-          <span>{`${defaultDownloadLocation}`}</span>
-        </VisuallyHidden>
-        <MiddleEllipsis key={defaultDownloadLocation}>
-          <span
-            className={styles.downloadLocationText}
-            aria-hidden="true"
-          >
-            {defaultDownloadLocation}
-          </span>
-        </MiddleEllipsis>
-      </span>
-
-      <Button
-        className={styles.downloadLocationButton}
-        type="button"
-        onClick={onSetChooseDownloadLocation}
-        data-testid="initialize-download-location"
-        aria-label="Choose another folder"
+      <FormRow
+        label="Download Location"
+        description="Set the location where you would like to download your files. With a download location set, you will not be prompted to chose a location before a download begins."
       >
-        Select Download Location
-      </Button>
-
-      <Button
-        size="md"
-        onClick={onClearDefaultDownload}
-        dataTestId="settings-clear-default-download"
-        className={styles.settingsClearDefaultDownload}
+        {
+          defaultDownloadLocation
+            ? (
+              <div className={styles.downloadLocationWrapper}>
+                <Tooltip
+                  content="Change the selected download location"
+                  additionalContent={defaultDownloadLocation}
+                >
+                  <button
+                    className={styles.downloadLocationButton}
+                    type="button"
+                    onClick={() => onSetChooseDownloadLocation}
+                    data-testid="initialize-download-location"
+                    aria-label="Choose another folder"
+                  >
+                    <span className={downloadLocationInputClassNames}>
+                      <FaFolder className={styles.downloadLocationIcon} />
+                      <VisuallyHidden>
+                        <span>{`${defaultDownloadLocation}`}</span>
+                      </VisuallyHidden>
+                      <MiddleEllipsis key={defaultDownloadLocation}>
+                        <span
+                          className={styles.downloadLocationText}
+                          aria-hidden="true"
+                        >
+                          {defaultDownloadLocation}
+                        </span>
+                      </MiddleEllipsis>
+                    </span>
+                  </button>
+                </Tooltip>
+                <Tooltip content="Clear download location">
+                  <Button
+                    className={styles.clearDownloadLocationButton}
+                    onClick={onClearDefaultDownload}
+                    Icon={FaBan}
+                    variant="danger"
+                    size="lg"
+                    hideLabel
+                    dataTestId="settings-clear-default-download"
+                  >
+                    Clear download location
+                  </Button>
+                </Tooltip>
+              </div>
+            )
+            : (
+              <Button
+                type="button"
+                size="lg"
+                Icon={FaFolder}
+                onClick={onSetChooseDownloadLocation}
+                data-testid="initialize-download-location"
+                aria-label="Choose another folder"
+              >
+                Set download location
+              </Button>
+            )
+        }
+      </FormRow>
+      <FormRow
+        label="Simultaneous Downloads"
+        description="Set a maximum number of files that can be downloaded simultaneously."
       >
-        Clear default download location
-      </Button>
+        <Input
+          id="concurrent-downloads"
+          label="Simultaneous Downloads"
+          type="text"
+          onChange={onChangeConcurrentDownloads}
+          value={concurrentDownloads}
+          onBlur={onBlurConcurrentDownloads}
+        />
+      </FormRow>
       { hasActiveDownloads
         ? (
           <div className={styles.activeDownloadsWarn} data-testid="settings-hasActiveDownloads">

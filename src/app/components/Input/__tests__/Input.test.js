@@ -9,17 +9,17 @@ describe('Input component', () => {
     const onChangeMock = jest.fn()
     const onBlur = jest.fn()
     const value = 'mock-value'
-    const mockLabel = 'mockLabel'
     render(
       <Input
-        type="number"
+        id="test-input"
+        label="Test Input"
+        type="text"
         onChange={onChangeMock}
         value={value}
-        label={mockLabel}
         onBlur={onBlur}
       />
     )
 
-    expect(screen.queryByText('mockLabel')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Test Input' })).toBeInTheDocument()
   })
 })

@@ -1,19 +1,16 @@
 .wrapper {
   margin-bottom: var(--size__600);
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 }
 
 .label {
-  font-size: var(--size__450);
-  font-weight: 700;
-  line-height: 35px;
+  font-size: var(--text__large);
+  font-weight: 600;
+  line-height: var(--size__700);
   text-align: left;
+  letter-spacing: -0.005rem;
 }
 
 .description {
   margin: 0;
-  margin-bottom: var(--size__250);
+  margin-bottom: var(--size__350);
 }

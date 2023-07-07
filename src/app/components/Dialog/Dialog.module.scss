@@ -28,7 +28,7 @@ input {
 }
 
 .header {
-  padding: var(--size__350) var(--size__350);
+  padding: var(--size__350) var(--size__500);
   border-bottom: 1px solid var(--color__black--300);
   text-align: left;
 
@@ -64,7 +64,7 @@ input {
 }
 
 .innerContent {
-  padding: var(--size__350);
+  padding: var(--size__500);
   text-align: left;
 }
 

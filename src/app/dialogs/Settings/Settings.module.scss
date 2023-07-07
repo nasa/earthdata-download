@@ -14,11 +14,12 @@
   display: flex;
 }
 
-.downloadLocationInputWrapper {
+:global(.input).downloadLocationInputWrapper {
   display: flex;
   overflow: hidden;
   max-width: 100%;
   flex-grow: 1;
+  justify-content: flex-start;
   text-overflow: ellipsis;
   white-space: nowrap;
 
@@ -40,6 +41,7 @@
 }
 
 .downloadLocationText {
+  padding: 0 var(--size__500) 0 0;
   color: var(--color__text--dark);
 }
 

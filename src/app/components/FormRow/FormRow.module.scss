@@ -1,0 +1,19 @@
+.wrapper {
+  margin-bottom: var(--size__600);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.label {
+  font-size: var(--size__450);
+  font-weight: 700;
+  line-height: 35px;
+  text-align: left;
+}
+
+.description {
+  margin: 0;
+  margin-bottom: var(--size__250);
+}

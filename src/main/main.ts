@@ -25,12 +25,6 @@ import getPreferenceFieldValue from './eventHandlers/getPreferenceFieldValue'
 
 import CurrentDownloadItems from './utils/currentDownloadItems'
 import windowStateKeeper from './utils/windowStateKeeper'
-import downloadStates from '../app/constants/downloadStates'
-
-// const { downloads } = require('../../test-download-files.json')
-// const { downloads } = require('../../test-download-files-one-collection.json')
-const { downloads } = require('../../test-download-files-one-file.json')
-
 import EddDatabase from './utils/database/EddDatabase'
 
 const userDataPath = app.getPath('userData')

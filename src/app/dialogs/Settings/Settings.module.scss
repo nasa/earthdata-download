@@ -12,9 +12,31 @@
 
 .downloadLocationWrapper {
   display: flex;
+}
+
+.downloadLocationInputWrapper {
+  display: flex;
   overflow: hidden;
+  max-width: 100%;
+  flex-grow: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+
+  &:hover {
+    background-color: var(--color__black--100);
+  }
+}
+
+.downloadLocationButton {
+  min-width: 0;
+  flex-shrink: 1;
+  border-radius: 0.25rem;
+  margin-right: var(--size__100);
+}
+
+.clearDownloadLocationButton {
+  flex-shrink: 0;
 }
 
 .downloadLocationText {

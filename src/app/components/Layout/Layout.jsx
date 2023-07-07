@@ -217,8 +217,8 @@ const Layout = () => {
           open={settingsDialogIsOpen}
           setOpen={setSettingsDialogIsOpen}
           showTitle
-          title="Edit Settings"
-          TitleIcon={FaCog}
+          size="lg"
+          title="Settings"
           closeButton
         >
           <Settings

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { FaTimes } from 'react-icons/fa'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import * as RadixDialog from '@radix-ui/react-dialog'
+import classNames from 'classnames'
 
 import * as styles from './Dialog.module.scss'
 import Button from '../Button/Button'
@@ -15,6 +16,7 @@ import Button from '../Button/Button'
  * @property {Boolean} open A boolean flag that determines the visibility of the dialog.
  * @property {Function} setOpen A function to set the open prop when the modal is closed.
  * @property {Boolean} [showTitle] An optional boolean flag that determines the visibility of the dialog title.
+ * @property {String} [size] An optional string designating a size (ex: "lg").
  * @property {String} title A string to be used as the title for the dialog window.
  * @property {Function} [TitleIcon] An optional react-icons icon.
  */
@@ -46,55 +48,76 @@ const Dialog = ({
   open,
   setOpen,
   showTitle,
+  size,
   title,
   TitleIcon
-}) => (
-  <RadixDialog.Root open={open} onOpenChange={setOpen}>
-    <RadixDialog.Portal>
-      <RadixDialog.Overlay className={styles.overlay} />
-      <div className={styles.contentWrapper}>
-        <RadixDialog.Content className={styles.content}>
-          {
-              showTitle
-                ? (
-                  <>
-                    {TitleIcon && <TitleIcon className={styles.titleIcon} />}
-                    <RadixDialog.Title className={styles.title}>{title}</RadixDialog.Title>
-                  </>
+}) => {
+  const headerClassNames = classNames([
+    styles.header,
+    {
+      [styles.hasIcon]: TitleIcon
+    }
+  ])
+
+  const contentClassNames = classNames([
+    styles.content,
+    {
+      [styles.isLg]: size === 'lg'
+    }
+  ])
+
+  return (
+    <RadixDialog.Root open={open} onOpenChange={setOpen}>
+      <RadixDialog.Portal>
+        <RadixDialog.Overlay className={styles.overlay} />
+        <div className={styles.contentWrapper}>
+          <RadixDialog.Content className={contentClassNames}>
+            <header className={headerClassNames}>
+              {
+                showTitle
+                  ? (
+                    <>
+                      {TitleIcon && <TitleIcon className={styles.titleIcon} />}
+                      <RadixDialog.Title className={styles.title}>{title}</RadixDialog.Title>
+                    </>
+                  )
+                  : (
+                    <VisuallyHidden asChild>
+                      <RadixDialog.Title className={styles.title}>{title}</RadixDialog.Title>
+                    </VisuallyHidden>
+                  )
+                }
+              {
+                description && (
+                  <RadixDialog.Description className={styles.description}>
+                    {description}
+                  </RadixDialog.Description>
                 )
-                : (
-                  <VisuallyHidden asChild>
-                    <RadixDialog.Title className={styles.title}>{title}</RadixDialog.Title>
-                  </VisuallyHidden>
-                )
-            }
-          {
-              description && (
-                <RadixDialog.Description className={styles.description}>
-                  {description}
-                </RadixDialog.Description>
+              }
+            </header>
+            <section className={styles.innerContent}>
+              {children}
+            </section>
+            {
+              closeButton && (
+                <RadixDialog.Close asChild>
+                  <Button
+                    className={styles.closeButton}
+                    aria-label="Close"
+                    Icon={FaTimes}
+                    dataTestId="dialog-button-close"
+                  >
+                    Close
+                  </Button>
+                </RadixDialog.Close>
               )
             }
-          {children}
-        </RadixDialog.Content>
-        {
-          closeButton && (
-            <RadixDialog.Close asChild>
-              <Button
-                className="IconButton"
-                aria-label="Close"
-                Icon={FaTimes}
-                dataTestId="dialog-button-close"
-              >
-                Close
-              </Button>
-            </RadixDialog.Close>
-          )
-        }
-      </div>
-    </RadixDialog.Portal>
-  </RadixDialog.Root>
-)
+          </RadixDialog.Content>
+        </div>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
+  )
+}
 
 Dialog.defaultProps = {
   children: null,
@@ -107,6 +130,7 @@ Dialog.defaultProps = {
   },
   setOpen: null,
   showTitle: false,
+  size: null,
   title: null,
   TitleIcon: null
 }
@@ -122,6 +146,7 @@ Dialog.propTypes = {
   }),
   setOpen: PropTypes.func,
   showTitle: PropTypes.bool,
+  size: PropTypes.string,
   title: PropTypes.string,
   TitleIcon: PropTypes.func
 }

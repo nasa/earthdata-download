@@ -7,20 +7,30 @@ import '@testing-library/jest-dom'
 import Settings from '../Settings'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 
-const setup = (hasActiveDownloads, settingsDialogIsOpen) => {
+const setup = (
+  hasActiveDownloads,
+  settingsDialogIsOpen,
+  getPreferenceFieldValue
+) => {
   // we need to mock hasActiveDownloads to render warning
   const mockHasActiveDownloads = hasActiveDownloads
   const mockSettingsDialogIsOpen = settingsDialogIsOpen
   const chooseDownloadLocation = jest.fn()
   const setDownloadLocation = jest.fn()
   const setPreferenceFieldValue = jest.fn()
-  const getPreferenceFieldValue = () => 5
+  const getPreferenceFieldValueMock = getPreferenceFieldValue
+    || jest.fn((field) => {
+      if (field === 'concurrentDownloads') return 5
+      if (field === 'defaultDownloadLocation') return null
+      return null
+    })
+
   const { rerender } = render(
     <ElectronApiContext.Provider value={{
       chooseDownloadLocation,
       setDownloadLocation,
       setPreferenceFieldValue,
-      getPreferenceFieldValue
+      getPreferenceFieldValue: getPreferenceFieldValueMock
     }}
     >
       <Settings
@@ -66,10 +76,11 @@ describe('Settings dialog', () => {
 
     const { chooseDownloadLocation } = setup(hasActiveDownloads, settingsDialogIsOpen)
 
-    await user.click(screen.getByTestId('initialize-download-location'))
+    const setDownloadLocation = await screen.findByTestId('initialize-download-location')
+
+    await user.click(setDownloadLocation)
 
     await waitFor(() => {
-      expect(screen.getByTestId('initialize-download-location')).toBeInTheDocument()
       expect(chooseDownloadLocation).toHaveBeenCalledTimes(1)
     })
   })
@@ -78,11 +89,22 @@ describe('Settings dialog', () => {
     const user = userEvent.setup()
     const hasActiveDownloads = true
     const settingsDialogIsOpen = true
-    const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
+    const getPreferenceFieldValueMock = jest.fn().mockReturnValue(undefined)
+      .mockReturnValueOnce('/test/location/')
+      .mockReturnValueOnce(5)
 
-    await user.click(screen.getByTestId('settings-clear-default-download'))
+    const { setPreferenceFieldValue } = setup(
+      hasActiveDownloads,
+      settingsDialogIsOpen,
+      getPreferenceFieldValueMock
+    )
+
+    const clearDownloadLocationButton = await screen.findByTestId('settings-clear-default-download')
+
+    await user.click(clearDownloadLocationButton)
 
     await waitFor(() => {
+      screen.getByTestId('initialize-download-location')
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
       expect(setPreferenceFieldValue).toHaveBeenCalledWith('defaultDownloadLocation', null)
     })
@@ -95,8 +117,8 @@ describe('Settings dialog', () => {
 
     const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
 
-    await user.type(screen.getByTestId('input-test-id'), '{backspace}')
-    await user.type(screen.getByTestId('input-test-id'), '3')
+    await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
+    await user.type(screen.getByLabelText('Simultaneous Downloads'), '3')
     // trigger blur by leaving the text field
     await user.tab()
 
@@ -112,10 +134,10 @@ describe('Settings dialog', () => {
     const hasActiveDownloads = true
     const settingsDialogIsOpen = true
     const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
-    await user.type(screen.getByTestId('input-test-id'), '{backspace}')
-    await user.type(screen.getByTestId('input-test-id'), '-')
-    await user.type(screen.getByTestId('input-test-id'), 'a')
-    await user.type(screen.getByTestId('input-test-id'), '0')
+    await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
+    await user.type(screen.getByLabelText('Simultaneous Downloads'), '-')
+    await user.type(screen.getByLabelText('Simultaneous Downloads'), 'a')
+    await user.type(screen.getByLabelText('Simultaneous Downloads'), '0')
     // trigger blur by leaving the text field
     await user.tab()
 
@@ -130,7 +152,7 @@ describe('Settings dialog', () => {
     const hasActiveDownloads = true
     const settingsDialogIsOpen = true
     const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
-    await user.type(screen.getByTestId('input-test-id'), '{backspace}')
+    await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
     // trigger blur by leaving the text field
     await user.tab()
 
@@ -160,8 +182,8 @@ describe('Settings dialog', () => {
       </ElectronApiContext.Provider>
     )
     const user = userEvent.setup()
-    await user.type(screen.getByTestId('input-test-id'), '{backspace}')
-    await user.type(screen.getByTestId('input-test-id'), '6')
+    await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
+    await user.type(screen.getByLabelText('Simultaneous Downloads'), '6')
 
     // re-render
     rerender(

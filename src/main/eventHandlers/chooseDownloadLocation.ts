@@ -10,7 +10,7 @@ import { dialog } from 'electron'
 const chooseDownloadLocation = ({
   appWindow
 }) => {
-  const result = dialog.showOpenDialogSync(appWindow, {
+  const result = dialog.showOpenDialogSync(null, {
     message: 'Where would you like to download your files?',
     buttonLabel: 'Choose folder',
     properties: [

@@ -1,14 +1,3 @@
-.labelRoot {
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 35px;
-  }
-
 .input {
-    box-shadow: 0 0 0 1px var(--color__black--300);
-
-    &:focus, &:hover {
-      background-color: --color__blue--200;
-    }
-  
-  }
+  display: block;
+}

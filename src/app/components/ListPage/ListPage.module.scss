@@ -38,14 +38,15 @@
 }
 
 .icon {
-  color: var(--color__black--400);
+  color: var(--color__black--500);
   font-size: 3rem;
 }
 
 .message {
   margin-top: var(--size__500);
-  color: var(--color__black--500);
+  color: var(--color__black--550);
   font-size: var(--size__500);
+  font-weight: 500;
 }
 
 .header {

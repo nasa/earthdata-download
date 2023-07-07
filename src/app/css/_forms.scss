@@ -1,0 +1,52 @@
+input,
+textarea,
+button {
+  all: unset;
+  box-sizing: border-box;
+}
+
+input,
+textarea,
+.input {
+  position: relative;
+  display: inline-flex;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: var(--size__250);
+  border: 1px solid var(--color__black--350);
+  border-radius: 0.25rem;
+  -webkit-app-region: no-drag;
+  background-color: var(--color__black--050);
+  box-shadow: 0 0.125rem 1rem -0.5rem transparent;
+  color: var(--color__black--750);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 1.03;
+  outline: none;
+  text-decoration: none;
+  transition: all 0.1s ease-in-out;
+  white-space: nowrap;
+}
+
+textarea {
+  padding: 10px;
+  resize: none;
+}
+
+input:focus,
+textarea:focus,
+.input:focus {
+  background-color: var(--color__black--100);
+  color: var(--color__black--900);
+}
+
+
+input::selection,
+textarea::selection,
+.input::selection {
+  background-color: var(--color__blue);
+  color: white;
+}

@@ -24,7 +24,6 @@ import * as styles from './FormRow.module.scss'
  *   </FormRow />
  * )
  */
-
 const FormRow = ({
   children,
   description,

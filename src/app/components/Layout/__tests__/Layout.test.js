@@ -123,7 +123,7 @@ describe('Layout component', () => {
 
     expect(Downloads).toHaveBeenCalledTimes(1)
 
-    await user.click(screen.getByTestId('layout-button-settings'))
+    await user.click(screen.getByText('Settings'))
 
     expect(Settings).toHaveBeenCalledTimes(1)
   })
@@ -146,10 +146,14 @@ describe('Layout component', () => {
       </ElectronApiContext.Provider>
     )
 
-    await user.click(screen.getByTestId('layout-button-settings'))
+    await user.click(screen.getByRole('button', { name: 'Settings' }))
 
     expect(Settings).toHaveBeenCalledTimes(1)
-    expect(screen.getByTestId('dialog-button-close')).toBeInTheDocument()
+    screen.debug()
+
+    const modalTitle = screen.getAllByText('Settings')[1]
+    expect(modalTitle).toBeInTheDocument()
+    expect(modalTitle).toHaveClass('title')
   })
 
   test('renders the settings button on a mac', () => {

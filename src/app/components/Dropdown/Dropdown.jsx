@@ -61,7 +61,6 @@ const Dropdown = ({
     <RadixDropdown.Root modal="false">
       <Tooltip
         content="More Actions"
-        delayDuration={300}
       >
         <RadixDropdown.Trigger asChild className={styles.trigger}>
           <Button
@@ -71,6 +70,7 @@ const Dropdown = ({
             Icon={FaEllipsisV}
             hideLabel
             tabIndex="0"
+            tooltipDelayDuration={300}
           >
             More Actions
           </Button>

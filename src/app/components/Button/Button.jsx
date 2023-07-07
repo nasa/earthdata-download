@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
+import Tooltip from '../Tooltip/Tooltip'
+
 import * as styles from './Button.module.scss'
 
 /**
@@ -58,12 +60,14 @@ const Button = forwardRef(({
   dataTestId,
   disabled,
   hideLabel,
+  hideTooltip,
   href,
   Icon,
   onClick,
   rel,
   size,
   target,
+  tooltipDelayDuration,
   variant,
   ...rest
 }, ref) => {
@@ -80,7 +84,7 @@ const Button = forwardRef(({
 
   if (!href) conditionalProps.type = 'button'
 
-  return (
+  let button = (
     <TagName
       ref={ref}
       className={
@@ -110,21 +114,36 @@ const Button = forwardRef(({
       }
     </TagName>
   )
+
+  if (hideLabel && !hideTooltip) {
+    button = (
+      <Tooltip
+        content={children}
+        delayDuration={tooltipDelayDuration}
+      >
+        {button}
+      </Tooltip>
+    )
+  }
+
+  return button
 })
 
-Button.displayName = 'button'
+Button.displayName = 'Button'
 
 Button.defaultProps = {
   className: null,
   dataTestId: null,
   disabled: false,
   hideLabel: false,
+  hideTooltip: false,
   href: null,
   Icon: null,
   onClick: null,
   rel: null,
   size: 'sm',
   target: null,
+  tooltipDelayDuration: 0,
   variant: null
 }
 
@@ -137,12 +156,14 @@ Button.propTypes = {
   dataTestId: PropTypes.string,
   disabled: PropTypes.bool,
   hideLabel: PropTypes.bool,
+  hideTooltip: PropTypes.bool,
   href: PropTypes.string,
   Icon: PropTypes.func,
   onClick: PropTypes.func,
   rel: PropTypes.string,
   size: PropTypes.string,
   target: PropTypes.string,
+  tooltipDelayDuration: PropTypes.number,
   variant: PropTypes.string
 }
 

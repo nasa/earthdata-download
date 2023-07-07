@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import { FaTimes } from 'react-icons/fa'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -101,19 +101,15 @@ const Dialog = ({
             </section>
             {
               closeButton && (
-                <Tooltip content="Close">
-                  <RadixDialog.Close asChild>
-                    <Button
-                      className={styles.closeButton}
-                      aria-label="Close"
-                      Icon={FaTimes}
-                      hideLabel
-                      dataTestId="dialog-button-close"
-                    >
-                      Close
-                    </Button>
-                  </RadixDialog.Close>
-                </Tooltip>
+                <RadixDialog.Close asChild>
+                  <Button
+                    className={styles.closeButton}
+                    hideLabel
+                    Icon={FaTimes}
+                  >
+                    Close
+                  </Button>
+                </RadixDialog.Close>
               )
             }
           </RadixDialog.Content>

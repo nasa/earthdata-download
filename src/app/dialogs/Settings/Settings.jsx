@@ -157,7 +157,7 @@ const Settings = ({
                   <button
                     className={styles.downloadLocationButton}
                     type="button"
-                    onClick={() => onSetChooseDownloadLocation}
+                    onClick={onSetChooseDownloadLocation}
                     data-testid="initialize-download-location"
                     aria-label="Choose another folder"
                   >
@@ -208,7 +208,7 @@ const Settings = ({
       </FormRow>
       <FormRow
         label="Simultaneous Downloads"
-        description="Set a maximum number of files that can be downloaded simultaneously."
+        description="Set the maximum number of files that can be downloaded simultaneously."
       >
         <Input
           id="concurrent-downloads"

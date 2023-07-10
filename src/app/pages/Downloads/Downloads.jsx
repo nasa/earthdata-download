@@ -76,7 +76,6 @@ const Downloads = ({
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
   const [allDownloadsError, setAllDownloadsError] = useState(false)
-  const [hasActiveDownload, setHasActiveDownload] = useState(false)
   const [hasPausedDownload, setHasPausedDownload] = useState(false)
   const [hasErrorDownload, setHasErrorDownload] = useState(false)
   const [totalDownloadFiles, setTotalDownloadFiles] = useState(0)
@@ -176,8 +175,8 @@ const Downloads = ({
       ({ state }) => state === downloadStates.completed
     )))
     setAllDownloadsError((runningDownloads.length && runningDownloads.every(
-      ({ state }) => state === downloadStates.error || state === downloadStates.completed)
-    ))
+      ({ state }) => state === downloadStates.error || state === downloadStates.completed
+    )))
     setHasActiveDownload(!!(runningDownloads.length && runningDownloads.some(
       ({ state }) => state === downloadStates.active
     )))
@@ -313,7 +312,6 @@ const Downloads = ({
     const isComplete = state === downloadStates.completed
     const shouldShowError = state === downloadStates.error
     const shouldShowLogin = state === downloadStates.waitingForAuth
-    const shouldShowError = state === downloadStates.error
 
     const actionsList = [
       [
@@ -489,12 +487,7 @@ const Downloads = ({
                   }
                   {
                     derivedStateFromDownloads === downloadStates.error && (
-                      getHumanizedDownloadStates[downloadStates.error]
-                    )
-                  }
-                  {
-                    derivedStateFromDownloads === downloadStates.error && (
-                      humanizedDownloadStates[downloadStates.error]
+                      getHumanizedDownloadStates(downloadStates.error)
                     )
                   }
                 </span>

@@ -5,7 +5,7 @@ import {
 } from 'react-icons/fa'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import MiddleEllipsis from 'react-middle-ellipsis'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
@@ -170,9 +170,9 @@ const Settings = ({
                   >
                     <span className={downloadLocationInputClassNames}>
                       <FaFolder className={styles.downloadLocationIcon} />
-                      <VisuallyHidden>
+                      <VisuallyHidden.Root>
                         <span>{`${defaultDownloadLocation}`}</span>
-                      </VisuallyHidden>
+                      </VisuallyHidden.Root>
                       <MiddleEllipsis key={defaultDownloadLocation}>
                         <span
                           className={styles.downloadLocationText}

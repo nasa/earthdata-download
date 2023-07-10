@@ -71,7 +71,7 @@ Tooltip.displayName = 'Tooltip'
 Tooltip.defaultProps = {
   additionalContent: null,
   delayDuration: 0,
-  open: undefined
+  open: null
 }
 
 Tooltip.propTypes = {

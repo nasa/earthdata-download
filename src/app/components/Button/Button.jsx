@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 
 import Tooltip from '../Tooltip/Tooltip'
 
@@ -84,7 +84,7 @@ const Button = forwardRef(({
 
   if (!href) conditionalProps.type = 'button'
 
-  let button = (
+  const button = (
     <TagName
       ref={ref}
       className={
@@ -102,21 +102,23 @@ const Button = forwardRef(({
       {...conditionalProps}
       {...rest}
     >
-      {Icon && <Icon className={styles.icon} />}
-      {
-        hideLabel
-          ? (
-            <VisuallyHidden>
-              {children}
-            </VisuallyHidden>
-          )
-          : children
-      }
+      <>
+        {Icon && <Icon className={styles.icon} />}
+        {
+          hideLabel
+            ? (
+              <VisuallyHidden.Root>
+                {children}
+              </VisuallyHidden.Root>
+            )
+            : children
+        }
+      </>
     </TagName>
   )
 
   if (hideLabel && !hideTooltip) {
-    button = (
+    return (
       <Tooltip
         content={children}
         delayDuration={tooltipDelayDuration}

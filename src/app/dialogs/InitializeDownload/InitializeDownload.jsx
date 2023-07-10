@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { FaBan, FaDownload, FaFolder } from 'react-icons/fa'
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import MiddleEllipsis from 'react-middle-ellipsis'
 
 import Button from '../../components/Button/Button'
@@ -96,9 +96,9 @@ const InitializeDownload = ({
           >
             <span className={styles.downloadLocationWrapper}>
               <FaFolder className={styles.downloadLocationIcon} />
-              <VisuallyHidden>
+              <VisuallyHidden.Root>
                 <span>{`${downloadLocation}`}</span>
-              </VisuallyHidden>
+              </VisuallyHidden.Root>
               <MiddleEllipsis key={downloadLocation}>
                 <span
                   className={styles.downloadLocationText}

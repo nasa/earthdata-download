@@ -243,6 +243,24 @@ describe('EddDatabase', () => {
     })
   })
 
+  describe('getNumErrors', () => {
+    test('returns requested collection number of errors', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select sum(`numErrors`) from `downloads`')
+        expect(query.bindings).toEqual([])
+
+        query.response([
+          { 'sum(`numErrors`)': 5 }
+        ])
+      })
+      const database = new EddDatabase('./')
+
+      const result = await database.getNumErrors()
+
+      expect(result).toEqual(5)
+    })
+  })
+
   describe('createDownload', () => {
     test('creates a new download', async () => {
       dbTracker.on('query', (query) => {
@@ -473,7 +491,7 @@ describe('EddDatabase', () => {
         expect(query.sql).toEqual('select count(`id`) from `files` where `downloadId` = ? and not `state` = ?')
         expect(query.bindings).toEqual([
           'mock-download-1',
-          downloadStates.completed
+          downloadStates.error
         ])
 
         query.response([

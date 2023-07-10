@@ -18,21 +18,18 @@ const cancelDownloadItem = async ({
 
   currentDownloadItems.cancelItem(downloadId, name)
 
-  if (downloadId && name) {
-    // Cancelling a file download decreases the number of errored downloads
-    const download = await database.getDownloadById(downloadId)
-    const { numErrors: oldErrors } = download
-    await database.updateDownloadById(downloadId, { numErrors: oldErrors - 1 })
-    await database.deleteFile(name)
-  }
-
-  // Cancelling a download will remove it from the list of downloads
-  // TODO how will this work when cancelling a granule download? I don't think we want to remove single items from a provided list of links
-  if (downloadId && !name) {
+  if (downloadId) {
     await database.updateDownloadById(downloadId, {
       state: downloadStates.completed
     })
-    await database.deleteDownloadById(downloadId)
+
+    // Cancelling a download will remove it from the list of downloads
+    if (name) {
+    // TODO how will this work when cancelling a granule download? I don't think we want to remove single items from a provided list of links
+      await database.deleteFile(name)
+    } else {
+      await database.deleteDownloadById(downloadId)
+    }
   }
 
   if (!downloadId) {

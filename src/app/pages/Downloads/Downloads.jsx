@@ -310,8 +310,8 @@ const Downloads = ({
     ].includes(state)
     const shouldDisableOpenFolder = finishedFiles === 0
     const isComplete = state === downloadStates.completed
-    const shouldShowError = state === downloadStates.error
     const shouldShowLogin = state === downloadStates.waitingForAuth
+    const shouldShowError = state === downloadStates.error
 
     const actionsList = [
       [

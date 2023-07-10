@@ -6,10 +6,13 @@ import fetch from 'node-fetch'
 import fetchLinks from '../fetchLinks'
 import initializeDownload from '../initializeDownload'
 
+jest.spyOn(console, 'error').mockImplementation(() => {})
+
 jest.mock('node-fetch', () => ({
   __esModule: true,
   default: jest.fn()
 }))
+
 jest.mock('../initializeDownload', () => ({
   __esModule: true,
   default: jest.fn()

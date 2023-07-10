@@ -1,12 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { FaTimes } from 'react-icons/fa'
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import * as RadixDialog from '@radix-ui/react-dialog'
 import classNames from 'classnames'
 
 import * as styles from './Dialog.module.scss'
 import Button from '../Button/Button'
+import Tooltip from '../Tooltip/Tooltip'
 
 /**
  * @typedef {Object} DialogProps
@@ -82,9 +83,9 @@ const Dialog = ({
                     </>
                   )
                   : (
-                    <VisuallyHidden asChild>
+                    <VisuallyHidden.Root asChild>
                       <RadixDialog.Title className={styles.title}>{title}</RadixDialog.Title>
-                    </VisuallyHidden>
+                    </VisuallyHidden.Root>
                   )
                 }
               {

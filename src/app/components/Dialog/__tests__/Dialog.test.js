@@ -6,7 +6,7 @@ import Dialog from '../Dialog'
 
 jest.mock('@radix-ui/react-visually-hidden', () => ({
   // eslint-disable-next-line react/prop-types
-  VisuallyHidden: ({ children }) => <span data-testid="visually-hidden">{children}</span>
+  Root: ({ children }) => <span data-testid="visually-hidden">{children}</span>
 }))
 
 describe('Dialog component', () => {
@@ -99,19 +99,17 @@ describe('Dialog component', () => {
   })
 
   describe('when closeButton is defined', () => {
-    test.only('renders a close button', () => {
+    test('renders a close button', () => {
       render(
         <Dialog
-          open
           closeButton
+          open
         >
           Test Dialog Content
         </Dialog>
       )
 
-      screen.debug()
-
-      expect(screen.queryByLabel('Close')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Close' })).toBeInTheDocument()
     })
   })
 })

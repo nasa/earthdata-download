@@ -149,7 +149,6 @@ describe('Layout component', () => {
     await user.click(screen.getByRole('button', { name: 'Settings' }))
 
     expect(Settings).toHaveBeenCalledTimes(1)
-    screen.debug()
 
     const modalTitle = screen.getAllByText('Settings')[1]
     expect(modalTitle).toBeInTheDocument()

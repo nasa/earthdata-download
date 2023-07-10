@@ -6,7 +6,7 @@ import Button from '../Button'
 
 jest.mock('@radix-ui/react-visually-hidden', () => ({
   // eslint-disable-next-line react/prop-types
-  VisuallyHidden: ({ children }) => <span data-testid="visually-hidden">{children}</span>
+  Root: ({ children }) => <span data-testid="visually-hidden">{children}</span>
 }))
 
 describe('Button component', () => {

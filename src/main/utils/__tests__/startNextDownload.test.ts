@@ -22,6 +22,7 @@ describe('startNextDownload', () => {
       getDownloadById: jest.fn().mockResolvedValue({
         downloadLocation: '/mock/download'
       }),
+      getNumErrors: jest.fn().mockResolvedValue(0),
       getToken: jest.fn().mockResolvedValue({ token: 'mock-token' }),
       updateFile: jest.fn()
     }
@@ -82,6 +83,7 @@ describe('startNextDownload', () => {
       getDownloadById: jest.fn().mockResolvedValue({
         downloadLocation: '/mock/download'
       }),
+      getNumErrors: jest.fn().mockResolvedValue(0),
       getToken: jest.fn().mockResolvedValue({ token: null }),
       updateFile: jest.fn()
     }
@@ -142,6 +144,7 @@ describe('startNextDownload', () => {
       getDownloadById: jest.fn().mockResolvedValue({
         downloadLocation: '/mock/download'
       }),
+      getNumErrors: jest.fn().mockResolvedValue(0),
       getToken: jest.fn().mockResolvedValue({ token: 'mock-token' }),
       updateFile: jest.fn()
     }
@@ -187,6 +190,102 @@ describe('startNextDownload', () => {
     })
   })
 
+  test('downloads additional files if download items err', async () => {
+    const downloadId = 'mock-download-id'
+    const downloadIdContext = {}
+    const database = {
+      getPreferences: jest.fn().mockResolvedValue({ concurrentDownloads: 2 }),
+      getFilesToStart: jest.fn().mockResolvedValue([{
+        id: 'mock-filename-1.png',
+        downloadId,
+        url: 'http://example.com/mock-filename-1.png',
+        state: 'PENDING',
+        percent: 0
+      },
+      {
+        id: 'mock-filename-2.png',
+        downloadId,
+        url: 'http://example.com/mock-filename-2.png',
+        state: 'PENDING',
+        percent: 0
+      },
+      {
+        id: 'mock-filename-3.png',
+        downloadId,
+        url: 'http://example.com/mock-filename-3.png',
+        state: 'PENDING',
+        percent: 0
+      }]),
+      getDownloadById: jest.fn().mockResolvedValue({
+        downloadLocation: '/mock/download'
+      }),
+      getNumErrors: jest.fn().mockResolvedValue(2),
+      getToken: jest.fn().mockResolvedValue({ token: 'mock-token' }),
+      updateFile: jest.fn()
+    }
+    const webContents = {
+      downloadURL: jest.fn()
+    }
+    const currentDownloadItems = {
+      getNumberOfDownloads: jest.fn().mockReturnValue(1)
+    }
+
+    await startNextDownload({
+      currentDownloadItems,
+      database,
+      downloadIdContext,
+      fileId: 123,
+      webContents
+    })
+
+    expect(database.getPreferences).toHaveBeenCalledTimes(1)
+    expect(database.getToken).toHaveBeenCalledTimes(1)
+    expect(database.getNumErrors).toHaveBeenCalledTimes(1)
+
+    expect(database.getFilesToStart).toHaveBeenCalledTimes(1)
+    expect(database.getFilesToStart).toHaveBeenCalledWith(3, 123)
+
+    expect(database.getDownloadById).toHaveBeenCalledTimes(3)
+    expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
+
+    expect(database.updateFile).toHaveBeenCalledTimes(3)
+    expect(database.updateFile).toHaveBeenCalledWith('mock-filename-1.png', { state: 'STARTING' })
+    expect(database.updateFile).toHaveBeenCalledWith('mock-filename-2.png', { state: 'STARTING' })
+    expect(database.updateFile).toHaveBeenCalledWith('mock-filename-3.png', { state: 'STARTING' })
+
+    expect(webContents.downloadURL).toHaveBeenCalledTimes(3)
+    expect(webContents.downloadURL).toHaveBeenCalledWith(
+      'http://example.com/mock-filename-1.png',
+      { headers: { Authorization: 'Bearer mock-token' } }
+    )
+    expect(webContents.downloadURL).toHaveBeenCalledWith(
+      'http://example.com/mock-filename-2.png',
+      { headers: { Authorization: 'Bearer mock-token' } }
+    )
+    expect(webContents.downloadURL).toHaveBeenCalledWith(
+      'http://example.com/mock-filename-3.png',
+      { headers: { Authorization: 'Bearer mock-token' } }
+    )
+
+    expect(downloadIdContext).toEqual({
+      'http://example.com/mock-filename-1.png': {
+        downloadId: 'mock-download-id',
+        downloadLocation: '/mock/download',
+        fileId: 'mock-filename-1.png'
+      },
+      'http://example.com/mock-filename-2.png': {
+        downloadId: 'mock-download-id',
+        downloadLocation: '/mock/download',
+        fileId: 'mock-filename-2.png'
+      },
+      'http://example.com/mock-filename-3.png': {
+        downloadId: 'mock-download-id',
+        downloadLocation: '/mock/download',
+        fileId: 'mock-filename-3.png'
+      }
+    })
+  })
+
   test('starts downloading multiple files', async () => {
     const downloadId = 'mock-download-id'
     const downloadIdContext = {}
@@ -212,6 +311,7 @@ describe('startNextDownload', () => {
         .mockResolvedValueOnce({
           downloadLocation: '/mock/download2'
         }),
+      getNumErrors: jest.fn().mockResolvedValue(0),
       getToken: jest.fn().mockResolvedValue({ token: 'mock-token' }),
       updateFile: jest.fn()
     }
@@ -274,6 +374,7 @@ describe('startNextDownload', () => {
       getPreferences: jest.fn().mockResolvedValue({ concurrentDownloads: 1 }),
       getFilesToStart: jest.fn(),
       getDownloadById: jest.fn(),
+      getNumErrors: jest.fn().mockResolvedValue(0),
       getToken: jest.fn().mockResolvedValue({ token: 'mock-token' }),
       updateFile: jest.fn()
     }
@@ -310,6 +411,7 @@ describe('startNextDownload', () => {
       getPreferences: jest.fn().mockResolvedValue({ concurrentDownloads: 1 }),
       getFilesToStart: jest.fn().mockResolvedValue([]),
       getDownloadById: jest.fn(),
+      getNumErrors: jest.fn().mockResolvedValue(0),
       getToken: jest.fn().mockResolvedValue({ token: 'mock-token' }),
       updateFile: jest.fn()
     }

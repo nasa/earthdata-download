@@ -28,7 +28,7 @@ describe('cancelDownloadItem', () => {
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { numErrors: 0 })
+      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: 'COMPLETED' })
 
       expect(database.deleteDownloadById).toHaveBeenCalledTimes(0)
       expect(database.deleteAllDownloads).toHaveBeenCalledTimes(0)

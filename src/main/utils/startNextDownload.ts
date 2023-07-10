@@ -27,8 +27,10 @@ const startNextDownload = async ({
   // Get number of running downloads
   const numberOfRunningDownloads = currentDownloadItems.getNumberOfDownloads()
 
+  const numErrors = await database.getNumErrors()
+
   // For available number of downloads, find the next `active` download with `pending` files and start downloading
-  const numberDownloadsToStart = concurrentDownloads - numberOfRunningDownloads
+  const numberDownloadsToStart = concurrentDownloads - numberOfRunningDownloads + numErrors
 
   if (numberDownloadsToStart === 0) return
 

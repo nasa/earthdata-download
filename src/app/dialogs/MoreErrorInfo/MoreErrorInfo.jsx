@@ -15,7 +15,7 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
  * @typedef {Object} MoreErrorInfoProps
  * @property {String} downloadId A string representing the id of a download.
  * @property {Object} collectionErrorInfo An object containing information about the errored file(s).
- * @property {String} collectionErrorInfo.itemName A string representing the name of a file.
+ * @property {String} collectionErrorInfo.filename A string representing the name of a file.
  * @property {String} collectionErrorInfo.url An string representing the download URL of a file.
  */
 /**
@@ -45,12 +45,12 @@ const MoreErrorInfo = ({
 
   collectionErrorInfo.forEach((item) => {
     const {
-      itemName,
+      filename,
       url
     } = item
 
     urls.push(url)
-    fileNames.push(itemName)
+    fileNames.push(filename)
   })
   const errorMessage = 'Server responded with an error while downloading files. If the errors persist, please contact the data provider.'
 
@@ -150,14 +150,10 @@ const MoreErrorInfo = ({
   )
 }
 
-// MoreErrorInfo.defaultProps = {
-//   downloadId: null
-// }
-
 MoreErrorInfo.propTypes = {
   downloadId: PropTypes.string.isRequired,
   collectionErrorInfo: PropTypes.arrayOf(PropTypes.shape({
-    itemName: PropTypes.string.isRequired,
+    filename: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired
   })).isRequired
 }

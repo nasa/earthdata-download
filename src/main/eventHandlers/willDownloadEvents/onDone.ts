@@ -32,7 +32,7 @@ const onDone = async ({
     downloadId
   })
 
-  const download = await database.getDownloadById(downloadId)
+  // const download = await database.getDownloadById(downloadId)
 
   // If the file is not found in the database, cancel the download
   if (!file) {
@@ -42,7 +42,6 @@ const onDone = async ({
   const {
     id: fileId
   } = file
-  console.log(state)
 
   let updatedState
   switch (state) {
@@ -64,15 +63,8 @@ const onDone = async ({
     percent: updatedState === downloadStates.completed ? 100 : 0
   })
 
-  if (updatedState !== downloadStates.error) {
-    // Remove the item from the currentDownloadItems
-    currentDownloadItems.removeItem(downloadId, filename)
-  } else {
-    const { numErrors } = download
-    await database.updateDownloadById(downloadId, {
-      numErrors: numErrors + 1
-    })
-  }
+  // Remove the item from the currentDownloadItems
+  currentDownloadItems.removeItem(downloadId, filename)
 
   // Start the next download
   await startNextDownload({

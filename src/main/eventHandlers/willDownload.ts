@@ -75,6 +75,18 @@ const willDownload = async ({
     return
   }
 
+  const totalBytes = item.getTotalBytes()
+  if (totalBytes === 0) {
+    await database.updateFile(fileId, {
+      state: downloadStates.error
+    })
+    const download = await database.getDownloadById(downloadId)
+    const { numErrors } = download
+    await database.updateDownloadById(downloadId, {
+      numErrors: numErrors + 1
+    })
+  }
+
   // Add the DownloadItem to the currentDownloadItems
   currentDownloadItems.addItem(downloadId, filename, item)
 

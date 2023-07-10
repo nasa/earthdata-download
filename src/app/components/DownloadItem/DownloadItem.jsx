@@ -288,18 +288,6 @@ const DownloadItem = ({
                 </div>
               )
             }
-            {
-              state === downloadStates.error && (
-                <div
-                  className={styles.statusDescription}
-                  data-testid="download-item-status-description"
-                >
-                  <FaInfoCircle />
-                  {' '}
-                  More Info
-                </div>
-              )
-            }
           </div>
           <div className={styles.metaSecondary}>
             {

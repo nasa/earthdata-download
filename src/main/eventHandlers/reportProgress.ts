@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import downloadStates from '../../app/constants/downloadStates'
+
 /**
  * Reports current progress on downloads
  * @param {Object} params
@@ -23,7 +25,6 @@ const reportProgress = async ({
       id: downloadId,
       loadingMoreFiles,
       name: downloadName = downloadId,
-      numErrors,
       state,
       timeEnd,
       timeStart
@@ -33,15 +34,24 @@ const reportProgress = async ({
       totalFiles,
       finishedFiles
     } = await database.getDownloadFilesProgressByDownloadId(downloadId)
-    const pausedFiles = Object.entries(files)
-      .filter(([, values]) => values.state === downloadStates.paused).length
-    const activeFiles = Object.entries(files)
-      .filter(([, values]) => values.state === downloadStates.active).length
 
-    const pausedFiles = Object.entries(files)
-      .filter(([, values]) => values.state === downloadStates.paused).length
-    const activeFiles = Object.entries(files)
-      .filter(([, values]) => values.state === downloadStates.active).length
+    const stateCounts = await database.getFileStateCounts(downloadId)
+    // const erroredFiles = await database.getFileCountWhere({
+    //   downloadId,
+    //   state: downloadStates.error
+    // })
+    // const activeFiles = await database.getFileCountWhere({
+    //   downloadId,
+    //   state: downloadStates.active
+    // })
+    // const pausedFiles = await database.getFileCountWhere({
+    //   downloadId,
+    //   state: downloadStates.paused
+    // })
+    // const completedFiles = await database.getFileCountWhere({
+    //   downloadId,
+    //   state: downloadStates.completed
+    // })
 
     let percent = 0
 
@@ -63,13 +73,14 @@ const reportProgress = async ({
       totalTime
     }
 
+    const files = await database.getFilesWhere({ downloadId })
     const errorInfo = []
     if (state === downloadStates.error) {
-      Object.keys(files).forEach((itemName) => {
-        const { state: itemState, url } = files[itemName]
+      (files).forEach((file) => {
+        const { state: itemState, url, filename } = file
         if (itemState === downloadStates.error) {
           errorInfo.push({
-            itemName,
+            filename,
             url
           })
         }
@@ -77,10 +88,14 @@ const reportProgress = async ({
     }
 
     // Set state depending on if there are errored or active downloads remaining
-    if (numErrors > 0 && !pausedFiles) {
+    if (stateCounts.error > 0 && !stateCounts.paused) {
       await database.updateDownloadById(downloadId, { state: downloadStates.error })
-    } else if (activeFiles) {
+    } else if (stateCounts.active) {
       await database.updateDownloadById(downloadId, { state: downloadStates.active })
+    } else if (stateCounts.completed && stateCounts.completed === totalFiles) {
+      await database.updateDownloadById(downloadId, { state: downloadStates.completed })
+    } else if (stateCounts.paused) {
+      await database.updateDownloadById(downloadId, { state: downloadStates.paused })
     }
 
     return {
@@ -89,7 +104,7 @@ const reportProgress = async ({
       errorInfo,
       // Sqlite booleans are actually integers 1/0
       loadingMoreFiles: loadingMoreFiles === 1,
-      numErrors,
+      numErrors: stateCounts.error,
       progress,
       state
     }

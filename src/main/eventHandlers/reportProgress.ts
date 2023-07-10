@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import downloadStates from '../../app/constants/downloadStates'
+
 /**
  * Reports current progress on downloads
  * @param {Object} params

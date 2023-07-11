@@ -11,25 +11,25 @@ class CurrentDownloadItems {
   /**
    * Adds a downloadItem to the current downloads.
    * @param {String} downloadId downloadId the item belongs to
-   * @param {String} name Name of the downloaded file
+   * @param {String} filename Filename of the downloaded file
    * @param {Object} downloadItem Electron DownloadItem class instance
    */
-  addItem(downloadId, name, downloadItem) {
+  addItem(downloadId, filename, downloadItem) {
     if (!this.downloadItems[downloadId]) {
       this.downloadItems[downloadId] = {}
     }
 
-    this.downloadItems[downloadId][name] = downloadItem
+    this.downloadItems[downloadId][filename] = downloadItem
   }
 
   /**
    * Cancels a downloadItem and removes it from the current downloadItems list.
    * @param {String} downloadId downloadId the item belongs to
-   * @param {String} name Name of the downloaded file
+   * @param {String} filename Filename of the downloaded file
    */
-  cancelItem(downloadId, name) {
-    if (name) {
-      const item = this.getItem(downloadId, name)
+  cancelItem(downloadId, filename) {
+    if (filename) {
+      const item = this.getItem(downloadId, filename)
 
       // Cancel the download
       if (item) item.cancel()
@@ -37,8 +37,8 @@ class CurrentDownloadItems {
       const items = this.getAllItemsInDownload(downloadId)
 
       if (items) {
-        Object.keys(items).forEach((name) => {
-          items[name].cancel()
+        Object.keys(items).forEach((filename) => {
+          items[filename].cancel()
         })
       }
     } else {
@@ -46,24 +46,24 @@ class CurrentDownloadItems {
         const items = this.getAllItemsInDownload(id)
 
         if (items) {
-          Object.keys(items).forEach((name) => {
-            items[name].cancel()
+          Object.keys(items).forEach((filename) => {
+            items[filename].cancel()
           })
         }
       })
     }
 
     // Remove the item from the downloadItems
-    this.removeItem(downloadId, name)
+    this.removeItem(downloadId, filename)
   }
 
   /**
    * Returns a downloadItem.
    * @param {String} downloadId downloadId the item belongs to
-   * @param {String} name Name of the downloaded file
+   * @param {String} filename Filename of the downloaded file
    */
-  getItem(downloadId, name) {
-    return this.downloadItems[downloadId][name]
+  getItem(downloadId, filename) {
+    return this.downloadItems[downloadId]?.[filename]
   }
 
   /**
@@ -92,19 +92,19 @@ class CurrentDownloadItems {
   /**
    * Pauses a downloadItem.
    * @param {String} downloadId downloadId the item belongs to
-   * @param {String} name Name of the downloaded file
+   * @param {String} filename Filename of the downloaded file
    */
-  pauseItem(downloadId, name) {
-    if (name) {
-      const item = this.getItem(downloadId, name)
+  pauseItem(downloadId, filename) {
+    if (filename) {
+      const item = this.getItem(downloadId, filename)
 
       if (item) item.pause()
     } else if (downloadId) {
       const items = this.getAllItemsInDownload(downloadId)
 
       if (items) {
-        Object.keys(items).forEach((name) => {
-          items[name].pause()
+        Object.keys(items).forEach((filename) => {
+          items[filename].pause()
         })
       }
     } else {
@@ -112,8 +112,8 @@ class CurrentDownloadItems {
         const items = this.getAllItemsInDownload(id)
 
         if (items) {
-          Object.keys(items).forEach((name) => {
-            items[name].pause()
+          Object.keys(items).forEach((filename) => {
+            items[filename].pause()
           })
         }
       })
@@ -123,38 +123,38 @@ class CurrentDownloadItems {
   /**
    * Removes a downloadItem from the current downloadItems list.
    * @param {String} downloadId downloadId the item belongs to
-   * @param {String} name Name of the downloaded file
+   * @param {String} filename Filename of the downloaded file
    */
-  removeItem(downloadId, name) {
+  removeItem(downloadId, filename) {
     try {
-      if (name) {
-        delete this.downloadItems[downloadId][name]
+      if (filename) {
+        delete this.downloadItems[downloadId][filename]
       } else if (downloadId) {
         delete this.downloadItems[downloadId]
       } else {
         this.downloadItems = {}
       }
     } catch {
-      console.log(`Item: ${downloadId}.${name} did not exist.`)
+      console.log(`Item: ${downloadId}.${filename} did not exist.`)
     }
   }
 
   /**
    * Resumes a downloadItem.
    * @param {String} downloadId downloadId the item belongs to
-   * @param {String} name Name of the downloaded file
+   * @param {String} filename Filename of the downloaded file
    */
-  resumeItem(downloadId, name) {
-    if (name) {
-      const item = this.getItem(downloadId, name)
+  resumeItem(downloadId, filename) {
+    if (filename) {
+      const item = this.getItem(downloadId, filename)
 
       if (item) item.resume()
     } else if (downloadId) {
       const items = this.getAllItemsInDownload(downloadId)
 
       if (items) {
-        Object.keys(items).forEach((name) => {
-          items[name].resume()
+        Object.keys(items).forEach((filename) => {
+          items[filename].resume()
         })
       }
     } else {
@@ -162,8 +162,8 @@ class CurrentDownloadItems {
         const items = this.getAllItemsInDownload(id)
 
         if (items) {
-          Object.keys(items).forEach((name) => {
-            items[name].resume()
+          Object.keys(items).forEach((filename) => {
+            items[filename].resume()
           })
         }
       })

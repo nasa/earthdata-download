@@ -17,12 +17,14 @@ const onUpdated = async ({
   state
 }) => {
   const filename = item.getFilename()
+  console.log('🚀 ~ file: onUpdated.ts:20 ~ filename:', filename)
 
   // Get the download item from the database
   const file = await database.getFileWhere({
     filename,
     downloadId
   })
+  console.log('🚀 ~ file: onUpdated.ts:26 ~ file:', file)
 
   // If the file is not found in the database, cancel the download
   if (!file) {

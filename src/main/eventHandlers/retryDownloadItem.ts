@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../app/constants/downloadStates'
-import willDownload from './willDownload'
+import startNextDownload from '../utils/startNextDownload'
 
 /**
  * Updates the downloadIds within `info` to active and restarts downloads
@@ -19,58 +19,65 @@ const retryDownloadItem = async ({
   info,
   webContents
 }) => {
-  const { downloadId, name } = info
-  const downloads = await database.getAllDownloads()
+  console.log('🚀 ~ file: retryDownloadItem.ts:73 ~ info:', info)
+  const { downloadId, filename } = info
 
-  const retryItem = (async (downloadId, name) => {
-    const { state } = await database.getFileWhere({
-      filename: name,
-      downloadId
+  if (downloadId && filename) {
+    // // Start the given file
+    // const file = await database.getFileWhere({
+    //   downloadId,
+    //   filename
+    // })
+    // console.log('🚀 ~ file: retryDownloadItem.ts:82 ~ file:', file)
+
+    // await downloadFile({
+    //   database,
+    //   downloadIdContext,
+    //   file,
+    //   webContents
+    // })
+
+    // Set the file to pending, and call startNextDownload
+    await database.updateFilesWhere({
+      downloadId,
+      filename
+    }, {
+      state: downloadStates.pending
     })
-    // Save the item before cancelling to re-queue
-    const item = currentDownloadItems.getItem(downloadId, name)
-    currentDownloadItems.cancelItem(downloadId, name)
-
-    if (state === downloadStates.error) {
-      // const { numErrors: oldErrors } = await database.getDownloadById(downloadId)
-      // await database.updateDownloadById(downloadId, { numErrors: oldErrors - 1 })
-      await database.updateFile(name, {
-        state: downloadStates.active,
-        errors: undefined,
-        timeEnd: undefined
-      })
-    }
-
-    willDownload({
-      currentDownloadItems,
-      database,
-      downloadIdContext,
-      item,
-      webContents
-    })
-  })
-
-  const retryCollection = (async (downloadId) => {
-    const items = currentDownloadItems.getAllItemsInDownload(downloadId)
-    Object.keys(items).forEach(async (name) => {
-      retryItem(downloadId, name)
-    })
-    await database.updateDownloadById(downloadId, { state: downloadStates.active, numErrors: 0 })
-  })
-
-  if (!downloadId) {
-    // Restart all collection downloads
-    Object.keys(downloads).forEach((downloadIndex) => {
-      const { id } = downloads[downloadIndex]
-      retryCollection(id)
-    })
-  } else if (!name) {
-    // Restart a collection download
-    retryCollection(downloadId)
-  } else {
-    // Restart an item download
-    retryItem(downloadId, name)
   }
+
+  if (downloadId && !filename) {
+    // Retry all errored files for downloadId
+    await database.updateFilesWhere({
+      downloadId,
+      state: downloadStates.error
+    }, {
+      state: downloadStates.pending
+    })
+  }
+
+  await startNextDownload({
+    currentDownloadItems,
+    database,
+    downloadIdContext,
+    // fileId,
+    webContents
+  })
+
+  // if (!downloadId) {
+  //   const downloads = await database.getAllDownloads()
+  //   // Restart all collection downloads
+  //   Object.keys(downloads).forEach((downloadIndex) => {
+  //     const { id } = downloads[downloadIndex]
+  //     retryCollection(id)
+  //   })
+  // } else if (!name) {
+  //   // Restart a collection download
+  //   retryCollection(downloadId)
+  // } else {
+  //   // Restart an item download
+  //   retryItem(downloadId, name)
+  // }
 }
 
 export default retryDownloadItem

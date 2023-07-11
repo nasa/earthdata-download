@@ -16,6 +16,7 @@ const reportProgress = async ({
   const downloads = await database.getAllDownloads()
 
   if (downloads.length === 0) {
+    // TODO is errorInfo needed?
     webContents.send('reportProgress', { progress: [], errorInfo: [] })
     return
   }
@@ -32,11 +33,21 @@ const reportProgress = async ({
 
     const {
       percentSum,
+      erroredFiles,
       totalFiles,
       finishedFiles
     } = await database.getDownloadFilesProgressByDownloadId(downloadId)
 
-    const stateCounts = await database.getFileStateCounts(downloadId)
+    let errorInfo
+    if (erroredFiles > 0) {
+      errorInfo = await database.getFilesWhere({
+        downloadId,
+        state: downloadStates.error
+      })
+    }
+
+    // const stateCounts = await database.getFileStateCounts(downloadId)
+    // console.log('🚀 ~ file: reportProgress.ts:41 ~ promises ~ stateCounts:', stateCounts)
 
     let percent = 0
 
@@ -58,30 +69,36 @@ const reportProgress = async ({
       totalTime
     }
 
-    const files = await database.getFilesWhere({ downloadId })
-    const errorInfo = []
-    if (state === downloadStates.error) {
-      (files).forEach((file) => {
-        const { state: itemState, url, filename } = file
-        if (itemState === downloadStates.error) {
-          errorInfo.push({
-            filename,
-            url
-          })
-        }
-      })
-    }
+    // const files = await database.getFilesWhere({ downloadId })
+    // const errorInfo = []
+    // if (state === downloadStates.error) {
+    //   (files).forEach((file) => {
+    //     const {
+    //       state: itemState,
+    //       url,
+    //       filename
+    //     } = file
 
-    // Set state depending on if there are errored or active downloads remaining
-    if (stateCounts.error > 0 && !stateCounts.paused) {
-      await database.updateDownloadById(downloadId, { state: downloadStates.error })
-    } else if (stateCounts.active) {
-      await database.updateDownloadById(downloadId, { state: downloadStates.active })
-    } else if (stateCounts.completed && stateCounts.completed === totalFiles) {
-      await database.updateDownloadById(downloadId, { state: downloadStates.completed })
-    } else if (stateCounts.paused) {
-      await database.updateDownloadById(downloadId, { state: downloadStates.paused })
-    }
+    //     if (itemState === downloadStates.error) {
+    //       errorInfo.push({
+    //         filename,
+    //         url
+    //       })
+    //     }
+    //   })
+    // }
+
+    // // TODO reportProgress should not update the database
+    // // Set state depending on if there are errored or active downloads remaining
+    // if (stateCounts.error > 0 && !stateCounts.paused) {
+    //   await database.updateDownloadById(downloadId, { state: downloadStates.error })
+    // } else if (stateCounts.active) {
+    //   await database.updateDownloadById(downloadId, { state: downloadStates.active })
+    // } else if (stateCounts.completed && stateCounts.completed === totalFiles) {
+    //   await database.updateDownloadById(downloadId, { state: downloadStates.completed })
+    // } else if (stateCounts.paused) {
+    //   await database.updateDownloadById(downloadId, { state: downloadStates.paused })
+    // }
 
     return {
       downloadId,
@@ -89,7 +106,7 @@ const reportProgress = async ({
       errorInfo,
       // Sqlite booleans are actually integers 1/0
       loadingMoreFiles: loadingMoreFiles === 1,
-      numErrors: stateCounts.error,
+      numErrors: erroredFiles,
       progress,
       state
     }

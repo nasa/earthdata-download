@@ -99,6 +99,8 @@ const createWindow = async () => {
     })
   })
 
+  // TODO organize event listeners, maybe strip out definitions into a new file?
+
   appWindow.webContents.session.on('will-download', async (event, item, webContents) => {
     await willDownload({
       currentDownloadItems,
@@ -143,9 +145,9 @@ const createWindow = async () => {
 
   ipcMain.on('beginDownload', async (event, info) => {
     await beginDownload({
+      currentDownloadItems,
       database,
       downloadIdContext,
-      currentDownloadItems,
       info,
       webContents: appWindow.webContents
     })
@@ -177,33 +179,33 @@ const createWindow = async () => {
 
   ipcMain.on('pauseDownloadItem', async (event, info) => {
     await pauseDownloadItem({
-      database,
       currentDownloadItems,
+      database,
       info
     })
   })
 
   ipcMain.on('cancelDownloadItem', async (event, info) => {
     await cancelDownloadItem({
-      database,
       currentDownloadItems,
+      database,
       info
     })
   })
 
   ipcMain.on('resumeDownloadItem', async (event, info) => {
     await resumeDownloadItem({
-      database,
       currentDownloadItems,
+      database,
       info
     })
   })
 
-  ipcMain.on('retryDownloadItem', (event, info) => {
-    retryDownloadItem({
+  ipcMain.on('retryDownloadItem', async (event, info) => {
+    await retryDownloadItem({
+      currentDownloadItems,
       database,
       downloadIdContext,
-      currentDownloadItems,
       info,
       webContents: appWindow.webContents
     })
@@ -310,12 +312,6 @@ if (!gotTheLock) {
     })
   })
 
-  // Create window, load the rest of the app, etc...
-  app.whenReady().then(async () => {
-    await createWindow()
-  })
-
-  // Handle the protocol. In this case, we choose to show an Error Box.
   app.on('open-url', async (event, url) => {
     await openUrl({
       appWindow,
@@ -326,5 +322,10 @@ if (!gotTheLock) {
       downloadsWaitingForAuth,
       webContents: appWindow.webContents
     })
+  })
+
+  // Create window, load the rest of the app, etc...
+  app.whenReady().then(async () => {
+    await createWindow()
   })
 }

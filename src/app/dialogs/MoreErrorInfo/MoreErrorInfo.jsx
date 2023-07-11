@@ -59,25 +59,12 @@ const MoreErrorInfo = ({
     retryDownloadItem
   } = useContext(ElectronApiContext)
 
-  const onCancelDownloadItem = (downloadId, name) => {
-    if (!name) {
-      // Cancel all errored downloads
-      fileNames.forEach((fileName) => {
-        cancelDownloadItem({ downloadId, name: fileName })
-      })
-    } else {
-      cancelDownloadItem({ downloadId, name })
-    }
+  const onCancelDownloadItem = (downloadId, filename) => {
+    cancelDownloadItem({ downloadId, filename })
   }
-  const onRetryDownloadItem = (downloadId, name) => {
-    if (!name) {
-      // Retry all errored downloads
-      fileNames.forEach((fileName) => {
-        retryDownloadItem({ downloadId, name: fileName })
-      })
-    } else {
-      retryDownloadItem({ downloadId, name })
-    }
+
+  const onRetryDownloadItem = (downloadId, filename) => {
+    retryDownloadItem({ downloadId, filename })
   }
 
   return (

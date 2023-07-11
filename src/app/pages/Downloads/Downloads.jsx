@@ -372,6 +372,7 @@ const Downloads = ({
           label: 'Restart Download',
           isActive: true,
           isPrimary: false,
+          // TODO this needs to set all files to pending first, probably don't use onRetryDownloadItem for it
           callback: () => onRetryDownloadItem(downloadId),
           icon: FaInfoCircle
         },

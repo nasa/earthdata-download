@@ -1,8 +1,12 @@
+// @ts-nocheck
+
 import MockDate from 'mockdate'
 
 import onDone from '../onDone'
 import startNextDownload from '../../../utils/startNextDownload'
 import finishDownload from '../finishDownload'
+
+import downloadStates from '../../../../app/constants/downloadStates'
 
 jest.mock('../../../utils/startNextDownload', () => ({
   __esModule: true,
@@ -61,7 +65,7 @@ describe('onDone', () => {
     expect(database.updateFile).toHaveBeenCalledTimes(1)
     expect(database.updateFile).toHaveBeenCalledWith(123, {
       percent: 100,
-      state: 'COMPLETED',
+      state: downloadStates.completed,
       timeEnd: 1684029600000
     })
 
@@ -111,22 +115,6 @@ describe('onDone', () => {
       webContents: {}
     })
 
-    // expect(store.set).toHaveBeenCalledTimes(2)
-    // expect(store.set).toHaveBeenCalledWith('downloads.mock-download-id', {
-    //   downloadLocation: '/mock/location/mock-download-id-20230514_012554',
-    //   timeStart: 1684027555379,
-    //   files: {
-    //     'mock-filename.png': {
-    //       url: 'http://example.com/mock-filename.png',
-    //       state: 'ACTIVE',
-    //       percent: 0,
-    //       timeStart: 1684029600000,
-    //       timeEnd: 1684029600000
-    //     }
-    //   },
-    //   state: 'ACTIVE',
-    //   numErrors: 1
-
     expect(database.getFileWhere).toHaveBeenCalledTimes(1)
     expect(database.getFileWhere).toHaveBeenCalledWith({
       downloadId: 'mock-download-id',
@@ -135,9 +123,9 @@ describe('onDone', () => {
 
     expect(database.updateFile).toHaveBeenCalledTimes(1)
     expect(database.updateFile).toHaveBeenCalledWith(123, {
-      errors: undefined,
+      errors: 'This file could not be downloaded',
       percent: 0,
-      state: 'ERROR',
+      state: downloadStates.error,
       timeEnd: 1684029600000
     })
 
@@ -200,7 +188,7 @@ describe('onDone', () => {
     expect(database.updateFile).toHaveBeenCalledWith(123, {
       errors: undefined,
       percent: 0,
-      state: 'PENDING',
+      state: downloadStates.cancelled,
       timeEnd: 1684029600000
     })
 

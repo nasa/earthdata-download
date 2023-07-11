@@ -30,7 +30,6 @@ const willDownload = async ({
   const [originalUrl] = item.getURLChain()
 
   const context = downloadIdContext[originalUrl]
-  console.log('🚀 ~ file: willDownload.ts:33 ~ context:', { ...context })
 
   // If no downloadIdContext is available for this download, cancel the download
   if (!context) {
@@ -43,10 +42,8 @@ const willDownload = async ({
     downloadLocation,
     fileId
   } = context
-  console.log('🚀 ~ file: willDownload.ts:46 ~ downloadLocation:', downloadLocation)
 
   const filename = item.getFilename()
-  console.log('🚀 ~ file: willDownload.ts:47 ~ filename:', filename)
 
   // Set the save path for the DownloadItem
   item.setSavePath(path.join(downloadLocation, filename))
@@ -55,7 +52,6 @@ const willDownload = async ({
   delete downloadIdContext[originalUrl]
 
   const urlChain = item.getURLChain()
-  console.log('🚀 ~ file: willDownload.ts:55 ~ urlChain:', urlChain)
   const lastUrl = urlChain.pop()
 
   // If the last item in the urlChain is EDL, set the download to pending and forward the user to EDL

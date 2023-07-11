@@ -10,9 +10,9 @@ import { app } from 'electron'
  * @param {Array} params.downloadIds Download IDs to be initialized
  */
 const initializeDownload = async ({
-  appWindow,
   database,
-  downloadIds
+  downloadIds,
+  webContents
 }) => {
   if (downloadIds.length > 0) {
     // Default the download location to the user's `downloads` folder
@@ -35,7 +35,7 @@ const initializeDownload = async ({
     }
 
     // Send a message to the renderer to initialize the download
-    appWindow.webContents.send('initializeDownload', {
+    webContents.send('initializeDownload', {
       downloadIds,
       downloadLocation: location,
       shouldUseDefaultLocation: !!defaultDownloadLocation

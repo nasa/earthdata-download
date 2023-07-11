@@ -4,7 +4,7 @@ import downloadStates from '../../app/constants/downloadStates'
 import startNextDownload from '../utils/startNextDownload'
 
 /**
- * Updates the downloadIds within `info` to active and restarts downloads
+ * Updates the files of a download to `pending`, sents the download to `active`, and calls `startNextDownload`
  * @param {Object} params
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {Object} params.database `EddDatabase` instance

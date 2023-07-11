@@ -153,9 +153,9 @@ const fetchLinks = async ({
       if (pageNum === 1) {
         // Initialize download will let the renderer process know to start a download
         initializeDownload({
-          appWindow,
           downloadIds: [downloadId],
-          database
+          database,
+          webContents: appWindow.webContents
         })
       }
 

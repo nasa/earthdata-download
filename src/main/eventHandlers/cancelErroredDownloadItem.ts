@@ -4,7 +4,7 @@ import downloadStates from '../../app/constants/downloadStates'
 import finishDownload from './willDownloadEvents/finishDownload'
 
 /**
- * Cancels a download and updates the database state
+ * Cancels an errored download and updates the database state
  * @param {Object} params
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {Object} params.database `EddDatabase` instance

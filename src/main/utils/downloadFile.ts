@@ -2,13 +2,20 @@
 
 import downloadStates from '../../app/constants/downloadStates'
 
+/**
+ * Starts a download of the given file
+ * @param {Object} params
+ * @param {Object} params.database `EddDatabase` instance
+ * @param {Object} params.downloadIdContext Object where we can associate a newly created download to a downloadId
+ * @param {Object} params.file File to start downloading
+ * @param {Object} params.webContents Electron BrowserWindow instance's webContents
+ */
 const downloadFile = async ({
   database,
   downloadIdContext,
   file,
   webContents
 }) => {
-  console.log('🚀 ~ file: downloadFile.ts:11 ~ file:', file)
   const { token } = await database.getToken()
 
   const {

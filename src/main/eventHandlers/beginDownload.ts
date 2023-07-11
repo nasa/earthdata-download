@@ -45,8 +45,7 @@ const beginDownload = async ({
       await database.updateDownloadById(downloadId, {
         downloadLocation: path.join(downloadLocation, downloadId),
         timeStart: new Date().getTime(),
-        state: downloadStates.active,
-        numErrors: 0
+        state: downloadStates.active
       })
     } else {
       shouldStart = false

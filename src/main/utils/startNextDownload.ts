@@ -2,7 +2,7 @@
 
 import 'array-foreach-async'
 
-import downloadStates from '../../app/constants/downloadStates'
+import downloadFile from './downloadFile'
 
 /**
  * Starts the next download when a download completes
@@ -22,49 +22,23 @@ const startNextDownload = async ({
 }) => {
   // Get the concurrentDownloads from preferences
   const { concurrentDownloads } = await database.getPreferences()
-  const { token } = await database.getToken()
 
   // Get number of running downloads
   const numberOfRunningDownloads = currentDownloadItems.getNumberOfDownloads()
 
-  const numErrors = await database.getNumErrors()
-
   // For available number of downloads, find the next `active` download with `pending` files and start downloading
-  const numberDownloadsToStart = concurrentDownloads - numberOfRunningDownloads + numErrors
+  const numberDownloadsToStart = concurrentDownloads - numberOfRunningDownloads
 
   if (numberDownloadsToStart === 0) return
 
   const filesToStart = await database.getFilesToStart(numberDownloadsToStart, fileId)
 
   const promises = filesToStart.map(async (file) => {
-    const {
-      downloadId,
-      id: fileId,
-      url
-    } = file
-
-    const { downloadLocation } = await database.getDownloadById(downloadId)
-
-    // The file might not actually start download before the next time through this loop
-    // Setting the file to `starting` ensures we start a new file if we need to
-    await database.updateFile(fileId, {
-      state: downloadStates.starting
-    })
-
-    // eslint-disable-next-line no-param-reassign
-    downloadIdContext[url] = {
-      downloadId,
-      downloadLocation,
-      fileId
-    }
-
-    let bearerToken
-    if (token) bearerToken = `Bearer ${token}`
-
-    webContents.downloadURL(url, {
-      headers: {
-        Authorization: bearerToken
-      }
+    await downloadFile({
+      database,
+      downloadIdContext,
+      file,
+      webContents
     })
   })
 

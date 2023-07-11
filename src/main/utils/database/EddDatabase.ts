@@ -75,16 +75,16 @@ class EddDatabase {
     return this.db('downloads').select().where({ id: downloadId }).first()
   }
 
-  /**
- * Returns a download given the downloadId.
- * @param {String} downloadId downloadId for download.
- */
-  async getNumErrors() {
-    const [result] = await this.db('downloads').sum('numErrors')
-    const { 'sum(`numErrors`)': sum } = result
+  // /**
+  //  * Returns a download given the downloadId.
+  //  * @param {String} downloadId downloadId for download.
+  //  */
+  // async getNumErrors() {
+  //   const [result] = await this.db('downloads').sum('numErrors')
+  //   const { 'sum(`numErrors`)': sum } = result
 
-    return sum
-  }
+  //   return sum
+  // }
 
   /**
    * Creates a new download.
@@ -185,25 +185,25 @@ class EddDatabase {
     return number
   }
 
-  /**
-   * Returns the count of selected files.
-   * @param {Object} where Knex `where` object to select downloads.
-   */
-  async getFileStateCounts(downloadId) {
-    const stateCounts = {}
-    const checkedStates = ['active', 'completed', 'error', 'paused']
-    checkedStates.forEach(async (state) => {
-      const [result] = await this.db('files').count('id').where({
-        downloadId,
-        state: downloadStates[state]
-      })
-      const { 'count(`id`)': number } = result
+  // /**
+  //  * Returns the count of selected files.
+  //  * @param {Object} where Knex `where` object to select downloads.
+  //  */
+  // async getFileStateCounts(downloadId) {
+  //   const stateCounts = {}
+  //   const checkedStates = ['ACTIVE', 'COMPLETED', 'ERROR', 'PAUSED']
+  //   checkedStates.forEach(async (state) => {
+  //     const [result] = await this.db('files').count('id').where({
+  //       downloadId,
+  //       state: downloadStates[state]
+  //     })
+  //     const { 'count(`id`)': number } = result
 
-      stateCounts[state] = number
-    })
+  //     stateCounts[state] = number
+  //   })
 
-    return stateCounts
-  }
+  //   return stateCounts
+  // }
 
   /**
    * Returns count of files that are not in the `completed` state for the given downloadId
@@ -213,7 +213,9 @@ class EddDatabase {
     const [result] = await this.db('files')
       .count('id')
       .where({ downloadId })
-      .whereNot({ state: downloadStates.completed && downloadStates.error })
+      // TODO this seems wrong
+      // .whereNot({ state: downloadStates.completed && downloadStates.error })
+      .whereNotIn('state', [downloadStates.completed, downloadStates.error])
 
     const { 'count(`id`)': number } = result
 
@@ -227,6 +229,15 @@ class EddDatabase {
    */
   async updateFile(fileId, data) {
     return this.db('files').update(data).where({ id: fileId })
+  }
+
+  /**
+   * Updates the given file.
+   * @param {Number} fileId ID of files to update.
+   * @param {Object} data The data of the file to be updated.
+   */
+  async updateFilesWhere(where, data) {
+    return this.db('files').update(data).where(where)
   }
 
   /**
@@ -271,7 +282,9 @@ class EddDatabase {
         // Return the count of the `id` column as `totalFiles`
         totalFiles: 'id',
         // Return the count of the `state` column when the value is `COMPLETED` as `finishedFiles`
-        finishedFiles: this.db.raw('CASE "state" WHEN "COMPLETED" THEN 1 ELSE NULL END')
+        finishedFiles: this.db.raw('CASE "state" WHEN "COMPLETED" THEN 1 ELSE NULL END'),
+        // Return the count of the `state` column when the value is `ERROR` as `totalErroredFiles`
+        erroredFiles: this.db.raw('CASE "state" WHEN "ERROR" THEN 1 ELSE NULL END')
       })
       .where({
         downloadId

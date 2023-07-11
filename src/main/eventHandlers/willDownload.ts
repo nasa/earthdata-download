@@ -30,6 +30,7 @@ const willDownload = async ({
   const [originalUrl] = item.getURLChain()
 
   const context = downloadIdContext[originalUrl]
+  console.log('🚀 ~ file: willDownload.ts:33 ~ context:', { ...context })
 
   // If no downloadIdContext is available for this download, cancel the download
   if (!context) {
@@ -42,8 +43,10 @@ const willDownload = async ({
     downloadLocation,
     fileId
   } = context
+  console.log('🚀 ~ file: willDownload.ts:46 ~ downloadLocation:', downloadLocation)
 
   const filename = item.getFilename()
+  console.log('🚀 ~ file: willDownload.ts:47 ~ filename:', filename)
 
   // Set the save path for the DownloadItem
   item.setSavePath(path.join(downloadLocation, filename))
@@ -52,6 +55,7 @@ const willDownload = async ({
   delete downloadIdContext[originalUrl]
 
   const urlChain = item.getURLChain()
+  console.log('🚀 ~ file: willDownload.ts:55 ~ urlChain:', urlChain)
   const lastUrl = urlChain.pop()
 
   // If the last item in the urlChain is EDL, set the download to pending and forward the user to EDL
@@ -75,16 +79,25 @@ const willDownload = async ({
     return
   }
 
+  // If the file has no totalBytes, report an error
   const totalBytes = item.getTotalBytes()
   if (totalBytes === 0) {
     await database.updateFile(fileId, {
-      state: downloadStates.error
+      state: downloadStates.error,
+      errors: 'This file could not be downloaded'
     })
-    const download = await database.getDownloadById(downloadId)
-    const { numErrors } = download
-    await database.updateDownloadById(downloadId, {
-      numErrors: numErrors + 1
-    })
+
+    // // TODO what is numErrors for?
+    // const download = await database.getDownloadById(downloadId)
+    // const { numErrors } = download
+
+    // await database.updateDownloadById(downloadId, {
+    //   numErrors: numErrors + 1
+    // })
+
+    item.cancel()
+
+    return
   }
 
   // Add the DownloadItem to the currentDownloadItems

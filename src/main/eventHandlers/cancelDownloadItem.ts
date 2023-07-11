@@ -14,24 +14,35 @@ const cancelDownloadItem = async ({
   database,
   info
 }) => {
-  const { downloadId, name } = info
+  const { downloadId, filename } = info
+  console.log('🚀 ~ file: cancelDownloadItem.ts:18 ~ info:', info)
 
-  currentDownloadItems.cancelItem(downloadId, name)
+  currentDownloadItems.cancelItem(downloadId, filename)
 
-  if (downloadId) {
-    await database.updateDownloadById(downloadId, {
-      state: downloadStates.completed
+  if (downloadId && filename) {
+    await database.updateFilesWhere({
+      downloadId,
+      filename
+    }, {
+      state: downloadStates.cancelled
     })
-
-    // Cancelling a download will remove it from the list of downloads
-    if (name) {
-    // TODO how will this work when cancelling a granule download? I don't think we want to remove single items from a provided list of links
-      await database.deleteFile(name)
-    } else {
-      await database.deleteDownloadById(downloadId)
-    }
   }
 
+  if (downloadId && !filename) {
+    // TODO EDD-30 also put all files into cancelled?
+    await database.updateDownloadById(downloadId, {
+      state: downloadStates.cancelled
+    })
+    await database.updateFilesWhere({
+      downloadId,
+      // TODO this doesn't specifally say cancel errored downloads, this might need a more specific event
+      state: downloadStates.error
+    }, {
+      state: downloadStates.cancelled
+    })
+  }
+
+  // TODO EDD-30 put the downloads into a cancelled state
   if (!downloadId) {
     await database.deleteAllDownloads()
   }

@@ -16,8 +16,10 @@ const reportProgress = async ({
   const downloads = await database.getAllDownloads()
 
   if (downloads.length === 0) {
-    // TODO is errorInfo needed?
-    webContents.send('reportProgress', { progress: [], errorInfo: [] })
+    webContents.send('reportProgress', {
+      progress: [],
+      errorInfo: []
+    })
     return
   }
 

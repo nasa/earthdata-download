@@ -3,32 +3,16 @@
 import {
   app,
   BrowserWindow,
-  ipcMain,
-  session,
-  shell
+  session
 } from 'electron'
 import path from 'path'
 
-import beginDownload from './eventHandlers/beginDownload'
-import cancelDownloadItem from './eventHandlers/cancelDownloadItem'
-import cancelErroredDownloadItem from './eventHandlers/cancelErroredDownloadItem'
-import chooseDownloadLocation from './eventHandlers/chooseDownloadLocation'
-import copyDownloadPath from './eventHandlers/copyDownloadPath'
-import getPreferenceFieldValue from './eventHandlers/getPreferenceFieldValue'
-import openDownloadFolder from './eventHandlers/openDownloadFolder'
 import openUrl from './eventHandlers/openUrl'
-import pauseDownloadItem from './eventHandlers/pauseDownloadItem'
-import reportProgress from './eventHandlers/reportProgress'
-import restartDownload from './eventHandlers/restartDownload'
-import resumeDownloadItem from './eventHandlers/resumeDownloadItem'
-import retryDownloadItem from './eventHandlers/retryDownloadItem'
-import sendToLogin from './eventHandlers/sendToLogin'
-import setPreferenceFieldValue from './eventHandlers/setPreferenceFieldValue'
-import willDownload from './eventHandlers/willDownload'
 
 import CurrentDownloadItems from './utils/currentDownloadItems'
-import windowStateKeeper from './utils/windowStateKeeper'
 import EddDatabase from './utils/database/EddDatabase'
+import setupEventListeners from './utils/setupEventListeners'
+import windowStateKeeper from './utils/windowStateKeeper'
 
 const userDataPath = app.getPath('userData')
 const database = new EddDatabase(userDataPath)
@@ -101,183 +85,15 @@ const createWindow = async () => {
     })
   })
 
-  // TODO organize event listeners, maybe strip out definitions into a new file?
-
-  appWindow.webContents.session.on('will-download', async (event, item, webContents) => {
-    await willDownload({
-      currentDownloadItems,
-      database,
-      downloadIdContext,
-      downloadsWaitingForAuth,
-      event,
-      item,
-      webContents
-    })
-  })
-
-  // Title bar click event handler
-  appWindow.on('resize', () => {
-    appWindow.webContents.send('windowsLinuxTitleBar', appWindow.isMaximized())
-  })
-
-  // Maximize the Windows OS layout
-  ipcMain.on('maximizeWindow', () => {
-    if (appWindow.isMaximized()) {
-      appWindow.unmaximize()
-    } else {
-      appWindow.maximize()
-    }
-  })
-
-  // Minimize the Windows OS layout
-  ipcMain.on('minimizeWindow', () => {
-    appWindow.minimize()
-  })
-
-  // Close the Windows OS layout
-  ipcMain.on('closeWindow', () => {
-    appWindow.close()
-  })
-
-  ipcMain.on('chooseDownloadLocation', () => {
-    chooseDownloadLocation({
-      appWindow
-    })
-  })
-
-  ipcMain.on('beginDownload', async (event, info) => {
-    await beginDownload({
-      currentDownloadItems,
-      database,
-      downloadIdContext,
-      info,
-      webContents: appWindow.webContents
-    })
-  })
-
-  ipcMain.on('setPreferenceFieldValue', async (event, field, value) => {
-    await setPreferenceFieldValue({
-      database,
-      field,
-      value
-    })
-  })
-
-  ipcMain.handle('getPreferenceFieldValue', async (event, field) => {
-    const value = await getPreferenceFieldValue({
-      database,
-      field
-    })
-    return value
-  })
-
-  appWindow.webContents.once('did-finish-load', () => {
-    // Show the electron appWindow
-    appWindow.show()
-
-    // Open the DevTools if running in development.
-    if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })
-  })
-
-  ipcMain.on('pauseDownloadItem', async (event, info) => {
-    await pauseDownloadItem({
-      currentDownloadItems,
-      database,
-      info
-    })
-  })
-
-  ipcMain.on('cancelDownloadItem', async (event, info) => {
-    await cancelDownloadItem({
-      currentDownloadItems,
-      database,
-      info
-    })
-  })
-
-  ipcMain.on('cancelErroredDownloadItem', async (event, info) => {
-    await cancelErroredDownloadItem({
-      currentDownloadItems,
-      database,
-      info
-    })
-  })
-
-  ipcMain.on('resumeDownloadItem', async (event, info) => {
-    await resumeDownloadItem({
-      currentDownloadItems,
-      database,
-      info
-    })
-  })
-
-  ipcMain.on('retryDownloadItem', async (event, info) => {
-    await retryDownloadItem({
-      currentDownloadItems,
-      database,
-      downloadIdContext,
-      info,
-      webContents: appWindow.webContents
-    })
-  })
-
-  ipcMain.on('restartDownload', async (event, info) => {
-    await restartDownload({
-      currentDownloadItems,
-      database,
-      downloadIdContext,
-      info,
-      webContents: appWindow.webContents
-    })
-  })
-
-  // Set up an interval to report progress to the renderer process every 1s
-  const reportProgressInterval = setInterval(async () => {
-    await reportProgress({
-      database,
-      webContents: appWindow.webContents
-    })
-  }, 1000)
-
-  // When the window is going to close, clear the reportProgressInterval
-  appWindow.on('close', () => {
-    if (reportProgressInterval) clearInterval(reportProgressInterval)
-  })
-
-  ipcMain.on('openDownloadFolder', async (event, info) => {
-    await openDownloadFolder({
-      database,
-      info
-    })
-  })
-
-  ipcMain.on('copyDownloadPath', async (event, info) => {
-    await copyDownloadPath({
-      database,
-      info
-    })
-  })
-
-  ipcMain.on('sendToLogin', async (event, info) => {
-    await sendToLogin({
-      database,
-      downloadsWaitingForAuth,
-      info,
-      webContents: appWindow.webContents
-    })
-  })
-
-  // Open `target="_blank"` links in the system browser
-  appWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url)
-    return { action: 'deny' }
+  // Setup event listeners that depend on appWindow
+  setupEventListeners({
+    appWindow,
+    currentDownloadItems,
+    database,
+    downloadIdContext,
+    downloadsWaitingForAuth
   })
 }
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-// app.whenReady().then(createWindow)
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

@@ -4,7 +4,7 @@ import downloadStates from '../../app/constants/downloadStates'
 import startNextDownload from '../utils/startNextDownload'
 
 /**
- * Updates the downloadIds within `info` to active and restarts downloads
+ * Updates the necessary files to to pending and and calls `startNextDownload`
  * @param {Object} params
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {Object} params.database `EddDatabase` instance
@@ -12,14 +12,13 @@ import startNextDownload from '../utils/startNextDownload'
  * @param {Object} params.info `info` parameter from ipc message
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
-const retryDownloadItem = async ({
+const retryErroredDownloadItem = async ({
   currentDownloadItems,
   database,
   downloadIdContext,
   info,
   webContents
 }) => {
-  console.log('🚀 ~ file: retryDownloadItem.ts:73 ~ info:', info)
   const { downloadId, filename } = info
 
   if (downloadId && filename) {
@@ -50,4 +49,4 @@ const retryDownloadItem = async ({
   })
 }
 
-export default retryDownloadItem
+export default retryErroredDownloadItem

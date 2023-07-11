@@ -25,7 +25,6 @@ const onDone = async ({
   webContents
 }) => {
   const filename = item.getFilename()
-  console.log('🚀 ~ file: onDone.ts:28 ~ filename:', filename)
 
   // Get the download item from the database
   const file = await database.getFileWhere({
@@ -44,19 +43,16 @@ const onDone = async ({
 
   // Remove the item from the currentDownloadItems
   currentDownloadItems.removeItem(downloadId, filename)
+  let errors
 
   let updatedState
   switch (state) {
     case 'cancelled':
-      // TODO should this go into cancelled
-      updatedState = downloadStates.pending
+      updatedState = downloadStates.cancelled
       break
     case 'interrupted':
-      // TODO how to get a file into this state?
-      // Try deleting in progress file from downloads folder
-      // Try serving file from local server, deleting file as it is downloading from server
-      // Try taking server offline during download
       updatedState = downloadStates.error
+      errors = 'This file could not be downloaded'
       break
     default:
       updatedState = downloadStates.completed
@@ -65,9 +61,10 @@ const onDone = async ({
 
   // Update the state in the database
   await database.updateFile(fileId, {
-    timeEnd: new Date().getTime(),
+    errors,
+    percent: updatedState === downloadStates.completed ? 100 : 0,
     state: updatedState,
-    percent: updatedState === downloadStates.completed ? 100 : 0
+    timeEnd: new Date().getTime()
   })
 
   // Start the next download

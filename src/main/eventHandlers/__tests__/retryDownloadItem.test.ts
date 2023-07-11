@@ -2,7 +2,7 @@
 
 import downloadStates from '../../../app/constants/downloadStates'
 
-import retryDownloadItem from '../retryDownloadItem'
+import retryDownloadItem from '../retryErroredDownloadItem'
 
 import startNextDownload from '../../utils/startNextDownload'
 

@@ -75,17 +75,6 @@ class EddDatabase {
     return this.db('downloads').select().where({ id: downloadId }).first()
   }
 
-  // /**
-  //  * Returns a download given the downloadId.
-  //  * @param {String} downloadId downloadId for download.
-  //  */
-  // async getNumErrors() {
-  //   const [result] = await this.db('downloads').sum('numErrors')
-  //   const { 'sum(`numErrors`)': sum } = result
-
-  //   return sum
-  // }
-
   /**
    * Creates a new download.
    * @param {String} downloadId ID of download to create.
@@ -185,26 +174,6 @@ class EddDatabase {
     return number
   }
 
-  // /**
-  //  * Returns the count of selected files.
-  //  * @param {Object} where Knex `where` object to select downloads.
-  //  */
-  // async getFileStateCounts(downloadId) {
-  //   const stateCounts = {}
-  //   const checkedStates = ['ACTIVE', 'COMPLETED', 'ERROR', 'PAUSED']
-  //   checkedStates.forEach(async (state) => {
-  //     const [result] = await this.db('files').count('id').where({
-  //       downloadId,
-  //       state: downloadStates[state]
-  //     })
-  //     const { 'count(`id`)': number } = result
-
-  //     stateCounts[state] = number
-  //   })
-
-  //   return stateCounts
-  // }
-
   /**
    * Returns count of files that are not in the `completed` state for the given downloadId
    * @param {String} downloadId Id of the download to add files.
@@ -213,9 +182,7 @@ class EddDatabase {
     const [result] = await this.db('files')
       .count('id')
       .where({ downloadId })
-      // TODO this seems wrong
-      // .whereNot({ state: downloadStates.completed && downloadStates.error })
-      .whereNotIn('state', [downloadStates.completed, downloadStates.error])
+      .whereNotIn('state', [downloadStates.completed, downloadStates.cancelled])
 
     const { 'count(`id`)': number } = result
 
@@ -232,20 +199,12 @@ class EddDatabase {
   }
 
   /**
-   * Updates the given file.
-   * @param {Number} fileId ID of files to update.
+   * Updates the given files.
+   * @param {Object} where Knex `where` object to select files.
    * @param {Object} data The data of the file to be updated.
    */
   async updateFilesWhere(where, data) {
     return this.db('files').update(data).where(where)
-  }
-
-  /**
- * Deletes the given file.
- * @param {Number} fileId ID of files to update.
- */
-  async deleteFile(fileId) {
-    await this.db('files').delete().where({ filename: fileId })
   }
 
   /**

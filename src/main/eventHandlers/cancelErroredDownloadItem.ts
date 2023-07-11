@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../app/constants/downloadStates'
+import finishDownload from './willDownloadEvents/finishDownload'
 
 /**
  * Cancels a download and updates the database state
@@ -9,7 +10,7 @@ import downloadStates from '../../app/constants/downloadStates'
  * @param {Object} params.database `EddDatabase` instance
  * @param {Object} params.info `info` parameter from ipc message
  */
-const cancelDownloadItem = async ({
+const cancelErroredDownloadItem = async ({
   currentDownloadItems,
   database,
   info
@@ -28,15 +29,19 @@ const cancelDownloadItem = async ({
   }
 
   if (downloadId && !filename) {
-    await database.updateDownloadById(downloadId, {
+    await database.updateFilesWhere({
+      downloadId,
+      state: downloadStates.error
+    }, {
       state: downloadStates.cancelled
     })
   }
 
-  // TODO EDD-30 put the downloads into a cancelled state
-  if (!downloadId) {
-    await database.deleteAllDownloads()
-  }
+  // Finish the download
+  await finishDownload({
+    database,
+    downloadId
+  })
 }
 
-export default cancelDownloadItem
+export default cancelErroredDownloadItem

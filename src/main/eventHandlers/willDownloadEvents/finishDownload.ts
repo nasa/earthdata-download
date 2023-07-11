@@ -13,6 +13,7 @@ const finishDownload = async ({
   downloadId
 }) => {
   const notCompleteFilesCount = await database.getNotCompletedFilesCountByDownloadId(downloadId)
+  console.log('🚀 ~ file: finishDownload.ts:16 ~ notCompleteFilesCount:', notCompleteFilesCount)
 
   if (notCompleteFilesCount === 0) {
     await database.updateDownloadById(downloadId, {

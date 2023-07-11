@@ -55,12 +55,12 @@ const MoreErrorInfo = ({
   const errorMessage = 'Server responded with an error while downloading files. If the errors persist, please contact the data provider.'
 
   const {
-    cancelDownloadItem,
+    cancelErroredDownloadItem,
     retryDownloadItem
   } = useContext(ElectronApiContext)
 
   const onCancelDownloadItem = (downloadId, filename) => {
-    cancelDownloadItem({ downloadId, filename })
+    cancelErroredDownloadItem({ downloadId, filename })
   }
 
   const onRetryDownloadItem = (downloadId, filename) => {

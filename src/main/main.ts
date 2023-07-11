@@ -11,18 +11,20 @@ import path from 'path'
 
 import beginDownload from './eventHandlers/beginDownload'
 import cancelDownloadItem from './eventHandlers/cancelDownloadItem'
+import cancelErroredDownloadItem from './eventHandlers/cancelErroredDownloadItem'
 import chooseDownloadLocation from './eventHandlers/chooseDownloadLocation'
 import copyDownloadPath from './eventHandlers/copyDownloadPath'
+import getPreferenceFieldValue from './eventHandlers/getPreferenceFieldValue'
 import openDownloadFolder from './eventHandlers/openDownloadFolder'
 import openUrl from './eventHandlers/openUrl'
 import pauseDownloadItem from './eventHandlers/pauseDownloadItem'
-import retryDownloadItem from './eventHandlers/retryDownloadItem'
 import reportProgress from './eventHandlers/reportProgress'
+import restartDownload from './eventHandlers/restartDownload'
 import resumeDownloadItem from './eventHandlers/resumeDownloadItem'
+import retryDownloadItem from './eventHandlers/retryDownloadItem'
 import sendToLogin from './eventHandlers/sendToLogin'
-import willDownload from './eventHandlers/willDownload'
 import setPreferenceFieldValue from './eventHandlers/setPreferenceFieldValue'
-import getPreferenceFieldValue from './eventHandlers/getPreferenceFieldValue'
+import willDownload from './eventHandlers/willDownload'
 
 import CurrentDownloadItems from './utils/currentDownloadItems'
 import windowStateKeeper from './utils/windowStateKeeper'
@@ -193,6 +195,14 @@ const createWindow = async () => {
     })
   })
 
+  ipcMain.on('cancelErroredDownloadItem', async (event, info) => {
+    await cancelErroredDownloadItem({
+      currentDownloadItems,
+      database,
+      info
+    })
+  })
+
   ipcMain.on('resumeDownloadItem', async (event, info) => {
     await resumeDownloadItem({
       currentDownloadItems,
@@ -203,6 +213,16 @@ const createWindow = async () => {
 
   ipcMain.on('retryDownloadItem', async (event, info) => {
     await retryDownloadItem({
+      currentDownloadItems,
+      database,
+      downloadIdContext,
+      info,
+      webContents: appWindow.webContents
+    })
+  })
+
+  ipcMain.on('restartDownload', async (event, info) => {
+    await restartDownload({
       currentDownloadItems,
       database,
       downloadIdContext,

@@ -62,9 +62,6 @@ describe('EddDatabase', () => {
             name: '20230613195511_create_files.js'
           }, {
             name: '20230616233921_create_token.js'
-          },
-          {
-            name: '20230623200927_add_num_errors_column.js'
           }
           ])
         } else if (step === 5) {
@@ -240,24 +237,6 @@ describe('EddDatabase', () => {
       expect(result).toEqual({
         id: 'mock-download-1'
       })
-    })
-  })
-
-  describe('getNumErrors', () => {
-    test('returns requested collection number of errors', async () => {
-      dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select sum(`numErrors`) from `downloads`')
-        expect(query.bindings).toEqual([])
-
-        query.response([
-          { 'sum(`numErrors`)': 5 }
-        ])
-      })
-      const database = new EddDatabase('./')
-
-      const result = await database.getNumErrors()
-
-      expect(result).toEqual(5)
     })
   })
 
@@ -488,10 +467,11 @@ describe('EddDatabase', () => {
   describe('getNotCompletedFilesCountByDownloadId', () => {
     test('returns requested file count', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select count(`id`) from `files` where `downloadId` = ? and not `state` = ?')
+        expect(query.sql).toEqual('select count(`id`) from `files` where `downloadId` = ? and `state` not in (?, ?)')
         expect(query.bindings).toEqual([
           'mock-download-1',
-          downloadStates.error
+          downloadStates.completed,
+          downloadStates.cancelled
         ])
 
         query.response([
@@ -519,6 +499,28 @@ describe('EddDatabase', () => {
 
       await database.updateFile('mock-file-1', {
         state: downloadStates.active
+      })
+    })
+  })
+
+  describe('updateFilesWhere', () => {
+    test('updates the requested file', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('update `files` set `state` = ? where `state` = ?')
+        expect(query.bindings).toEqual([
+          downloadStates.pending,
+          downloadStates.error
+        ])
+
+        // We aren't returning anything from this method, the above assertions are the important part of the test
+        query.response([1])
+      })
+      const database = new EddDatabase('./')
+
+      await database.updateFilesWhere({
+        state: downloadStates.error
+      }, {
+        state: downloadStates.pending
       })
     })
   })
@@ -564,7 +566,7 @@ describe('EddDatabase', () => {
   describe('getDownloadFilesProgressByDownloadId', () => {
     test('updates the requested file', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select sum(`percent`) as `percentSum`, count(`id`) as `totalFiles`, count(CASE "state" WHEN "COMPLETED" THEN 1 ELSE NULL END) as `finishedFiles` from `files` where `downloadId` = ?')
+        expect(query.sql).toEqual('select sum(`percent`) as `percentSum`, count(`id`) as `totalFiles`, count(CASE "state" WHEN "COMPLETED" THEN 1 ELSE NULL END) as `finishedFiles`, count(CASE "state" WHEN "ERROR" THEN 1 ELSE NULL END) as `erroredFiles` from `files` where `downloadId` = ?')
         expect(query.bindings).toEqual(['mock-download-1'])
 
         query.response([{

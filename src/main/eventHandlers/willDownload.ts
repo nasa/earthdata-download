@@ -87,14 +87,6 @@ const willDownload = async ({
       errors: 'This file could not be downloaded'
     })
 
-    // // TODO what is numErrors for?
-    // const download = await database.getDownloadById(downloadId)
-    // const { numErrors } = download
-
-    // await database.updateDownloadById(downloadId, {
-    //   numErrors: numErrors + 1
-    // })
-
     item.cancel()
 
     return

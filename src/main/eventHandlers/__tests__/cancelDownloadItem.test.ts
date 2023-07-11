@@ -1,21 +1,23 @@
+// @ts-nocheck
+
+import downloadStates from '../../../app/constants/downloadStates'
+
 import cancelDownloadItem from '../cancelDownloadItem'
 
 describe('cancelDownloadItem', () => {
   describe('when downloadId and name are provided', () => {
-    test('calls currentDownloadItems.cancelItem', async () => {
+    test('updates the file state', async () => {
       const currentDownloadItems = {
         cancelItem: jest.fn()
       }
       const info = {
         downloadId: 'mock-download-id',
-        name: 'mock-filename.png'
+        filename: 'mock-filename.png'
       }
       const database = {
-        getDownloadById: jest.fn().mockResolvedValue({ numErrors: 1 }),
-        deleteDownloadById: jest.fn(),
         deleteAllDownloads: jest.fn(),
         updateDownloadById: jest.fn(),
-        deleteFile: jest.fn()
+        updateFilesWhere: jest.fn()
       }
 
       await cancelDownloadItem({
@@ -27,16 +29,21 @@ describe('cancelDownloadItem', () => {
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
-      expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: 'COMPLETED' })
+      expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
+      expect(database.updateFilesWhere).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id',
+        filename: 'mock-filename.png'
+      }, {
+        state: downloadStates.cancelled
+      })
 
-      expect(database.deleteDownloadById).toHaveBeenCalledTimes(0)
+      expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
       expect(database.deleteAllDownloads).toHaveBeenCalledTimes(0)
     })
   })
 
   describe('when only downloadId is provided', () => {
-    test('calls currentDownloadItems.cancelItem and updates the database', async () => {
+    test('updates the files state', async () => {
       const currentDownloadItems = {
         cancelItem: jest.fn()
       }
@@ -44,9 +51,9 @@ describe('cancelDownloadItem', () => {
         downloadId: 'mock-download-id'
       }
       const database = {
-        deleteDownloadById: jest.fn(),
         deleteAllDownloads: jest.fn(),
-        updateDownloadById: jest.fn()
+        updateDownloadById: jest.fn(),
+        updateFilesWhere: jest.fn()
       }
 
       await cancelDownloadItem({
@@ -59,11 +66,9 @@ describe('cancelDownloadItem', () => {
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: 'COMPLETED' })
+      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: 'CANCELLED' })
 
-      expect(database.deleteDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.deleteDownloadById).toHaveBeenCalledWith('mock-download-id')
-
+      expect(database.updateFilesWhere).toHaveBeenCalledTimes(0)
       expect(database.deleteAllDownloads).toHaveBeenCalledTimes(0)
     })
   })

@@ -61,8 +61,9 @@ const Downloads = ({
     openDownloadFolder,
     pauseDownloadItem,
     reportProgress,
-    retryDownloadItem,
+    restartDownload,
     resumeDownloadItem,
+    retryDownloadItem,
     sendToLogin,
     setDownloadLocation
   } = useContext(ElectronApiContext)
@@ -130,12 +131,16 @@ const Downloads = ({
     copyDownloadPath({ downloadId })
   }
 
-  const onResumeDownloadItem = (downloadId) => {
-    resumeDownloadItem({ downloadId })
-  }
-
   const onCancelDownloadItem = (downloadId) => {
     cancelDownloadItem({ downloadId })
+  }
+
+  const onRestartDownload = (downloadId) => {
+    restartDownload({ downloadId })
+  }
+
+  const onResumeDownloadItem = (downloadId) => {
+    resumeDownloadItem({ downloadId })
   }
 
   const onRetryDownloadItem = (downloadId) => {
@@ -372,8 +377,7 @@ const Downloads = ({
           label: 'Restart Download',
           isActive: true,
           isPrimary: false,
-          // TODO this needs to set all files to pending first, probably don't use onRetryDownloadItem for it
-          callback: () => onRetryDownloadItem(downloadId),
+          callback: () => onRestartDownload(downloadId),
           icon: FaInfoCircle
         },
         {

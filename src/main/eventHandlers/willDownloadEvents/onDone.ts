@@ -33,8 +33,6 @@ const onDone = async ({
     downloadId
   })
 
-  // const download = await database.getDownloadById(downloadId)
-
   // If the file is not found in the database, cancel the download
   if (!file) {
     return

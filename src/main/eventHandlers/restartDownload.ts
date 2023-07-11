@@ -12,35 +12,27 @@ import startNextDownload from '../utils/startNextDownload'
  * @param {Object} params.info `info` parameter from ipc message
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
-const retryDownloadItem = async ({
+const restartDownload = async ({
   currentDownloadItems,
   database,
   downloadIdContext,
   info,
   webContents
 }) => {
-  console.log('🚀 ~ file: retryDownloadItem.ts:73 ~ info:', info)
-  const { downloadId, filename } = info
+  const { downloadId } = info
 
-  if (downloadId && filename) {
-    // Set the file to pending, and call startNextDownload
-    await database.updateFilesWhere({
-      downloadId,
-      filename
-    }, {
-      state: downloadStates.pending
-    })
-  }
+  // Set the files to pending
+  await database.updateFilesWhere({
+    downloadId
+  }, {
+    state: downloadStates.pending
+  })
 
-  if (downloadId && !filename) {
-    // Retry all errored files for downloadId
-    await database.updateFilesWhere({
-      downloadId,
-      state: downloadStates.error
-    }, {
-      state: downloadStates.pending
-    })
-  }
+  // Set the download to active
+  await database.updateDownloadById(downloadId, {
+    state: downloadStates.active,
+    timeStart: new Date().getTime()
+  })
 
   await startNextDownload({
     currentDownloadItems,
@@ -50,4 +42,4 @@ const retryDownloadItem = async ({
   })
 }
 
-export default retryDownloadItem
+export default restartDownload

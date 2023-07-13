@@ -27,6 +27,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   maximizeWindow: () => ipcRenderer.send('maximizeWindow'),
 
   // Messages to be received by the renderer process
+  autoUpdateAvailable: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('autoUpdateAvailable', callback),
+  autoUpdateProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('autoUpdateProgress', callback),
   initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('initializeDownload', callback),
   reportProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('reportProgress', callback),
   setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('setDownloadLocation', callback),

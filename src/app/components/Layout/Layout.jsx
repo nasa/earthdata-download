@@ -34,6 +34,7 @@ import * as styles from './Layout.module.scss'
  */
 const Layout = () => {
   const {
+    autoUpdateAvailable,
     closeWindow,
     minimizeWindow,
     maximizeWindow,
@@ -55,6 +56,18 @@ const Layout = () => {
   }
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
   const [hasActiveDownload, setHasActiveDownload] = useState(false)
+
+  // const onAutoUpdateAvailable = () => {
+  //   console.log('🚀 ~ file: Layout.jsx:56 ~ onAutoUpdateAvailable ~ onAutoUpdateAvailable:')
+  //   setNewAppVersionDialogOpen(true)
+  // }
+
+  // const onCloseNewAppVersionDialog = () => {
+  //   setNewAppVersionDialogOpen(false)
+  //   setInstallOnQuit(true)
+  // }
+
+  // TODO add toast to show update download progress
 
   let pageComponent
 
@@ -79,9 +92,11 @@ const Layout = () => {
 
   useEffect(() => {
     windowsLinuxTitleBar(true, onWindowMaximized)
+    // autoUpdateAvailable(true, onAutoUpdateAvailable)
 
     return () => {
       windowsLinuxTitleBar(false, onWindowMaximized)
+      // autoUpdateAvailable(false, onAutoUpdateAvailable)
     }
   }, [])
 

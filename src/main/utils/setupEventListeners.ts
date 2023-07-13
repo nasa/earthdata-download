@@ -29,6 +29,7 @@ import willDownload from '../eventHandlers/willDownload'
  */
 const setupEventListeners = ({
   appWindow,
+  autoUpdater,
   currentDownloadItems,
   database,
   downloadIdContext,
@@ -221,12 +222,14 @@ const setupEventListeners = ({
    */
 
   // When the application finished loading, show the appWindow
-  appWindow.webContents.once('did-finish-load', () => {
+  appWindow.webContents.once('did-finish-load', async () => {
     // Show the electron appWindow
     appWindow.show()
 
     // Open the DevTools if running in development.
     if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })
+
+    await autoUpdater.checkForUpdates()
   })
 
   // When a `target=_blank` link is clicked, open in an external browser

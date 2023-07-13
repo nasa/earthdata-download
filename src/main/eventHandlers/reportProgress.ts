@@ -25,6 +25,7 @@ const reportProgress = async ({
 
   const promises = downloads.map(async (download) => {
     const {
+      createdAt,
       id: downloadId,
       loadingMoreFiles,
       name: downloadName = downloadId,
@@ -60,7 +61,7 @@ const reportProgress = async ({
 
     const lastTime = timeEnd || now
 
-    const totalTime = Math.ceil((lastTime - timeStart) / 1000)
+    const totalTime = Math.ceil((lastTime - (timeStart || createdAt)) / 1000)
 
     const progress = {
       percent,

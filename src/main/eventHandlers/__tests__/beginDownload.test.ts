@@ -1,8 +1,12 @@
+// @ts-nocheck
+
 import MockDate from 'mockdate'
 
 import beginDownload from '../beginDownload'
 import CurrentDownloadItems from '../../utils/currentDownloadItems'
 import startNextDownload from '../../utils/startNextDownload'
+
+import downloadStates from '../../../app/constants/downloadStates'
 
 jest.mock('../../utils/startNextDownload', () => ({
   __esModule: true,
@@ -25,7 +29,7 @@ describe('beginDownload', () => {
     }
     const database = {
       setPreferences: jest.fn(),
-      getDownloadById: jest.fn().mockResolvedValue({ state: 'PENDING' }),
+      getDownloadById: jest.fn().mockResolvedValue({ state: downloadStates.starting }),
       updateDownloadById: jest.fn()
     }
     const webContents = {
@@ -74,7 +78,7 @@ describe('beginDownload', () => {
     }
     const database = {
       setPreferences: jest.fn(),
-      getDownloadById: jest.fn().mockResolvedValue({ state: 'PENDING' }),
+      getDownloadById: jest.fn().mockResolvedValue({ state: downloadStates.starting }),
       updateDownloadById: jest.fn()
     }
     const webContents = {

@@ -40,7 +40,7 @@ const beginDownload = async ({
   const promises = downloadIds.map(async (downloadId) => {
     const { state } = await database.getDownloadById(downloadId)
 
-    if (state === downloadStates.pending) {
+    if (state === downloadStates.starting) {
       // Update the download in the database
       await database.updateDownloadById(downloadId, {
         downloadLocation: path.join(downloadLocation, downloadId),

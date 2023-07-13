@@ -48,31 +48,23 @@ const isTrustedLink = (link: string) => {
 const fetchLinks = async ({
   appWindow,
   database,
-  downloadId: downloadIdWithoutTime,
-  getLinks,
-  authUrl,
-  token
+  downloadId,
+  getLinksToken,
+  getLinksUrl
 }) => {
-  const now = new Date().toISOString().replace(/(:|-)/g, '').replace('T', '_')
-    .split('.')[0]
-
-  const downloadId = `${downloadIdWithoutTime}-${now}`
-
   // Create a download in the database
-  await database.createDownload(downloadId, {
+  await database.updateDownloadById(downloadId, {
     loadingMoreFiles: true,
-    authUrl,
-    state: downloadStates.pending,
-    createdAt: new Date().getTime()
+    state: downloadStates.starting
   })
 
   // If the getLinks URL is not trusted, don't fetch the links
-  if (!isTrustedLink(getLinks)) {
+  if (!isTrustedLink(getLinksUrl)) {
     await database.updateDownloadById(downloadId, {
       loadingMoreFiles: false,
       state: downloadStates.error,
       errors: [{
-        message: `The host [${getLinks}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
+        message: `The host [${getLinksUrl}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
       }]
     })
 
@@ -90,7 +82,7 @@ const fetchLinks = async ({
     /* eslint-disable no-await-in-loop */
     while (!finished) {
       // node-fetch doesn't play nice with `localhost`, replace it with 127.0.0.1 for local dev
-      let updatedUrl = getLinks.replace('localhost', '127.0.0.1')
+      let updatedUrl = getLinksUrl.replace('localhost', '127.0.0.1')
 
       // If a cursor exists, add it to the URL
       if (cursor) {
@@ -103,8 +95,8 @@ const fetchLinks = async ({
       const headers = {}
 
       // If a token exists, add it to the `Authorization` header
-      if (token) {
-        headers.Authorization = token
+      if (getLinksToken) {
+        headers.Authorization = getLinksToken
       }
 
       // eslint-disable-next-line no-await-in-loop

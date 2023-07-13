@@ -1,7 +1,8 @@
 // @ts-nocheck
 
-import fetchLinks from '../utils/fetchLinks'
 import startNextDownload from '../utils/startNextDownload'
+import startPendingDownloads from '../utils/startPendingDownloads'
+
 import downloadStates from '../../app/constants/downloadStates'
 
 /**
@@ -22,7 +23,7 @@ const openUrl = async ({
   deepLink,
   downloadIdContext,
   downloadsWaitingForAuth,
-  webContents
+  updateAvailable
 }) => {
   const url = new URL(deepLink)
   const {
@@ -32,19 +33,35 @@ const openUrl = async ({
 
   // Start a new download
   if (hostname === 'startDownload') {
-    const getLinks = searchParams.get('getLinks')
-    const downloadId = searchParams.get('downloadId')
-    const token = searchParams.get('token')
     const authUrl = searchParams.get('authUrl')
+    const downloadIdWithoutTime = searchParams.get('downloadId')
+    const getLinksToken = searchParams.get('token')
+    const getLinksUrl = searchParams.get('getLinks')
 
-    fetchLinks({
-      appWindow,
-      database,
-      downloadId,
-      getLinks,
+    const now = new Date()
+      .toISOString()
+      .replace(/(:|-)/g, '')
+      .replace('T', '_')
+      .split('.')[0]
+    const downloadId = `${downloadIdWithoutTime}-${now}`
+
+    // Create a download in the database
+    await database.createDownload(downloadId, {
       authUrl,
-      token
+      createdAt: new Date().getTime(),
+      getLinksToken,
+      getLinksUrl,
+      state: downloadStates.pending
     })
+
+    // If an app update is not available, start fetching links
+    // Check for false as value is inialized as undefined
+    if (updateAvailable === false) {
+      await startPendingDownloads({
+        appWindow,
+        database
+      })
+    }
   }
 
   // User has been authenticated, save the new token and start the download
@@ -66,7 +83,7 @@ const openUrl = async ({
       state: downloadStates.active
     })
 
-    webContents.send('showWaitingForLoginDialog', { showDialog: false })
+    appWindow.webContents.send('showWaitingForLoginDialog', { showDialog: false })
 
     // Restart the fileId that was waitingForAuth
     await startNextDownload({

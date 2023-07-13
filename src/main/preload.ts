@@ -32,6 +32,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'off']('setDownloadLocation', callback),
   showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'off']('showWaitingForLoginDialog', callback),
   windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'off']('windowsLinuxTitleBar', callback),
+  autoUpdateProgress: (on, callback) => ipcRenderer[on ? 'on' : 'off']('autoUpdateProgress', callback),
+  autoUpdateAvailable: (on, callback) => ipcRenderer[on ? 'on' : 'off']('autoUpdateAvailable', callback),
 
   // System values for renderer
   isMac: process.platform === 'darwin',

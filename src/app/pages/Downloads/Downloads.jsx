@@ -115,7 +115,7 @@ const Downloads = ({
     }
   }
 
-  const onCloseChooseLocationModal = () => {
+  const onCloseChooseLocationDialog = () => {
     setChooseDownloadLocationIsOpen(false)
   }
 
@@ -415,7 +415,7 @@ const Downloads = ({
           downloadIds={downloadIds}
           downloadLocation={selectedDownloadLocation}
           setDownloadIds={setDownloadIds}
-          onCloseChooseLocationModal={onCloseChooseLocationModal}
+          onCloseChooseLocationDialog={onCloseChooseLocationDialog}
         />
       </Dialog>
       <ListPage

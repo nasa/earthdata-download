@@ -62,6 +62,8 @@ describe('EddDatabase', () => {
             name: '20230613195511_create_files.js'
           }, {
             name: '20230616233921_create_token.js'
+          }, {
+            name: '20230706005138_add_getLinks_token_to_downloads.js'
           }])
         } else if (step === 5) {
           // select `name` from `knex_migrations` order by `id` asc'
@@ -232,6 +234,28 @@ describe('EddDatabase', () => {
       const database = new EddDatabase('./')
 
       const result = await database.getDownloadById('mock-download-1')
+
+      expect(result).toEqual({
+        id: 'mock-download-1'
+      })
+    })
+  })
+
+  describe('getDownloadsWhere', () => {
+    test('returns requested download', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select `id`, `getLinksToken`, `getLinksUrl` from `downloads` where `state` = ?')
+        expect(query.bindings).toEqual([downloadStates.pending])
+
+        query.response({
+          id: 'mock-download-1'
+        })
+      })
+      const database = new EddDatabase('./')
+
+      const result = await database.getDownloadsWhere({
+        state: downloadStates.pending
+      })
 
       expect(result).toEqual({
         id: 'mock-download-1'

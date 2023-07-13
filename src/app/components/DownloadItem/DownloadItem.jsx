@@ -24,7 +24,7 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import commafy from '../../utils/commafy'
 import Dialog from '../Dialog/Dialog'
-import WaitingForLogin from '../../dialogs/InitializeDownload/WaitingForLogin'
+import WaitingForLogin from '../../dialogs/WaitingForLogin/WaitingForLogin'
 
 /**
  * @typedef {Object} DownloadItemProps

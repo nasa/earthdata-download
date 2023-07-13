@@ -1,0 +1,4 @@
+owner: nasa
+repo: earthdata-download
+provider: github
+updaterCacheDirName: earthdata-download-updater

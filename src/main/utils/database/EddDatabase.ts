@@ -76,6 +76,14 @@ class EddDatabase {
   }
 
   /**
+   * Returns the selected downloads.
+   * @param {Object} where Knex `where` object to select downloads.
+   */
+  async getDownloadsWhere(where) {
+    return this.db('downloads').select('id', 'getLinksToken', 'getLinksUrl').where(where)
+  }
+
+  /**
    * Creates a new download.
    * @param {String} downloadId ID of download to create.
    * @param {Object} data The data of the download to be inserted.

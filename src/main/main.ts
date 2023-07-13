@@ -3,8 +3,10 @@
 import {
   app,
   BrowserWindow,
+  dialog,
   session
 } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import path from 'path'
 
 import openUrl from './eventHandlers/openUrl'
@@ -13,11 +15,25 @@ import CurrentDownloadItems from './utils/currentDownloadItems'
 import EddDatabase from './utils/database/EddDatabase'
 import setupEventListeners from './utils/setupEventListeners'
 import windowStateKeeper from './utils/windowStateKeeper'
+import startPendingDownloads from './utils/startPendingDownloads'
 
 const userDataPath = app.getPath('userData')
 const database = new EddDatabase(userDataPath)
 
 const currentDownloadItems = new CurrentDownloadItems()
+
+autoUpdater.autoDownload = true
+autoUpdater.autoInstallOnAppQuit = true
+// autoUpdater.forceDevUpdateConfig = true
+console.log('version', autoUpdater.currentVersion)
+
+// Call the install new version
+// autoUpdater.quitAndInstall()
+
+// Remember if an available update was found when the app launched
+// If a startDownload link launches the app when it is already opened,
+// we want to be able to start that download right away
+let updateAvailable
 
 let appWindow
 
@@ -89,6 +105,7 @@ const createWindow = async () => {
   // Setup event listeners that depend on appWindow
   setupEventListeners({
     appWindow,
+    autoUpdater,
     currentDownloadItems,
     database,
     downloadIdContext,
@@ -145,6 +162,7 @@ if (!gotTheLock) {
       deepLink: url,
       downloadIdContext,
       downloadsWaitingForAuth,
+      updateAvailable,
       webContents: appWindow.webContents
     })
   })
@@ -157,6 +175,7 @@ if (!gotTheLock) {
       deepLink: url,
       downloadIdContext,
       downloadsWaitingForAuth,
+      updateAvailable,
       webContents: appWindow.webContents
     })
   })
@@ -166,3 +185,62 @@ if (!gotTheLock) {
     await createWindow()
   })
 }
+
+// autoUpdater.on('checking-for-update', () => {
+//   console.log('Checking for update...')
+// })
+autoUpdater.on('update-available', () => {
+  updateAvailable = true
+  console.log('Update available.')
+  appWindow.webContents.send('autoUpdateAvailable')
+})
+autoUpdater.on('update-not-available', async () => {
+  updateAvailable = false
+  console.log('Update not available.')
+  // Start any pending downloads
+  await startPendingDownloads({
+    appWindow,
+    database
+  })
+})
+autoUpdater.on('error', async (error) => {
+  // TODO what to do if there is an error here?
+  console.log(`Error in auto-updater. ${error}`)
+  // Start any pending downloads
+  await startPendingDownloads({
+    appWindow,
+    database
+  })
+})
+autoUpdater.on('download-progress', ({ percent }) => {
+  appWindow.webContents.send('autoUpdateProgress', percent)
+  console.log('🚀 ~ file: main.ts:350 ~ autoUpdater.on ~ percent:', percent)
+})
+autoUpdater.on('update-downloaded', async () => {
+  console.log('Update downloaded')
+  // appWindow.webContents.send('autoUpdateProgress', 100)
+
+  const result = dialog.showMessageBoxSync(null, {
+    title: 'Update Available',
+    detail: 'A new version of Earthdata Download is ready to be installed.',
+    message: 'Update Available',
+    buttons: ['Install now', 'Install on next launch'],
+    cancelId: 1
+  })
+
+  // Install now
+  if (result === 0) {
+    autoUpdater.quitAndInstall()
+  }
+
+  // Install on next launch
+  if (result === 1) {
+    updateAvailable = false
+    // Start any pending downloads
+    await startPendingDownloads({
+      appWindow,
+      database
+    })
+  }
+  console.log('🚀 ~ file: main.ts:346 ~ autoUpdater.on ~ result:', result)
+})

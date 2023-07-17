@@ -13,11 +13,16 @@ import Dialog from '../Dialog/Dialog'
 import DownloadHistory from '../../pages/DownloadHistory/DownloadHistory'
 import Downloads from '../../pages/Downloads/Downloads'
 import Settings from '../../dialogs/Settings/Settings'
-import { PAGES } from '../../constants/pages'
+import ToastList from '../ToastList/ToastList'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
+import useAppContext from '../../hooks/useAppContext'
+
+import { PAGES } from '../../constants/pages'
+
 import * as styles from './Layout.module.scss'
+
 /**
  * Renders a `Layout` page.
  *
@@ -37,6 +42,11 @@ const Layout = () => {
     isLinux,
     windowsLinuxTitleBar
   } = useContext(ElectronApiContext)
+
+  const appContext = useAppContext()
+  const { toasts: toastsApi } = appContext
+  const { toasts, dismissToast } = toastsApi
+
   const [currentPage, setCurrentPage] = useState(PAGES.downloads)
   const [isWindowMaximized, setIsWindowMaximized] = useState(false)
 
@@ -215,6 +225,11 @@ const Layout = () => {
       </header>
       <main className={styles.main}>
         {pageComponent}
+        <ToastList
+          className={styles.toastLt}
+          dismissToast={dismissToast}
+          toasts={toasts}
+        />
         <Dialog
           open={settingsDialogIsOpen}
           setOpen={setSettingsDialogIsOpen}

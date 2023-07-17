@@ -136,3 +136,13 @@ body {
     }
   }
 }
+
+.toastList {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  @media (width >= 30em) {
+    max-width: 80%;
+  }
+}

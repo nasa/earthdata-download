@@ -6,6 +6,7 @@ import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import Tooltip from '../Tooltip/Tooltip'
 
 import * as styles from './Button.module.scss'
+import createVariantClassName from '../../utils/createVariantName'
 
 /**
  * @typedef {Object} ButtonProps
@@ -89,11 +90,11 @@ const Button = forwardRef(({
       ref={ref}
       className={
         classNames([
+          className,
           styles.button,
-          styles[size],
-          styles[variant],
-          { [styles.hasLabel]: !hideLabel },
-          className
+          styles[createVariantClassName(size)],
+          styles[createVariantClassName(variant)],
+          { [styles.hasLabel]: !hideLabel }
         ])
       }
       data-testid={dataTestId}

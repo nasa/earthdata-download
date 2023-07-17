@@ -4,6 +4,7 @@ import '@testing-library/jest-dom'
 
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import Downloads from '../Downloads'
+import AppContext from '../../../context/AppContext'
 
 describe('Downloads component', () => {
   test('renders the downloads page', () => {
@@ -40,11 +41,18 @@ describe('Downloads component', () => {
         }
       }
       >
-        <Downloads
-          setCurrentPage={setCurrentPage}
-          hasActiveDownload={hasActiveDownload}
-          setHasActiveDownload={setHasActiveDownload}
-        />
+        <AppContext.Provider value={{
+          toasts: {
+            addToast: () => {}
+          }
+        }}
+        >
+          <Downloads
+            setCurrentPage={setCurrentPage}
+            hasActiveDownload={hasActiveDownload}
+            setHasActiveDownload={setHasActiveDownload}
+          />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 

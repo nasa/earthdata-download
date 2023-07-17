@@ -20,12 +20,17 @@ jest.mock('../../../dialogs/Settings/Settings', () => jest.fn(({ children }) => 
     {children}
   </mock-Settings>
 )))
+jest.mock('../../../components/ToastList/ToastList', () => jest.fn(() => (
+  <mock-ToastList data-testid="ToastList" />
+)))
 
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
+import AppContext from '../../../context/AppContext'
 
 import Downloads from '../../../pages/Downloads/Downloads'
 import DownloadHistory from '../../../pages/DownloadHistory/DownloadHistory'
 import Settings from '../../../dialogs/Settings/Settings'
+import ToastList from '../../ToastList/ToastList'
 
 describe('Layout component', () => {
   test('renders the downloads page', () => {
@@ -40,7 +45,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -62,7 +72,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -92,7 +107,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -117,7 +137,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -142,7 +167,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -167,7 +197,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -188,7 +223,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -207,7 +247,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -231,7 +276,12 @@ describe('Layout component', () => {
           maximizeWindow: maximizeWindowMock
         }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -252,7 +302,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -271,7 +326,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -293,7 +353,12 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -317,7 +382,12 @@ describe('Layout component', () => {
         maximizeWindow: maximizeWindowMock
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
@@ -341,12 +411,92 @@ describe('Layout component', () => {
         maximizeWindow: jest.fn()
       }}
       >
-        <Layout />
+        <AppContext.Provider value={{
+          toasts: {}
+        }}
+        >
+          <Layout />
+        </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
     await user.click(screen.getByTestId('minimize-window'))
 
     expect(minimizeWindowMock).toHaveBeenCalledTimes(1)
+  })
+
+  describe('when toasts are not defined in the app context', () => {
+    test('renders the ToastList with the correct props', async () => {
+      const minimizeWindowMock = jest.fn()
+
+      render(
+        <ElectronApiContext.Provider value={{
+          isWin: true,
+          isMac: false,
+          isLinux: false,
+          windowsLinuxTitleBar: jest.fn(),
+          closeWindow: jest.fn(),
+          minimizeWindow: minimizeWindowMock,
+          maximizeWindow: jest.fn()
+        }}
+        >
+          <AppContext.Provider value={{
+            toasts: {
+              toasts: []
+            }
+          }}
+          >
+            <Layout />
+          </AppContext.Provider>
+        </ElectronApiContext.Provider>
+      )
+
+      expect(ToastList).toHaveBeenCalledTimes(1)
+      expect(ToastList).toHaveBeenCalledWith(expect.objectContaining({
+        toasts: []
+      }), {})
+    })
+  })
+
+  describe('when toasts are defined in the app context', () => {
+    test('renders the ToastList with the correct props', async () => {
+      const minimizeWindowMock = jest.fn()
+
+      render(
+        <ElectronApiContext.Provider value={{
+          isWin: true,
+          isMac: false,
+          isLinux: false,
+          windowsLinuxTitleBar: jest.fn(),
+          closeWindow: jest.fn(),
+          minimizeWindow: minimizeWindowMock,
+          maximizeWindow: jest.fn()
+        }}
+        >
+          <AppContext.Provider value={{
+            toasts: {
+              toasts: [
+                {
+                  id: 'mock-toast-id',
+                  message: 'Mock toast message'
+                }
+              ]
+            }
+          }}
+          >
+            <Layout />
+          </AppContext.Provider>
+        </ElectronApiContext.Provider>
+      )
+
+      expect(ToastList).toHaveBeenCalledTimes(1)
+      expect(ToastList).toHaveBeenCalledWith(expect.objectContaining({
+        toasts: [
+          expect.objectContaining({
+            id: 'mock-toast-id'
+          })
+        ]
+      }), {})
+    })
   })
 })

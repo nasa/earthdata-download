@@ -1,9 +1,22 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom'
+import { ToastProvider, ToastViewport } from '@radix-ui/react-toast'
+import { FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa'
+
+import AppContext from '../../../context/AppContext'
 
 import Toast from '../Toast'
+
+jest.mock('react-icons/fa', () => ({
+  FaExclamationTriangle: jest.fn(() => (
+    <mock-FaExclamationTriangle data-testid="FaExclamationTriangle" />
+  )),
+  FaInfoCircle: jest.fn(() => (
+    <mock-FaInfoCircle data-testid="FaInfoCircle" />
+  ))
+}))
 
 /**
  * JSDOM doesn't implement PointerEvent so we need to mock our own implementation
@@ -22,48 +35,178 @@ window.PointerEvent = MockPointerEvent
 window.HTMLElement.prototype.hasPointerCapture = jest.fn()
 
 describe('Toast component', () => {
-  describe('when the toast is not triggered', () => {
-    test('does not render the toast', () => {
+  test('renders the message', () => {
+    render(
+      <AppContext.Provider value={{
+        toasts: {}
+      }}
+      >
+        <ToastProvider>
+          <Toast
+            id="mock-toast-id"
+            dismissToast={() => {}}
+            message="This is a mock message"
+          />
+          <ToastViewport />
+        </ToastProvider>
+      </AppContext.Provider>
+    )
+
+    expect(screen.getByText('This is a mock message')).toBeInTheDocument()
+  })
+
+  test('renders the correct icon', () => {
+    render(
+      <AppContext.Provider value={{
+        toasts: {}
+      }}
+      >
+        <ToastProvider>
+          <Toast
+            id="mock-toast-id"
+            dismissToast={() => {}}
+            message="This is a mock message"
+          />
+          <ToastViewport />
+        </ToastProvider>
+      </AppContext.Provider>
+    )
+
+    expect(FaInfoCircle).toHaveBeenCalledTimes(1)
+  })
+
+  describe('when a title is defined', () => {
+    test('renders the title', () => {
       render(
-        <Toast open={false}>
-          Test Toast Content
-        </Toast>
+        <ToastProvider>
+          <Toast
+            id="mock-toast-id"
+            dismissToast={() => {}}
+            title="Mock title"
+            message="This is a mock message"
+          />
+          <ToastViewport />
+        </ToastProvider>
       )
 
-      expect(screen.queryByText('Test Toast Content')).not.toBeInTheDocument()
+      expect(screen.getByText('Mock title')).toBeInTheDocument()
     })
   })
 
-  describe('when the toast is triggered', () => {
-    test('renders the toast', () => {
+  describe('when a variant is defined', () => {
+    test('renders adds the class name', () => {
       render(
-        <Toast open>
-          Test Toast Content
-        </Toast>
+        <ToastProvider>
+          <Toast
+            id="mock-toast-id"
+            dismissToast={() => {}}
+            message="This is a mock message"
+            variant="danger"
+          />
+          <ToastViewport />
+        </ToastProvider>
       )
 
-      expect(screen.queryByText('Test Toast Content')).toBeInTheDocument()
+      expect(screen.getAllByRole('status')[0]).toHaveClass('isDanger')
     })
   })
 
-  describe('when closeButton is set', () => {
-    test('renders a close button', async () => {
+  describe('when a the danger variant is defined', () => {
+    test('renders adds the class name', () => {
       render(
-        <Toast
-          open
-          closeButton
-        >
-          Test Toast Content
-        </Toast>
+        <ToastProvider>
+          <Toast
+            id="mock-toast-id"
+            dismissToast={() => {}}
+            message="This is a mock message"
+            variant="danger"
+          />
+          <ToastViewport />
+        </ToastProvider>
       )
 
-      const user = userEvent.setup()
+      expect(FaExclamationTriangle).toHaveBeenCalledTimes(1)
+    })
+  })
 
-      const closeButton = screen.queryByTestId('toast-close-button')
-      expect(closeButton).toBeInTheDocument()
+  describe('when actions are defined', () => {
+    test('renders the actions', () => {
+      const actionOnClickMock = jest.fn()
 
-      await user.click(closeButton)
-      expect(screen.queryByText('Test Toast Content')).not.toBeInTheDocument()
+      render(
+        <ToastProvider>
+          <Toast
+            id="mock-toast-id"
+            dismissToast={() => {}}
+            message="This is a mock message"
+            actions={[{
+              altText: 'Mock alt text',
+              buttonProps: {
+                variant: 'danger',
+                onClick: actionOnClickMock
+              },
+              buttonText: 'Mock action'
+            }]}
+          />
+          <ToastViewport />
+        </ToastProvider>
+      )
+
+      expect(screen.getByRole('button', { name: 'Mock action' })).toBeInTheDocument()
+    })
+  })
+
+  describe('when actions are defined', () => {
+    test('renders the actions', async () => {
+      const actionOnClickMock = jest.fn()
+
+      render(
+        <ToastProvider>
+          <Toast
+            id="mock-toast-id"
+            dismissToast={() => {}}
+            message="This is a mock message"
+            actions={[{
+              altText: 'Mock alt text',
+              buttonProps: {
+                variant: 'danger',
+                onClick: actionOnClickMock
+              },
+              buttonText: 'Mock action'
+            }]}
+          />
+          <ToastViewport />
+        </ToastProvider>
+      )
+
+      const actionButton = screen.getByRole('button', { name: 'Mock action' })
+
+      await userEvent.click(actionButton)
+
+      expect(actionOnClickMock).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('when the dismiss toast button is clicked', () => {
+    test('calls the callback on the context', async () => {
+      const dismissToastMock = jest.fn()
+
+      render(
+        <ToastProvider>
+          <Toast
+            id="mock-toast-id"
+            dismissToast={dismissToastMock}
+            message="This is a mock message"
+          />
+          <ToastViewport />
+        </ToastProvider>
+      )
+
+      const actionButton = screen.getByRole('button', { name: 'Dismiss' })
+
+      await userEvent.click(actionButton)
+
+      expect(dismissToastMock).toHaveBeenCalledTimes(1)
     })
   })
 })

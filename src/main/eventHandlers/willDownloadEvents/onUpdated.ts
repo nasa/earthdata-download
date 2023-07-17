@@ -61,7 +61,9 @@ const onUpdated = async ({
     // Update the database with the percent and state
     await database.updateFileById(fileId, {
       state: item.isPaused() ? downloadStates.paused : downloadStates.active,
-      percent: percentDone
+      percent: percentDone,
+      receivedBytes,
+      totalBytes
     })
   }
 }

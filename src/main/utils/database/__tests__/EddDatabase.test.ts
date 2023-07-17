@@ -64,6 +64,9 @@ describe('EddDatabase', () => {
             name: '20230616233921_create_token.js'
           }, {
             name: '20230706005138_add_getLinks_token_to_downloads.js'
+          },
+          {
+            name: '20230717153820_add_byte_columns_to_files_table.js'
           }, {
             name: '20230724200528_add_eulaUrl_to_downloads.js'
           }])
@@ -572,6 +575,30 @@ describe('EddDatabase', () => {
       }, {
         state: downloadStates.pending
       })
+    })
+  })
+
+  describe('updateFilesWhereAndWhereNot', () => {
+    test('updates the requested file where and where not condition', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('update `files` set `state` = ? where `downloadId` = ? and not `state` = ?')
+        expect(query.bindings).toEqual([
+          downloadStates.cancelled,
+          'mock-download-1',
+          downloadStates.completed
+        ])
+
+        // We aren't returning anything from this method, the above assertions are the important part of the test
+        query.response([1])
+      })
+
+      const database = new EddDatabase('./')
+
+      await database.updateFilesWhereAndWhereNot(
+        { downloadId: 'mock-download-1' },
+        { state: downloadStates.completed },
+        { state: downloadStates.cancelled }
+      )
     })
   })
 

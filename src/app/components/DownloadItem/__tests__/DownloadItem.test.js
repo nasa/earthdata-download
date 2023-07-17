@@ -8,6 +8,7 @@ import { FaPause, FaSignInAlt } from 'react-icons/fa'
 import DownloadItem from '../DownloadItem'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import downloadStates from '../../../constants/downloadStates'
+import { PAGES } from '../../../constants/pages'
 
 const progress = {
   percent: 0,
@@ -19,13 +20,17 @@ const progress = {
 const setup = (overrideProps) => {
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
+  const startReportingFiles = jest.fn()
+  const setCurrentPage = jest.fn()
 
   const props = {
-    downloadId: 'download-id',
     downloadName: 'download-name',
-    progress,
     loadingMoreFiles: false,
+    progress,
     state: downloadStates.active,
+    actionsList: [],
+    runningFileDownloads: {},
+    setCurrentPage,
     ...overrideProps
   }
 
@@ -34,7 +39,8 @@ const setup = (overrideProps) => {
       value={
         {
           showWaitingForEulaDialog,
-          showWaitingForLoginDialog
+          showWaitingForLoginDialog,
+          startReportingFiles
         }
       }
     >
@@ -43,12 +49,30 @@ const setup = (overrideProps) => {
   )
 
   return {
+    setCurrentPage,
     showWaitingForEulaDialog,
-    showWaitingForLoginDialog
+    showWaitingForLoginDialog,
+    startReportingFiles
   }
 }
 
 describe('DownloadItem component', () => {
+  describe('when a download is starting', () => {
+    test('clicking on the `DownloadItem` will not redirect to `fileDownloads` page', async () => {
+      const { startReportingFiles, setCurrentPage } = setup({
+        state: downloadStates.starting,
+        loadingMoreFiles: true
+      })
+      const fileDownloadsPortal = screen.getByTestId('download-item-open-file-downloads')
+      expect(fileDownloadsPortal).toBeInTheDocument()
+      await userEvent.click(fileDownloadsPortal)
+
+      expect(setCurrentPage).toHaveBeenCalledTimes(0)
+
+      expect(startReportingFiles).toHaveBeenCalledTimes(0)
+    })
+  })
+
   describe('when a download is pending', () => {
     test('displays the correct download information', () => {
       setup({
@@ -60,6 +84,20 @@ describe('DownloadItem component', () => {
       expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
       expect(screen.queryByTestId('download-item-status-description')).not.toBeInTheDocument()
       expect(screen.getByTestId('download-item-state')).toHaveTextContent('Initializing')
+    })
+
+    test('clicking on the `DownloadItem` will not redirect to the `fileDownloads` page', async () => {
+      const { startReportingFiles, setCurrentPage } = setup({
+        state: downloadStates.pending,
+        loadingMoreFiles: true
+      })
+      const fileDownloadsPortal = screen.getByTestId('download-item-open-file-downloads')
+      expect(fileDownloadsPortal).toBeInTheDocument()
+      await userEvent.click(fileDownloadsPortal)
+
+      expect(setCurrentPage).toHaveBeenCalledTimes(0)
+
+      expect(startReportingFiles).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -88,30 +126,104 @@ describe('DownloadItem component', () => {
       })
     })
 
-    describe('when clicking a primary action button', () => {
-      test('fires the action callback', async () => {
-        const actionsList = [
-          [
-            {
-              label: 'test-label',
-              isActive: true,
-              isPrimary: true,
-              callback: jest.fn(),
-              icon: FaPause
-            }
-          ]
-        ]
+    describe('when clicking on a `DownloadItem`', () => {
+      test('calls `setCurrentPage` and `startReportingFiles` ', async () => {
+        const { startReportingFiles, setCurrentPage } = setup({
+          state: downloadStates.active,
+          loadingMoreFiles: true
+        })
+        const fileDownloadsPortal = screen.getByTestId('download-item-open-file-downloads')
+        expect(fileDownloadsPortal).toBeInTheDocument()
+        await userEvent.click(fileDownloadsPortal)
 
-        setup({
-          actionsList
+        expect(setCurrentPage).toHaveBeenCalledTimes(1)
+        expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
+
+        expect(startReportingFiles).toHaveBeenCalledTimes(1)
+        expect(startReportingFiles).toHaveBeenCalledWith({ downloadName: 'download-name' })
+      })
+    })
+
+    describe('when pressing enter on a `DownloadItem`', () => {
+      test('calls setCurrentPage and startReportingFiles', async () => {
+        const { startReportingFiles, setCurrentPage } = setup({
+          state: downloadStates.active,
+          loadingMoreFiles: true
         })
 
-        const testButton = screen.getByText('test-label')
+        // Focus screen on the `div-button` then trigger onKeyDown
+        screen.getByTestId('download-item-open-file-downloads').focus()
+        await userEvent.keyboard('{Enter}')
 
-        await userEvent.click(testButton)
+        expect(setCurrentPage).toHaveBeenCalledTimes(1)
+        expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
 
-        expect(actionsList[0][0].callback).toHaveBeenCalledTimes(1)
+        expect(startReportingFiles).toHaveBeenCalledTimes(1)
+        expect(startReportingFiles).toHaveBeenCalledWith({ downloadName: 'download-name' })
       })
+    })
+
+    describe('when pressing spacebar on a `DownloadItem`', () => {
+      test('calls setCurrentPage and startReportingFiles', async () => {
+        const { startReportingFiles, setCurrentPage } = setup({
+          state: downloadStates.active,
+          loadingMoreFiles: true
+        })
+
+        // Focus screen on the `div-button` then trigger onKeyDown
+        screen.getByTestId('download-item-open-file-downloads').focus()
+
+        // Refers to Spacebar key
+        await userEvent.keyboard(' ')
+
+        expect(setCurrentPage).toHaveBeenCalledTimes(1)
+        expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
+
+        expect(startReportingFiles).toHaveBeenCalledTimes(1)
+        expect(startReportingFiles).toHaveBeenCalledWith({ downloadName: 'download-name' })
+      })
+    })
+
+    describe('when pressing a non-enter key on a `DownloadItem`', () => {
+      test('does not call setCurrentPage or startReportingFiles', async () => {
+        const { startReportingFiles, setCurrentPage } = setup({
+          state: downloadStates.active,
+          loadingMoreFiles: true
+        })
+
+        // Focus screen on the `div-button` then fail to trigger onKeyDown because key is not 'Enter' or 'Spacebar'
+        screen.getByTestId('download-item-open-file-downloads').focus()
+        await userEvent.keyboard('{a}')
+
+        expect(setCurrentPage).toHaveBeenCalledTimes(0)
+        expect(startReportingFiles).toHaveBeenCalledTimes(0)
+      })
+    })
+  })
+
+  describe('when clicking a primary action button', () => {
+    test('fires the action callback', async () => {
+      const actionsList = [
+        [
+          {
+            label: 'test-label',
+            isActive: true,
+            isPrimary: true,
+            callback: jest.fn(),
+            icon: FaPause
+          }
+        ]
+      ]
+
+      setup({
+        actionsList
+      })
+
+      const testButton = screen.getByText('test-label')
+
+      await userEvent.click(testButton)
+
+      expect(actionsList[0][0].callback).toHaveBeenCalledTimes(1)
     })
 
     describe('when generating primary actions', () => {

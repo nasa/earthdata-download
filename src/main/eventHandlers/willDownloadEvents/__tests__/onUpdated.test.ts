@@ -2,6 +2,8 @@ import MockDate from 'mockdate'
 
 import onUpdated from '../onUpdated'
 
+import downloadStates from '../../../../app/constants/downloadStates'
+
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
 })
@@ -39,12 +41,12 @@ describe('onUpdated', () => {
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 42,
-      state: 'INTERRUPTED'
+      state: downloadStates.interrupted
     })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
     expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', {
-      state: 'INTERRUPTED'
+      state: downloadStates.interrupted
     })
   })
 
@@ -81,7 +83,9 @@ describe('onUpdated', () => {
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 42,
-      state: 'ACTIVE'
+      state: downloadStates.active,
+      receivedBytes: 42,
+      totalBytes: 100
     })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
@@ -120,7 +124,9 @@ describe('onUpdated', () => {
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 42,
-      state: 'PAUSED'
+      state: downloadStates.paused,
+      receivedBytes: 42,
+      totalBytes: 100
     })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
@@ -159,7 +165,9 @@ describe('onUpdated', () => {
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 0,
-      state: 'ACTIVE'
+      receivedBytes: 0,
+      state: downloadStates.active,
+      totalBytes: 0
     })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(0)

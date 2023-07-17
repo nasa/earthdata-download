@@ -4,7 +4,7 @@ import downloadStates from '../../app/constants/downloadStates'
 import startNextDownload from '../utils/startNextDownload'
 
 /**
- * Updates the files of a download to `pending`, sents the download to `active`, and calls `startNextDownload`
+ * Updates the files of a download to `pending`, sets the download to `active`, and calls `startNextDownload`
  * @param {Object} params
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {Object} params.database `EddDatabase` instance
@@ -19,7 +19,37 @@ const restartDownload = async ({
   info,
   webContents
 }) => {
-  const { downloadId } = info
+  const {
+    downloadId,
+    filename
+  } = info
+
+  currentDownloadItems.cancelItem(downloadId, filename)
+
+  if (downloadId && filename) {
+    // Restart a specific file
+    await database.updateFilesWhere({
+      downloadId,
+      filename
+    }, {
+      state: downloadStates.pending,
+      percent: 0,
+      timeStart: null,
+      timeEnd: null,
+      errors: null,
+      receivedBytes: null,
+      totalBytes: null
+    })
+
+    await startNextDownload({
+      currentDownloadItems,
+      database,
+      downloadIdContext,
+      webContents
+    })
+
+    return
+  }
 
   // Set the files to pending
   await database.updateFilesWhere({
@@ -29,7 +59,9 @@ const restartDownload = async ({
     percent: 0,
     timeStart: null,
     timeEnd: null,
-    errors: null
+    errors: null,
+    receivedBytes: null,
+    totalBytes: null
   })
 
   // Set the download to active

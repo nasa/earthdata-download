@@ -31,7 +31,9 @@ const retryErroredDownloadItem = async ({
       percent: 0,
       timeStart: null,
       timeEnd: null,
-      errors: null
+      errors: null,
+      receivedBytes: null,
+      totalBytes: null
     })
   }
 
@@ -45,7 +47,9 @@ const retryErroredDownloadItem = async ({
       percent: 0,
       timeStart: null,
       timeEnd: null,
-      errors: null
+      errors: null,
+      receivedBytes: null,
+      totalBytes: null
     })
   }
 

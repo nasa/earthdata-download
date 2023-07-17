@@ -5,39 +5,43 @@ import '@testing-library/jest-dom'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import Downloads from '../Downloads'
 import AppContext from '../../../context/AppContext'
+import ListPage from '../../../components/ListPage/ListPage'
+
+jest.mock('../../../components/ListPage/ListPage', () => jest.fn(
+  () => <mock-ListPage>Mock ListPage</mock-ListPage>
+))
 
 describe('Downloads component', () => {
   test('renders the downloads page', () => {
     // Props
     const setCurrentPage = jest.fn()
-    const setHasActiveDownload = jest.fn()
     const hasActiveDownload = false
+    const setHasActiveDownload = jest.fn()
+    const showMoreInfoDialog = jest.fn()
 
     // Context functions
-    const beginDownload = jest.fn()
-    const initializeDownload = jest.fn()
-    const setDownloadLocation = jest.fn()
-    const pauseDownloadItem = jest.fn()
-    const reportProgress = jest.fn()
-    const requestProgressReport = jest.fn()
-    const resumeDownloadItem = jest.fn()
     const cancelDownloadItem = jest.fn()
-    const openDownloadFolder = jest.fn()
     const copyDownloadPath = jest.fn()
+    const openDownloadFolder = jest.fn()
+    const pauseDownloadItem = jest.fn()
+    const reportDownloadsProgress = jest.fn()
+    const restartDownload = jest.fn()
+    const resumeDownloadItem = jest.fn()
+    const sendToEula = jest.fn()
+    const sendToLogin = jest.fn()
 
     render(
       <ElectronApiContext.Provider value={
         {
-          beginDownload,
-          initializeDownload,
-          setDownloadLocation,
-          pauseDownloadItem,
-          reportProgress,
-          requestProgressReport,
-          resumeDownloadItem,
           cancelDownloadItem,
+          copyDownloadPath,
           openDownloadFolder,
-          copyDownloadPath
+          pauseDownloadItem,
+          reportDownloadsProgress,
+          restartDownload,
+          resumeDownloadItem,
+          sendToEula,
+          sendToLogin
         }
       }
       >
@@ -50,14 +54,19 @@ describe('Downloads component', () => {
         }
         >
           <Downloads
-            setCurrentPage={setCurrentPage}
             hasActiveDownload={hasActiveDownload}
+            setCurrentPage={setCurrentPage}
+            showMoreInfoDialog={showMoreInfoDialog}
             setHasActiveDownload={setHasActiveDownload}
           />
         </AppContext.Provider>
       </ElectronApiContext.Provider>
     )
 
-    expect(screen.getByText('No downloads in progress')).toBeInTheDocument()
+    // The useEffect for setDownloadItems(items) is updating a state variable,
+    // setDownloadItems(items) is updating a state variable,
+    // causing the component to re-render, which renders the mock a second time.
+    expect(ListPage).toHaveBeenCalledTimes(2)
+    expect(screen.queryAllByText('Mock ListPage').length).toBe(1)
   })
 })

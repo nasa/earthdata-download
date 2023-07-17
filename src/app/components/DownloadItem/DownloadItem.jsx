@@ -17,6 +17,7 @@ import humanizeDuration from 'humanize-duration'
 import Button from '../Button/Button'
 import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
+
 import Tooltip from '../Tooltip/Tooltip'
 
 import Dialog from '../Dialog/Dialog'
@@ -30,6 +31,7 @@ import commafy from '../../utils/commafy'
 import createVariantClassName from '../../utils/createVariantName'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
+import { PAGES } from '../../constants/pages'
 
 import * as styles from './DownloadItem.module.scss'
 
@@ -59,16 +61,18 @@ import * as styles from './DownloadItem.module.scss'
  * )
  */
 const DownloadItem = ({
+  actionsList,
   downloadName,
   hasErrors,
   loadingMoreFiles,
   progress,
-  state,
-  actionsList
+  setCurrentPage,
+  state
 }) => {
   const {
     showWaitingForEulaDialog,
-    showWaitingForLoginDialog
+    showWaitingForLoginDialog,
+    startReportingFiles
   } = useContext(ElectronApiContext)
 
   const [waitingForEulaDialogIsOpen, setWaitingForEulaDialogIsOpen] = useState(false)
@@ -82,6 +86,13 @@ const DownloadItem = ({
   const onShowWaitingForLoginDialog = (event, info) => {
     const { showDialog } = info
     setWaitingForLoginDialogIsOpen(showDialog)
+  }
+
+  const onSelectDownloadItem = () => {
+    if (state !== downloadStates.starting && state !== downloadStates.pending) {
+      startReportingFiles({ downloadName })
+      setCurrentPage(PAGES.fileDownloads)
+    }
   }
 
   // Setup event listeners
@@ -115,7 +126,13 @@ const DownloadItem = ({
               size="sm"
               Icon={action.icon}
               hideLabel
-              onClick={action.callback}
+              onClick={
+                (event) => {
+                // Stop the parent div's click event from going off
+                  event.stopPropagation()
+                  action.callback()
+                }
+              }
               variant={action.variant}
               dataTestId={`download-item-${action.label}`}
               tooltipDelayDuration={300}
@@ -184,14 +201,20 @@ const DownloadItem = ({
       >
         <WaitingForLogin
           downloadId={downloadName}
-          // TODO EDD-13, might want to be able to send a fileId as well
-          // fileId={fileId}
         />
       </Dialog>
       <div
+        data-testid="download-item-open-file-downloads"
         className={styles.innerWrapper}
-        onClick={() => {}}
-        onKeyDown={() => {}}
+        onClick={onSelectDownloadItem}
+        onKeyDown={
+          (event) => {
+            // If the enter key or the Spacebar key is pressed
+            if (event.key === 'Enter' || event.key === ' ') {
+              onSelectDownloadItem()
+            }
+          }
+        }
         role="button"
         tabIndex="0"
       >
@@ -394,6 +417,7 @@ DownloadItem.propTypes = {
     totalFiles: PropTypes.number,
     totalTime: PropTypes.number
   }).isRequired,
+  setCurrentPage: PropTypes.func.isRequired,
   state: PropTypes.string.isRequired
 }
 

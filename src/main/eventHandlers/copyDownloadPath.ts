@@ -13,10 +13,18 @@ const copyDownloadPath = async ({
   info
 }) => {
   const {
-    downloadId
+    downloadId,
+    filename
   } = info
 
   const { downloadLocation } = await database.getDownloadById(downloadId)
+
+  if (filename) {
+    const fileLocation = `${downloadLocation}/${filename}`
+    clipboard.writeText(fileLocation)
+
+    return
+  }
 
   clipboard.writeText(downloadLocation)
 }

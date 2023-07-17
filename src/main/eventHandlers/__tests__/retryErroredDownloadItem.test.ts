@@ -42,7 +42,9 @@ describe('retryErroredDownloadItem', () => {
         percent: 0,
         timeStart: null,
         timeEnd: null,
-        errors: null
+        errors: null,
+        receivedBytes: null,
+        totalBytes: null
       })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)
@@ -78,7 +80,9 @@ describe('retryErroredDownloadItem', () => {
         percent: 0,
         timeStart: null,
         timeEnd: null,
-        errors: null
+        errors: null,
+        receivedBytes: null,
+        totalBytes: null
       })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)

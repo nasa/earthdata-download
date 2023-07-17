@@ -1,8 +1,7 @@
 // @ts-nocheck
+import cancelDownloadItem from '../cancelDownloadItem'
 
 import downloadStates from '../../../app/constants/downloadStates'
-
-import cancelDownloadItem from '../cancelDownloadItem'
 
 describe('cancelDownloadItem', () => {
   describe('when downloadId and name are provided', () => {
@@ -17,7 +16,8 @@ describe('cancelDownloadItem', () => {
       const database = {
         deleteAllDownloads: jest.fn(),
         updateDownloadById: jest.fn(),
-        updateFilesWhere: jest.fn()
+        updateFilesWhere: jest.fn(),
+        getNotCompletedFilesCountByDownloadId: jest.fn()
       }
 
       await cancelDownloadItem({
@@ -37,6 +37,8 @@ describe('cancelDownloadItem', () => {
         state: downloadStates.cancelled
       })
 
+      expect(database.getNotCompletedFilesCountByDownloadId).toHaveBeenCalledTimes(1)
+
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
       expect(database.deleteAllDownloads).toHaveBeenCalledTimes(0)
     })
@@ -53,7 +55,8 @@ describe('cancelDownloadItem', () => {
       const database = {
         deleteAllDownloads: jest.fn(),
         updateDownloadById: jest.fn(),
-        updateFilesWhere: jest.fn()
+        updateFilesWhere: jest.fn(),
+        updateFilesWhereAndWhereNot: jest.fn()
       }
 
       await cancelDownloadItem({
@@ -66,7 +69,14 @@ describe('cancelDownloadItem', () => {
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: 'CANCELLED' })
+      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: downloadStates.cancelled })
+
+      expect(database.updateFilesWhereAndWhereNot).toHaveBeenCalledTimes(1)
+      expect(database.updateFilesWhereAndWhereNot).toHaveBeenCalledWith(
+        { downloadId: 'mock-download-id' },
+        { state: downloadStates.completed },
+        { state: downloadStates.cancelled }
+      )
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(0)
       expect(database.deleteAllDownloads).toHaveBeenCalledTimes(0)

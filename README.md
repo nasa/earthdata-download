@@ -58,6 +58,10 @@ And push that tag to GitHub
 
 That will trigger the Build/Release workflow, and create a new draft release matching your `version`.
 
+## Database Migrations
+
+ Run `npx knex migrate:make <migration_name>` this will create a new file under `/migrations` directory. Fill in the `up` and `down` functions with the appropriate logic for your use-case.
+
 ## Documentation
 
 - [Introduction](docs/README.md)

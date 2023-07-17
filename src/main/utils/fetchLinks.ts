@@ -100,7 +100,6 @@ const fetchLinks = async ({
         headers.Authorization = getLinksToken
       }
 
-      // eslint-disable-next-line no-await-in-loop
       response = await fetch(updatedUrl, {
         headers,
         method: 'get'

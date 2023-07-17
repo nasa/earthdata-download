@@ -2,6 +2,8 @@ import MockDate from 'mockdate'
 
 import finishDownload from '../finishDownload'
 
+import downloadStates from '../../../../app/constants/downloadStates'
+
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00.000')
 })
@@ -22,7 +24,7 @@ describe('finishDownload', () => {
     expect(database.updateDownloadById).toHaveBeenCalledWith(
       'mock-download-id',
       {
-        state: 'COMPLETED',
+        state: downloadStates.completed,
         timeEnd: 1684029600000
       }
     )

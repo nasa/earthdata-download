@@ -56,7 +56,7 @@ describe('beginDownload', () => {
     expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
     expect(database.updateDownloadById).toHaveBeenCalledWith('mock-id', {
       downloadLocation: '/mock/location/mock-id',
-      state: 'ACTIVE',
+      state: downloadStates.active,
       timeStart: 1682899200000
     })
 
@@ -105,7 +105,7 @@ describe('beginDownload', () => {
     expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
     expect(database.updateDownloadById).toHaveBeenCalledWith('mock-id', {
       downloadLocation: '/mock/location/mock-id',
-      state: 'ACTIVE',
+      state: downloadStates.active,
       timeStart: 1682899200000
     })
 
@@ -127,7 +127,7 @@ describe('beginDownload', () => {
     }
     const database = {
       setPreferences: jest.fn(),
-      getDownloadById: jest.fn().mockResolvedValue({ state: 'ACTIVE' }),
+      getDownloadById: jest.fn().mockResolvedValue({ state: downloadStates.active }),
       updateDownloadById: jest.fn()
     }
     const webContents = {

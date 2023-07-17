@@ -2,7 +2,7 @@
 
 import MockDate from 'mockdate'
 
-import reportProgress from '../reportProgress'
+import reportDownloadsProgress from '../reportDownloadsProgress'
 
 import downloadStates from '../../../app/constants/downloadStates'
 
@@ -10,7 +10,7 @@ beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
 })
 
-describe('reportProgress', () => {
+describe('reportDownloadsProgress', () => {
   test('reports progress of collection downloads', async () => {
     const database = {
       getAllDownloads: jest.fn()
@@ -58,7 +58,7 @@ describe('reportProgress', () => {
       send: jest.fn()
     }
 
-    await reportProgress({
+    await reportDownloadsProgress({
       database,
       webContents
     })
@@ -73,7 +73,7 @@ describe('reportProgress', () => {
     expect(database.getFilesWhere).toHaveBeenCalledTimes(0)
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
-    expect(webContents.send).toHaveBeenCalledWith('reportProgress', {
+    expect(webContents.send).toHaveBeenCalledWith('reportDownloadsProgress', {
       progressReport: [{
         downloadId: 'download-id-1',
         downloadName: 'download-id-1',
@@ -119,13 +119,13 @@ describe('reportProgress', () => {
       send: jest.fn()
     }
 
-    await reportProgress({
+    await reportDownloadsProgress({
       database,
       webContents
     })
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
-    expect(webContents.send).toHaveBeenCalledWith('reportProgress', { progressReport: [] })
+    expect(webContents.send).toHaveBeenCalledWith('reportDownloadsProgress', { progressReport: [] })
   })
 
   test('reports progress of downloads with errors', async () => {
@@ -155,7 +155,7 @@ describe('reportProgress', () => {
       send: jest.fn()
     }
 
-    await reportProgress({
+    await reportDownloadsProgress({
       database,
       webContents
     })
@@ -172,7 +172,7 @@ describe('reportProgress', () => {
     })
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
-    expect(webContents.send).toHaveBeenCalledWith('reportProgress', {
+    expect(webContents.send).toHaveBeenCalledWith('reportDownloadsProgress', {
       progressReport: [{
         downloadId: 'download-id-1',
         downloadName: 'download-id-1',

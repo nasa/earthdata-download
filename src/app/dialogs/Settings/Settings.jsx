@@ -54,7 +54,11 @@ const Settings = ({
   const [defaultDownloadLocation, setDefaultDownloadLocation] = useState()
 
   const onClearDefaultDownload = () => {
-    setPreferenceFieldValue('defaultDownloadLocation', null)
+    setPreferenceFieldValue({
+      field: 'defaultDownloadLocation',
+      value: null
+    })
+
     setDefaultDownloadLocation(null)
   }
 
@@ -93,14 +97,20 @@ const Settings = ({
 
     const valueNumeric = parseInt(value, 10)
     if (!Number.isNaN(valueNumeric) && valueNumeric > 0) {
-      setPreferenceFieldValue('concurrentDownloads', valueNumeric)
+      setPreferenceFieldValue({
+        field: 'concurrentDownloads',
+        value: valueNumeric
+      })
     }
   }
 
   const onSetDownloadLocation = (event, info) => {
     const { downloadLocation: newDownloadLocation } = info
     setDefaultDownloadLocation(newDownloadLocation)
-    setPreferenceFieldValue('defaultDownloadLocation', newDownloadLocation)
+    setPreferenceFieldValue({
+      field: 'defaultDownloadLocation',
+      value: newDownloadLocation
+    })
   }
 
   useEffect(() => {
@@ -134,7 +144,10 @@ const Settings = ({
     if (!settingsDialogIsOpen) {
       const valueNumeric = parseInt(concurrentDownloads.toString(), 10)
       if (valueNumeric > 0) {
-        setPreferenceFieldValue('concurrentDownloads', valueNumeric)
+        setPreferenceFieldValue({
+          field: 'concurrentDownloads',
+          value: valueNumeric
+        })
       }
     }
   }, [settingsDialogIsOpen])

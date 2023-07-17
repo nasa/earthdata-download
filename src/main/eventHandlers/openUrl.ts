@@ -45,7 +45,10 @@ const openUrl = async ({
       .replace(/(:|-)/g, '')
       .replace('T', '_')
       .split('.')[0]
-    const downloadId = `${downloadIdWithoutTime}-${now}`
+
+    const downloadIdWithoutTimeFormatted = downloadIdWithoutTime.replace(/\s/g, '_')
+
+    const downloadId = `${downloadIdWithoutTimeFormatted}-${now}`
 
     // Create a download in the database
     await database.createDownload(downloadId, {
@@ -58,7 +61,7 @@ const openUrl = async ({
     })
 
     // If an app update is not available, start fetching links
-    // Check for false as value is inialized as undefined
+    // Check for false as value is initialized as undefined
     if (updateAvailable === false) {
       await startPendingDownloads({
         appWindow,

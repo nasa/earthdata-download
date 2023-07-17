@@ -38,7 +38,8 @@ const onDone = async ({
   }
 
   const {
-    id: fileId
+    id: fileId,
+    state: previousState
   } = file
 
   // Remove the item from the currentDownloadItems
@@ -48,7 +49,10 @@ const onDone = async ({
   let updatedState
   switch (state) {
     case 'cancelled':
-      updatedState = downloadStates.cancelled
+      if (previousState !== downloadStates.pending) {
+        updatedState = downloadStates.cancelled
+      }
+
       break
     case 'interrupted':
       updatedState = downloadStates.error

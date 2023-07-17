@@ -55,8 +55,8 @@ const InitializeDownload = ({
 }) => {
   const {
     beginDownload,
-    cancelDownloadItem,
-    chooseDownloadLocation
+    chooseDownloadLocation,
+    deleteDownload
   } = useContext(ElectronApiContext)
   const [makeDefaultDownloadLocation, setMakeDefaultDownloadLocation] = useState(true)
 
@@ -79,7 +79,8 @@ const InitializeDownload = ({
 
   const onCancel = () => {
     // TODO Can we add an undo functionality?
-    downloadIds.forEach((downloadId) => cancelDownloadItem({ downloadId }))
+    // Delete the download entirely if it is canceled here
+    downloadIds.forEach((downloadId) => deleteDownload({ downloadId }))
     onCloseChooseLocationDialog()
   }
 

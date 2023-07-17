@@ -70,6 +70,7 @@ const Dropdown = ({
             hideLabel
             tabIndex="0"
             tooltipDelayDuration={300}
+            onClick={(event) => { event.stopPropagation() }}
           >
             More Actions
           </Button>
@@ -79,8 +80,9 @@ const Dropdown = ({
         className={styles.content}
         align="end"
         sideOffset={4}
-        onCloseAutoFocus={(e) => e.preventDefault()}
-        onInteractOutside={(e) => e.stopPropagation()}
+        onCloseAutoFocus={(event) => event.preventDefault()}
+        onInteractOutside={(event) => event.stopPropagation()}
+        onClick={(event) => { event.stopPropagation() }}
       >
         {dropdownOptions}
       </RadixDropdown.Content>

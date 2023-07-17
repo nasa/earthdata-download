@@ -16,11 +16,20 @@ const resumeDownloadItem = async ({
   database,
   info
 }) => {
-  const { downloadId, name } = info
+  const { downloadId, filename } = info
 
-  currentDownloadItems.resumeItem(downloadId, name)
+  currentDownloadItems.resumeItem(downloadId, filename)
 
-  if (downloadId && !name) {
+  if (downloadId && filename) {
+    await database.updateFilesWhere({
+      downloadId,
+      filename
+    }, {
+      state: downloadStates.active
+    })
+  }
+
+  if (downloadId && !filename) {
     const numberFiles = await database.getFileCountWhere({ downloadId })
 
     // If files exist, put the item into active

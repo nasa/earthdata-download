@@ -226,7 +226,7 @@ const Layout = () => {
       <main className={styles.main}>
         {pageComponent}
         <ToastList
-          className={styles.toastLt}
+          className={styles.toastList}
           dismissToast={dismissToast}
           toasts={toasts}
         />

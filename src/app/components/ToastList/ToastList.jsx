@@ -11,7 +11,9 @@ import * as styles from './ToastList.module.scss'
  * @typedef {Object} ToastListProps
  * @property {Array} toasts A list of objects to configure the toasts.
  * @property {String} [className] An optional css class name.
- /**
+*/
+
+/**
  * Renders a `ToastList` component
  * @param {ToastListProps} props
  *
@@ -71,7 +73,7 @@ ToastList.propTypes = {
         PropTypes.shape({})
       ),
       title: PropTypes.string,
-      variant: PropTypes.string,
+      variant: PropTypes.string
     })
   ).isRequired
 }

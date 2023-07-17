@@ -6,10 +6,10 @@ import useToasts from '../../hooks/useToasts'
 import AppContext from '../../context/AppContext'
 
 const AppContextProvider = ({ children }) => {
-  const appContextValue = useToasts()
+  const toasts = useToasts()
 
   return (
-    <AppContext.Provider value={appContextValue}>
+    <AppContext.Provider value={{ toasts }}>
       {children}
     </AppContext.Provider>
   )

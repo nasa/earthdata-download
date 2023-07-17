@@ -24,7 +24,7 @@ import createVariantClassName from '../../utils/createVariantName'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import InitializeDownload from '../../dialogs/InitializeDownload/InitializeDownload'
-import MoreErrorInfo from '../../dialogs/MoreErrorInfo/MoreErrorInfo'
+// import MoreErrorInfo from '../../dialogs/MoreErrorInfo/MoreErrorInfo'
 import Button from '../../components/Button/Button'
 import Dialog from '../../components/Dialog/Dialog'
 import ListPage from '../../components/ListPage/ListPage'
@@ -75,7 +75,7 @@ const Downloads = ({
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
   const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
-  const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
+  // const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
   const [runningDownloads, setRunningDownloads] = useState([])
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
@@ -250,7 +250,7 @@ const Downloads = ({
           buttonText: 'More Info',
           buttonProps: {
             Icon: FaInfoCircle,
-            onClick: () => console.log('Show the modal'),
+            onClick: () => console.log('Dialog'),
             hideLabel: true
           }
         }
@@ -291,7 +291,7 @@ const Downloads = ({
     const shouldDisableOpenFolder = finishedFiles === 0
     const isComplete = state === downloadStates.completed
     const shouldShowLogin = state === downloadStates.waitingForAuth
-    const shouldShowError = state === downloadStates.error
+    // const shouldShowError = state === downloadStates.error
 
     const actionsList = [
       [
@@ -354,14 +354,14 @@ const Downloads = ({
           isPrimary: false,
           callback: () => onRestartDownload(downloadId),
           icon: FaInfoCircle
-        },
-        {
-          label: 'View Error Info',
-          isActive: shouldShowError,
-          isPrimary: false,
-          callback: () => setMoreErrorInfoIsOpen(true),
-          icon: FaInfoCircle
         }
+        // {
+        //   label: 'View Error Info',
+        //   isActive: shouldShowError,
+        //   isPrimary: false,
+        //   callback: () => setMoreErrorInfoIsOpen(true),
+        //   icon: FaInfoCircle
+        // }
       ]
     ]
 

@@ -64,6 +64,7 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-middle-ellipsis": "^1.2.2",
+    "react-transition-group": "^4.4.5",
     "simplebar-react": "^3.2.4",
     "sqlite3": "^5.1.6"
   },

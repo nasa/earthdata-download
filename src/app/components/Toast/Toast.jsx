@@ -1,21 +1,31 @@
-import React, { useState } from 'react'
-import * as RadixToast from '@radix-ui/react-toast'
-import { FaWindowClose } from 'react-icons/fa'
-import classNames from 'classnames'
+import React from 'react'
 import PropTypes from 'prop-types'
+import * as RadixToast from '@radix-ui/react-toast'
+import classNames from 'classnames'
+import { FaExclamationTriangle, FaInfoCircle, FaTimes } from 'react-icons/fa'
+
 import Button from '../Button/Button'
+
 import * as styles from './Toast.module.scss'
+import createVariantClassName from '../../utils/createVariantName'
+
+/**
+ * @typedef {Object} ToastAction
+ * @property {String} altText The alt text for assistive technologies.
+ * @property {Object} buttonProps An object used to configure the action button.
+ * @property {String} buttonText The label for the action.
+*/
 
 /**
  * @typedef {Object} ToastProps
- * @property {React.ReactNode} [action] A React node to be used as a follow-up action for the toast component.
- * @property {React.ReactNode} [children] A React node to be used as the description field of the toast component.
- * @property {String} [className] An optional css class name.
- * @property {Boolean} [closeButton] An optional boolean flag that determines the visibility of a close button for the component.
- * @property {Boolean} [open] A boolean flag that determines the initial visibility of the toast.
- * @property {String} [size] An optional string which modifies the size of the toast.
- * @property {String} [variant] An optional variant which modifies the visual appearance of the toast.
- /**
+ * @property {[ToastAction]} [actions] A list of objects used to configure additional actions.
+ * @property {Function} dismissToast A callback function used to dismiss the toast.
+ * @property {String} message A string used as the message for the toast.
+ * @property {String} [title] A string used as the title for the toast.
+ * @property {String} [variant] A string used as the variant for the toast.
+*/
+
+/**
  * Renders a `Toast` component
  * @param {ToastProps} props
  *
@@ -34,75 +44,95 @@ import * as styles from './Toast.module.scss'
  *  </Toast>
  * )
  */
-
 const Toast = ({
-  action,
-  children,
-  className,
-  closeButton,
-  open,
-  size,
+  actions,
+  dismissToast,
+  id,
+  message,
+  title,
   variant
-}) => {
-  const [isOpen, setIsOpen] = useState(open)
-
-  return (
-    <RadixToast.Provider>
-      <RadixToast.Root
-        className={
-          classNames([
-            styles[size],
-            styles[variant],
-            className
-          ])
-        }
-        open={isOpen}
-        key={className}
-      >
-        <RadixToast.Description>
-          <div className={styles.description}>
-            {
-              children
-            }
-          </div>
-        </RadixToast.Description>
-        <RadixToast.Action className={styles.action} asChild altText="toast action">
-          {
-            action
-          }
-        </RadixToast.Action>
-        {
-          closeButton && (
-            <Button
-              data-testid="toast-close-button"
-              onClick={() => setIsOpen(false)}
-              Icon={FaWindowClose}
-              variant="danger"
-            />
+}) => (
+  <RadixToast.Root
+    className={classNames([
+      styles.toast,
+      styles[createVariantClassName(variant)]
+    ])}
+    open
+  >
+    <div className={styles.primary}>
+      {
+          !variant && (
+            <FaInfoCircle className={styles.icon} />
           )
         }
-      </RadixToast.Root>
-      <RadixToast.Viewport className="ToastViewport" />
-    </RadixToast.Provider>
-  )
-}
+      {
+          variant === 'danger' && (
+            <FaExclamationTriangle className={styles.icon} />
+          )
+        }
+      <div>
+        {title && <h3 className={styles.title}>{title}</h3>}
+        <p className={styles.message}>
+          {message}
+        </p>
+      </div>
+    </div>
+    <div className={styles.secondary}>
+      {
+        actions && actions.map(({
+          altText,
+          buttonProps,
+          buttonText
+        }) => (
+          <RadixToast.Action
+            key={`${id}_action-${buttonText}`}
+            asChild
+            altText={altText}
+          >
+            <Button className={styles.action} {...buttonProps} size="lg">
+              {buttonText}
+            </Button>
+          </RadixToast.Action>
+        ))
+      }
+      <RadixToast.Action asChild altText="Dismiss">
+        <Button
+          className={styles.action}
+          data-testid="toast-close-button"
+          onClick={() => dismissToast(id)}
+          Icon={FaTimes}
+          size="lg"
+          hideLabel
+        >
+          Dismiss
+        </Button>
+      </RadixToast.Action>
+    </div>
+  </RadixToast.Root>
+)
 
 Toast.defaultProps = {
-  action: null,
-  children: null,
-  className: null,
-  closeButton: true,
-  size: null,
+  actions: [],
+  title: null,
   variant: null
 }
 
 Toast.propTypes = {
-  action: PropTypes.node,
-  children: PropTypes.node,
-  className: PropTypes.string,
-  closeButton: PropTypes.bool,
-  open: PropTypes.bool.isRequired,
-  size: PropTypes.string,
+  actions: PropTypes.arrayOf(
+    PropTypes.shape({
+      altText: PropTypes.string.isRequired,
+      buttonProps: PropTypes.shape({
+        onClick: PropTypes.func.isRequired,
+        variant: PropTypes.string,
+        hideLabel: PropTypes.func
+      }).isRequired,
+      buttonText: PropTypes.string.isRequired
+    })
+  ),
+  dismissToast: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
+  message: PropTypes.string.isRequired,
+  title: PropTypes.string,
   variant: PropTypes.string
 }
 

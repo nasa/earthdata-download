@@ -1,17 +1,115 @@
-.foreground {
-  left: 0;
+.toast {
   display: flex;
-  max-width: 100vw;
-  flex-direction: row;
-  padding: 1% 10%;
-  border-radius: 3%;
-  background-color: var(--color__red--500);
-  color: white;
+  max-width: 29rem;
+  align-items: stretch;
+  justify-content: space-between;
+  border: 1px solid var(--color__black);
+  border-radius: var(--size__100);
+  margin-top: var(--size__200);
+  background-color: var(--color__black--900);
+  box-shadow: hsl(206deg 22% 7% / 35%) 0 10px 38px -10px, hsl(206deg 22% 7% / 20%) 0 10px 20px -15px;
+
+  &.isDanger {
+    border: 1px solid var(--color__red--600);
+    background-color: var(--color__red--550);
+    color: var(--color__white);
+  }
+}
+
+.primary {
+  display: flex;
+  overflow: hidden;
+  flex-grow: 1;
+  flex-shrink: 1;
+  align-items: center;
+  padding: var(--size__200) var(--size__300);
+  text-align: left;
+}
+
+.icon {
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-right: var(--size__250);
+  color: var(--color__black--650);
+
+  .isDanger & {
+    color: var(--color__red--750);
+  }
+}
+
+.title {
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  margin: 0;
+  color: var(--color__black--050);
+  font-size: var(--size__350);
+  font-size: 0.825rem;
+  font-weight: 600;
+  letter-spacing: 0.025rem;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 5px var(--color__black--600);
   white-space: nowrap;
+
+  .isDanger & {
+    color: var(--color__red--050);
+    text-shadow: 0 0 5px var(--color__red--600);
+  }
+}
+
+.message {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  -webkit-box-orient: vertical;
+  color: var(--color__white);
+  font-size: var(--size__350);
+  font-weight: 400;
+  letter-spacing: 0.0125rem;
+  -webkit-line-clamp: 2;
+  line-height: 1.2;
+  text-shadow: 0 0 5px var(--color__black--600);
+
+  .isDanger & {
+    color: var(--color__white);
+    text-shadow: 0 0 5px var(--color__red--600);
+  }
+}
+
+.secondary {
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
 }
 
 .action {
-  align-content: flex-end;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 0;
+  border-left: 1px solid var(--color__black--750);
+  background-color: transparent;
+  color: var(--color__black--150);
+
+  .toast & {
+    height: auto;
+  }
+
+  .isDanger & {
+    border-left: 1px solid var(--color__red--650);
+    color: var(--color__white);
+  }
+
+  &:hover {
+    border: none;
+    border-left: 1px solid var(--color__black--750);
+    background-color: var(--color__black--950);
+    color: var(--color__black--050);
+
+    .isDanger & {
+      border-left: 1px solid var(--color__red--650);
+      background-color: var(--color__red--600);
+    }
+  }
 }
 
 .close {

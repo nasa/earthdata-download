@@ -6,9 +6,10 @@ import '@testing-library/jest-dom'
 
 import MoreErrorInfo from '../MoreErrorInfo'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
+import AppContext from '../../../context/AppContext'
 
 const setup = (overrideErrorInfo) => {
-  const cancelDownloadItem = jest.fn()
+  const cancelErroredDownloadItem = jest.fn()
   const retryDownloadItem = jest.fn()
 
   const collectionErrorInfo = overrideErrorInfo || [
@@ -19,16 +20,21 @@ const setup = (overrideErrorInfo) => {
   ]
 
   render(
-    <ElectronApiContext.Provider value={{ cancelDownloadItem, retryDownloadItem }}>
-      <MoreErrorInfo
-        downloadId="mock-download-id"
-        collectionErrorInfo={collectionErrorInfo}
-      />
+    <ElectronApiContext.Provider value={{ cancelErroredDownloadItem, retryDownloadItem }}>
+      <AppContext.Provider value={{
+        toasts: {}
+      }}
+      >
+        <MoreErrorInfo
+          downloadId="mock-download-id"
+          collectionErrorInfo={collectionErrorInfo}
+        />
+      </AppContext.Provider>
     </ElectronApiContext.Provider>
   )
 
   return {
-    cancelDownloadItem,
+    cancelErroredDownloadItem,
     retryDownloadItem
   }
 }
@@ -38,60 +44,8 @@ describe('MoreErrorInfo component', () => {
     setup()
 
     expect(screen.getByText(
-      /server responded with an error while downloading files/i
+      /An error occurred while downloading files to/i
     )).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /view errored file details/i })).toBeInTheDocument()
-  })
-
-  test('clicking the view errored files button opens the dropdown', async () => {
-    setup()
-
-    const user = userEvent.setup()
-    const dropdown = screen.getByRole('button', { name: /view errored file details/i })
-
-    expect(screen.getByText(
-      /server responded with an error while downloading files/i
-    )).toBeInTheDocument()
-    expect(dropdown).toBeInTheDocument()
-
-    await user.click(dropdown)
-
-    expect(screen.getByRole('button', { name: /^retry$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^cancel$/i })).toBeInTheDocument()
-  })
-
-  test('clicking the Retry File Download button sends a message to the main process', async () => {
-    const user = userEvent.setup()
-
-    const { retryDownloadItem } = setup()
-
-    const dropdown = screen.getByRole('button', { name: /view errored file details/i })
-    await user.click(dropdown)
-
-    await user.click(screen.getByRole('button', { name: /^retry$/i }))
-
-    expect(retryDownloadItem).toHaveBeenCalledTimes(1)
-    expect(retryDownloadItem).toHaveBeenCalledWith({
-      downloadId: 'mock-download-id',
-      name: 'mock-filename.png'
-    })
-  })
-
-  test('clicking the Cancel File Download button sends a message to the main process', async () => {
-    const user = userEvent.setup()
-
-    const { cancelDownloadItem } = setup()
-
-    const dropdown = screen.getByRole('button', { name: /view errored file details/i })
-    await user.click(dropdown)
-
-    await user.click(screen.getByRole('button', { name: /^cancel$/i }))
-
-    expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
-    expect(cancelDownloadItem).toHaveBeenCalledWith({
-      downloadId: 'mock-download-id',
-      name: 'mock-filename.png'
-    })
   })
 
   test('clicking the Retry All Errored button sends a message to the main process', async () => {
@@ -108,23 +62,18 @@ describe('MoreErrorInfo component', () => {
       }
     ])
 
-    await user.click(screen.getByRole('button', { name: /retry all errored/i }))
+    await user.click(screen.getByRole('button', { name: /Retry Downloading Files/i }))
 
-    expect(retryDownloadItem).toHaveBeenCalledTimes(2)
+    expect(retryDownloadItem).toHaveBeenCalledTimes(1)
     expect(retryDownloadItem).toHaveBeenCalledWith({
-      downloadId: 'mock-download-id',
-      name: 'mock-filename-1.png'
-    })
-    expect(retryDownloadItem).toHaveBeenCalledWith({
-      downloadId: 'mock-download-id',
-      name: 'mock-filename-2.png'
+      downloadId: 'mock-download-id'
     })
   })
 
   test('clicking the Cancel All Errored button sends a message to the main process', async () => {
     const user = userEvent.setup()
 
-    const { cancelDownloadItem } = setup([
+    const { cancelErroredDownloadItem } = setup([
       {
         itemName: 'mock-filename-1.png',
         url: 'http://example.com/mock-filename-1.png'
@@ -135,16 +84,11 @@ describe('MoreErrorInfo component', () => {
       }
     ])
 
-    await user.click(screen.getByRole('button', { name: /cancel all errored/i }))
+    await user.click(screen.getByRole('button', { name: /Cancel Downloading Files/i }))
 
-    expect(cancelDownloadItem).toHaveBeenCalledTimes(2)
-    expect(cancelDownloadItem).toHaveBeenCalledWith({
-      downloadId: 'mock-download-id',
-      name: 'mock-filename-1.png'
-    })
-    expect(cancelDownloadItem).toHaveBeenCalledWith({
-      downloadId: 'mock-download-id',
-      name: 'mock-filename-2.png'
+    expect(cancelErroredDownloadItem).toHaveBeenCalledTimes(1)
+    expect(cancelErroredDownloadItem).toHaveBeenCalledWith({
+      downloadId: 'mock-download-id'
     })
   })
 })

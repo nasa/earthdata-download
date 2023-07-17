@@ -29,7 +29,8 @@ import Button from '../../components/Button/Button'
 import Dialog from '../../components/Dialog/Dialog'
 import ListPage from '../../components/ListPage/ListPage'
 import DownloadItem from '../../components/DownloadItem/DownloadItem'
-import Toast from '../../components/Toast/Toast'
+
+import useAppContext from '../../hooks/useAppContext'
 
 import * as styles from './Downloads.module.scss'
 
@@ -53,6 +54,8 @@ const Downloads = ({
   hasActiveDownload,
   setHasActiveDownload
 }) => {
+  const { toasts } = useAppContext()
+  const { addToast } = toasts
   const {
     beginDownload,
     cancelDownloadItem,
@@ -220,6 +223,7 @@ const Downloads = ({
 
     if (hasPausedDownload) {
       setDerivedStateFromDownloads(downloadStates.paused)
+      return
     }
 
     if (hasErrorDownload) {
@@ -227,61 +231,32 @@ const Downloads = ({
     }
   }, [runningDownloads])
 
-  // Create the array of error toasts from error info reported from the main process
-  const errorToasts = runningDownloads.map((runningDownload) => {
-    const {
-      downloadId,
-      errorInfo,
-      numErrors
-    } = runningDownload
-
-    if (numErrors === 0) {
-      return null
-    }
-    const errorMessage = `${errorInfo.length} error${errorInfo.length === 1 ? '' : 's'} occurred downloading `
-
-    const action = (
-      <Button
-        className={styles.button}
-        size="sm"
-        Icon={FaInfoCircle}
-        variant="danger"
-        onClick={() => setMoreErrorInfoIsOpen(true)}
-      >
-        More Info
-        <Dialog
-          open={moreErrorInfoIsOpen}
-          setOpen={setMoreErrorInfoIsOpen}
-          showTitle
-          title="An error occurred when downloading a file"
-          TitleIcon={FaInfoCircle}
-          closeButton
-        >
-          <MoreErrorInfo
-            downloadId={downloadId}
-            collectionErrorInfo={errorInfo}
-          />
-        </Dialog>
-      </Button>
-    )
-    return (
-      hasErrorDownload && (
-        <Toast
-          className={styles.toast}
-          open={hasErrorDownload}
-          closeButton
-          key={downloadId}
-          variant="foreground"
-          action={action}
-        >
-          <div className={styles.errorMessage}>
-            {errorMessage}
-            <b>{downloadId}</b>
-          </div>
-        </Toast>
-      )
-    )
-  })
+  useEffect(() => {
+    addToast({
+      title: 'An error occurred',
+      message: '3 files failed to download in SENTINEL-1A_SLC_1-20230714_151613',
+      variant: 'danger',
+      actions: [
+        {
+          altText: 'Retry',
+          buttonText: 'Retry',
+          buttonProps: {
+            Icon: FaRedo,
+            onClick: () => console.log('Retry')
+          }
+        },
+        {
+          altText: 'More Info',
+          buttonText: 'More Info',
+          buttonProps: {
+            Icon: FaInfoCircle,
+            onClick: () => console.log('Show the modal'),
+            hideLabel: true
+          }
+        }
+      ]
+    })
+  }, [])
 
   // Create the downloadItems array from the runningDownloads reported from the main process
   const downloadItems = runningDownloads.map((runningDownload) => {
@@ -576,7 +551,6 @@ const Downloads = ({
         }
         Icon={FaDownload}
         items={downloadItems}
-        errorToasts={errorToasts}
       />
     </>
   )

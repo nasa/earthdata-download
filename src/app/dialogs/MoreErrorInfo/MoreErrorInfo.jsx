@@ -15,7 +15,6 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
  * @typedef {Object} MoreErrorInfoProps
  * @property {String} downloadId A string representing the id of a download.
  * @property {Object} collectionErrorInfo An object containing information about the errored file(s).
- * @property {String} collectionErrorInfo.filename A string representing the name of a file.
  * @property {String} collectionErrorInfo.url An string representing the download URL of a file.
  */
 /**
@@ -35,102 +34,44 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
  * )
  */
 const MoreErrorInfo = ({
-  downloadId,
-  collectionErrorInfo
+  downloadId
 }) => {
-  const [viewErrors, setViewErrors] = useState(false)
-
-  const urls = []
-  const fileNames = []
-
-  collectionErrorInfo.forEach((item) => {
-    const {
-      filename,
-      url
-    } = item
-
-    urls.push(url)
-    fileNames.push(filename)
-  })
-  const errorMessage = 'Server responded with an error while downloading files. If the errors persist, please contact the data provider.'
-
   const {
     cancelErroredDownloadItem,
     retryDownloadItem
   } = useContext(ElectronApiContext)
 
-  const onCancelDownloadItem = (downloadId, filename) => {
-    cancelErroredDownloadItem({ downloadId, filename })
+  const onCancelDownloadItem = ({ downloadId }) => {
+    cancelErroredDownloadItem({ downloadId })
   }
 
-  const onRetryDownloadItem = (downloadId, filename) => {
-    retryDownloadItem({ downloadId, filename })
+  const onRetryDownloadItem = ({ downloadId }) => {
+    retryDownloadItem({ downloadId })
   }
 
   return (
     <>
       <div className={styles.message}>
-        {errorMessage}
+        {`An error occurred while downloading files to ${downloadId}`}
       </div>
-      <Button
-        className={styles.button}
-        size="sm"
-        Icon={viewErrors ? FaAngleUp : FaAngleDown}
-        onClick={() => setViewErrors(!viewErrors)}
-      >
-        View Errored File Details
-      </Button>
       {'\n'}
-      <ul
-        className={styles.list}
-      >
-        {
-          viewErrors && (Array.from({ length: urls.length }).map((_, index) => (
-            <div className={styles.item} key={fileNames[index]}>
-              <b> File:&nbsp;</b>
-              {urls[index]}
-              <br />
-              <Button
-                className={styles.button}
-                size="sm"
-                Icon={FaRedo}
-                variant="danger"
-                onClick={() => onRetryDownloadItem(downloadId, fileNames[index])}
-              >
-                Retry
-              </Button>
-              <Button
-                className={styles.button}
-                size="sm"
-                Icon={FaBan}
-                variant="danger"
-                onClick={() => onCancelDownloadItem(downloadId, fileNames[index])}
-              >
-                Cancel
-              </Button>
-              <div />
-            </div>
-          )))
-        }
-      </ul>
-
       <Button
         className={styles.button}
         size="sm"
         Icon={FaRedo}
         variant="danger"
-        onClick={() => onRetryDownloadItem(downloadId)}
+        onClick={() => onRetryDownloadItem({ downloadId })}
       >
-        Retry All Errored
+        Retry Downloading Files
       </Button>
       <Button
         className={styles.button}
         size="sm"
         Icon={FaBan}
         variant="danger"
-        onClick={() => onCancelDownloadItem(downloadId)}
+        onClick={() => onCancelDownloadItem({ downloadId })}
       >
-        Cancel All Errored
+        Cancel Downloading Files
       </Button>
       <div />
     </>
@@ -138,11 +79,7 @@ const MoreErrorInfo = ({
 }
 
 MoreErrorInfo.propTypes = {
-  downloadId: PropTypes.string.isRequired,
-  collectionErrorInfo: PropTypes.arrayOf(PropTypes.shape({
-    filename: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired
-  })).isRequired
+  downloadId: PropTypes.string.isRequired
 }
 
 export default MoreErrorInfo

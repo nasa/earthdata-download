@@ -69,12 +69,13 @@ const createWindow = async () => {
   appWindow.webContents.session.webRequest.onBeforeSendHeaders(async (details, callback) => {
     const { token } = await database.getToken()
 
+    await session.defaultSession.clearStorageData()
+
     let bearerToken
     if (token) {
       bearerToken = `Bearer ${token}`
     } else {
       // If we have no token in the database, clear the cookie data that is saved by providers downloads
-      await session.defaultSession.clearStorageData()
     }
 
     callback({

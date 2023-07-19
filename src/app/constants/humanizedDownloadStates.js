@@ -9,14 +9,14 @@ const humanizedDownloadStates = {
   [downloadStates.pending]: 'Initializing'
 }
 
-const getHumanizedDownloadStates = (state, percent = 0) => {
+const getHumanizedDownloadStates = (state, percent = 0, hasErrors = false) => {
   if (state === downloadStates.waitingForAuth) {
     if (percent > 0) return humanizedDownloadStates[downloadStates.interrupted]
 
     return humanizedDownloadStates[downloadStates.pending]
   }
 
-  return humanizedDownloadStates[state]
+  return `${humanizedDownloadStates[state]}${hasErrors ? ' with errors' : ''}`
 }
 
 export default getHumanizedDownloadStates

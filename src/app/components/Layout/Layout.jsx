@@ -44,8 +44,8 @@ const Layout = () => {
   } = useContext(ElectronApiContext)
 
   const appContext = useAppContext()
-  const { toasts: toastsApi } = appContext
-  const { toasts, dismissToast } = toastsApi
+  const { toasts, dismissToast } = appContext
+  const { activeToasts = [] } = toasts
 
   const [currentPage, setCurrentPage] = useState(PAGES.downloads)
   const [isWindowMaximized, setIsWindowMaximized] = useState(false)
@@ -228,7 +228,7 @@ const Layout = () => {
         <ToastList
           className={styles.toastList}
           dismissToast={dismissToast}
-          toasts={toasts}
+          toasts={activeToasts}
         />
         <Dialog
           open={settingsDialogIsOpen}

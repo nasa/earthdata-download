@@ -4,6 +4,10 @@
 }
 
 .actions {
+  text-align: center;
+}
+
+.actionsButton {
   margin-right: var(--size__200);
 
   &:last-child {

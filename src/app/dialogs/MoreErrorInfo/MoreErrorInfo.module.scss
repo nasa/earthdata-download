@@ -1,17 +1,16 @@
 .message {
-  padding-bottom: 2%;
-  text-align: left; 
+  margin-bottom: var(--size__250);
+  text-align: center;
 }
 
-.list {
-  text-align: left; 
+.actions {
+  text-align: center;
 }
 
-.item {
-  padding-bottom: 3%;
-}
+.actionsButton {
+  margin-right: var(--size__200);
 
-.button {
-  align-self: left;
-  text-align: left;
+  &:last-child {
+    margin-right: 0;
+  }
 }

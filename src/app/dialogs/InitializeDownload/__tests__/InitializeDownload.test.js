@@ -12,7 +12,7 @@ const setup = () => {
   const cancelDownloadItem = jest.fn()
   const chooseDownloadLocation = jest.fn()
   const beginDownload = jest.fn()
-  const onCloseChooseLocationModal = jest.fn()
+  const onCloseChooseLocationDialog = jest.fn()
 
   render(
     <ElectronApiContext.Provider
@@ -27,7 +27,7 @@ const setup = () => {
       <InitializeDownload
         downloadIds={['mock-id']}
         downloadLocation="/mock/location"
-        onCloseChooseLocationModal={onCloseChooseLocationModal}
+        onCloseChooseLocationDialog={onCloseChooseLocationDialog}
         setDownloadIds={setDownloadIds}
       />
     </ElectronApiContext.Provider>

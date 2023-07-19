@@ -1,41 +1,50 @@
 import { useCallback, useReducer } from 'react'
-import { nanoid } from 'nanoid'
 
-const toastsReducer = (state, action) => {
-  switch (action.type) {
-    case 'ADD':
-      return [...state, action.payload]
-    case 'DELETE':
-      return state.filter(({ id }) => id !== action.payload)
-    default:
-      throw new Error(`Unhandled action type (${action.type}) in toast reducer`)
-  }
-}
+import { initialState, toastsReducer } from '../reducers/toastsReducer'
 
 const useToasts = () => {
-  const [toasts, toastsDispatch] = useReducer(toastsReducer, [])
+  const [toasts, toastsDispatch] = useReducer(toastsReducer, initialState)
 
+  /**
+   * Add a new toast
+   */
   const addToast = useCallback(({
     actions,
+    id,
     message,
+    numberErrors,
     title,
     variant
   }) => {
     toastsDispatch({
-      type: 'ADD',
+      type: 'ADD_TOAST',
       payload: {
         actions,
-        id: nanoid(),
+        id,
         message,
+        numberErrors,
         title,
         variant
       }
     })
   }, [])
 
+  /**
+   * Dismiss a toast
+   */
   const dismissToast = useCallback((id) => {
     toastsDispatch({
-      type: 'DELETE',
+      type: 'DISMISS_TOAST',
+      payload: id
+    })
+  }, [])
+
+  /**
+   * Delete all toasts (active or dismissed) given an ID
+   */
+  const deleteAllToastsById = useCallback((id) => {
+    toastsDispatch({
+      type: 'DELETE_ALL_TOASTS_BY_ID',
       payload: id
     })
   }, [])
@@ -43,7 +52,8 @@ const useToasts = () => {
   return {
     toasts,
     addToast,
-    dismissToast
+    dismissToast,
+    deleteAllToastsById
   }
 }
 

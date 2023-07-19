@@ -20,6 +20,7 @@ import createVariantClassName from '../../utils/createVariantName'
  * @typedef {Object} ToastProps
  * @property {[ToastAction]} [actions] A list of objects used to configure additional actions.
  * @property {Function} dismissToast A callback function used to dismiss the toast.
+ * @property {String} id An ID to be used by the toast.
  * @property {String} message A string used as the message for the toast.
  * @property {String} [title] A string used as the title for the toast.
  * @property {String} [variant] A string used as the variant for the toast.
@@ -61,17 +62,23 @@ const Toast = ({
   >
     <div className={styles.primary}>
       {
-          !variant && (
-            <FaInfoCircle className={styles.icon} />
-          )
-        }
+        !variant && (
+          <FaInfoCircle className={styles.icon} />
+        )
+      }
       {
-          variant === 'danger' && (
-            <FaExclamationTriangle className={styles.icon} />
+        variant === 'danger' && (
+          <FaExclamationTriangle className={styles.icon} />
+        )
+      }
+      <div>
+        {
+          title && (
+            <h3 className={styles.title}>
+              {title}
+            </h3>
           )
         }
-      <div>
-        {title && <h3 className={styles.title}>{title}</h3>}
         <p className={styles.message}>
           {message}
         </p>
@@ -124,7 +131,7 @@ Toast.propTypes = {
       buttonProps: PropTypes.shape({
         onClick: PropTypes.func.isRequired,
         variant: PropTypes.string,
-        hideLabel: PropTypes.func
+        hideLabel: PropTypes.bool
       }).isRequired,
       buttonText: PropTypes.string.isRequired
     })

@@ -17,9 +17,9 @@ const reportProgress = async ({
 
   if (downloads.length === 0) {
     webContents.send('reportProgress', {
-      progress: [],
-      errorInfo: []
+      progressReport: []
     })
+
     return
   }
 
@@ -41,9 +41,9 @@ const reportProgress = async ({
     } = await database.getDownloadFilesProgressByDownloadId(downloadId)
 
     // If any erroredFiles exist, get the files
-    let errorInfo
+    let errors
     if (erroredFiles > 0) {
-      errorInfo = await database.getFilesWhere({
+      errors = await database.getFilesWhere({
         downloadId,
         state: downloadStates.error
       })
@@ -72,18 +72,17 @@ const reportProgress = async ({
     return {
       downloadId,
       downloadName,
-      errorInfo,
+      errors,
       // Sqlite booleans are actually integers 1/0
       loadingMoreFiles: loadingMoreFiles === 1,
-      numErrors: erroredFiles,
       progress,
       state
     }
   })
 
-  const progress = await Promise.all(promises)
+  const progressReport = await Promise.all(promises)
 
-  webContents.send('reportProgress', { progress })
+  webContents.send('reportProgress', { progressReport })
 }
 
 export default reportProgress

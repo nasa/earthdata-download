@@ -229,6 +229,26 @@ describe('DownloadItem component', () => {
     })
   })
 
+  describe('when a download has errors', () => {
+    test('displays the correct download information', () => {
+      setup({
+        hasErrors: true,
+        progress: {
+          ...progress,
+          percent: 0
+        },
+        state: downloadStates.active
+      })
+
+      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+      expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
+      expect(screen.queryByTestId('download-item-spinner')).toBeInTheDocument()
+      expect(screen.queryByTestId('download-item-error')).toBeInTheDocument()
+      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Downloading with errors')
+      expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('0 of 1 files done in 0 seconds')
+    })
+  })
+
   describe('when a download is waiting for authentication', () => {
     describe('when the download has not started yet', () => {
       test('displays the correct download information', () => {

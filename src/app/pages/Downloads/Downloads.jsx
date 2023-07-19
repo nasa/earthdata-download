@@ -24,7 +24,7 @@ import createVariantClassName from '../../utils/createVariantName'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import InitializeDownload from '../../dialogs/InitializeDownload/InitializeDownload'
-// import MoreErrorInfo from '../../dialogs/MoreErrorInfo/MoreErrorInfo'
+import MoreErrorInfo from '../../dialogs/MoreErrorInfo/MoreErrorInfo'
 import Button from '../../components/Button/Button'
 import Dialog from '../../components/Dialog/Dialog'
 import ListPage from '../../components/ListPage/ListPage'
@@ -54,8 +54,11 @@ const Downloads = ({
   hasActiveDownload,
   setHasActiveDownload
 }) => {
-  const { toasts } = useAppContext()
-  const { addToast } = toasts
+  const appContext = useAppContext()
+  const {
+    addToast,
+    deleteAllToastsById
+  } = appContext
   const {
     beginDownload,
     cancelDownloadItem,
@@ -75,7 +78,8 @@ const Downloads = ({
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
   const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
-  // const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
+  const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
+  const [activeMoreInfoDownloadInfo, setActiveMoreInfoDownloadInfo] = useState({})
   const [runningDownloads, setRunningDownloads] = useState([])
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
@@ -84,6 +88,7 @@ const Downloads = ({
   const [hasErrorDownload, setHasErrorDownload] = useState(false)
   const [totalDownloadFiles, setTotalDownloadFiles] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
+  const [downloadItems, setDownloadItems] = useState([])
   const [
     derivedStateFromDownloads,
     setDerivedStateFromDownloads
@@ -118,7 +123,7 @@ const Downloads = ({
     }
   }
 
-  const onCloseChooseLocationModal = () => {
+  const onCloseChooseLocationDialog = () => {
     setChooseDownloadLocationIsOpen(false)
   }
 
@@ -136,23 +141,27 @@ const Downloads = ({
 
   const onCancelDownloadItem = (downloadId) => {
     cancelDownloadItem({ downloadId })
+    deleteAllToastsById(downloadId)
   }
 
   const onRestartDownload = (downloadId) => {
     restartDownload({ downloadId })
+    deleteAllToastsById(downloadId)
   }
 
   const onResumeDownloadItem = (downloadId) => {
     resumeDownloadItem({ downloadId })
   }
 
-  const onRetryDownloadItem = (downloadId) => {
-    retryDownloadItem({ downloadId })
+  const onReportProgress = (event, info) => {
+    const { progressReport } = info
+
+    setRunningDownloads(progressReport)
   }
 
-  const onReportProgress = (event, info) => {
-    const { progress, errorInfo } = info
-    setRunningDownloads(progress, errorInfo)
+  const showMoreInfoDialog = (downloadId, numberErrors) => {
+    setActiveMoreInfoDownloadInfo({ downloadId, numberErrors })
+    setMoreErrorInfoIsOpen(true)
   }
 
   // Setup event listeners
@@ -192,7 +201,7 @@ const Downloads = ({
       ({ state }) => state === downloadStates.paused
     )))
     setHasErrorDownload((runningDownloads.length && runningDownloads.some(
-      ({ numErrors }) => (numErrors > 0 && !hasPausedDownload)
+      ({ errors = [] }) => (errors.length > 0 && !hasPausedDownload)
     )))
 
     setTotalDownloadFiles(runningDownloads.length && runningDownloads.reduce(
@@ -232,150 +241,169 @@ const Downloads = ({
   }, [runningDownloads])
 
   useEffect(() => {
-    addToast({
-      title: 'An error occurred',
-      message: '3 files failed to download in SENTINEL-1A_SLC_1-20230714_151613',
-      variant: 'danger',
-      actions: [
-        {
-          altText: 'Retry',
-          buttonText: 'Retry',
-          buttonProps: {
-            Icon: FaRedo,
-            onClick: () => console.log('Retry')
-          }
-        },
-        {
-          altText: 'More Info',
-          buttonText: 'More Info',
-          buttonProps: {
-            Icon: FaInfoCircle,
-            onClick: () => console.log('Dialog'),
-            hideLabel: true
-          }
-        }
-      ]
-    })
-  }, [])
+    // Create the downloadItems array from the runningDownloads reported from the main process
+    const items = runningDownloads.map((runningDownload) => {
+      const {
+        downloadId,
+        downloadName,
+        errors,
+        loadingMoreFiles,
+        progress,
+        state
+      } = runningDownload
 
-  // Create the downloadItems array from the runningDownloads reported from the main process
-  const downloadItems = runningDownloads.map((runningDownload) => {
-    const {
-      downloadId,
-      downloadName,
-      loadingMoreFiles,
-      progress,
-      state
-    } = runningDownload
+      const { finishedFiles } = progress
 
-    const { finishedFiles } = progress
+      const shouldShowPause = [
+        downloadStates.pending,
+        downloadStates.error,
+        downloadStates.active
+      ].includes(state)
+      const shouldShowResume = [
+        downloadStates.paused,
+        downloadStates.error,
+        downloadStates.interrupted
+      ].includes(state)
+      const shouldShowCancel = [
+        downloadStates.pending,
+        downloadStates.paused,
+        downloadStates.active,
+        downloadStates.error,
+        downloadStates.interrupted,
+        downloadStates.waitingForAuth
+      ].includes(state)
+      const shouldDisableOpenFolder = finishedFiles === 0
+      const isComplete = state === downloadStates.completed
+      const shouldShowLogin = state === downloadStates.waitingForAuth
+      // const shouldShowError = state === downloadStates.error
 
-    const shouldShowPause = [
-      downloadStates.pending,
-      downloadStates.error,
-      downloadStates.active
-    ].includes(state)
-    const shouldShowResume = [
-      downloadStates.paused,
-      downloadStates.error,
-      downloadStates.interrupted
-    ].includes(state)
-    const shouldShowCancel = [
-      downloadStates.pending,
-      downloadStates.paused,
-      downloadStates.active,
-      downloadStates.error,
-      downloadStates.interrupted,
-      downloadStates.waitingForAuth
-    ].includes(state)
-    const shouldDisableOpenFolder = finishedFiles === 0
-    const isComplete = state === downloadStates.completed
-    const shouldShowLogin = state === downloadStates.waitingForAuth
-    // const shouldShowError = state === downloadStates.error
+      // Add errors
+      if (state !== downloadStates.cancelled && errors) {
+        const numberErrors = errors.length
 
-    const actionsList = [
-      [
-        {
-          label: 'Log In with Earthdata Login',
-          isActive: shouldShowLogin,
-          isPrimary: shouldShowLogin,
-          callback: () => sendToLogin({
-            downloadId: downloadName,
-            forceLogin: true
-            // TODO EDD-13, might want to be able to send a fileId as well
-            // fileId
-          }),
-          icon: FaSignInAlt
-        },
-        {
-          label: 'Pause Download',
-          isActive: shouldShowPause,
-          isPrimary: !isComplete,
-          callback: () => onPauseDownloadItem(downloadId, downloadName),
-          icon: FaPause
-        },
-        {
-          label: 'Resume Download',
-          isActive: shouldShowResume && !shouldShowPause,
-          isPrimary: !isComplete,
-          callback: () => onResumeDownloadItem(downloadId, downloadName),
-          icon: FaPlay
-        },
-        {
-          label: 'Cancel Download',
-          isActive: shouldShowCancel,
-          isPrimary: !isComplete,
+        addToast({
+          id: downloadId,
+          title: 'An error occurred',
+          message: `${numberErrors} files failed to download in ${downloadId}`,
+          numberErrors,
           variant: 'danger',
-          callback: () => onCancelDownloadItem(downloadId, downloadName),
-          icon: FaBan
-        }
-      ],
-      [
-        {
-          label: 'Open Folder',
-          isActive: !shouldDisableOpenFolder,
-          isPrimary: isComplete,
-          callback: () => onOpenDownloadFolder(downloadId),
-          icon: FaFolderOpen,
-          disabled: shouldDisableOpenFolder
-        },
-        {
-          label: 'Copy Folder Path',
-          isActive: true,
-          isPrimary: isComplete,
-          callback: () => onCopyDownloadPath(downloadId),
-          icon: FaClipboard
-        }
-      ],
-      [
-        {
-          label: 'Restart Download',
-          isActive: true,
-          isPrimary: false,
-          callback: () => onRestartDownload(downloadId),
-          icon: FaInfoCircle
-        }
-        // {
-        //   label: 'View Error Info',
-        //   isActive: shouldShowError,
-        //   isPrimary: false,
-        //   callback: () => setMoreErrorInfoIsOpen(true),
-        //   icon: FaInfoCircle
-        // }
-      ]
-    ]
+          actions: [
+            {
+              altText: 'Retry',
+              buttonText: 'Retry',
+              buttonProps: {
+                Icon: FaRedo,
+                onClick: () => {
+                  retryDownloadItem({ downloadId })
+                  deleteAllToastsById(downloadId)
+                }
+              }
+            },
+            {
+              altText: 'More Info',
+              buttonText: 'More Info',
+              buttonProps: {
+                Icon: FaInfoCircle,
+                hideLabel: true,
+                onClick: () => showMoreInfoDialog(downloadId, numberErrors)
+              }
+            }
+          ]
+        })
+      }
 
-    return (
-      <DownloadItem
-        key={downloadId}
-        downloadName={downloadName}
-        loadingMoreFiles={loadingMoreFiles}
-        progress={progress}
-        state={state}
-        actionsList={actionsList}
-      />
-    )
-  })
+      const actionsList = [
+        [
+          {
+            label: 'Log In with Earthdata Login',
+            isActive: shouldShowLogin,
+            isPrimary: shouldShowLogin,
+            callback: () => sendToLogin({
+              downloadId: downloadName,
+              forceLogin: true
+              // TODO EDD-13, might want to be able to send a fileId as well
+              // fileId
+            }),
+            icon: FaSignInAlt
+          },
+          {
+            label: 'Pause Download',
+            isActive: shouldShowPause,
+            isPrimary: !isComplete,
+            callback: () => onPauseDownloadItem(downloadId, downloadName),
+            icon: FaPause
+          },
+          {
+            label: 'Resume Download',
+            isActive: shouldShowResume && !shouldShowPause,
+            isPrimary: !isComplete,
+            callback: () => onResumeDownloadItem(downloadId, downloadName),
+            icon: FaPlay
+          },
+          {
+            label: 'Cancel Download',
+            isActive: shouldShowCancel,
+            isPrimary: !isComplete,
+            variant: 'danger',
+            callback: () => onCancelDownloadItem(downloadId, downloadName),
+            icon: FaBan
+          }
+        ],
+        [
+          {
+            label: 'Open Folder',
+            isActive: !shouldDisableOpenFolder,
+            isPrimary: isComplete,
+            callback: () => onOpenDownloadFolder(downloadId),
+            icon: FaFolderOpen,
+            disabled: shouldDisableOpenFolder
+          },
+          {
+            label: 'Copy Folder Path',
+            isActive: true,
+            isPrimary: isComplete,
+            callback: () => onCopyDownloadPath(downloadId),
+            icon: FaClipboard
+          }
+        ],
+        [
+          {
+            label: 'Restart Download',
+            isActive: true,
+            isPrimary: false,
+            callback: () => onRestartDownload(downloadId),
+            icon: FaInfoCircle
+          }
+          // {
+          //   label: 'View Error Info',
+          //   isActive: shouldShowError,
+          //   isPrimary: false,
+          //   callback: () => setMoreErrorInfoIsOpen(true),
+          //   icon: FaInfoCircle
+          // }
+        ]
+      ]
+
+      return (
+        <DownloadItem
+          key={downloadId}
+          downloadName={downloadName}
+          hasErrors={errors && errors.length > 0}
+          loadingMoreFiles={loadingMoreFiles}
+          progress={progress}
+          state={state}
+          actionsList={actionsList}
+        />
+      )
+    })
+
+    setDownloadItems(items)
+  }, [runningDownloads])
+
+  const {
+    downloadId: moreInfoDownloadId,
+    numberErrors
+  } = activeMoreInfoDownloadInfo
 
   return (
     <>
@@ -390,7 +418,20 @@ const Downloads = ({
           downloadIds={downloadIds}
           downloadLocation={selectedDownloadLocation}
           setDownloadIds={setDownloadIds}
-          onCloseChooseLocationModal={onCloseChooseLocationModal}
+          onCloseChooseLocationDialog={onCloseChooseLocationDialog}
+        />
+      </Dialog>
+      <Dialog
+        open={moreErrorInfoIsOpen}
+        setOpen={setMoreErrorInfoIsOpen}
+        showTitle
+        title="Errors occurred while downloading files"
+        TitleIcon={FaExclamationCircle}
+      >
+        <MoreErrorInfo
+          downloadId={moreInfoDownloadId}
+          numberErrors={numberErrors}
+          onCloseMoreErrorInfoDialog={setMoreErrorInfoIsOpen}
         />
       </Dialog>
       <ListPage
@@ -483,19 +524,6 @@ const Downloads = ({
               </div>
               <div className={styles.listHeaderSecondary}>
                 {
-                  allDownloadsError && (
-                    <Button
-                      className={styles.button}
-                      size="sm"
-                      Icon={FaRedo}
-                      variant="danger"
-                      onClick={() => onRetryDownloadItem()}
-                    >
-                      Restart All
-                    </Button>
-                  )
-                }
-                {
                   !allDownloadsCompleted
                     ? (
                       <>
@@ -523,7 +551,7 @@ const Downloads = ({
                             ))
                         }
                         <Button
-                          className={styles.button}
+                          className={styles.headerButton}
                           size="sm"
                           Icon={FaBan}
                           variant="danger"
@@ -535,7 +563,7 @@ const Downloads = ({
                     )
                     : (
                       <Button
-                        className={styles.button}
+                        className={styles.headerButton}
                         size="sm"
                         Icon={FaBan}
                         variant="danger"
@@ -562,5 +590,7 @@ Downloads.propTypes = {
   ]).isRequired,
   setHasActiveDownload: PropTypes.func.isRequired
 }
+
+Downloads.whyDidYouRender = true
 
 export default Downloads

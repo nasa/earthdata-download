@@ -17,7 +17,7 @@ import Tooltip from '../../components/Tooltip/Tooltip'
  * @property {String} downloadId A string representing the id of a download.
  * @property {String} downloadLocation A string representing the absolute path of a download
  * @property {Boolean} useDefaultLocation A boolean flag which indicates whether a default download location should be used.
- * @property {Function} onCloseChooseLocationModal A function which sets the dialog state.
+ * @property {Function} onCloseChooseLocationDialog A function which sets the dialog state.
  */
 
 /**
@@ -38,7 +38,7 @@ import Tooltip from '../../components/Tooltip/Tooltip'
  *       downloadIds={downloadIds}
  *       downloadLocation={downloadLocation}
  *       useDefaultLocation={useDefaultLocation}
- *       onCloseChooseLocationModal={() => setChooseDownloadLocationIsOpen(false)}
+ *       onCloseChooseLocationDialog={() => setChooseDownloadLocationIsOpen(false)}
  *     />
  *   </Dialog>
  * )
@@ -46,7 +46,7 @@ import Tooltip from '../../components/Tooltip/Tooltip'
 const InitializeDownload = ({
   downloadIds,
   downloadLocation,
-  onCloseChooseLocationModal,
+  onCloseChooseLocationDialog,
   setDownloadIds
 }) => {
   const {
@@ -70,13 +70,13 @@ const InitializeDownload = ({
     })
 
     setDownloadIds(null)
-    onCloseChooseLocationModal()
+    onCloseChooseLocationDialog()
   }
 
   const onCancel = () => {
     // TODO Can we add an undo functionality?
     downloadIds.forEach((downloadId) => cancelDownloadItem({ downloadId }))
-    onCloseChooseLocationModal()
+    onCloseChooseLocationDialog()
   }
 
   return (
@@ -123,9 +123,9 @@ const InitializeDownload = ({
           }}
         />
       </div>
-      <div>
+      <div className={styles.actions}>
         <Button
-          className={styles.actions}
+          className={styles.actionsButton}
           size="lg"
           variant="danger"
           Icon={FaBan}
@@ -135,7 +135,7 @@ const InitializeDownload = ({
           Cancel
         </Button>
         <Button
-          className={styles.actions}
+          className={styles.actionsButton}
           size="lg"
           Icon={FaDownload}
           variant="success"
@@ -160,7 +160,7 @@ InitializeDownload.defaultProps = {
 InitializeDownload.propTypes = {
   downloadIds: PropTypes.arrayOf(PropTypes.string),
   downloadLocation: PropTypes.string,
-  onCloseChooseLocationModal: PropTypes.func.isRequired,
+  onCloseChooseLocationDialog: PropTypes.func.isRequired,
   setDownloadIds: PropTypes.func.isRequired
 }
 

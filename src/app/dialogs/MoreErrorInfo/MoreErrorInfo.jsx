@@ -1,21 +1,21 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  FaAngleDown,
-  FaAngleUp,
   FaBan,
   FaRedo
 } from 'react-icons/fa'
 import Button from '../../components/Button/Button'
 
-import * as styles from './MoreErrorInfo.module.scss'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
+import useAppContext from '../../hooks/useAppContext'
+
+import * as styles from './MoreErrorInfo.module.scss'
 
 /**
  * @typedef {Object} MoreErrorInfoProps
- * @property {String} downloadId A string representing the id of a download.
- * @property {Object} collectionErrorInfo An object containing information about the errored file(s).
- * @property {String} collectionErrorInfo.url An string representing the download URL of a file.
+ * @property {String} [downloadId] A string representing the id of a download.
+ * @property {Number} [numberErrors] The number of errors associated with the Dialog.
+ * @property {Function} [onCloseMoreErrorInfoDialog] A function which sets the dialog state.
  */
 /**
  * Renders a `MoreErrorInfo` dialog.
@@ -23,19 +23,27 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
  *
  * @example <caption>Render a MoreErrorInfo dialog.</caption>
  *
+ * const [downloadId, setDownloadId] = useState(null)
+ * const [numberErrors, setNumberErrors] = useState(null)
+ * const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState(false)
  *
  * return (
  *   <Dialog {...dialogProps}>
  *     <MoreErrorInfo
- *       collectionErrorInfo={collectionErrorInfo}
  *       downloadId={downloadId}
+ *       numberErrors={numberErrors}
+ *       onCloseMoreErrorInfoDialog={}
  *     />
  *   </MoreErrorInfo>
  * )
  */
 const MoreErrorInfo = ({
-  downloadId
+  downloadId,
+  numberErrors,
+  onCloseMoreErrorInfoDialog
 }) => {
+  const appContext = useAppContext()
+  const { deleteAllToastsById } = appContext
   const {
     cancelErroredDownloadItem,
     retryDownloadItem
@@ -43,43 +51,55 @@ const MoreErrorInfo = ({
 
   const onCancelDownloadItem = ({ downloadId }) => {
     cancelErroredDownloadItem({ downloadId })
+    onCloseMoreErrorInfoDialog(false)
+    deleteAllToastsById(downloadId)
   }
 
   const onRetryDownloadItem = ({ downloadId }) => {
     retryDownloadItem({ downloadId })
+    onCloseMoreErrorInfoDialog(false)
+    deleteAllToastsById(downloadId)
   }
 
   return (
     <>
       <div className={styles.message}>
-        {`An error occurred while downloading files to ${downloadId}`}
+        {/* TODO EDD-27 link downloadId to the files view */}
+        {`${numberErrors} files failed to download in ${downloadId}.`}
       </div>
-      {'\n'}
-      <Button
-        className={styles.button}
-        size="sm"
-        Icon={FaRedo}
-        variant="danger"
-        onClick={() => onRetryDownloadItem({ downloadId })}
-      >
-        Retry Downloading Files
-      </Button>
-      <Button
-        className={styles.button}
-        size="sm"
-        Icon={FaBan}
-        variant="danger"
-        onClick={() => onCancelDownloadItem({ downloadId })}
-      >
-        Cancel Downloading Files
-      </Button>
-      <div />
+      <div className={styles.actions}>
+        <Button
+          className={styles.actionsButton}
+          size="sm"
+          Icon={FaRedo}
+          variant="danger"
+          onClick={() => onRetryDownloadItem({ downloadId })}
+        >
+          Retry Failed Files
+        </Button>
+        <Button
+          className={styles.actionsButton}
+          size="sm"
+          Icon={FaBan}
+          variant="danger"
+          onClick={() => onCancelDownloadItem({ downloadId })}
+        >
+          Cancel Failed Files
+        </Button>
+      </div>
     </>
   )
 }
 
+MoreErrorInfo.defaultProps = {
+  downloadId: null,
+  numberErrors: null
+}
+
 MoreErrorInfo.propTypes = {
-  downloadId: PropTypes.string.isRequired
+  downloadId: PropTypes.string,
+  numberErrors: PropTypes.number,
+  onCloseMoreErrorInfoDialog: PropTypes.func.isRequired
 }
 
 export default MoreErrorInfo

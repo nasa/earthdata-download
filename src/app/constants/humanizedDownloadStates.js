@@ -2,6 +2,7 @@ import downloadStates from './downloadStates'
 
 const humanizedDownloadStates = {
   [downloadStates.active]: 'Downloading',
+  [downloadStates.cancelled]: 'Cancelled',
   [downloadStates.completed]: 'Completed',
   [downloadStates.error]: 'An error occurred',
   [downloadStates.interrupted]: 'Interrupted',

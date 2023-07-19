@@ -45,7 +45,8 @@ describe('restartDownload', () => {
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
         downloadId: 'mock-download-id'
       }, {
-        state: downloadStates.pending
+        state: downloadStates.pending,
+        percent: 0
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)

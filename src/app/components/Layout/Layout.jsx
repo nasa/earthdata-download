@@ -45,7 +45,7 @@ const Layout = () => {
 
   const appContext = useAppContext()
   const { toasts, dismissToast } = appContext
-  const { activeToasts = [] } = toasts
+  const { activeToasts = {} } = toasts
 
   const [currentPage, setCurrentPage] = useState(PAGES.downloads)
   const [isWindowMaximized, setIsWindowMaximized] = useState(false)
@@ -228,7 +228,7 @@ const Layout = () => {
         <ToastList
           className={styles.toastList}
           dismissToast={dismissToast}
-          toasts={activeToasts}
+          toasts={Object.values(activeToasts).filter(Boolean)}
         />
         <Dialog
           open={settingsDialogIsOpen}

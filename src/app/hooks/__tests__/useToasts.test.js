@@ -21,23 +21,25 @@ const TestComponent = () => {
 
   return (
     <div>
-      {activeToasts.map(({ message, id }) => (
-        <div key={id}>
-          {`${message} for toast id: ${id}`}
-          <button
-            type="button"
-            onClick={() => dismissToast(id)}
-          >
-            Dismiss
-          </button>
-          <button
-            type="button"
-            onClick={() => deleteAllToastsById(id)}
-          >
-            Delete
-          </button>
-        </div>
-      ))}
+      {
+        Object.values(activeToasts).filter(Boolean).map(({ message, id }) => (
+          <div key={id}>
+            {`${message} for toast id: ${id}`}
+            <button
+              type="button"
+              onClick={() => dismissToast(id)}
+            >
+              Dismiss
+            </button>
+            <button
+              type="button"
+              onClick={() => deleteAllToastsById(id)}
+            >
+              Delete
+            </button>
+          </div>
+        ))
+      }
       <div>
         <button
           type="button"

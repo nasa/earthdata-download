@@ -25,7 +25,9 @@ describe('toastsReducer', () => {
 
       const expectedState = {
         ...initialState,
-        activeToasts: [toast]
+        activeToasts: {
+          [toast.id]: toast
+        }
       }
 
       expect(toastsReducer(initialState, action)).toEqual(expectedState)
@@ -44,12 +46,16 @@ describe('toastsReducer', () => {
 
       const expectedState = {
         ...initialState,
-        activeToasts: [toast]
+        activeToasts: {
+          [toast.id]: toast
+        }
       }
 
       const initial = {
         ...initialState,
-        activeToasts: [toast]
+        activeToasts: {
+          [toast.id]: toast
+        }
       }
 
       expect(toastsReducer(initial, action)).toEqual(expectedState)
@@ -96,7 +102,9 @@ describe('toastsReducer', () => {
 
       const expectedState = {
         ...initialState,
-        activeToasts: [toast],
+        activeToasts: {
+          [toast.id]: toast
+        },
         dismissedToasts: {
           [toast.id]: {
             ...toast,
@@ -133,7 +141,7 @@ describe('toastsReducer', () => {
 
       const expectedState = {
         ...initialState,
-        activeToasts: [],
+        activeToasts: {},
         dismissedToasts: {
           [toast.id]: toast
         }
@@ -141,7 +149,9 @@ describe('toastsReducer', () => {
 
       const initial = {
         ...initialState,
-        activeToasts: [toast]
+        activeToasts: {
+          [toast.id]: toast
+        }
       }
 
       expect(toastsReducer(initial, action)).toEqual(expectedState)
@@ -162,7 +172,7 @@ describe('toastsReducer', () => {
 
       const expectedState = {
         ...initialState,
-        activeToasts: [],
+        activeToasts: {},
         dismissedToasts: {
           [toast.id]: undefined
         }
@@ -170,7 +180,9 @@ describe('toastsReducer', () => {
 
       const initial = {
         ...initialState,
-        activeToasts: [toast],
+        activeToasts: {
+          [toast.id]: toast
+        },
         dismissedToasts: {
           [toast.id]: toast
         }
@@ -192,7 +204,9 @@ describe('toastsReducer', () => {
 
       const initial = {
         ...initialState,
-        activeToasts: [toast],
+        activeToasts: {
+          [toast.id]: toast
+        },
         dismissedToasts: {
           [toast.id]: toast
         }

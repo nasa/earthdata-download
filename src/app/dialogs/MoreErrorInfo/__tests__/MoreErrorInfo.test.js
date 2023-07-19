@@ -12,10 +12,10 @@ const setup = () => {
   const cancelErroredDownloadItem = jest.fn()
   const deleteAllToastsById = jest.fn()
   const onCloseMoreErrorInfoDialog = jest.fn()
-  const retryDownloadItem = jest.fn()
+  const retryErroredDownloadItem = jest.fn()
 
   render(
-    <ElectronApiContext.Provider value={{ cancelErroredDownloadItem, retryDownloadItem }}>
+    <ElectronApiContext.Provider value={{ cancelErroredDownloadItem, retryErroredDownloadItem }}>
       <AppContext.Provider value={{
         deleteAllToastsById
       }}
@@ -32,7 +32,7 @@ const setup = () => {
   return {
     cancelErroredDownloadItem,
     deleteAllToastsById,
-    retryDownloadItem
+    retryErroredDownloadItem
   }
 }
 
@@ -48,7 +48,7 @@ describe('MoreErrorInfo component', () => {
   test('clicking the Retry All Errored button sends a message to the main process', async () => {
     const user = userEvent.setup()
 
-    const { deleteAllToastsById, retryDownloadItem } = setup([
+    const { deleteAllToastsById, retryErroredDownloadItem } = setup([
       {
         itemName: 'mock-filename-1.png',
         url: 'http://example.com/mock-filename-1.png'
@@ -61,8 +61,8 @@ describe('MoreErrorInfo component', () => {
 
     await user.click(screen.getByRole('button', { name: /Retry Failed Files/i }))
 
-    expect(retryDownloadItem).toHaveBeenCalledTimes(1)
-    expect(retryDownloadItem).toHaveBeenCalledWith({
+    expect(retryErroredDownloadItem).toHaveBeenCalledTimes(1)
+    expect(retryErroredDownloadItem).toHaveBeenCalledWith({
       downloadId: 'mock-download-id'
     })
 

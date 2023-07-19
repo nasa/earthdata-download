@@ -9,6 +9,8 @@ import Button from '../../components/Button/Button'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import useAppContext from '../../hooks/useAppContext'
 
+import pluralize from '../../utils/pluralize'
+
 import * as styles from './MoreErrorInfo.module.scss'
 
 /**
@@ -46,7 +48,7 @@ const MoreErrorInfo = ({
   const { deleteAllToastsById } = appContext
   const {
     cancelErroredDownloadItem,
-    retryDownloadItem
+    retryErroredDownloadItem
   } = useContext(ElectronApiContext)
 
   const onCancelDownloadItem = ({ downloadId }) => {
@@ -55,8 +57,8 @@ const MoreErrorInfo = ({
     deleteAllToastsById(downloadId)
   }
 
-  const onRetryDownloadItem = ({ downloadId }) => {
-    retryDownloadItem({ downloadId })
+  const onRetryErroredDownloadItem = ({ downloadId }) => {
+    retryErroredDownloadItem({ downloadId })
     onCloseMoreErrorInfoDialog(false)
     deleteAllToastsById(downloadId)
   }
@@ -65,7 +67,7 @@ const MoreErrorInfo = ({
     <>
       <div className={styles.message}>
         {/* TODO EDD-27 link downloadId to the files view */}
-        {`${numberErrors} files failed to download in ${downloadId}.`}
+        {`${numberErrors} ${pluralize('file', numberErrors)} failed to download in ${downloadId}.`}
       </div>
       <div className={styles.actions}>
         <Button
@@ -73,7 +75,7 @@ const MoreErrorInfo = ({
           size="sm"
           Icon={FaRedo}
           variant="danger"
-          onClick={() => onRetryDownloadItem({ downloadId })}
+          onClick={() => onRetryErroredDownloadItem({ downloadId })}
         >
           Retry Failed Files
         </Button>

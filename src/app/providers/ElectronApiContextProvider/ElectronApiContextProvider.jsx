@@ -5,14 +5,30 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 const { electronApi } = window
 
-const ElectronApiProvider = ({ children }) => (
+/**
+ * @typedef {Object} ElectronApiContextProviderProps
+ * @property {ReactNode} children The children to be rendered.
+
+/**
+ * Renders any children wrapped with ElectronApiContext.
+ * @param {ElectronApiContextProviderProps} props
+ *
+ * @example <caption>Renders children wrapped with ElectronApiContext.</caption>
+ *
+ * return (
+ *   <ElectronApiContextProvider>
+ *     {children}
+ *   </ElectronApiContextProvider>
+ * )
+ */
+const ElectronApiContextProvider = ({ children }) => (
   <ElectronApiContext.Provider value={electronApi}>
     {children}
   </ElectronApiContext.Provider>
 )
 
-ElectronApiProvider.propTypes = {
+ElectronApiContextProvider.propTypes = {
   children: PropTypes.node.isRequired
 }
 
-export default ElectronApiProvider
+export default ElectronApiContextProvider

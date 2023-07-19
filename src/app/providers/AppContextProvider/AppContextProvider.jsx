@@ -5,6 +5,22 @@ import useToasts from '../../hooks/useToasts'
 
 import AppContext from '../../context/AppContext'
 
+/**
+ * @typedef {Object} AppContextProviderProps
+ * @property {ReactNode} children The children to be rendered.
+
+/**
+ * Renders any children wrapped with AppContext.
+ * @param {AppContextProviderProps} props
+ *
+ * @example <caption>Renders children wrapped with AppContext.</caption>
+ *
+ * return (
+ *   <AppContextProvider>
+ *     {children}
+ *   </AppContextProvider>
+ * )
+ */
 const AppContextProvider = ({ children }) => {
   const toastContext = useToasts()
 

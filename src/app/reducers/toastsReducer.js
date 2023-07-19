@@ -4,21 +4,8 @@
  * `dismissedToasts` is an object holding the dismissed toasts. The key/value pairs are the toastId/toastValue
  */
 export const initialState = {
-  activeToasts: [],
+  activeToasts: {},
   dismissedToasts: {}
-}
-
-/**
- * Checks if the toastId is already found in activeToasts
- * @param {Object} state Current reducer state
- * @param {String} toastId ID of the toast to find
- * @returns {Boolean}
- */
-const isToastAlreadyActive = (state, toastId) => {
-  const { activeToasts = [] } = state
-  const alreadyActive = activeToasts.find((toast) => toast.id === toastId)
-
-  return !!alreadyActive
 }
 
 /**
@@ -40,29 +27,35 @@ export const toastsReducer = (state, action) => {
     case 'ADD_TOAST': {
       const { id } = action.payload
 
-      // If the incoming toast is ready active, don't add another toast to the active list
-      if (isToastAlreadyActive(state, id)) return state
+      // TODO if numberErrors has incremented, the new value isn't showing up
+
+      // // If the incoming toast is ready active, don't add another toast to the active list
+      // if (isToastAlreadyActive(state, id)) return state
 
       // If the incoming toast has been dismissed, don't add another toast to the active list
       if (isToastDismissed(state, action.payload)) return state
 
       return {
         ...state,
-        activeToasts: [
+        activeToasts: {
           ...state.activeToasts,
-          action.payload
-        ]
+          [id]: action.payload
+        }
       }
     }
     case 'DISMISS_TOAST': {
       const dismissedToastId = action.payload
 
       // Get values for dismissed toast to put into state.dismissedToasts
-      const dismissedToast = state.activeToasts.find((toast) => toast.id === dismissedToastId)
+      const dismissedToast = state.activeToasts[dismissedToastId]
 
       return {
         ...state,
-        activeToasts: state.activeToasts.filter((toast) => toast.id !== dismissedToastId),
+        // activeToasts: state.activeToasts.filter((toast) => toast.id !== dismissedToastId),
+        activeToasts: {
+          ...state.activeToasts,
+          [dismissedToastId]: undefined
+        },
         dismissedToasts: {
           ...state.dismissedToasts,
           [dismissedToast.id]: dismissedToast
@@ -77,7 +70,11 @@ export const toastsReducer = (state, action) => {
 
       return {
         ...state,
-        activeToasts: state.activeToasts.filter((toast) => toast.id !== toastId),
+        // activeToasts: state.activeToasts.filter((toast) => toast.id !== toastId),
+        activeToasts: {
+          ...state.activeToasts,
+          [toastId]: undefined
+        },
         dismissedToasts: {
           ...state.dismissedToasts,
           [toastId]: undefined

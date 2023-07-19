@@ -2,7 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as RadixToast from '@radix-ui/react-toast'
 import classNames from 'classnames'
-import { FaExclamationTriangle, FaInfoCircle, FaTimes } from 'react-icons/fa'
+import {
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaInfoCircle,
+  FaSpinner,
+  FaTimes
+} from 'react-icons/fa'
 
 import Button from '../Button/Button'
 
@@ -69,6 +75,21 @@ const Toast = ({
       {
         variant === 'danger' && (
           <FaExclamationTriangle className={styles.icon} />
+        )
+      }
+      {
+        variant === 'spinner' && (
+          <FaSpinner
+            className={classNames([
+              styles.icon,
+              styles.spinner
+            ])}
+          />
+        )
+      }
+      {
+        variant === 'success' && (
+          <FaCheckCircle className={styles.icon} />
         )
       }
       <div>

@@ -14,6 +14,12 @@
     background-color: var(--color__red--550);
     color: var(--color__white);
   }
+
+  &.isSuccess {
+    border: 1px solid var(--color__green--600);
+    background-color: var(--color__green--550);
+    color: var(--color__white);
+  }
 }
 
 .primary {
@@ -35,6 +41,10 @@
   .isDanger & {
     color: var(--color__red--750);
   }
+
+  .isSuccess & {
+    color: var(--color__green--750);
+  }
 }
 
 .title {
@@ -55,6 +65,11 @@
     color: var(--color__red--050);
     text-shadow: 0 0 5px var(--color__red--600);
   }
+
+  .isSuccess & {
+    color: var(--color__green--050);
+    text-shadow: 0 0 5px var(--color__green--600);
+  }
 }
 
 .message {
@@ -73,6 +88,11 @@
   .isDanger & {
     color: var(--color__white);
     text-shadow: 0 0 5px var(--color__red--600);
+  }
+
+  .isSuccess & {
+    color: var(--color__white);
+    text-shadow: 0 0 5px var(--color__green--600);
   }
 }
 
@@ -99,6 +119,11 @@
     color: var(--color__white);
   }
 
+  .isSuccess & {
+    border-left: 1px solid var(--color__green--650);
+    color: var(--color__white);
+  }
+
   &:hover {
     border: none;
     border-left: 1px solid var(--color__black--750);
@@ -108,6 +133,11 @@
     .isDanger & {
       border-left: 1px solid var(--color__red--650);
       background-color: var(--color__red--600);
+    }
+
+    .isSuccess & {
+      border-left: 1px solid var(--color__green--650);
+      background-color: var(--color__green--600);
     }
   }
 }
@@ -122,4 +152,19 @@
   margin: 0;
   line-height: 1.3;
   white-space: nowrap;
+}
+
+.spinner {
+  animation: spinnerRotate 2s linear infinite;
+}
+
+
+@keyframes spinnerRotate {
+  from {
+    transform:rotate(0deg);
+  }
+
+  to {
+    transform:rotate(360deg);
+  }
 }

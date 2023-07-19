@@ -23,6 +23,8 @@ import { PAGES } from '../../constants/pages'
 
 import * as styles from './Layout.module.scss'
 
+const updateAvailableToastId = 'updateAvailable'
+
 /**
  * Renders a `Layout` page.
  *
@@ -35,6 +37,8 @@ import * as styles from './Layout.module.scss'
 const Layout = () => {
   const {
     autoUpdateAvailable,
+    autoUpdateInstallLater,
+    autoUpdateProgress,
     closeWindow,
     minimizeWindow,
     maximizeWindow,
@@ -45,7 +49,11 @@ const Layout = () => {
   } = useContext(ElectronApiContext)
 
   const appContext = useAppContext()
-  const { toasts, dismissToast } = appContext
+  const {
+    toasts,
+    addToast,
+    dismissToast
+  } = appContext
   const { activeToasts = {} } = toasts
 
   const [currentPage, setCurrentPage] = useState(PAGES.downloads)
@@ -57,17 +65,49 @@ const Layout = () => {
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
   const [hasActiveDownload, setHasActiveDownload] = useState(false)
 
-  // const onAutoUpdateAvailable = () => {
-  //   console.log('🚀 ~ file: Layout.jsx:56 ~ onAutoUpdateAvailable ~ onAutoUpdateAvailable:')
-  //   setNewAppVersionDialogOpen(true)
-  // }
+  const onDismissToast = (id) => {
+    if (id === updateAvailableToastId) {
+      autoUpdateInstallLater()
+    }
 
-  // const onCloseNewAppVersionDialog = () => {
-  //   setNewAppVersionDialogOpen(false)
-  //   setInstallOnQuit(true)
-  // }
+    dismissToast(id)
+  }
 
-  // TODO add toast to show update download progress
+  const onAutoUpdateAvailable = () => {
+    addToast({
+      id: updateAvailableToastId,
+      title: 'An app update is available',
+      message: 'Downloading update: 0%',
+      numberErrors: 0,
+      variant: 'spinner'
+    })
+  }
+
+  const onAutoUpdateProgress = (event, info) => {
+    console.log('🚀 ~ file: Layout.jsx:70 ~ onAutoUpdateProgress ~ info:', info)
+    const { percent } = info
+
+    if (percent < 100) {
+      addToast({
+        id: updateAvailableToastId,
+        title: 'An app update is available',
+        message: `Downloading update: ${percent}%`,
+        numberErrors: 0,
+        variant: 'spinner'
+      })
+    } else {
+      addToast({
+        id: updateAvailableToastId,
+        message: 'Update is ready to install',
+        numberErrors: 0,
+        variant: 'success'
+      })
+
+      setInterval(() => {
+        dismissToast(updateAvailableToastId)
+      }, 3000)
+    }
+  }
 
   let pageComponent
 
@@ -92,11 +132,13 @@ const Layout = () => {
 
   useEffect(() => {
     windowsLinuxTitleBar(true, onWindowMaximized)
-    // autoUpdateAvailable(true, onAutoUpdateAvailable)
+    autoUpdateAvailable(true, onAutoUpdateAvailable)
+    autoUpdateProgress(true, onAutoUpdateProgress)
 
     return () => {
       windowsLinuxTitleBar(false, onWindowMaximized)
-      // autoUpdateAvailable(false, onAutoUpdateAvailable)
+      autoUpdateAvailable(false, onAutoUpdateAvailable)
+      autoUpdateProgress(false, onAutoUpdateProgress)
     }
   }, [])
 
@@ -242,7 +284,7 @@ const Layout = () => {
         {pageComponent}
         <ToastList
           className={styles.toastList}
-          dismissToast={dismissToast}
+          dismissToast={onDismissToast}
           toasts={Object.values(activeToasts).filter(Boolean)}
         />
         <Dialog

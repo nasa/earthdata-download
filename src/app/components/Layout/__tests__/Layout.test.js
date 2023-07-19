@@ -32,27 +32,52 @@ import DownloadHistory from '../../../pages/DownloadHistory/DownloadHistory'
 import Settings from '../../../dialogs/Settings/Settings'
 import ToastList from '../../ToastList/ToastList'
 
-describe('Layout component', () => {
-  test('renders the downloads page', () => {
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: false,
-        isMac: true,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
+const setup = (overrideApiContextValue = {}, toasts = {}) => {
+  const closeWindow = jest.fn()
+  const minimizeWindow = jest.fn()
+  const maximizeWindow = jest.fn()
+
+  const apiContextValue = {
+    isWin: false,
+    isMac: true,
+    isLinux: false,
+    closeWindow,
+    minimizeWindow,
+    maximizeWindow,
+    ...overrideApiContextValue
+  }
+
+  render(
+    <ElectronApiContext.Provider value={{
+      isWin: false,
+      isMac: true,
+      isLinux: false,
+      autoUpdateAvailable: jest.fn(),
+      autoUpdateInstallLater: jest.fn(),
+      autoUpdateProgress: jest.fn(),
+      windowsLinuxTitleBar: jest.fn(),
+      ...apiContextValue
+    }}
+    >
+      <AppContext.Provider value={{
+        toasts
       }}
       >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+        <Layout />
+      </AppContext.Provider>
+    </ElectronApiContext.Provider>
+  )
+
+  return {
+    closeWindow,
+    minimizeWindow,
+    maximizeWindow
+  }
+}
+
+describe('Layout component', () => {
+  test('renders the downloads page', () => {
+    setup()
 
     expect(Downloads).toHaveBeenCalledTimes(1)
   })
@@ -61,25 +86,7 @@ describe('Layout component', () => {
     // Skipping because the nav buttons are hidden until EDD-18
     const user = userEvent.setup()
 
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: false,
-        isMac: true,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup()
 
     expect(Downloads).toHaveBeenCalledTimes(1)
 
@@ -96,25 +103,7 @@ describe('Layout component', () => {
     // Skipping because the nav buttons are hidden until EDD-18
     const user = userEvent.setup()
 
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: false,
-        isMac: true,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup()
 
     expect(Downloads).toHaveBeenCalledTimes(1)
 
@@ -126,25 +115,7 @@ describe('Layout component', () => {
   test('renders the settings page when clicking the nav button', async () => {
     const user = userEvent.setup()
 
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: false,
-        isMac: true,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup()
 
     expect(Downloads).toHaveBeenCalledTimes(1)
 
@@ -156,25 +127,7 @@ describe('Layout component', () => {
   test('Settings dialog modal can be escaped using Radix close', async () => {
     const user = userEvent.setup()
 
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: false,
-        isMac: true,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup()
 
     await user.click(screen.getByRole('button', { name: 'Settings' }))
 
@@ -186,25 +139,7 @@ describe('Layout component', () => {
   })
 
   test('renders the settings button on a mac', () => {
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: false,
-        isMac: true,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup({ isMac: true })
 
     expect(Downloads).toHaveBeenCalledTimes(1)
 
@@ -212,49 +147,19 @@ describe('Layout component', () => {
   })
 
   test('renders the settings button on windows', () => {
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: true,
-        isMac: false,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup({
+      isMac: false,
+      isWin: true
+    })
 
     expect(screen.getByTestId('layout-header').className).not.toContain('isMac')
   })
 
   test('renders the window buttons on Windows', () => {
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: true,
-        isMac: false,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup({
+      isMac: false,
+      isWin: true
+    })
 
     expect(screen.getByTestId('window-buttons').className).toContain('windowButtons')
   })
@@ -264,26 +169,10 @@ describe('Layout component', () => {
     const user = userEvent.setup()
     const maximizeWindowMock = jest.fn()
 
-    render(
-      <ElectronApiContext.Provider
-        value={{
-          isWin: false,
-          isMac: false,
-          isLinux: true,
-          windowsLinuxTitleBar: jest.fn(),
-          closeWindow: jest.fn(),
-          minimizeWindow: jest.fn(),
-          maximizeWindow: maximizeWindowMock
-        }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup({
+      isMac: false,
+      isWin: true
+    })
 
     await user.click(screen.getByTestId('maximize-restore-window'))
 
@@ -291,165 +180,62 @@ describe('Layout component', () => {
   })
 
   test('renders the window buttons on Linux', () => {
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: false,
-        isMac: false,
-        isLinux: true,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup({
+      isMac: false,
+      isLinux: true
+    })
 
     expect(screen.getByTestId('window-buttons').className).toContain('windowButtons')
   })
 
   test('does not render the window buttons on Mac', () => {
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: false,
-        isMac: true,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    setup()
 
     expect(screen.getByTestId('layout-header').className).not.toContain('windowButtons')
   })
 
   test('clicking the close button sends a message to the main process', async () => {
     const user = userEvent.setup()
-    const closeWindowMock = jest.fn()
 
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: true,
-        windowsLinuxTitleBar: jest.fn(),
-        isMac: false,
-        isLinux: false,
-        closeWindow: closeWindowMock,
-        minimizeWindow: jest.fn(),
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    const { closeWindow } = setup({
+      isMac: false,
+      isWin: true
+    })
 
     await user.click(screen.getByTestId('close-window'))
 
-    expect(closeWindowMock).toHaveBeenCalledTimes(1)
+    expect(closeWindow).toHaveBeenCalledTimes(1)
   })
 
   test('clicking the maximize/restore button sends a message to the main process', async () => {
     const user = userEvent.setup()
-    const maximizeWindowMock = jest.fn()
 
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: true,
-        isMac: false,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: jest.fn(),
-        maximizeWindow: maximizeWindowMock
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    const { maximizeWindow } = setup({
+      isMac: false,
+      isWin: true
+    })
 
     await user.click(screen.getByTestId('maximize-restore-window'))
 
-    expect(maximizeWindowMock).toHaveBeenCalledTimes(1)
+    expect(maximizeWindow).toHaveBeenCalledTimes(1)
   })
 
   test('clicking the minimize button sends a message to the main process', async () => {
     const user = userEvent.setup()
-    const minimizeWindowMock = jest.fn()
 
-    render(
-      <ElectronApiContext.Provider value={{
-        isWin: true,
-        isMac: false,
-        isLinux: false,
-        windowsLinuxTitleBar: jest.fn(),
-        closeWindow: jest.fn(),
-        minimizeWindow: minimizeWindowMock,
-        maximizeWindow: jest.fn()
-      }}
-      >
-        <AppContext.Provider value={{
-          toasts: {}
-        }}
-        >
-          <Layout />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    const { minimizeWindow } = setup({
+      isMac: false,
+      isWin: true
+    })
 
     await user.click(screen.getByTestId('minimize-window'))
 
-    expect(minimizeWindowMock).toHaveBeenCalledTimes(1)
+    expect(minimizeWindow).toHaveBeenCalledTimes(1)
   })
 
   describe('when toasts are not defined in the app context', () => {
     test('renders the ToastList with the correct props', async () => {
-      const minimizeWindowMock = jest.fn()
-
-      render(
-        <ElectronApiContext.Provider value={{
-          isWin: true,
-          isMac: false,
-          isLinux: false,
-          windowsLinuxTitleBar: jest.fn(),
-          closeWindow: jest.fn(),
-          minimizeWindow: minimizeWindowMock,
-          maximizeWindow: jest.fn()
-        }}
-        >
-          <AppContext.Provider value={{
-            toasts: {
-              activeToasts: []
-            }
-          }}
-          >
-            <Layout />
-          </AppContext.Provider>
-        </ElectronApiContext.Provider>
-      )
+      setup()
 
       expect(ToastList).toHaveBeenCalledTimes(1)
       expect(ToastList).toHaveBeenCalledWith(expect.objectContaining({
@@ -460,34 +246,14 @@ describe('Layout component', () => {
 
   describe('when toasts are defined in the app context', () => {
     test('renders the ToastList with the correct props', async () => {
-      const minimizeWindowMock = jest.fn()
-
-      render(
-        <ElectronApiContext.Provider value={{
-          isWin: true,
-          isMac: false,
-          isLinux: false,
-          windowsLinuxTitleBar: jest.fn(),
-          closeWindow: jest.fn(),
-          minimizeWindow: minimizeWindowMock,
-          maximizeWindow: jest.fn()
-        }}
-        >
-          <AppContext.Provider value={{
-            toasts: {
-              activeToasts: [
-                {
-                  id: 'mock-toast-id',
-                  message: 'Mock toast message'
-                }
-              ]
-            }
-          }}
-          >
-            <Layout />
-          </AppContext.Provider>
-        </ElectronApiContext.Provider>
-      )
+      setup({}, {
+        activeToasts: {
+          'mock-toast-id': {
+            id: 'mock-toast-id',
+            message: 'Mock toast message'
+          }
+        }
+      })
 
       expect(ToastList).toHaveBeenCalledTimes(1)
       expect(ToastList).toHaveBeenCalledWith(expect.objectContaining({

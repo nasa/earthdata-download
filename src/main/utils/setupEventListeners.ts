@@ -1,6 +1,11 @@
 // @ts-nocheck
 
-import { app, ipcMain, shell } from 'electron'
+import {
+  app,
+  dialog,
+  ipcMain,
+  shell
+} from 'electron'
 
 import beginDownload from '../eventHandlers/beginDownload'
 import cancelDownloadItem from '../eventHandlers/cancelDownloadItem'
@@ -18,6 +23,8 @@ import sendToLogin from '../eventHandlers/sendToLogin'
 import setPreferenceFieldValue from '../eventHandlers/setPreferenceFieldValue'
 import willDownload from '../eventHandlers/willDownload'
 
+import startPendingDownloads from '../utils/startPendingDownloads'
+
 /**
  * Sets up event listeners for the main process
  * @param {Object} params
@@ -33,7 +40,8 @@ const setupEventListeners = ({
   currentDownloadItems,
   database,
   downloadIdContext,
-  downloadsWaitingForAuth
+  downloadsWaitingForAuth,
+  setUpdateAvailable
 }) => {
   /**
    * Browser Window event listeners
@@ -215,6 +223,91 @@ const setupEventListeners = ({
   // When the window is going to close, clear the reportProgressInterval
   appWindow.on('close', () => {
     if (reportProgressInterval) clearInterval(reportProgressInterval)
+  })
+
+  /**
+   * AutoUpdater event listeners
+   */
+
+  // Called when an update is available for download
+  autoUpdater.on('update-available', () => {
+    setUpdateAvailable(true)
+
+    appWindow.webContents.send('autoUpdateAvailable')
+  })
+
+  // Called when there is no update available for download
+  autoUpdater.on('update-not-available', async () => {
+    setUpdateAvailable(false)
+
+    // Start any pending downloads
+    await startPendingDownloads({
+      appWindow,
+      database
+    })
+  })
+
+  // Called when an error occurrs with the autoUpdate
+  autoUpdater.on('error', async (error) => {
+    console.log(`Error in auto-updater. ${error}`)
+    setUpdateAvailable(false)
+
+    // Start any pending downloads
+    await startPendingDownloads({
+      appWindow,
+      database
+    })
+  })
+
+  // Called when the download progress changes
+  autoUpdater.on('download-progress', ({ percent }) => {
+    appWindow.webContents.send('autoUpdateProgress', { percent: Math.round(percent) })
+  })
+
+  let installLater = false
+  // Called when the update finishes downloading
+  autoUpdater.on('update-downloaded', async () => {
+    appWindow.webContents.send('autoUpdateProgress', { percent: 100 })
+
+    // If the user already indicated they wanted to install the update later,
+    // don't prompt them to install
+    if (installLater) return
+
+    // Prompt the user to install the update
+    const result = dialog.showMessageBoxSync(null, {
+      title: 'Update Available',
+      detail: 'A new version of Earthdata Download is ready to be installed.',
+      message: 'Update Available',
+      buttons: ['Install now', 'Install on next launch'],
+      cancelId: 1
+    })
+
+    // Install now was selected
+    if (result === 0) {
+      autoUpdater.quitAndInstall()
+    }
+
+    // Install on next launch was selected
+    if (result === 1) {
+      setUpdateAvailable(false)
+
+      // Start any pending downloads
+      await startPendingDownloads({
+        appWindow,
+        database
+      })
+    }
+  })
+
+  ipcMain.on('autoUpdateInstallLater', async () => {
+    setUpdateAvailable(false)
+    installLater = true
+
+    // Start any pending downloads
+    await startPendingDownloads({
+      appWindow,
+      database
+    })
   })
 
   /**

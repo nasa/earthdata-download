@@ -27,11 +27,6 @@ export const toastsReducer = (state, action) => {
     case 'ADD_TOAST': {
       const { id } = action.payload
 
-      // TODO if numberErrors has incremented, the new value isn't showing up
-
-      // // If the incoming toast is ready active, don't add another toast to the active list
-      // if (isToastAlreadyActive(state, id)) return state
-
       // If the incoming toast has been dismissed, don't add another toast to the active list
       if (isToastDismissed(state, action.payload)) return state
 
@@ -58,7 +53,7 @@ export const toastsReducer = (state, action) => {
         },
         dismissedToasts: {
           ...state.dismissedToasts,
-          [dismissedToast.id]: dismissedToast
+          [dismissedToastId]: dismissedToast
         }
       }
     }

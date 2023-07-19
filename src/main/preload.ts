@@ -27,11 +27,11 @@ contextBridge.exposeInMainWorld('electronApi', {
   maximizeWindow: () => ipcRenderer.send('maximizeWindow'),
 
   // Messages to be received by the renderer process
-  initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'off']('initializeDownload', callback),
-  reportProgress: (on, callback) => ipcRenderer[on ? 'on' : 'off']('reportProgress', callback),
-  setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'off']('setDownloadLocation', callback),
-  showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'off']('showWaitingForLoginDialog', callback),
-  windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'off']('windowsLinuxTitleBar', callback),
+  initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('initializeDownload', callback),
+  reportProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('reportProgress', callback),
+  setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('setDownloadLocation', callback),
+  showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForLoginDialog', callback),
+  windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('windowsLinuxTitleBar', callback),
 
   // System values for renderer
   isMac: process.platform === 'darwin',

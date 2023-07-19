@@ -47,7 +47,7 @@
     background-color: var(--color__yellow--050);
     color: var(--color__yellow--700);
   }
-  
+
   .isError & {
     border: 1px solid var(--color__red--350);
     background-color: var(--color__red--050);
@@ -74,7 +74,7 @@
     background-color: var(--color__yellow--100);
     color: var(--color__yellow--850);
   }
-  
+
   .isError &:hover,
   .isError &:focus-visible  {
     border: 1px solid var(--color__red--500);
@@ -207,6 +207,11 @@
 
 .statusInformationIcon {
   margin-right: var(--size__050);
+}
+
+.hasErrorsIcon {
+  margin-right: var(--size__100);
+  color: var(--color__red--550);
 }
 
 .metaSecondary {

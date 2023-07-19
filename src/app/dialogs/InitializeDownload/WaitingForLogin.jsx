@@ -43,9 +43,9 @@ const WaitingForLogin = ({
           If your browser did not open automatically, click Log In with Earthdata Login below.
         </p>
       </div>
-      <div>
+      <div className={styles.actions}>
         <Button
-          className={styles.actions}
+          className={styles.actionsButton}
           size="lg"
           Icon={FaSignInAlt}
           onClick={() => sendToLogin({

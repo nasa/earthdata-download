@@ -114,7 +114,7 @@ describe('willDownload', () => {
       }
       const database = {
         getDownloadById: jest.fn().mockResolvedValue({
-          numErrors: 0
+          errors: []
         }),
         updateFile: jest.fn()
       }

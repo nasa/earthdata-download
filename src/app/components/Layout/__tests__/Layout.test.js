@@ -442,7 +442,7 @@ describe('Layout component', () => {
         >
           <AppContext.Provider value={{
             toasts: {
-              toasts: []
+              activeToasts: []
             }
           }}
           >
@@ -475,7 +475,7 @@ describe('Layout component', () => {
         >
           <AppContext.Provider value={{
             toasts: {
-              toasts: [
+              activeToasts: [
                 {
                   id: 'mock-toast-id',
                   message: 'Mock toast message'

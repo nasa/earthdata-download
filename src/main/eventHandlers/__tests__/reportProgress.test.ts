@@ -71,11 +71,10 @@ describe('reportProgress', () => {
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
     expect(webContents.send).toHaveBeenCalledWith('reportProgress', {
-      progress: [{
+      progressReport: [{
         downloadId: 'download-id-1',
         downloadName: 'download-id-1',
         loadingMoreFiles: true,
-        numErrors: 0,
         progress: {
           finishedFiles: 0,
           percent: 0,
@@ -87,7 +86,6 @@ describe('reportProgress', () => {
         downloadId: 'download-id-2',
         downloadName: 'download-id-2',
         loadingMoreFiles: false,
-        numErrors: 0,
         progress: {
           finishedFiles: 0,
           percent: 0,
@@ -99,7 +97,6 @@ describe('reportProgress', () => {
         downloadId: 'download-id-3',
         downloadName: 'download-id-3',
         loadingMoreFiles: false,
-        numErrors: 0,
         progress: {
           finishedFiles: 2,
           percent: 39.6,
@@ -122,7 +119,7 @@ describe('reportProgress', () => {
     await reportProgress({ database, webContents })
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
-    expect(webContents.send).toHaveBeenCalledWith('reportProgress', { progress: [], errorInfo: [] })
+    expect(webContents.send).toHaveBeenCalledWith('reportProgress', { progressReport: [] })
   })
 
   test('reports progress of downloads with errors', async () => {
@@ -167,16 +164,15 @@ describe('reportProgress', () => {
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
     expect(webContents.send).toHaveBeenCalledWith('reportProgress', {
-      progress: [{
+      progressReport: [{
         downloadId: 'download-id-1',
         downloadName: 'download-id-1',
-        errorInfo: [{
+        errors: [{
           id: 123,
           filename: 'mock-filename.png',
           state: downloadStates.error
         }],
         loadingMoreFiles: true,
-        numErrors: 1,
         progress: {
           finishedFiles: 0,
           percent: 0,

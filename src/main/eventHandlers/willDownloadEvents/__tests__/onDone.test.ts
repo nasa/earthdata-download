@@ -35,7 +35,7 @@ describe('onDone', () => {
     }
     const state = 'completed'
     const database = {
-      getDownloadById: jest.fn().mockResolvedValue({ numErrors: 0 }),
+      getDownloadById: jest.fn().mockResolvedValue({ errors: [] }),
       updateDownloadById: jest.fn(),
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
@@ -97,7 +97,7 @@ describe('onDone', () => {
     }
     const state = 'interrupted'
     const database = {
-      getDownloadById: jest.fn().mockResolvedValue({ numErrors: 0 }),
+      getDownloadById: jest.fn().mockResolvedValue({ errors: [] }),
       updateDownloadById: jest.fn(),
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
@@ -157,7 +157,7 @@ describe('onDone', () => {
     }
     const state = 'cancelled'
     const database = {
-      getDownloadById: jest.fn().mockResolvedValue({ numErrors: 0 }),
+      getDownloadById: jest.fn().mockResolvedValue({ errors: [] }),
       updateDownloadById: jest.fn(),
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
@@ -221,7 +221,7 @@ describe('onDone', () => {
     }
     const state = 'progressing'
     const database = {
-      getDownloadById: jest.fn().mockResolvedValue({ numErrors: 0 }),
+      getDownloadById: jest.fn().mockResolvedValue({ errors: [] }),
       getFileWhere: jest.fn().mockResolvedValue(undefined),
       updateFile: jest.fn(),
       updateDownloadById: jest.fn()

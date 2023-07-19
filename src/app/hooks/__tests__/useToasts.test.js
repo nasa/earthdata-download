@@ -5,23 +5,23 @@ import '@testing-library/jest-dom'
 
 import useToasts from '../useToasts'
 
-jest.mock('nanoid', () => ({
-  nanoid: jest.fn()
-    .mockReturnValueOnce(1)
-    .mockReturnValueOnce(2)
-    .mockReturnValueOnce(3)
-    .mockReturnValueOnce(4)
-}))
-
 afterEach(() => {
   jest.clearAllMocks()
 })
 
 const TestComponent = () => {
-  const { toasts, addToast, dismissToast } = useToasts()
+  const {
+    toasts,
+    addToast,
+    deleteAllToastsById,
+    dismissToast
+  } = useToasts()
+
+  const { activeToasts } = toasts
+
   return (
     <div>
-      {toasts.map(({ message, id }) => (
+      {activeToasts.map(({ message, id }) => (
         <div key={id}>
           {`${message} for toast id: ${id}`}
           <button
@@ -30,14 +30,32 @@ const TestComponent = () => {
           >
             Dismiss
           </button>
+          <button
+            type="button"
+            onClick={() => deleteAllToastsById(id)}
+          >
+            Delete
+          </button>
         </div>
       ))}
       <div>
         <button
           type="button"
-          onClick={() => addToast({ message: 'This is a message' })}
+          onClick={() => addToast({
+            id: 'mock-id',
+            message: 'This is a message'
+          })}
         >
           Add
+        </button>
+        <button
+          type="button"
+          onClick={() => addToast({
+            id: 'mock-id-2',
+            message: 'This is a second message'
+          })}
+        >
+          Add 2
         </button>
       </div>
     </div>
@@ -61,7 +79,7 @@ describe('useToasts', () => {
 
       await userEvent.click(addButton)
 
-      expect(screen.queryByText('This is a message for toast id: 1')).toBeInTheDocument()
+      expect(screen.queryByText('This is a message for toast id: mock-id')).toBeInTheDocument()
     })
   })
 
@@ -77,10 +95,9 @@ describe('useToasts', () => {
 
       await userEvent.click(dismissButton)
 
-      expect(screen.queryByText('This is a message for toast id: 1')).not.toBeInTheDocument()
+      expect(screen.queryByText('This is a message for toast id: mock-id')).not.toBeInTheDocument()
     })
 
-    // TODO why is the mockimplementation not resetting here
     describe('when multiple toasts exist', () => {
       test('removes the correct toast', async () => {
         render(<TestComponent />)
@@ -88,16 +105,36 @@ describe('useToasts', () => {
         const addButton = screen.queryByRole('button', { name: 'Add' })
 
         await userEvent.click(addButton)
-        await userEvent.click(addButton)
+
+        const addSecondButton = screen.queryByRole('button', { name: 'Add 2' })
+        await userEvent.click(addSecondButton)
 
         const dismissButton = screen.queryAllByRole('button', { name: 'Dismiss' })
 
-        expect(screen.queryByText('This is a message for toast id: 3')).toBeInTheDocument()
+        expect(screen.queryByText('This is a message for toast id: mock-id')).toBeInTheDocument()
+        expect(screen.queryByText('This is a second message for toast id: mock-id-2')).toBeInTheDocument()
 
         await userEvent.click(dismissButton[0])
 
-        expect(screen.queryByText('This is a message for toast id: 3')).not.toBeInTheDocument()
+        expect(screen.queryByText('This is a message for toast id: mock-id')).not.toBeInTheDocument()
+        expect(screen.queryByText('This is a second message for toast id: mock-id-2')).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('when deleting all toasts by id', () => {
+    test('removes the toast', async () => {
+      render(<TestComponent />)
+
+      const addButton = screen.queryByRole('button', { name: 'Add' })
+
+      await userEvent.click(addButton)
+
+      const deleteButton = screen.queryByRole('button', { name: 'Delete' })
+
+      await userEvent.click(deleteButton)
+
+      expect(screen.queryByText('This is a message for toast id: mock-id')).not.toBeInTheDocument()
     })
   })
 })

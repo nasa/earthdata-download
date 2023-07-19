@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import {
   FaCheckCircle,
+  FaExclamationCircle,
   FaInfoCircle,
   FaSignInAlt,
   FaSpinner
@@ -28,6 +29,7 @@ import WaitingForLogin from '../../dialogs/InitializeDownload/WaitingForLogin'
 /**
  * @typedef {Object} DownloadItemProps
  * @property {String} downloadName The name of the DownloadItem.
+ * @property {Boolean} hasErrors Does this download item have errors.
  * @property {Boolean} loadingMoreFiles Is EDD loading more download files.
  * @property {Object} progress The progress of the DownloadItem.
  * @property {String} state The state of the DownloadItem.
@@ -51,11 +53,13 @@ import WaitingForLogin from '../../dialogs/InitializeDownload/WaitingForLogin'
  */
 const DownloadItem = ({
   downloadName,
+  hasErrors,
   loadingMoreFiles,
   progress,
   state,
   actionsList
 }) => {
+  console.log('🚀 ~ file: DownloadItem.jsx:62 ~ hasErrors:', hasErrors)
   const {
     showWaitingForLoginDialog
   } = useContext(ElectronApiContext)
@@ -176,7 +180,7 @@ const DownloadItem = ({
               )
             }
             {
-              getHumanizedDownloadStates(state, percent) && (
+              getHumanizedDownloadStates(state, percent, hasErrors) && (
                 <div
                   className={styles.displayStatus}
                   data-testid="download-item-state"
@@ -199,7 +203,15 @@ const DownloadItem = ({
                       <FaCheckCircle className={styles.statusDescriptionIcon} />
                     )
                   }
-                  {getHumanizedDownloadStates(state, percent)}
+                  {
+                    hasErrors && (
+                      <FaExclamationCircle
+                        className={styles.hasErrorsIcon}
+                        data-testid="download-item-error"
+                      />
+                    )
+                  }
+                  {getHumanizedDownloadStates(state, percent, hasErrors)}
                 </div>
               )
             }
@@ -305,28 +317,34 @@ const DownloadItem = ({
 
 DownloadItem.defaultProps = {
   actionsList: null,
+  hasErrors: false,
   loadingMoreFiles: false
 }
 
 DownloadItem.propTypes = {
+  actionsList: PropTypes.arrayOf(
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        isActive: PropTypes.bool.isRequired,
+        isPrimary: PropTypes.bool.isRequired,
+        variant: PropTypes.string,
+        callback: PropTypes.func.isRequired,
+        icon: PropTypes.func.isRequired,
+        disabled: PropTypes.bool
+      })
+    )
+  ),
   downloadName: PropTypes.string.isRequired,
+  hasErrors: PropTypes.bool,
+  loadingMoreFiles: PropTypes.bool,
   progress: PropTypes.shape({
     percent: PropTypes.number,
     finishedFiles: PropTypes.number,
     totalFiles: PropTypes.number,
     totalTime: PropTypes.number
   }).isRequired,
-  loadingMoreFiles: PropTypes.bool,
-  state: PropTypes.string.isRequired,
-  actionsList: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    isActive: PropTypes.bool.isRequired,
-    isPrimary: PropTypes.bool.isRequired,
-    variant: PropTypes.string,
-    callback: PropTypes.func.isRequired,
-    icon: PropTypes.func.isRequired,
-    disabled: PropTypes.bool
-  })))
+  state: PropTypes.string.isRequired
 }
 
 export default DownloadItem

@@ -25,7 +25,8 @@ const restartDownload = async ({
   await database.updateFilesWhere({
     downloadId
   }, {
-    state: downloadStates.pending
+    state: downloadStates.pending,
+    percent: 0
   })
 
   // Set the download to active

@@ -21,6 +21,7 @@ import downloadStates from '../../constants/downloadStates'
 import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
 import createVariantClassName from '../../utils/createVariantName'
+import pluralize from '../../utils/pluralize'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import InitializeDownload from '../../dialogs/InitializeDownload/InitializeDownload'
@@ -69,7 +70,7 @@ const Downloads = ({
     reportProgress,
     restartDownload,
     resumeDownloadItem,
-    retryDownloadItem,
+    retryErroredDownloadItem,
     sendToLogin,
     setDownloadLocation
   } = useContext(ElectronApiContext)
@@ -83,9 +84,7 @@ const Downloads = ({
   const [runningDownloads, setRunningDownloads] = useState([])
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
-  const [allDownloadsError, setAllDownloadsError] = useState(false)
   const [hasPausedDownload, setHasPausedDownload] = useState(false)
-  const [hasErrorDownload, setHasErrorDownload] = useState(false)
   const [totalDownloadFiles, setTotalDownloadFiles] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
   const [downloadItems, setDownloadItems] = useState([])
@@ -191,17 +190,11 @@ const Downloads = ({
     setAllDownloadsCompleted(!!(runningDownloads.length && runningDownloads.every(
       ({ state }) => state === downloadStates.completed
     )))
-    setAllDownloadsError((runningDownloads.length && runningDownloads.every(
-      ({ state }) => state === downloadStates.error || state === downloadStates.completed
-    )))
     setHasActiveDownload(!!(runningDownloads.length && runningDownloads.some(
       ({ state }) => state === downloadStates.active
     )))
     setHasPausedDownload(!!(runningDownloads.length && runningDownloads.some(
       ({ state }) => state === downloadStates.paused
-    )))
-    setHasErrorDownload((runningDownloads.length && runningDownloads.some(
-      ({ errors = [] }) => (errors.length > 0 && !hasPausedDownload)
     )))
 
     setTotalDownloadFiles(runningDownloads.length && runningDownloads.reduce(
@@ -232,11 +225,6 @@ const Downloads = ({
 
     if (hasPausedDownload) {
       setDerivedStateFromDownloads(downloadStates.paused)
-      return
-    }
-
-    if (hasErrorDownload) {
-      setDerivedStateFromDownloads(downloadStates.error)
     }
   }, [runningDownloads])
 
@@ -284,7 +272,7 @@ const Downloads = ({
         addToast({
           id: downloadId,
           title: 'An error occurred',
-          message: `${numberErrors} files failed to download in ${downloadId}`,
+          message: `${numberErrors} ${pluralize('file', numberErrors)} failed to download in ${downloadId}`,
           numberErrors,
           variant: 'danger',
           actions: [
@@ -294,7 +282,7 @@ const Downloads = ({
               buttonProps: {
                 Icon: FaRedo,
                 onClick: () => {
-                  retryDownloadItem({ downloadId })
+                  retryErroredDownloadItem({ downloadId })
                   deleteAllToastsById(downloadId)
                 }
               }
@@ -374,13 +362,6 @@ const Downloads = ({
             callback: () => onRestartDownload(downloadId),
             icon: FaInfoCircle
           }
-          // {
-          //   label: 'View Error Info',
-          //   isActive: shouldShowError,
-          //   isPrimary: false,
-          //   callback: () => setMoreErrorInfoIsOpen(true),
-          //   icon: FaInfoCircle
-          // }
         ]
       ]
 
@@ -485,11 +466,6 @@ const Downloads = ({
                     <FaCheckCircle className={styles.derivedStatusIcon} />
                   )
                 }
-                {
-                  derivedStateFromDownloads === downloadStates.error && (
-                    <FaExclamationCircle className={styles.derivedStatusIcon} />
-                  )
-                }
                 <span className={styles.derivedStatus}>
                   {
                     derivedStateFromDownloads === downloadStates.active && (
@@ -504,11 +480,6 @@ const Downloads = ({
                   {
                     derivedStateFromDownloads === downloadStates.completed && (
                       getHumanizedDownloadStates(downloadStates.completed)
-                    )
-                  }
-                  {
-                    derivedStateFromDownloads === downloadStates.error && (
-                      getHumanizedDownloadStates(downloadStates.error)
                     )
                   }
                 </span>
@@ -528,7 +499,7 @@ const Downloads = ({
                     ? (
                       <>
                         {
-                          !allDownloadsError && (!allDownloadsPaused
+                          !allDownloadsPaused
                             ? (
                               <Button
                                 className={styles.headerButton}
@@ -548,7 +519,7 @@ const Downloads = ({
                               >
                                 Resume All
                               </Button>
-                            ))
+                            )
                         }
                         <Button
                           className={styles.headerButton}
@@ -590,7 +561,5 @@ Downloads.propTypes = {
   ]).isRequired,
   setHasActiveDownload: PropTypes.func.isRequired
 }
-
-Downloads.whyDidYouRender = true
 
 export default Downloads

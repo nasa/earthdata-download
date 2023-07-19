@@ -27,7 +27,8 @@ const retryErroredDownloadItem = async ({
       downloadId,
       filename
     }, {
-      state: downloadStates.pending
+      state: downloadStates.pending,
+      percent: 0
     })
   }
 
@@ -37,7 +38,8 @@ const retryErroredDownloadItem = async ({
       downloadId,
       state: downloadStates.error
     }, {
-      state: downloadStates.pending
+      state: downloadStates.pending,
+      percent: 0
     })
   }
 

@@ -59,7 +59,6 @@ const DownloadItem = ({
   state,
   actionsList
 }) => {
-  console.log('🚀 ~ file: DownloadItem.jsx:62 ~ hasErrors:', hasErrors)
   const {
     showWaitingForLoginDialog
   } = useContext(ElectronApiContext)

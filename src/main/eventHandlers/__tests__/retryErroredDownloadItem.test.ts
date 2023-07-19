@@ -2,7 +2,7 @@
 
 import downloadStates from '../../../app/constants/downloadStates'
 
-import retryDownloadItem from '../retryErroredDownloadItem'
+import retryErroredDownloadItem from '../retryErroredDownloadItem'
 
 import startNextDownload from '../../utils/startNextDownload'
 
@@ -11,7 +11,7 @@ jest.mock('../../utils/startNextDownload', () => ({
   default: jest.fn(() => {})
 }))
 
-describe('retryDownloadItem', () => {
+describe('retryErroredDownloadItem', () => {
   describe('when downloadId and filename are provided', () => {
     test('updates the file and calls startNextDownload', async () => {
       const currentDownloadItems = {}
@@ -25,7 +25,7 @@ describe('retryDownloadItem', () => {
         filename: 'mock-filename.png'
       }
 
-      await retryDownloadItem({
+      await retryErroredDownloadItem({
         currentDownloadItems,
         database,
         downloadIdContext,
@@ -38,7 +38,8 @@ describe('retryDownloadItem', () => {
         downloadId: 'mock-download-id',
         filename: 'mock-filename.png'
       }, {
-        state: downloadStates.pending
+        state: downloadStates.pending,
+        percent: 0
       })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)
@@ -57,7 +58,7 @@ describe('retryDownloadItem', () => {
         downloadId: 'mock-download-id'
       }
 
-      await retryDownloadItem({
+      await retryErroredDownloadItem({
         currentDownloadItems,
         database,
         downloadIdContext,
@@ -70,7 +71,8 @@ describe('retryDownloadItem', () => {
         downloadId: 'mock-download-id',
         state: downloadStates.error
       }, {
-        state: downloadStates.pending
+        state: downloadStates.pending,
+        percent: 0
       })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)

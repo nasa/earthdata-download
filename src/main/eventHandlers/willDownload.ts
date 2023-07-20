@@ -3,6 +3,7 @@
 import path from 'path'
 
 import sendToLogin from './sendToLogin'
+import startNextDownload from '../utils/startNextDownload'
 
 import onDone from './willDownloadEvents/onDone'
 import onUpdated from './willDownloadEvents/onUpdated'
@@ -84,6 +85,15 @@ const willDownload = async ({
     })
 
     item.cancel()
+
+    // Start the next download
+    await startNextDownload({
+      currentDownloadItems,
+      database,
+      downloadId,
+      downloadIdContext,
+      webContents
+    })
 
     return
   }

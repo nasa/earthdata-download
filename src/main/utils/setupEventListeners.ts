@@ -323,6 +323,17 @@ const setupEventListeners = ({
     if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })
 
     await autoUpdater.checkForUpdates()
+
+    // Locally, start pending downloads unless `forceDevUpdateConfig` is enabled
+    if (!app.isPackaged && !autoUpdater.forceDevUpdateConfig) {
+      setUpdateAvailable(false)
+
+      // Start any pending downloads
+      await startPendingDownloads({
+        appWindow,
+        database
+      })
+    }
   })
 
   // When a `target=_blank` link is clicked, open in an external browser

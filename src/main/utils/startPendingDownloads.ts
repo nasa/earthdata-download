@@ -3,6 +3,12 @@
 import downloadStates from '../../app/constants/downloadStates'
 import fetchLinks from './fetchLinks'
 
+/**
+ * Calls `fetchLinks` for any downloads in the `pending` state
+ * @param {Object} params
+ * @param {Object} params.appWindow Electron window instance
+ * @param {Object} params.database `EddDatabase` instance
+ */
 const startPendingDownloads = async ({
   appWindow,
   database

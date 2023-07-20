@@ -7,8 +7,14 @@ import willDownload from '../willDownload'
 import sendToLogin from '../sendToLogin'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import startNextDownload from '../../utils/startNextDownload'
 
 jest.mock('../sendToLogin', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
+jest.mock('../../utils/startNextDownload', () => ({
   __esModule: true,
   default: jest.fn(() => {})
 }))
@@ -161,6 +167,11 @@ describe('willDownload', () => {
       )
 
       expect(currentDownloadItems.addItem).toHaveBeenCalledTimes(0)
+
+      expect(startNextDownload).toHaveBeenCalledTimes(1)
+      expect(startNextDownload).toHaveBeenCalledWith(expect.objectContaining({
+        downloadId: 'shortName_version-1-20230514_012554'
+      }))
     })
   })
 

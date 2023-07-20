@@ -73,6 +73,7 @@ const Layout = () => {
     dismissToast(id)
   }
 
+  // Add a toast when an app update is available
   const onAutoUpdateAvailable = () => {
     addToast({
       id: updateAvailableToastId,
@@ -83,8 +84,8 @@ const Layout = () => {
     })
   }
 
+  // Update the toast with the status as the download progresses
   const onAutoUpdateProgress = (event, info) => {
-    console.log('🚀 ~ file: Layout.jsx:70 ~ onAutoUpdateProgress ~ info:', info)
     const { percent } = info
 
     if (percent < 100) {

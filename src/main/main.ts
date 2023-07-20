@@ -164,8 +164,7 @@ if (!gotTheLock) {
       deepLink: url,
       downloadIdContext,
       downloadsWaitingForAuth,
-      updateAvailable,
-      webContents: appWindow.webContents
+      updateAvailable
     })
   })
 
@@ -177,8 +176,7 @@ if (!gotTheLock) {
       deepLink: url,
       downloadIdContext,
       downloadsWaitingForAuth,
-      updateAvailable,
-      webContents: appWindow.webContents
+      updateAvailable
     })
   })
 

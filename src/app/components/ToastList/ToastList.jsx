@@ -9,8 +9,9 @@ import * as styles from './ToastList.module.scss'
 
 /**
  * @typedef {Object} ToastListProps
- * @property {Array} toasts A list of objects to configure the toasts.
  * @property {String} [className] An optional css class name.
+ * @property {Function} dismissToast A callback function used to dismiss the toast.
+ * @property {Array} toasts A list of objects to configure the toasts.
 */
 
 /**

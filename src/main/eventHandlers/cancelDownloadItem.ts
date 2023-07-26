@@ -16,8 +16,6 @@ const cancelDownloadItem = async ({
 }) => {
   const { downloadId, filename } = info
 
-  currentDownloadItems.cancelItem(downloadId, filename)
-
   if (downloadId && filename) {
     await database.updateFilesWhere({
       downloadId,
@@ -28,6 +26,12 @@ const cancelDownloadItem = async ({
   }
 
   if (downloadId && !filename) {
+    // await database.updateFilesWhere({
+    //   downloadId
+    // }, {
+    //   state: downloadStates.cancelled
+    // })
+
     await database.updateDownloadById(downloadId, {
       state: downloadStates.cancelled
     })
@@ -37,6 +41,8 @@ const cancelDownloadItem = async ({
   if (!downloadId) {
     await database.deleteAllDownloads()
   }
+
+  currentDownloadItems.cancelItem(downloadId, filename)
 }
 
 export default cancelDownloadItem

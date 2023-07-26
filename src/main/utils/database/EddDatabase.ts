@@ -147,15 +147,19 @@ class EddDatabase {
    */
   async getFilesToStart(limit, fileId) {
     let query = this.db('files')
-      .select()
-      .where({ state: downloadStates.pending })
+      .select('files.*')
+      .join('downloads', { 'files.downloadId': 'downloads.id' })
+      .where({
+        'files.state': downloadStates.pending,
+        'downloads.state': downloadStates.active
+      })
 
     // If a fileId was provided, add it to the query
     if (fileId) {
-      query = query.orWhere({ id: fileId })
+      query = query.orWhere({ 'files.id': fileId })
     }
 
-    query = query.orderBy('createdAt', 'asc')
+    query = query.orderBy('files.createdAt', 'asc')
       .limit(limit)
 
     // Execute the full query and return the value

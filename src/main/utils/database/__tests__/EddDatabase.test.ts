@@ -397,9 +397,10 @@ describe('EddDatabase', () => {
   describe('getFilesToStart', () => {
     test('returns requested files', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select * from `files` where `state` = ? order by `createdAt` asc limit ?')
+        expect(query.sql).toEqual('select `files`.* from `files` inner join `downloads` on `files`.`downloadId` = `downloads`.`id` where `files`.`state` = ? and `downloads`.`state` = ? order by `files`.`createdAt` asc limit ?')
         expect(query.bindings).toEqual([
           downloadStates.pending,
+          downloadStates.active,
           2
         ])
 
@@ -422,9 +423,10 @@ describe('EddDatabase', () => {
 
     test('returns requested files when a fileId is provided', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select * from `files` where `state` = ? or (`id` = ?) order by `createdAt` asc limit ?')
+        expect(query.sql).toEqual('select `files`.* from `files` inner join `downloads` on `files`.`downloadId` = `downloads`.`id` where `files`.`state` = ? and `downloads`.`state` = ? or (`files`.`id` = ?) order by `files`.`createdAt` asc limit ?')
         expect(query.bindings).toEqual([
           downloadStates.pending,
+          downloadStates.active,
           123,
           2
         ])

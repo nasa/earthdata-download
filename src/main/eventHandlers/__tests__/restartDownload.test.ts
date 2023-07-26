@@ -46,7 +46,10 @@ describe('restartDownload', () => {
         downloadId: 'mock-download-id'
       }, {
         state: downloadStates.pending,
-        percent: 0
+        percent: 0,
+        timeStart: null,
+        timeEnd: null,
+        errors: null
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
@@ -54,7 +57,9 @@ describe('restartDownload', () => {
         'mock-download-id',
         {
           state: downloadStates.active,
-          timeStart: 1682899200000
+          timeStart: 1682899200000,
+          timeEnd: null,
+          errors: null
         }
       )
 

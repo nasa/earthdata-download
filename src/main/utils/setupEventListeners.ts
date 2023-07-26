@@ -24,6 +24,7 @@ import setPreferenceFieldValue from '../eventHandlers/setPreferenceFieldValue'
 import willDownload from '../eventHandlers/willDownload'
 
 import startPendingDownloads from '../utils/startPendingDownloads'
+import sendToEula from '../eventHandlers/sendToEula'
 
 /**
  * Sets up event listeners for the main process
@@ -41,6 +42,7 @@ const setupEventListeners = ({
   database,
   downloadIdContext,
   downloadsWaitingForAuth,
+  downloadsWaitingForEula,
   setUpdateAvailable
 }) => {
   /**
@@ -94,6 +96,16 @@ const setupEventListeners = ({
     })
   })
 
+  // Send the user to the EULA URL
+  ipcMain.on('sendToEula', async (event, info) => {
+    await sendToEula({
+      database,
+      downloadsWaitingForEula,
+      info,
+      webContents: appWindow.webContents
+    })
+  })
+
   // Send the user to the login URL
   ipcMain.on('sendToLogin', async (event, info) => {
     await sendToLogin({
@@ -137,6 +149,7 @@ const setupEventListeners = ({
       database,
       downloadIdContext,
       downloadsWaitingForAuth,
+      downloadsWaitingForEula,
       event,
       item,
       webContents

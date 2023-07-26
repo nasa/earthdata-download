@@ -28,7 +28,7 @@ const downloadFile = async ({
 
   // The file might not actually start download before the next time through this loop
   // Setting the file to `starting` ensures we start a new file if we need to
-  await database.updateFile(fileId, {
+  await database.updateFileById(fileId, {
     state: downloadStates.starting
   })
 

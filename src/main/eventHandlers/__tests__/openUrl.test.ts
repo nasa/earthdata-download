@@ -47,6 +47,7 @@ describe('openUrl', () => {
         {
           authUrl: null,
           createdAt: 1682899200000,
+          eulaRedirectUrl: null,
           getLinksToken: 'Bearer mock-token',
           getLinksUrl: 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data',
           state: 'PENDING'
@@ -83,6 +84,7 @@ describe('openUrl', () => {
         {
           authUrl: null,
           createdAt: 1682899200000,
+          eulaRedirectUrl: null,
           getLinksToken: 'Bearer mock-token',
           getLinksUrl: 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data',
           state: 'PENDING'
@@ -145,6 +147,45 @@ describe('openUrl', () => {
 
       expect(appWindow.webContents.send).toHaveBeenCalledTimes(1)
       expect(appWindow.webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', { showDialog: false })
+
+      expect(startNextDownload).toHaveBeenCalledTimes(1)
+      expect(startNextDownload).toHaveBeenCalledWith(expect.objectContaining({
+        fileId: '1234'
+      }))
+    })
+  })
+
+  describe('when hostname is eulaCallback', () => {
+    test('updates the download and calls startNextDownload', async () => {
+      const appWindow = {
+        webContents: {
+          send: jest.fn()
+        }
+      }
+      const deepLink = 'earthdata-download://eulaCallback?fileId=1234'
+      const database = {
+        getFileWhere: jest.fn().mockResolvedValue({ downloadId: 'downloadId1' }),
+        updateDownloadById: jest.fn()
+      }
+      const downloadsWaitingForEula = {}
+
+      await openUrl({
+        appWindow,
+        currentDownloadItems: {},
+        database,
+        deepLink,
+        downloadIdContext: {},
+        downloadsWaitingForEula
+      })
+
+      expect(database.getFileWhere).toHaveBeenCalledTimes(1)
+      expect(database.getFileWhere).toHaveBeenCalledWith({ id: '1234' })
+
+      expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+      expect(database.updateDownloadById).toHaveBeenCalledWith('downloadId1', { state: downloadStates.active })
+
+      expect(appWindow.webContents.send).toHaveBeenCalledTimes(1)
+      expect(appWindow.webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', { showDialog: false })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)
       expect(startNextDownload).toHaveBeenCalledWith(expect.objectContaining({

@@ -12,7 +12,7 @@ const humanizedDownloadStates = {
 }
 
 const getHumanizedDownloadStates = (state, percent = 0, hasErrors = false) => {
-  if (state === downloadStates.waitingForAuth) {
+  if (state === downloadStates.waitingForAuth || state === downloadStates.waitingForEula) {
     if (percent > 0) return humanizedDownloadStates[downloadStates.interrupted]
 
     return humanizedDownloadStates[downloadStates.pending]

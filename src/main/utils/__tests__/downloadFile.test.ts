@@ -17,7 +17,7 @@ describe('downloadFile', () => {
     const database = {
       getToken: jest.fn().mockResolvedValue({ token: null }),
       getDownloadById: jest.fn().mockResolvedValue({ downloadLocation: '/mock/location' }),
-      updateFile: jest.fn()
+      updateFileById: jest.fn()
     }
     const webContents = {
       downloadURL: jest.fn()
@@ -38,8 +38,8 @@ describe('downloadFile', () => {
     expect(database.getDownloadById).toHaveBeenCalledTimes(1)
     expect(database.getDownloadById).toHaveBeenCalledWith(downloadId)
 
-    expect(database.updateFile).toHaveBeenCalledTimes(1)
-    expect(database.updateFile).toHaveBeenCalledWith(123, { state: downloadStates.starting })
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, { state: downloadStates.starting })
 
     expect(webContents.downloadURL).toHaveBeenCalledTimes(1)
     expect(webContents.downloadURL).toHaveBeenCalledWith(
@@ -58,7 +58,7 @@ describe('downloadFile', () => {
     const database = {
       getToken: jest.fn().mockResolvedValue({ token: 'mock-token' }),
       getDownloadById: jest.fn().mockResolvedValue({ downloadLocation: '/mock/location' }),
-      updateFile: jest.fn()
+      updateFileById: jest.fn()
     }
     const webContents = {
       downloadURL: jest.fn()
@@ -79,8 +79,8 @@ describe('downloadFile', () => {
     expect(database.getDownloadById).toHaveBeenCalledTimes(1)
     expect(database.getDownloadById).toHaveBeenCalledWith(downloadId)
 
-    expect(database.updateFile).toHaveBeenCalledTimes(1)
-    expect(database.updateFile).toHaveBeenCalledWith(123, { state: downloadStates.starting })
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, { state: downloadStates.starting })
 
     expect(webContents.downloadURL).toHaveBeenCalledTimes(1)
     expect(webContents.downloadURL).toHaveBeenCalledWith(

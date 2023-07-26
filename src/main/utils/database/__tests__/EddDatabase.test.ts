@@ -64,6 +64,8 @@ describe('EddDatabase', () => {
             name: '20230616233921_create_token.js'
           }, {
             name: '20230706005138_add_getLinks_token_to_downloads.js'
+          }, {
+            name: '20230724200528_add_eulaUrl_to_downloads.js'
           }])
         } else if (step === 5) {
           // select `name` from `knex_migrations` order by `id` asc'
@@ -520,7 +522,7 @@ describe('EddDatabase', () => {
       })
       const database = new EddDatabase('./')
 
-      await database.updateFile('mock-file-1', {
+      await database.updateFileById('mock-file-1', {
         state: downloadStates.active
       })
     })

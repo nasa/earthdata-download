@@ -60,7 +60,7 @@ const onDone = async ({
   }
 
   // Update the state in the database
-  await database.updateFile(fileId, {
+  await database.updateFileById(fileId, {
     errors,
     percent: updatedState === downloadStates.completed ? 100 : 0,
     state: updatedState,

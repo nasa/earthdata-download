@@ -5,16 +5,16 @@ import { shell } from 'electron'
 import downloadStates from '../../app/constants/downloadStates'
 
 /**
- * Sends the user to the download's authUrl to get a new token
+ * Sends the user to the download's eulaUrl to get a new token
  * @param {Object} params
  * @param {Object} params.database `EddDatabase` instance
- * @param {Object} params.downloadsWaitingForAuth Object where we can mark a downloadId as waiting for authentication
+ * @param {Object} params.downloadsWaitingForEula Object where we can mark a downloadId as waiting for authentication
  * @param {Object} params.info `info` parameter from ipc message
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
-const sendToLogin = async ({
+const sendToEula = async ({
   database,
-  downloadsWaitingForAuth,
+  downloadsWaitingForEula,
   info,
   webContents
 }) => {
@@ -26,30 +26,33 @@ const sendToLogin = async ({
 
   let fileId = providedFileId
 
-  // If no fileId was provided, find the file that is waitingForAuth for the downloadId
+  // If no fileId was provided, find the file that is waitingForEula for the downloadId
   if (!providedFileId) {
     ({ id: fileId } = await database.getFileWhere({
       downloadId,
-      state: downloadStates.waitingForAuth
+      state: downloadStates.waitingForEula
     }))
   }
 
-  let newState = downloadStates.waitingForAuth
+  let newState = downloadStates.waitingForEula
 
-  if (downloadsWaitingForAuth[downloadId] && !forceLogin) {
-    // A file is already waiting for auth, don't open the authUrl
+  if (downloadsWaitingForEula[downloadId] && !forceLogin) {
+    // A file is already waiting for eula, don't open the eulaUrl
     newState = downloadStates.pending
   } else {
     // eslint-disable-next-line no-param-reassign
-    downloadsWaitingForAuth[downloadId] = true
+    downloadsWaitingForEula[downloadId] = true
     const download = await database.getDownloadById(downloadId)
 
     const {
-      authUrl
+      // eulaUrl comes from the 403 response
+      eulaUrl,
+      // eulaRedirectUrl comes from EDSC, should point to EDSC auth_callback
+      eulaRedirectUrl
     } = download
 
     // Pull `eddRedirect` out of `authUrl` and add `fileId` to it
-    const url = new URL(authUrl)
+    const url = new URL(eulaRedirectUrl)
     const { searchParams } = url
     const eddRedirect = searchParams.get('eddRedirect')
 
@@ -59,11 +62,14 @@ const sendToLogin = async ({
     // Update the eddRedirect parameter with the `fileId` added
     url.searchParams.set('eddRedirect', eddRedirectUrl.toString())
 
-    // TODO handle errors opening the authUrl, authUrl not existing
-    shell.openExternal(url.toString())
+    // eulaRedirectUrl `redirect` param needs to know the fileId
+    const eulaRedirectUrlWithFileId = url.toString()
+    const eulaRedirect = `${eulaUrl}&redirect_uri=${encodeURIComponent(eulaRedirectUrlWithFileId)}`
 
-    // Send message to renderer to show waiting for login dialog
-    webContents.send('showWaitingForLoginDialog', { showDialog: true })
+    shell.openExternal(eulaRedirect)
+
+    // Send message to renderer to show waiting for eula dialog
+    webContents.send('showWaitingForEulaDialog', { showDialog: true })
   }
 
   await database.updateFileById(fileId, {
@@ -72,4 +78,4 @@ const sendToLogin = async ({
   })
 }
 
-export default sendToLogin
+export default sendToEula

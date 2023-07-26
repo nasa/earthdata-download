@@ -23,6 +23,7 @@ const openUrl = async ({
   deepLink,
   downloadIdContext,
   downloadsWaitingForAuth,
+  downloadsWaitingForEula,
   updateAvailable
 }) => {
   const url = new URL(deepLink)
@@ -35,6 +36,7 @@ const openUrl = async ({
   if (hostname === 'startDownload') {
     const authUrl = searchParams.get('authUrl')
     const downloadIdWithoutTime = searchParams.get('downloadId')
+    const eulaRedirectUrl = searchParams.get('eulaRedirectUrl')
     const getLinksToken = searchParams.get('token')
     const getLinksUrl = searchParams.get('getLinks')
 
@@ -49,6 +51,7 @@ const openUrl = async ({
     await database.createDownload(downloadId, {
       authUrl,
       createdAt: new Date().getTime(),
+      eulaRedirectUrl,
       getLinksToken,
       getLinksUrl,
       state: downloadStates.pending
@@ -83,9 +86,38 @@ const openUrl = async ({
       state: downloadStates.active
     })
 
+    // Close the waiting dialog
     appWindow.webContents.send('showWaitingForLoginDialog', { showDialog: false })
 
     // Restart the fileId that was waitingForAuth
+    await startNextDownload({
+      currentDownloadItems,
+      database,
+      downloadIdContext,
+      fileId,
+      webContents: appWindow.webContents
+    })
+  }
+
+  // User has accepted a EULA, start the download
+  if (hostname === 'eulaCallback') {
+    const fileId = searchParams.get('fileId')
+
+    const { downloadId } = await database.getFileWhere({ id: fileId })
+
+    // Remove the download from `downloadsWaitingForEula`
+    // eslint-disable-next-line no-param-reassign
+    delete downloadsWaitingForEula[downloadId]
+
+    // Update the download to be active
+    await database.updateDownloadById(downloadId, {
+      state: downloadStates.active
+    })
+
+    // Close the waiting dialog
+    appWindow.webContents.send('showWaitingForEulaDialog', { showDialog: false })
+
+    // Restart the fileId that was waitingForEula
     await startNextDownload({
       currentDownloadItems,
       database,

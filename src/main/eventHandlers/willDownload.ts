@@ -9,6 +9,7 @@ import onDone from './willDownloadEvents/onDone'
 import onUpdated from './willDownloadEvents/onUpdated'
 
 import downloadStates from '../../app/constants/downloadStates'
+import verifyDownload from '../utils/verifyDownload'
 
 /**
  * Handles the DownloadItem events
@@ -17,6 +18,7 @@ import downloadStates from '../../app/constants/downloadStates'
  * @param {Object} params.database `EddDatabase` instance
  * @param {Object} params.downloadIdContext Object where we can associate a newly created download to a downloadId
  * @param {Object} params.downloadsWaitingForAuth Object where we can mark a downloadId as waiting for authentication
+ * @param {Object} params.downloadsWaitingForEula Object where we can mark a downloadId as waiting for EULA acceptance
  * @param {Object} params.item Electron DownloadItem class instance
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
@@ -25,6 +27,7 @@ const willDownload = async ({
   database,
   downloadIdContext,
   downloadsWaitingForAuth,
+  downloadsWaitingForEula,
   item,
   webContents
 }) => {
@@ -76,10 +79,25 @@ const willDownload = async ({
     return
   }
 
+  const downloadCheck = await verifyDownload({
+    database,
+    downloadId,
+    downloadsWaitingForEula,
+    fileId,
+    url: lastUrl,
+    webContents
+  })
+
+  if (!downloadCheck) {
+    item.cancel()
+
+    return
+  }
+
   // If the file has no totalBytes, report an error
   const totalBytes = item.getTotalBytes()
   if (totalBytes === 0) {
-    await database.updateFile(fileId, {
+    await database.updateFileById(fileId, {
       state: downloadStates.error,
       errors: 'This file could not be downloaded'
     })
@@ -102,7 +120,7 @@ const willDownload = async ({
   currentDownloadItems.addItem(downloadId, filename, item)
 
   // Update the start time for the file
-  await database.updateFile(fileId, {
+  await database.updateFileById(fileId, {
     timeStart: new Date().getTime()
   })
 

@@ -47,7 +47,7 @@ const onUpdated = async ({
 
   if (state === 'interrupted') {
     // Update the database if the state has updated to interrupted
-    await database.updateFile(fileId, {
+    await database.updateFileById(fileId, {
       state: downloadStates.interrupted,
       percent: percentDone
     })
@@ -58,7 +58,7 @@ const onUpdated = async ({
     })
   } else if (state === 'progressing') {
     // Update the database with the percent and state
-    await database.updateFile(fileId, {
+    await database.updateFileById(fileId, {
       state: item.isPaused() ? downloadStates.paused : downloadStates.active,
       percent: percentDone
     })

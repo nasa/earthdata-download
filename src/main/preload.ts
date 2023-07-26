@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   chooseDownloadLocation: () => ipcRenderer.send('chooseDownloadLocation'),
   clearDefaultDownload: () => ipcRenderer.send('clearDefaultDownload'),
   deleteCookies: () => ipcRenderer.send('deleteCookies'),
+  sendToEula: (data) => ipcRenderer.send('sendToEula', data),
   sendToLogin: (data) => ipcRenderer.send('sendToLogin', data),
   setPreferenceFieldValue: (field, value) => ipcRenderer.send('setPreferenceFieldValue', field, value),
   getPreferenceFieldValue: (field) => ipcRenderer.invoke('getPreferenceFieldValue', field),
@@ -33,6 +34,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('initializeDownload', callback),
   reportProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('reportProgress', callback),
   setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('setDownloadLocation', callback),
+  showWaitingForEulaDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForEulaDialog', callback),
   showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForLoginDialog', callback),
   windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('windowsLinuxTitleBar', callback),
 

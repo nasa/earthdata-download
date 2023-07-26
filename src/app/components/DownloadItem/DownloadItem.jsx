@@ -9,22 +9,25 @@ import {
   FaSpinner
 } from 'react-icons/fa'
 import humanizeDuration from 'humanize-duration'
+
 import Button from '../Button/Button'
 import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
-
-import * as styles from './DownloadItem.module.scss'
-import createVariantClassName from '../../utils/createVariantName'
 import Tooltip from '../Tooltip/Tooltip'
+
+import Dialog from '../Dialog/Dialog'
+import WaitingForLogin from '../../dialogs/WaitingForLogin/WaitingForLogin'
+import WaitingForEula from '../../dialogs/WaitingForEula/WaitingForEula'
 
 import downloadStates from '../../constants/downloadStates'
 import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
+import commafy from '../../utils/commafy'
+import createVariantClassName from '../../utils/createVariantName'
+
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
-import commafy from '../../utils/commafy'
-import Dialog from '../Dialog/Dialog'
-import WaitingForLogin from '../../dialogs/WaitingForLogin/WaitingForLogin'
+import * as styles from './DownloadItem.module.scss'
 
 /**
  * @typedef {Object} DownloadItemProps
@@ -60,10 +63,17 @@ const DownloadItem = ({
   actionsList
 }) => {
   const {
+    showWaitingForEulaDialog,
     showWaitingForLoginDialog
   } = useContext(ElectronApiContext)
 
+  const [waitingForEulaDialogIsOpen, setWaitingForEulaDialogIsOpen] = useState(false)
   const [waitingForLoginDialogIsOpen, setWaitingForLoginDialogIsOpen] = useState(false)
+
+  const onShowWaitingForEulaDialog = (event, info) => {
+    const { showDialog } = info
+    setWaitingForEulaDialogIsOpen(showDialog)
+  }
 
   const onShowWaitingForLoginDialog = (event, info) => {
     const { showDialog } = info
@@ -72,9 +82,11 @@ const DownloadItem = ({
 
   // Setup event listeners
   useEffect(() => {
+    showWaitingForEulaDialog(true, onShowWaitingForEulaDialog)
     showWaitingForLoginDialog(true, onShowWaitingForLoginDialog)
 
     return () => {
+      showWaitingForEulaDialog(false, onShowWaitingForEulaDialog)
       showWaitingForLoginDialog(false, onShowWaitingForLoginDialog)
     }
   }, [])
@@ -113,9 +125,16 @@ const DownloadItem = ({
   }
 
   const shouldShowProgress = (state !== downloadStates.pending)
-    && (percent > 0 || state !== downloadStates.waitingForAuth)
+    && (
+      percent > 0
+      || (
+        state !== downloadStates.waitingForEula
+        && state !== downloadStates.waitingForAuth
+      )
+    )
 
   const shouldShowTime = state !== downloadStates.pending
+    && state !== downloadStates.waitingForEula
     && state !== downloadStates.waitingForAuth
     && totalFiles > 0
 
@@ -139,6 +158,19 @@ const DownloadItem = ({
       }
       data-testid="download-item"
     >
+      <Dialog
+        open={waitingForEulaDialogIsOpen}
+        setOpen={setWaitingForEulaDialogIsOpen}
+        showTitle
+        title="You must accept a EULA to download this data."
+        TitleIcon={FaSignInAlt}
+      >
+        <WaitingForEula
+          downloadId={downloadName}
+          // TODO EDD-13, might want to be able to send a fileId as well
+          // fileId={fileId}
+        />
+      </Dialog>
       <Dialog
         open={waitingForLoginDialogIsOpen}
         setOpen={setWaitingForLoginDialogIsOpen}
@@ -268,6 +300,23 @@ const DownloadItem = ({
                           {' '}
                           <Tooltip
                             content="This download requires authentication with Earthdata Login. If your browser did not automatically open, click Log In"
+                          >
+                            <span className={styles.statusInformationTooltip}>
+                              <FaInfoCircle className={styles.statusInformationIcon} />
+                              <span>More Info</span>
+                            </span>
+                          </Tooltip>
+                        </>
+                      )
+                    }
+                    {
+                      state === downloadStates.waitingForEula && (
+                        <>
+                          {' '}
+                          Waiting for EULA acceptance
+                          {' '}
+                          <Tooltip
+                            content="This download requires accepting a EULA with Earthdata Login. If your browser did not automatically open, click Accept EULA"
                           >
                             <span className={styles.statusInformationTooltip}>
                               <FaInfoCircle className={styles.statusInformationIcon} />

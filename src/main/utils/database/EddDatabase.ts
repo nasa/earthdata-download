@@ -202,7 +202,7 @@ class EddDatabase {
    * @param {Number} fileId ID of files to update.
    * @param {Object} data The data of the file to be updated.
    */
-  async updateFile(fileId, data) {
+  async updateFileById(fileId, data) {
     return this.db('files').update(data).where({ id: fileId })
   }
 

@@ -71,6 +71,7 @@ const Downloads = ({
     restartDownload,
     resumeDownloadItem,
     retryErroredDownloadItem,
+    sendToEula,
     sendToLogin,
     setDownloadLocation
   } = useContext(ElectronApiContext)
@@ -263,6 +264,7 @@ const Downloads = ({
       const shouldDisableOpenFolder = finishedFiles === 0
       const isComplete = state === downloadStates.completed
       const shouldShowLogin = state === downloadStates.waitingForAuth
+      const shouldShowEula = state === downloadStates.waitingForEula
       // const shouldShowError = state === downloadStates.error
 
       // Add errors
@@ -307,6 +309,18 @@ const Downloads = ({
             isActive: shouldShowLogin,
             isPrimary: shouldShowLogin,
             callback: () => sendToLogin({
+              downloadId: downloadName,
+              forceLogin: true
+              // TODO EDD-13, might want to be able to send a fileId as well
+              // fileId
+            }),
+            icon: FaSignInAlt
+          },
+          {
+            label: 'Accept EULA',
+            isActive: shouldShowEula,
+            isPrimary: shouldShowEula,
+            callback: () => sendToEula({
               downloadId: downloadName,
               forceLogin: true
               // TODO EDD-13, might want to be able to send a fileId as well

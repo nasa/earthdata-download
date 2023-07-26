@@ -17,6 +17,7 @@ const progress = {
 }
 
 const setup = (overrideProps) => {
+  const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
 
   const props = {
@@ -32,6 +33,7 @@ const setup = (overrideProps) => {
     <ElectronApiContext.Provider
       value={
         {
+          showWaitingForEulaDialog,
           showWaitingForLoginDialog
         }
       }
@@ -41,6 +43,7 @@ const setup = (overrideProps) => {
   )
 
   return {
+    showWaitingForEulaDialog,
     showWaitingForLoginDialog
   }
 }
@@ -318,6 +321,79 @@ describe('DownloadItem component', () => {
         await userEvent.click(loginButton)
 
         expect(sendToLogin).toHaveBeenCalledTimes(1)
+      })
+    })
+  })
+
+  describe('when a download is waiting for EULA acceptance', () => {
+    describe('when the download has not started yet', () => {
+      test('displays the correct download information', () => {
+        setup({
+          state: downloadStates.waitingForEula
+        })
+
+        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+        expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
+        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Initializing')
+        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('Waiting for EULA acceptance More Info')
+      })
+    })
+
+    describe('when the download has some progress', () => {
+      test('displays the correct download information', () => {
+        setup({
+          progress: {
+            ...progress,
+            finishedFiles: 1,
+            totalFiles: 2,
+            percent: 50
+          },
+          state: downloadStates.waitingForEula
+        })
+
+        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
+        expect(screen.getByTestId('download-item-percent')).toHaveTextContent('50%')
+        expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
+        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Interrupted')
+        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 2 files Waiting for EULA acceptance More Info')
+      })
+    })
+
+    describe('when clicking a primary action button', () => {
+      test('sends a message to the main process', async () => {
+        const sendToEula = jest.fn()
+        const actionsList = [
+          [
+            {
+              label: 'Log In with Earthdata Login',
+              isActive: true,
+              isPrimary: true,
+              callback: sendToEula,
+              icon: FaSignInAlt
+            }
+          ]
+        ]
+
+        setup({
+          actionsList
+        })
+        setup({
+          actionsList,
+          progress: {
+            ...progress,
+            finishedFiles: 1,
+            totalFiles: 2,
+            percent: 50
+          },
+          state: downloadStates.waitingForEula
+        })
+
+        const loginButton = screen.getAllByTestId('download-item-Log In with Earthdata Login')[0]
+
+        await userEvent.click(loginButton)
+
+        expect(sendToEula).toHaveBeenCalledTimes(1)
       })
     })
   })

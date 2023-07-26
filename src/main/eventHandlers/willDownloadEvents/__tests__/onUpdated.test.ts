@@ -19,7 +19,7 @@ describe('onUpdated', () => {
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
-      updateFile: jest.fn(),
+      updateFileById: jest.fn(),
       updateDownloadById: jest.fn()
     }
 
@@ -36,8 +36,8 @@ describe('onUpdated', () => {
       filename: 'mock-filename.png'
     })
 
-    expect(database.updateFile).toHaveBeenCalledTimes(1)
-    expect(database.updateFile).toHaveBeenCalledWith(123, {
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 42,
       state: 'INTERRUPTED'
     })
@@ -61,7 +61,7 @@ describe('onUpdated', () => {
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
-      updateFile: jest.fn(),
+      updateFileById: jest.fn(),
       updateDownloadById: jest.fn()
     }
 
@@ -78,8 +78,8 @@ describe('onUpdated', () => {
       filename: 'mock-filename.png'
     })
 
-    expect(database.updateFile).toHaveBeenCalledTimes(1)
-    expect(database.updateFile).toHaveBeenCalledWith(123, {
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 42,
       state: 'ACTIVE'
     })
@@ -100,7 +100,7 @@ describe('onUpdated', () => {
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
-      updateFile: jest.fn(),
+      updateFileById: jest.fn(),
       updateDownloadById: jest.fn()
     }
 
@@ -117,8 +117,8 @@ describe('onUpdated', () => {
       filename: 'mock-filename.png'
     })
 
-    expect(database.updateFile).toHaveBeenCalledTimes(1)
-    expect(database.updateFile).toHaveBeenCalledWith(123, {
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 42,
       state: 'PAUSED'
     })
@@ -139,7 +139,7 @@ describe('onUpdated', () => {
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
-      updateFile: jest.fn(),
+      updateFileById: jest.fn(),
       updateDownloadById: jest.fn()
     }
 
@@ -156,8 +156,8 @@ describe('onUpdated', () => {
       filename: 'mock-filename.png'
     })
 
-    expect(database.updateFile).toHaveBeenCalledTimes(1)
-    expect(database.updateFile).toHaveBeenCalledWith(123, {
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 0,
       state: 'ACTIVE'
     })
@@ -176,7 +176,7 @@ describe('onUpdated', () => {
     const state = 'progressing'
     const database = {
       getFileWhere: jest.fn().mockResolvedValue(undefined),
-      updateFile: jest.fn(),
+      updateFileById: jest.fn(),
       updateDownloadById: jest.fn()
     }
 
@@ -195,7 +195,7 @@ describe('onUpdated', () => {
 
     expect(item.cancel).toHaveBeenCalledTimes(1)
 
-    expect(database.updateFile).toHaveBeenCalledTimes(0)
+    expect(database.updateFileById).toHaveBeenCalledTimes(0)
     expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
   })
 })

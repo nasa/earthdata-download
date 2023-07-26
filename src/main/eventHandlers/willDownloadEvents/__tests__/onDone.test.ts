@@ -40,7 +40,7 @@ describe('onDone', () => {
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
-      updateFile: jest.fn()
+      updateFileById: jest.fn()
     }
 
     await onDone({
@@ -62,8 +62,8 @@ describe('onDone', () => {
       filename: 'mock-filename.png'
     })
 
-    expect(database.updateFile).toHaveBeenCalledTimes(1)
-    expect(database.updateFile).toHaveBeenCalledWith(123, {
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 100,
       state: downloadStates.completed,
       timeEnd: 1684029600000
@@ -102,7 +102,7 @@ describe('onDone', () => {
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
-      updateFile: jest.fn()
+      updateFileById: jest.fn()
     }
 
     await onDone({
@@ -121,8 +121,8 @@ describe('onDone', () => {
       filename: 'mock-filename.png'
     })
 
-    expect(database.updateFile).toHaveBeenCalledTimes(1)
-    expect(database.updateFile).toHaveBeenCalledWith(123, {
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, {
       errors: 'This file could not be downloaded',
       percent: 0,
       state: downloadStates.error,
@@ -162,7 +162,7 @@ describe('onDone', () => {
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123
       }),
-      updateFile: jest.fn()
+      updateFileById: jest.fn()
     }
 
     await onDone({
@@ -184,8 +184,8 @@ describe('onDone', () => {
       filename: 'mock-filename.png'
     })
 
-    expect(database.updateFile).toHaveBeenCalledTimes(1)
-    expect(database.updateFile).toHaveBeenCalledWith(123, {
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, {
       errors: undefined,
       percent: 0,
       state: downloadStates.cancelled,
@@ -223,7 +223,7 @@ describe('onDone', () => {
     const database = {
       getDownloadById: jest.fn().mockResolvedValue({ errors: [] }),
       getFileWhere: jest.fn().mockResolvedValue(undefined),
-      updateFile: jest.fn(),
+      updateFileById: jest.fn(),
       updateDownloadById: jest.fn()
     }
 
@@ -243,7 +243,7 @@ describe('onDone', () => {
       filename: 'mock-filename.png'
     })
 
-    expect(database.updateFile).toHaveBeenCalledTimes(0)
+    expect(database.updateFileById).toHaveBeenCalledTimes(0)
     expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 
     expect(startNextDownload).toHaveBeenCalledTimes(0)

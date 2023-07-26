@@ -2,7 +2,7 @@
 
 import { shell } from 'electron'
 
-import sendToLogin from '../sendToLogin'
+import sendToEula from '../sendToEula'
 
 import downloadStates from '../../../app/constants/downloadStates'
 
@@ -12,16 +12,17 @@ jest.mock('electronShell', () => ({
   }
 }))
 
-describe('sendToLogin', () => {
-  test('opens the authUrl', async () => {
+describe('sendToEula', () => {
+  test('opens the eulaRedirectUrl', async () => {
     const database = {
       getFileWhere: jest.fn(),
       getDownloadById: jest.fn().mockResolvedValue({
-        authUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback'
+        eulaUrl: 'http://example.com/accept_eula',
+        eulaRedirectUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FeulaCallback'
       }),
       updateFileById: jest.fn()
     }
-    const downloadsWaitingForAuth = {}
+    const downloadsWaitingForEula = {}
     const info = {
       downloadId: 'downloadID',
       fileId: 1234
@@ -30,9 +31,9 @@ describe('sendToLogin', () => {
       send: jest.fn()
     }
 
-    await sendToLogin({
+    await sendToEula({
       database,
-      downloadsWaitingForAuth,
+      downloadsWaitingForEula,
       info,
       webContents
     })
@@ -40,30 +41,31 @@ describe('sendToLogin', () => {
     expect(database.getFileWhere).toHaveBeenCalledTimes(0)
 
     expect(shell.openExternal).toHaveBeenCalledTimes(1)
-    expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback%3FfileId%3D1234')
+    expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/accept_eula&redirect_uri=http%3A%2F%2Fexample.com%2Fauth%3FeddRedirect%3Dearthdata-download%253A%252F%252FeulaCallback%253FfileId%253D1234')
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
-    expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', { showDialog: true })
+    expect(webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', { showDialog: true })
 
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(1234, {
-      state: downloadStates.waitingForAuth,
+      state: downloadStates.waitingForEula,
       timeStart: null
     })
   })
 
   describe('when a fileId is not provided', () => {
-    test('opens the authUrl', async () => {
+    test('opens the eulaRedirectUrl', async () => {
       const database = {
         getFileWhere: jest.fn().mockResolvedValue({
           id: 1234
         }),
         getDownloadById: jest.fn().mockResolvedValue({
-          authUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback'
+          eulaUrl: 'http://example.com/accept_eula',
+          eulaRedirectUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FeulaCallback'
         }),
         updateFileById: jest.fn()
       }
-      const downloadsWaitingForAuth = {}
+      const downloadsWaitingForEula = {}
       const info = {
         downloadId: 'downloadID',
         forceLogin: false
@@ -72,40 +74,41 @@ describe('sendToLogin', () => {
         send: jest.fn()
       }
 
-      await sendToLogin({
+      await sendToEula({
         database,
-        downloadsWaitingForAuth,
+        downloadsWaitingForEula,
         info,
         webContents
       })
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(1)
-      expect(database.getFileWhere).toHaveBeenCalledWith({ downloadId: 'downloadID', state: downloadStates.waitingForAuth })
+      expect(database.getFileWhere).toHaveBeenCalledWith({ downloadId: 'downloadID', state: downloadStates.waitingForEula })
 
       expect(shell.openExternal).toHaveBeenCalledTimes(1)
-      expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback%3FfileId%3D1234')
+      expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/accept_eula&redirect_uri=http%3A%2F%2Fexample.com%2Fauth%3FeddRedirect%3Dearthdata-download%253A%252F%252FeulaCallback%253FfileId%253D1234')
 
       expect(webContents.send).toHaveBeenCalledTimes(1)
-      expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', { showDialog: true })
+      expect(webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', { showDialog: true })
 
       expect(database.updateFileById).toHaveBeenCalledTimes(1)
       expect(database.updateFileById).toHaveBeenCalledWith(1234, {
-        state: downloadStates.waitingForAuth,
+        state: downloadStates.waitingForEula,
         timeStart: null
       })
     })
   })
 
   describe('when the download is already waiting for auth', () => {
-    test('does not open the authUrl', async () => {
+    test('does not open the eulaRedirectUrl', async () => {
       const database = {
         getFileWhere: jest.fn(),
         getDownloadById: jest.fn().mockResolvedValue({
-          authUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback'
+          eulaUrl: 'http://example.com/accept_eula',
+          eulaRedirectUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FeulaCallback'
         }),
         updateFileById: jest.fn()
       }
-      const downloadsWaitingForAuth = {
+      const downloadsWaitingForEula = {
         downloadID: true
       }
       const info = {
@@ -117,9 +120,9 @@ describe('sendToLogin', () => {
         send: jest.fn()
       }
 
-      await sendToLogin({
+      await sendToEula({
         database,
-        downloadsWaitingForAuth,
+        downloadsWaitingForEula,
         info,
         webContents
       })
@@ -137,15 +140,16 @@ describe('sendToLogin', () => {
   })
 
   describe('forceLogin is set to true', () => {
-    test('does not open the authUrl', async () => {
+    test('does not open the eulaRedirectUrl', async () => {
       const database = {
         getFileWhere: jest.fn(),
         getDownloadById: jest.fn().mockResolvedValue({
-          authUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback'
+          eulaUrl: 'http://example.com/accept_eula',
+          eulaRedirectUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FeulaCallback'
         }),
         updateFileById: jest.fn()
       }
-      const downloadsWaitingForAuth = {
+      const downloadsWaitingForEula = {
         downloadID: true
       }
       const info = {
@@ -157,9 +161,9 @@ describe('sendToLogin', () => {
         send: jest.fn()
       }
 
-      await sendToLogin({
+      await sendToEula({
         database,
-        downloadsWaitingForAuth,
+        downloadsWaitingForEula,
         info,
         webContents
       })
@@ -167,14 +171,14 @@ describe('sendToLogin', () => {
       expect(database.getFileWhere).toHaveBeenCalledTimes(0)
 
       expect(shell.openExternal).toHaveBeenCalledTimes(1)
-      expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback%3FfileId%3D1234')
+      expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/accept_eula&redirect_uri=http%3A%2F%2Fexample.com%2Fauth%3FeddRedirect%3Dearthdata-download%253A%252F%252FeulaCallback%253FfileId%253D1234')
 
       expect(webContents.send).toHaveBeenCalledTimes(1)
-      expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', { showDialog: true })
+      expect(webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', { showDialog: true })
 
       expect(database.updateFileById).toHaveBeenCalledTimes(1)
       expect(database.updateFileById).toHaveBeenCalledWith(1234, {
-        state: downloadStates.waitingForAuth,
+        state: downloadStates.waitingForEula,
         timeStart: null
       })
     })

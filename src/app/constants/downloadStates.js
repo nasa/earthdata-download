@@ -7,7 +7,8 @@ const downloadStates = {
   paused: 'PAUSED',
   pending: 'PENDING',
   starting: 'STARTING',
-  waitingForAuth: 'WAITING_FOR_AUTH'
+  waitingForAuth: 'WAITING_FOR_AUTH',
+  waitingForEula: 'WAITING_FOR_EULA'
 }
 
 export default downloadStates

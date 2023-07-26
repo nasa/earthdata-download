@@ -7,6 +7,7 @@ import {
 } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
+import electronLog from 'electron-log'
 
 import openUrl from './eventHandlers/openUrl'
 
@@ -22,6 +23,9 @@ const currentDownloadItems = new CurrentDownloadItems()
 
 autoUpdater.autoDownload = true
 autoUpdater.autoInstallOnAppQuit = true
+
+autoUpdater.logger = electronLog
+autoUpdater.logger.transports.file.level = 'debug'
 
 // Uncomment if you want to test downloading an update locally. Will not actually do an install in dev mode
 // autoUpdater.forceDevUpdateConfig = true
@@ -42,6 +46,7 @@ const downloadIdContext = {}
 // `downloadsWaitingForAuth` holds downloadIds when that download is waiting for authentication.
 // This allows us to only try getting auth for 1 file, and not open too many auth windows
 const downloadsWaitingForAuth = {}
+const downloadsWaitingForEula = {}
 
 const createWindow = async () => {
   // Ensure the database is up to date
@@ -111,6 +116,7 @@ const createWindow = async () => {
     database,
     downloadIdContext,
     downloadsWaitingForAuth,
+    downloadsWaitingForEula,
     setUpdateAvailable
   })
 }
@@ -164,6 +170,7 @@ if (!gotTheLock) {
       deepLink: url,
       downloadIdContext,
       downloadsWaitingForAuth,
+      downloadsWaitingForEula,
       updateAvailable
     })
   })
@@ -176,6 +183,7 @@ if (!gotTheLock) {
       deepLink: url,
       downloadIdContext,
       downloadsWaitingForAuth,
+      downloadsWaitingForEula,
       updateAvailable
     })
   })

@@ -16,34 +16,54 @@ Example
 
 ## Deep Link Formats
 
-In order to have your web application launch the Earthdata Download application, you need to use [deep links](https://www.electronjs.org/docs/latest/tutorial/launch-app-from-url-in-another-app). The following links are examples used by Earthdata Search
+In order to have your web application launch the Earthdata Download application, you need to use [deep links](https://www.electronjs.org/docs/latest/tutorial/launch-app-from-url-in-another-app). The following links are examples used by Earthdata Search.
 
 ### Starting a new download
 
 This link will start a new download in Earthdata Download.
 
-    earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgranule_links%3Fid%3D42%26flattenLinks%3Dtrue%26linkTypes%3Ddata&downloadId=shortName_versionId&token=Bearer mock-token
+```text
+earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgranule_links%3Fid%3D42%26flattenLinks%3Dtrue%26linkTypes%3Ddata&downloadId=shortName_versionId&token=Bearer mock-token
+```
 
 #### Query Parameters
 
 | Hostname | Query Parameter | Required | Purpose |
 | --- | --- | --- | --- |
-| startDownload | | | This tells Earthdata Download that it needs to start a new download |
+| startDownload | | | This tells Earthdata Download that it needs to start a new download. |
 | | downloadId | true | This is the name of the download that will be visible to the user. Suggested value: `<short name>_<version>`. A timestamp will be appended to this value in order to ensure the value is unique. |
-| | getLinks | true | This is a URL that Earthdata Download will use to fetch the links it needs to download. [See more details on this request](GET_LINKS.md) |
-| | authUrl | false | This is a link where Earthdata Download can send the user to login with Earthdata Login. After logging in the user needs to be redirected to the Authentication callback. See [this document](EDL_AUTH.md) for more information on Earthdata Login authentication |
-| | token | false | A token to be passed in the `getLinks` request. Value will be added to the `Authorization` header |
+| | getLinks | true | This is a URL that Earthdata Download will use to fetch the links it needs to download. [See more details on this request](GET_LINKS.md). |
+| | authUrl | false | This is a URL where Earthdata Download can send the user to login with Earthdata Login. After logging in the user needs to be redirected to the Authentication callback. See [this document](EDL_AUTH.md) for more information on Earthdata Login authentication. |
+| | eulaRedirectUrl | false | This is a URL that Earthdata Download will use as a redirect after the user is sent to Earthdata Login to accept a EULA. See [this document](EULA_CALLBACK.md) for more information on the EULA acceptance workflow. |
+| | token | false | A token to be passed in the `getLinks` request. Value will be added to the `Authorization` header. |
 
 ### Authentication callback
 
-This link will add a new Earthdata Login token to Earthdata Download to be used when downloading files. See [this document](EDL_AUTH.md) for more information on Earthdata Login authentication
+This link will add a new Earthdata Login token to Earthdata Download to be used when downloading files. See [this document](EDL_AUTH.md) for more information on Earthdata Login authentication.
 
-    earthdata-download://authCallback?token=mock-token&fileId=1234
+```text
+earthdata-download://authCallback?token=mock-token&fileId=1234
+```
 
-#### Query Parameters
+#### authCallbackQuery Parameters
 
 | Hostname | Query Parameter | Required | Purpose |
 | --- | --- | --- | --- |
-| authCallback | | | This tells Earthdata Download that it needs to start a new download |
+| authCallback | | | This tells Earthdata Download that it needs to update the user's token and start downloading. |
 | | fileId | true | This is the name of the download that will be visible to the user. Suggested value: `<short name>_<version>`. A timestamp will be appended to this value in order to ensure the value is unique. |
-| | token | true | An EDL token to be included in the download request. Value will be sent as a Bearer token in the `Authorization` header |
+| | token | true | An EDL token to be included in the download request. Value will be sent as a Bearer token in the `Authorization` header. |
+
+### EULA callback
+
+This link can be called after Earthdata Download redirects the user to Earthdata Login to accept a EULA. See [this document](EULA_CALLBACK.md) for more information on the EULA acceptance workflow.
+
+```text
+earthdata-download://eulaCallback?fileId=1234
+```
+
+#### eulaCallback Query Parameters
+
+| Hostname | Query Parameter | Required | Purpose |
+| --- | --- | --- | --- |
+| eulaCallback | | | This tells Earthdata Download that it needs to retry downloads that are waiting on EULA acceptance. |
+| | fileId | true | This is the name of the download that will be visible to the user. Suggested value: `<short name>_<version>`. A timestamp will be appended to this value in order to ensure the value is unique. |

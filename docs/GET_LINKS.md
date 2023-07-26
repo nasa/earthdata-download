@@ -24,12 +24,14 @@ It is very important that your API returns the correct response to Earthdata Dow
 
 ### Example Response
 
-    {
-      cursor: 'mock-cursor',
-      done: false,
-      links: [
-        'http://example.com/link1',
-        'http://example.com/link2',
-        ...
-      ]
-    }
+```js
+{
+  cursor: 'mock-cursor',
+  done: false,
+  links: [
+    'http://example.com/link1',
+    'http://example.com/link2',
+    ...
+  ]
+}
+```

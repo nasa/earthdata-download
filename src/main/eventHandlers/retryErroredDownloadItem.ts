@@ -28,7 +28,10 @@ const retryErroredDownloadItem = async ({
       filename
     }, {
       state: downloadStates.pending,
-      percent: 0
+      percent: 0,
+      timeStart: null,
+      timeEnd: null,
+      errors: null
     })
   }
 
@@ -39,7 +42,10 @@ const retryErroredDownloadItem = async ({
       state: downloadStates.error
     }, {
       state: downloadStates.pending,
-      percent: 0
+      percent: 0,
+      timeStart: null,
+      timeEnd: null,
+      errors: null
     })
   }
 

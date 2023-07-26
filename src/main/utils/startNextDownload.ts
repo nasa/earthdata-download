@@ -4,6 +4,8 @@ import 'array-foreach-async'
 
 import downloadFile from './downloadFile'
 
+import downloadStates from '../../app/constants/downloadStates'
+
 /**
  * Starts the next download when a download completes
  * @param {Object} params
@@ -26,10 +28,17 @@ const startNextDownload = async ({
   // Get number of running downloads
   const numberOfRunningDownloads = currentDownloadItems.getNumberOfDownloads()
 
-  // For available number of downloads, find the next `active` download with `pending` files and start downloading
-  const numberDownloadsToStart = concurrentDownloads - numberOfRunningDownloads
+  // Get the number of files starting to download
+  const numberOfStartingDownloads = await database.getFileCountWhere({
+    state: downloadStates.starting
+  })
 
-  if (numberDownloadsToStart === 0) return
+  // For available number of downloads, find the next `active` download with `pending` files and start downloading
+  const numberDownloadsToStart = concurrentDownloads
+    - numberOfStartingDownloads
+    - numberOfRunningDownloads
+
+  if (numberDownloadsToStart < 1) return
 
   const filesToStart = await database.getFilesToStart(numberDownloadsToStart, fileId)
 

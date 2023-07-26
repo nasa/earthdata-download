@@ -1,8 +1,12 @@
+// @ts-nocheck
+
 import MockDate from 'mockdate'
 
 import startNextDownload from '../startNextDownload'
 
 import downloadFile from '../downloadFile'
+
+import downloadStates from '../../../app/constants/downloadStates'
 
 jest.mock('../downloadFile', () => ({
   __esModule: true,
@@ -26,7 +30,8 @@ describe('startNextDownload', () => {
         url: 'http://example.com/mock-filename-1.png',
         state: 'PENDING',
         percent: 0
-      }])
+      }]),
+      getFileCountWhere: jest.fn().mockResolvedValue(0)
     }
     const webContents = {
       downloadURL: jest.fn()
@@ -44,6 +49,9 @@ describe('startNextDownload', () => {
     })
 
     expect(database.getPreferences).toHaveBeenCalledTimes(1)
+
+    expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileCountWhere).toHaveBeenCalledWith({ state: downloadStates.starting })
 
     expect(database.getFilesToStart).toHaveBeenCalledTimes(1)
     expect(database.getFilesToStart).toHaveBeenCalledWith(1, undefined)
@@ -73,7 +81,8 @@ describe('startNextDownload', () => {
         url: 'http://example.com/mock-filename-1.png',
         state: 'PENDING',
         percent: 0
-      }])
+      }]),
+      getFileCountWhere: jest.fn().mockResolvedValue(0)
     }
     const webContents = {
       downloadURL: jest.fn()
@@ -91,6 +100,9 @@ describe('startNextDownload', () => {
     })
 
     expect(database.getPreferences).toHaveBeenCalledTimes(1)
+
+    expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileCountWhere).toHaveBeenCalledWith({ state: downloadStates.starting })
 
     expect(database.getFilesToStart).toHaveBeenCalledTimes(1)
     expect(database.getFilesToStart).toHaveBeenCalledWith(1, 123)
@@ -127,7 +139,8 @@ describe('startNextDownload', () => {
         url: 'http://example.com/mock-filename-2.png',
         state: 'PENDING',
         percent: 0
-      }])
+      }]),
+      getFileCountWhere: jest.fn().mockResolvedValue(0)
     }
     const webContents = {
       downloadURL: jest.fn()
@@ -145,6 +158,9 @@ describe('startNextDownload', () => {
     })
 
     expect(database.getPreferences).toHaveBeenCalledTimes(1)
+
+    expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileCountWhere).toHaveBeenCalledWith({ state: downloadStates.starting })
 
     expect(database.getFilesToStart).toHaveBeenCalledTimes(1)
     expect(database.getFilesToStart).toHaveBeenCalledWith(2, undefined)
@@ -176,7 +192,8 @@ describe('startNextDownload', () => {
     const downloadIdContext = {}
     const database = {
       getPreferences: jest.fn().mockResolvedValue({ concurrentDownloads: 1 }),
-      getFilesToStart: jest.fn()
+      getFilesToStart: jest.fn(),
+      getFileCountWhere: jest.fn().mockResolvedValue(0)
     }
     const webContents = {
       downloadURL: jest.fn()
@@ -195,6 +212,41 @@ describe('startNextDownload', () => {
 
     expect(database.getPreferences).toHaveBeenCalledTimes(1)
 
+    expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileCountWhere).toHaveBeenCalledWith({ state: downloadStates.starting })
+
+    expect(database.getFilesToStart).toHaveBeenCalledTimes(0)
+
+    expect(downloadFile).toHaveBeenCalledTimes(0)
+  })
+
+  test('does not start downloading a file if the concurrentDownloads is met because of other starting files', async () => {
+    const downloadIdContext = {}
+    const database = {
+      getPreferences: jest.fn().mockResolvedValue({ concurrentDownloads: 2 }),
+      getFilesToStart: jest.fn(),
+      getFileCountWhere: jest.fn().mockResolvedValue(1)
+    }
+    const webContents = {
+      downloadURL: jest.fn()
+    }
+    const currentDownloadItems = {
+      getNumberOfDownloads: jest.fn().mockReturnValue(1)
+    }
+
+    await startNextDownload({
+      currentDownloadItems,
+      database,
+      downloadIdContext,
+      fileId: undefined,
+      webContents
+    })
+
+    expect(database.getPreferences).toHaveBeenCalledTimes(1)
+
+    expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileCountWhere).toHaveBeenCalledWith({ state: downloadStates.starting })
+
     expect(database.getFilesToStart).toHaveBeenCalledTimes(0)
 
     expect(downloadFile).toHaveBeenCalledTimes(0)
@@ -204,7 +256,8 @@ describe('startNextDownload', () => {
     const downloadIdContext = {}
     const database = {
       getPreferences: jest.fn().mockResolvedValue({ concurrentDownloads: 1 }),
-      getFilesToStart: jest.fn().mockResolvedValue([])
+      getFilesToStart: jest.fn().mockResolvedValue([]),
+      getFileCountWhere: jest.fn().mockResolvedValue(0)
     }
     const webContents = {
       downloadURL: jest.fn()
@@ -222,6 +275,9 @@ describe('startNextDownload', () => {
     })
 
     expect(database.getPreferences).toHaveBeenCalledTimes(1)
+
+    expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileCountWhere).toHaveBeenCalledWith({ state: downloadStates.starting })
 
     expect(database.getFilesToStart).toHaveBeenCalledTimes(1)
     expect(database.getFilesToStart).toHaveBeenCalledWith(1, undefined)

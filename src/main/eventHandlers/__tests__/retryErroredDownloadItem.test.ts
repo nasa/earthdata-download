@@ -39,7 +39,10 @@ describe('retryErroredDownloadItem', () => {
         filename: 'mock-filename.png'
       }, {
         state: downloadStates.pending,
-        percent: 0
+        percent: 0,
+        timeStart: null,
+        timeEnd: null,
+        errors: null
       })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)
@@ -72,7 +75,10 @@ describe('retryErroredDownloadItem', () => {
         state: downloadStates.error
       }, {
         state: downloadStates.pending,
-        percent: 0
+        percent: 0,
+        timeStart: null,
+        timeEnd: null,
+        errors: null
       })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)

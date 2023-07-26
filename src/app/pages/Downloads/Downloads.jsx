@@ -234,6 +234,7 @@ const Downloads = ({
     const items = runningDownloads.map((runningDownload) => {
       const {
         downloadId,
+        // TODO stop using downloadName
         downloadName,
         errors,
         loadingMoreFiles,

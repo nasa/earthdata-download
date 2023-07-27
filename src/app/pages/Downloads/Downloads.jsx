@@ -318,7 +318,7 @@ const Downloads = ({
             icon: FaSignInAlt
           },
           {
-            label: 'Accept EULA',
+            label: 'View & Accept License Agreement',
             isActive: shouldShowEula,
             isPrimary: shouldShowEula,
             callback: () => sendToEula({

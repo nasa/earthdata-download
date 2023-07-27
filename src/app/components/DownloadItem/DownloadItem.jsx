@@ -162,19 +162,19 @@ const DownloadItem = ({
         open={waitingForEulaDialogIsOpen}
         setOpen={setWaitingForEulaDialogIsOpen}
         showTitle
-        title="You must accept a EULA to download this data."
+        closeButton
+        title="Accept the license agreement to continue your download."
         TitleIcon={FaSignInAlt}
       >
         <WaitingForEula
           downloadId={downloadName}
-          // TODO EDD-13, might want to be able to send a fileId as well
-          // fileId={fileId}
         />
       </Dialog>
       <Dialog
         open={waitingForLoginDialogIsOpen}
         setOpen={setWaitingForLoginDialogIsOpen}
         showTitle
+        closeButton
         title="You must log in with Earthdata Login to download this data."
         TitleIcon={FaSignInAlt}
       >
@@ -299,7 +299,7 @@ const DownloadItem = ({
                           Waiting for log in with Earthdata Login
                           {' '}
                           <Tooltip
-                            content="This download requires authentication with Earthdata Login. If your browser did not automatically open, click Log In"
+                            content="This download requires authentication with Earthdata Login. If your browser did not automatically open, click Log In."
                           >
                             <span className={styles.statusInformationTooltip}>
                               <FaInfoCircle className={styles.statusInformationIcon} />
@@ -313,10 +313,10 @@ const DownloadItem = ({
                       state === downloadStates.waitingForEula && (
                         <>
                           {' '}
-                          Waiting for EULA acceptance
+                          Accept license agreement to continue
                           {' '}
                           <Tooltip
-                            content="This download requires accepting a EULA with Earthdata Login. If your browser did not automatically open, click Accept EULA"
+                            content="Accept the license agreement to access the data you've requested. If your browser did not automatically open, click View & Accept License Agreement."
                           >
                             <span className={styles.statusInformationTooltip}>
                               <FaInfoCircle className={styles.statusInformationIcon} />

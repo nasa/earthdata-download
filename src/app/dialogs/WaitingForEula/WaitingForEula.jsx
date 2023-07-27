@@ -36,11 +36,11 @@ const WaitingForEula = ({
     <>
       <div className={styles.content}>
         <p>
-          Your default browser has been opened so you can log in. After accepting the EULA,
-          your download should start automatically.
+          {/* eslint-disable-next-line max-len */}
+          The data provider requires acceptance of a license agreement to access the data you&apos;ve requested. Your default browser has been opened so you can accept the agreement. After accepting the agreement, your download should start automatically.
         </p>
         <p>
-          If your browser did not open automatically, click Accept EULA below.
+          If your browser did not open automatically, click View & Accept License Agreement below.
         </p>
       </div>
       <div className={styles.actions}>
@@ -56,7 +56,7 @@ const WaitingForEula = ({
           })}
           dataTestId="waiting-for-eula-accept-eula"
         >
-          Accept EULA
+          View & Accept License Agreement
         </Button>
       </div>
     </>

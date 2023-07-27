@@ -336,7 +336,7 @@ describe('DownloadItem component', () => {
         expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
         expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
         expect(screen.getByTestId('download-item-state')).toHaveTextContent('Initializing')
-        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('Waiting for EULA acceptance More Info')
+        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('Accept license agreement to continue More Info')
       })
     })
 
@@ -356,7 +356,7 @@ describe('DownloadItem component', () => {
         expect(screen.getByTestId('download-item-percent')).toHaveTextContent('50%')
         expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
         expect(screen.getByTestId('download-item-state')).toHaveTextContent('Interrupted')
-        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 2 files Waiting for EULA acceptance More Info')
+        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 2 files Accept license agreement to continue More Info')
       })
     })
 

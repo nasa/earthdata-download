@@ -44,6 +44,9 @@ describe('WaitingForEula component', () => {
     await user.click(screen.getByTestId('waiting-for-eula-accept-eula'))
 
     expect(sendToEula).toHaveBeenCalledTimes(1)
-    expect(sendToEula).toHaveBeenCalledWith({ downloadId: 'download-id', forceLogin: true })
+    expect(sendToEula).toHaveBeenCalledWith({
+      downloadId: 'download-id',
+      forceLogin: true
+    })
   })
 })

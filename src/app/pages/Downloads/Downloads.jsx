@@ -280,6 +280,7 @@ const Downloads = ({
       const shouldDisableOpenFolder = finishedFiles === 0
       const isComplete = state === downloadStates.completed
       const shouldShowLogin = state === downloadStates.waitingForAuth
+      const shouldShowEula = state === downloadStates.waitingForEula
 
       // Add errors
       if (state !== downloadStates.cancelled && errors) {

@@ -45,9 +45,9 @@ const sendToEula = async ({
     const download = await database.getDownloadById(downloadId)
 
     const {
-      // eulaUrl comes from the 403 response
+      // `eulaUrl` comes from the 403 response
       eulaUrl,
-      // eulaRedirectUrl comes from EDSC, should point to EDSC auth_callback
+      // `eulaRedirectUrl` comes from EDSC, should point to EDSC auth_callback
       eulaRedirectUrl
     } = download
 
@@ -62,7 +62,7 @@ const sendToEula = async ({
     // Update the eddRedirect parameter with the `fileId` added
     url.searchParams.set('eddRedirect', eddRedirectUrl.toString())
 
-    // eulaRedirectUrl `redirect` param needs to know the fileId
+    // `eulaRedirectUrl` `redirect` param needs to know the fileId
     const eulaRedirectUrlWithFileId = url.toString()
     const eulaRedirect = `${eulaUrl}&redirect_uri=${encodeURIComponent(eulaRedirectUrlWithFileId)}`
 

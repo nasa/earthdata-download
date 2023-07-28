@@ -135,6 +135,7 @@ const setupEventListeners = ({
       database,
       field
     })
+
     return value
   })
 
@@ -352,6 +353,7 @@ const setupEventListeners = ({
   // When a `target=_blank` link is clicked, open in an external browser
   appWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
+
     return { action: 'deny' }
   })
 }

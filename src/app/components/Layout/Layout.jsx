@@ -1,4 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, {
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 import classNames from 'classnames'
 import { FaCog } from 'react-icons/fa'
 import {
@@ -62,6 +66,7 @@ const Layout = () => {
   const onWindowMaximized = (event, windowMaximized) => {
     setIsWindowMaximized(windowMaximized)
   }
+
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
   const [hasActiveDownload, setHasActiveDownload] = useState(false)
 
@@ -121,11 +126,13 @@ const Layout = () => {
           setHasActiveDownload={setHasActiveDownload}
         />
       )
+
       break
     case PAGES.downloadHistory:
       pageComponent = (
         <DownloadHistory setCurrentPage={setCurrentPage} />
       )
+
       break
     default:
       break
@@ -215,71 +222,73 @@ const Layout = () => {
             Settings
           </Button>
         </section>
-        {(isWin || isLinux) && (
-          <div
-            data-testid="window-buttons"
-            className={styles.windowButtons}
-          >
-            <Button
-              className={
-                classNames(
-                  [
-                    styles.minMaxCloseButton,
-                    {
-                      [styles.isLinux]: isLinux
-                    }
-                  ]
-                )
-              }
-              onClick={minimizeWindow}
-              dataTestId="minimize-window"
-              Icon={VscChromeMinimize}
-              hideLabel
-              hideTooltip
+        {
+          (isWin || isLinux) && (
+            <div
+              data-testid="window-buttons"
+              className={styles.windowButtons}
             >
-              Minimize
-            </Button>
-            <Button
-              className={
-                classNames(
-                  [
-                    styles.minMaxCloseButton,
-                    {
-                      [styles.isLinux]: isLinux
-                    }
-                  ]
-                )
-              }
-              onClick={maximizeWindow}
-              dataTestId="maximize-restore-window"
-              Icon={isWindowMaximized && isWin ? VscChromeRestore : VscChromeMaximize}
-              hideLabel
-              hideTooltip
-            >
-              Maximize/Restore
-            </Button>
-            <Button
-              className={
-                classNames(
-                  [
-                    styles.minMaxCloseButton,
-                    styles.windowClose,
-                    {
-                      [styles.isLinux]: isLinux
-                    }
-                  ]
-                )
-              }
-              onClick={closeWindow}
-              dataTestId="close-window"
-              Icon={VscChromeClose}
-              hideLabel
-              hideTooltip
-            >
-              Close
-            </Button>
-          </div>
-        )}
+              <Button
+                className={
+                  classNames(
+                    [
+                      styles.minMaxCloseButton,
+                      {
+                        [styles.isLinux]: isLinux
+                      }
+                    ]
+                  )
+                }
+                onClick={minimizeWindow}
+                dataTestId="minimize-window"
+                Icon={VscChromeMinimize}
+                hideLabel
+                hideTooltip
+              >
+                Minimize
+              </Button>
+              <Button
+                className={
+                  classNames(
+                    [
+                      styles.minMaxCloseButton,
+                      {
+                        [styles.isLinux]: isLinux
+                      }
+                    ]
+                  )
+                }
+                onClick={maximizeWindow}
+                dataTestId="maximize-restore-window"
+                Icon={isWindowMaximized && isWin ? VscChromeRestore : VscChromeMaximize}
+                hideLabel
+                hideTooltip
+              >
+                Maximize/Restore
+              </Button>
+              <Button
+                className={
+                  classNames(
+                    [
+                      styles.minMaxCloseButton,
+                      styles.windowClose,
+                      {
+                        [styles.isLinux]: isLinux
+                      }
+                    ]
+                  )
+                }
+                onClick={closeWindow}
+                dataTestId="close-window"
+                Icon={VscChromeClose}
+                hideLabel
+                hideTooltip
+              >
+                Close
+              </Button>
+            </div>
+          )
+        }
       </header>
       <main className={styles.main}>
         {pageComponent}

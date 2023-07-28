@@ -19,7 +19,10 @@ describe('copyDownloadPath', () => {
       getDownloadById: jest.fn().mockReturnValue({ downloadLocation })
     }
 
-    await copyDownloadPath({ database, info })
+    await copyDownloadPath({
+      database,
+      info
+    })
 
     expect(database.getDownloadById).toHaveBeenCalledTimes(1)
     expect(database.getDownloadById).toHaveBeenCalledWith('shortName_version-1-20230514_012554')

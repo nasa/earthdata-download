@@ -43,19 +43,23 @@ const TestComponent = () => {
       <div>
         <button
           type="button"
-          onClick={() => addToast({
-            id: 'mock-id',
-            message: 'This is a message'
-          })}
+          onClick={
+            () => addToast({
+              id: 'mock-id',
+              message: 'This is a message'
+            })
+          }
         >
           Add
         </button>
         <button
           type="button"
-          onClick={() => addToast({
-            id: 'mock-id-2',
-            message: 'This is a second message'
-          })}
+          onClick={
+            () => addToast({
+              id: 'mock-id-2',
+              message: 'This is a second message'
+            })
+          }
         >
           Add 2
         </button>

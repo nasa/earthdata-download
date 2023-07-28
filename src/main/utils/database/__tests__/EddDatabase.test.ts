@@ -44,16 +44,16 @@ describe('EddDatabase', () => {
     test('runs the migrations and seeds', async () => {
       dbTracker.on('query', (query, step) => {
         if (step === 1 || step === 2 || step === 7 || step === 8) {
-          // knex_migrations, knex_migrations_lock
+          // `knex_migrations`, `knex_migrations_lock`
           query.response([{ type: 'table' }])
         } else if (step === 3 || step === 9) {
-          // select * from `knex_migrations_lock`
+          // Query: select * from `knex_migrations_lock`
           query.response([{
             index: 1,
             isLocked: 0
           }])
         } else if (step === 4 || step === 10) {
-          // select `name` from `knex_migrations` order by `id` asc'
+          // Query: select `name` from `knex_migrations` order by `id` asc'
           query.response([{
             name: '20230613175153_create_preferences.js'
           }, {
@@ -68,25 +68,25 @@ describe('EddDatabase', () => {
             name: '20230724200528_add_eulaUrl_to_downloads.js'
           }])
         } else if (step === 5) {
-          // select `name` from `knex_migrations` order by `id` asc'
+          // Query: select `name` from `knex_migrations` order by `id` asc'
           query.response()
         } else if (step === 6 || step === 12) {
-          // update `knex_migrations_lock` set `is_locked` = ?'
+          // Query: update `knex_migrations_lock` set `is_locked` = ?'
           query.response(1)
         } else if (step === 11) {
-          // select max(`batch`) as `max_batch` from `knex_migrations`
+          // Query: select max(`batch`) as `max_batch` from `knex_migrations`
           query.response([{ 'max(`batch`)': 1 }])
         } else if (step === 7 || step === 13) {
           // 7 - BEGIN
           // 13 - COMMIT
           query.response()
         } else if (step === 14) {
-          // running the seed, inserting preferences
+          // Running the seed, inserting preferences
           expect(query.sql).toEqual('insert into `preferences` (`concurrentDownloads`, `id`) values (?, ?) on conflict do nothing')
           expect(query.bindings).toEqual([5, 1])
           query.response([])
         } else if (step === 15) {
-          // running the seed, inserting token
+          // Running the seed, inserting token
           expect(query.sql).toEqual('insert into `token` (`id`, `token`) values (?, ?) on conflict do nothing')
           expect(query.bindings).toEqual([1, null])
           query.response([])
@@ -111,6 +111,7 @@ describe('EddDatabase', () => {
           concurrentDownloads: 5
         })
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getPreferences()
@@ -129,6 +130,7 @@ describe('EddDatabase', () => {
           concurrentDownloads: 5
         })
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getPreferencesByField('concurrentDownloads')
@@ -148,6 +150,7 @@ describe('EddDatabase', () => {
           lastDownloadLocation: '/mock/downloads'
         })
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.setPreferences({
@@ -169,6 +172,7 @@ describe('EddDatabase', () => {
 
         query.response('mock-token')
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getToken()
@@ -188,6 +192,7 @@ describe('EddDatabase', () => {
           token: 'mock-token'
         })
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.setToken('mock-token')
@@ -211,6 +216,7 @@ describe('EddDatabase', () => {
           id: 'mock-download-2'
         }])
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getAllDownloads()
@@ -233,6 +239,7 @@ describe('EddDatabase', () => {
           id: 'mock-download-1'
         })
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getDownloadById('mock-download-1')
@@ -253,6 +260,7 @@ describe('EddDatabase', () => {
           id: 'mock-download-1'
         })
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getDownloadsWhere({
@@ -274,6 +282,7 @@ describe('EddDatabase', () => {
         // We aren't returning anything from this method, the above assertions are the important part of the test
         query.response([1])
       })
+
       const database = new EddDatabase('./')
 
       await database.createDownload('mock-download-1', {
@@ -292,6 +301,7 @@ describe('EddDatabase', () => {
         // We aren't returning anything from this method, the above assertions are the important part of the test
         query.response([1])
       })
+
       const database = new EddDatabase('./')
 
       await database.updateDownloadById('mock-download-1', {
@@ -314,6 +324,7 @@ describe('EddDatabase', () => {
         // We aren't returning anything from this method, the above assertions are the important part of the test
         query.response([1])
       })
+
       const database = new EddDatabase('./')
 
       await database.updateDownloadsWhereIn([
@@ -332,6 +343,7 @@ describe('EddDatabase', () => {
           expect(query.sql).toEqual('delete from `files` where `downloadId` = ?')
           expect(query.bindings).toEqual(['mock-download-1'])
         }
+
         if (step === 2) {
           expect(query.sql).toEqual('delete from `downloads` where `id` = ?')
           expect(query.bindings).toEqual(['mock-download-1'])
@@ -340,6 +352,7 @@ describe('EddDatabase', () => {
         // We aren't returning anything from this method, the above assertions are the important part of the test
         query.response([1])
       })
+
       const database = new EddDatabase('./')
 
       await database.deleteDownloadById('mock-download-1')
@@ -353,6 +366,7 @@ describe('EddDatabase', () => {
           expect(query.sql).toEqual('delete from `files`')
           expect(query.bindings).toEqual([])
         }
+
         if (step === 2) {
           expect(query.sql).toEqual('delete from `downloads`')
           expect(query.bindings).toEqual([])
@@ -361,6 +375,7 @@ describe('EddDatabase', () => {
         // We aren't returning anything from this method, the above assertions are the important part of the test
         query.response([1])
       })
+
       const database = new EddDatabase('./')
 
       await database.deleteAllDownloads()
@@ -381,6 +396,7 @@ describe('EddDatabase', () => {
           id: 'mock-download-1'
         })
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getFileWhere({
@@ -410,6 +426,7 @@ describe('EddDatabase', () => {
           id: 456
         }])
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getFilesToStart(2)
@@ -437,6 +454,7 @@ describe('EddDatabase', () => {
           id: 456
         }])
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getFilesToStart(2, 123)
@@ -459,6 +477,7 @@ describe('EddDatabase', () => {
           id: 'mock-download-1'
         })
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getFilesWhere({
@@ -481,6 +500,7 @@ describe('EddDatabase', () => {
           { 'count(`id`)': 5 }
         ])
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getFileCountWhere({
@@ -505,6 +525,7 @@ describe('EddDatabase', () => {
           { 'count(`id`)': 5 }
         ])
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getNotCompletedFilesCountByDownloadId('mock-download-1')
@@ -522,6 +543,7 @@ describe('EddDatabase', () => {
         // We aren't returning anything from this method, the above assertions are the important part of the test
         query.response([1])
       })
+
       const database = new EddDatabase('./')
 
       await database.updateFileById('mock-file-1', {
@@ -542,6 +564,7 @@ describe('EddDatabase', () => {
         // We aren't returning anything from this method, the above assertions are the important part of the test
         query.response([1])
       })
+
       const database = new EddDatabase('./')
 
       await database.updateFilesWhere({
@@ -580,6 +603,7 @@ describe('EddDatabase', () => {
         // We aren't returning anything from this method, the above assertions are the important part of the test
         query.response([1])
       })
+
       const database = new EddDatabase('./')
 
       await database.addLinksByDownloadId('mock-download-1', [
@@ -602,6 +626,7 @@ describe('EddDatabase', () => {
           finishedFiles: 0
         }])
       })
+
       const database = new EddDatabase('./')
 
       const result = await database.getDownloadFilesProgressByDownloadId('mock-download-1')

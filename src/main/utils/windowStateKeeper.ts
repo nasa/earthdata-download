@@ -17,6 +17,7 @@ const windowStateKeeper = async (database) => {
 
     if (windowStateString) {
       windowState = JSON.parse(windowStateString)
+
       return
     }
 

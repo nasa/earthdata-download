@@ -27,6 +27,7 @@ const onUpdated = async ({
   // If the file is not found in the database, cancel the download
   if (!file) {
     item.cancel()
+
     return
   }
 

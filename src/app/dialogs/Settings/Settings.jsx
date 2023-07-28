@@ -1,8 +1,9 @@
-import React, { useContext, useState, useEffect } from 'react'
-import {
-  FaBan,
-  FaFolder
-} from 'react-icons/fa'
+import React, {
+  useContext,
+  useState,
+  useEffect
+} from 'react'
+import { FaBan, FaFolder } from 'react-icons/fa'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
@@ -64,10 +65,11 @@ const Settings = ({
   const onChangeConcurrentDownloads = (event) => {
     const { value } = event.target
 
-    // if value is non numerical and can't be parsed as an integer return 0
+    // If value is non numerical and can't be parsed as an integer return 0
     const valueNumeric = parseInt(value, 10) || 0
     if (value === '') {
       setConcurrentDownloads('')
+
       return
     }
 
@@ -85,6 +87,7 @@ const Settings = ({
     if (!value) {
       const concurrentDownloadsPreference = await getPreferenceFieldValue('concurrentDownloads')
       setConcurrentDownloads(concurrentDownloadsPreference.toString())
+
       return
     }
 
@@ -104,20 +107,23 @@ const Settings = ({
     const fetchDefaultDownloadLocation = async () => {
       setDefaultDownloadLocation(await getPreferenceFieldValue('defaultDownloadLocation'))
     }
+
     fetchDefaultDownloadLocation()
   }, [])
 
   useEffect(() => {
     const fetchConcurrentDownloads = async () => {
-      const concurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
-      setConcurrentDownloads(concurrentDownloads.toString())
+      const newConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
+      setConcurrentDownloads(newConcurrentDownloads.toString())
     }
+
     fetchConcurrentDownloads()
   }, [])
 
   // Handle the response from the setDownloadLocation
   useEffect(() => {
     setDownloadLocation(true, onSetDownloadLocation)
+
     return () => {
       setDownloadLocation(false, onSetDownloadLocation)
     }
@@ -171,7 +177,7 @@ const Settings = ({
                     <span className={downloadLocationInputClassNames}>
                       <FaFolder className={styles.downloadLocationIcon} />
                       <VisuallyHidden.Root>
-                        <span>{`${defaultDownloadLocation}`}</span>
+                        <span>{defaultDownloadLocation}</span>
                       </VisuallyHidden.Root>
                       <MiddleEllipsis key={defaultDownloadLocation}>
                         <span

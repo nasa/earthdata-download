@@ -303,9 +303,6 @@ describe('DownloadItem component', () => {
         ]
 
         setup({
-          actionsList
-        })
-        setup({
           actionsList,
           progress: {
             ...progress,

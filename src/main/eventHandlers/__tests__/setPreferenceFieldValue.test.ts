@@ -9,7 +9,9 @@ describe('set a field in the preferences', () => {
     }
 
     await setPreferenceFieldValue({
-      database, field: 'concurrentDownloads', value: '2'
+      database,
+      field: 'concurrentDownloads',
+      value: '2'
     })
 
     expect(database.setPreferences).toHaveBeenCalledTimes(1)

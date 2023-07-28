@@ -80,7 +80,10 @@ describe('sendToLogin', () => {
       })
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(1)
-      expect(database.getFileWhere).toHaveBeenCalledWith({ downloadId: 'downloadID', state: downloadStates.waitingForAuth })
+      expect(database.getFileWhere).toHaveBeenCalledWith({
+        downloadId: 'downloadID',
+        state: downloadStates.waitingForAuth
+      })
 
       expect(shell.openExternal).toHaveBeenCalledTimes(1)
       expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback%3FfileId%3D1234')

@@ -16,6 +16,7 @@ describe('AppContext', () => {
       const context = useContext(AppContext)
       console.log('context', context)
     }
+
     render(<TestComponent />)
 
     console.log('createContext', createContext)

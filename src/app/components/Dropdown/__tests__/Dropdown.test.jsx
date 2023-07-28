@@ -44,6 +44,7 @@ describe('Dropdown component', () => {
       render(
         <Dropdown actionsList={actionsList} />
       )
+
       const trigger = screen.queryByRole('button')
       await userEvent.click(trigger)
 

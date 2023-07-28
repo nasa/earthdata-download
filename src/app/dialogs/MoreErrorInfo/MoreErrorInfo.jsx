@@ -1,9 +1,6 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import {
-  FaBan,
-  FaRedo
-} from 'react-icons/fa'
+import { FaBan, FaRedo } from 'react-icons/fa'
 import Button from '../../components/Button/Button'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
@@ -51,16 +48,16 @@ const MoreErrorInfo = ({
     retryErroredDownloadItem
   } = useContext(ElectronApiContext)
 
-  const onCancelDownloadItem = ({ downloadId }) => {
-    cancelErroredDownloadItem({ downloadId })
+  const onCancelDownloadItem = ({ downloadId: cancelledDownloadId }) => {
+    cancelErroredDownloadItem({ downloadId: cancelledDownloadId })
     onCloseMoreErrorInfoDialog(false)
-    deleteAllToastsById(downloadId)
+    deleteAllToastsById(cancelledDownloadId)
   }
 
-  const onRetryErroredDownloadItem = ({ downloadId }) => {
-    retryErroredDownloadItem({ downloadId })
+  const onRetryErroredDownloadItem = ({ downloadId: retryDownloadId }) => {
+    retryErroredDownloadItem({ downloadId: retryDownloadId })
     onCloseMoreErrorInfoDialog(false)
-    deleteAllToastsById(downloadId)
+    deleteAllToastsById(retryDownloadId)
   }
 
   return (

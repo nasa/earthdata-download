@@ -6,9 +6,11 @@
  */
 export const pluralize = (string, value) => {
   if (typeof value !== 'number') return `${string}`
+
   if (value > 1 || value === 0) {
     return `${string}s`
   }
+
   return `${string}`
 }
 

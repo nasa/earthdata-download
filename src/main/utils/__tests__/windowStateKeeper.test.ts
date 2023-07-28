@@ -62,7 +62,6 @@ describe('windowStateKeeper', () => {
         width: 800,
         height: 600
       })
-      // on: jest.fn()
     }
 
     const windowState = await windowStateKeeper(database)
@@ -70,8 +69,6 @@ describe('windowStateKeeper', () => {
     // TODO how do I fire an event on my mocked window.
     // Or how do I use a real BrowserWindow, not mocked by electronMock.js?
     windowState.track(window)
-
-    // window.on()
 
     expect(database.setPreferences).toHaveBeenCalledTimes(1)
     expect(database.setPreferences).toHaveBeenCalledWith(1)

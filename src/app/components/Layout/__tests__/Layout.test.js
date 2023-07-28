@@ -5,25 +5,6 @@ import '@testing-library/jest-dom'
 
 import Layout from '../Layout'
 
-jest.mock('../../../pages/Downloads/Downloads', () => jest.fn(({ children }) => (
-  <mock-Downloads data-testid="Downloads">
-    {children}
-  </mock-Downloads>
-)))
-jest.mock('../../../pages/DownloadHistory/DownloadHistory', () => jest.fn(({ children }) => (
-  <mock-DownloadHistory data-testid="DownloadHistory">
-    {children}
-  </mock-DownloadHistory>
-)))
-jest.mock('../../../dialogs/Settings/Settings', () => jest.fn(({ children }) => (
-  <mock-Settings data-testid="Settings">
-    {children}
-  </mock-Settings>
-)))
-jest.mock('../../../components/ToastList/ToastList', () => jest.fn(() => (
-  <mock-ToastList data-testid="ToastList" />
-)))
-
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import AppContext from '../../../context/AppContext'
 
@@ -31,6 +12,28 @@ import Downloads from '../../../pages/Downloads/Downloads'
 import DownloadHistory from '../../../pages/DownloadHistory/DownloadHistory'
 import Settings from '../../../dialogs/Settings/Settings'
 import ToastList from '../../ToastList/ToastList'
+
+jest.mock('../../../pages/Downloads/Downloads', () => jest.fn(({ children }) => (
+  <mock-Downloads data-testid="Downloads">
+    {children}
+  </mock-Downloads>
+)))
+
+jest.mock('../../../pages/DownloadHistory/DownloadHistory', () => jest.fn(({ children }) => (
+  <mock-DownloadHistory data-testid="DownloadHistory">
+    {children}
+  </mock-DownloadHistory>
+)))
+
+jest.mock('../../../dialogs/Settings/Settings', () => jest.fn(({ children }) => (
+  <mock-Settings data-testid="Settings">
+    {children}
+  </mock-Settings>
+)))
+
+jest.mock('../../../components/ToastList/ToastList', () => jest.fn(() => (
+  <mock-ToastList data-testid="ToastList" />
+)))
 
 const setup = (overrideApiContextValue = {}, toasts = {}) => {
   const closeWindow = jest.fn()
@@ -48,20 +51,24 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
   }
 
   render(
-    <ElectronApiContext.Provider value={{
-      isWin: false,
-      isMac: true,
-      isLinux: false,
-      autoUpdateAvailable: jest.fn(),
-      autoUpdateInstallLater: jest.fn(),
-      autoUpdateProgress: jest.fn(),
-      windowsLinuxTitleBar: jest.fn(),
-      ...apiContextValue
-    }}
+    <ElectronApiContext.Provider value={
+      {
+        isWin: false,
+        isMac: true,
+        isLinux: false,
+        autoUpdateAvailable: jest.fn(),
+        autoUpdateInstallLater: jest.fn(),
+        autoUpdateProgress: jest.fn(),
+        windowsLinuxTitleBar: jest.fn(),
+        ...apiContextValue
+      }
+    }
     >
-      <AppContext.Provider value={{
-        toasts
-      }}
+      <AppContext.Provider value={
+        {
+          toasts
+        }
+      }
       >
         <Layout />
       </AppContext.Provider>

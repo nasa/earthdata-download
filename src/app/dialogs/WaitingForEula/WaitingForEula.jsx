@@ -48,12 +48,14 @@ const WaitingForEula = ({
           className={styles.actionsButton}
           size="lg"
           Icon={FaSignInAlt}
-          onClick={() => sendToEula({
-            downloadId,
-            forceLogin: true
+          onClick={
+            () => sendToEula({
+              downloadId,
+              forceLogin: true
             // TODO EDD-13, might want to be able to send a fileId as well
             // fileId
-          })}
+            })
+          }
           dataTestId="waiting-for-eula-accept-eula"
         >
           View & Accept License Agreement

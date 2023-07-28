@@ -51,13 +51,13 @@ const DownloadHistory = ({ setCurrentPage }) => (
           </Button>
           {/* Hiding nav buttons until EDD-18 */}
           {/* <Button
-          className={styles.button}
-          Icon={FaDownload}
-          size="lg"
-          onClick={() => setCurrentPage(PAGES.downloads)}
-        >
-          View Downloads
-        </Button> */}
+            className={styles.button}
+            Icon={FaDownload}
+            size="lg"
+            onClick={() => setCurrentPage(PAGES.downloads)}
+          >
+            View Downloads
+          </Button> */}
         </>
       )
     }

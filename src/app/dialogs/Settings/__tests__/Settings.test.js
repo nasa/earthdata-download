@@ -1,6 +1,10 @@
 import React from 'react'
 
-import { render, screen, waitFor } from '@testing-library/react'
+import {
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
@@ -15,7 +19,7 @@ const setup = (
   settingsDialogIsOpen,
   getPreferenceFieldValue
 ) => {
-  // we need to mock hasActiveDownloads to render warning
+  // We need to mock hasActiveDownloads to render warning
   const mockHasActiveDownloads = hasActiveDownloads
   const mockSettingsDialogIsOpen = settingsDialogIsOpen
   const chooseDownloadLocation = jest.fn()
@@ -25,16 +29,19 @@ const setup = (
     || jest.fn((field) => {
       if (field === 'concurrentDownloads') return 5
       if (field === 'defaultDownloadLocation') return null
+
       return null
     })
 
   const { rerender } = render(
-    <ElectronApiContext.Provider value={{
-      chooseDownloadLocation,
-      setDownloadLocation,
-      setPreferenceFieldValue,
-      getPreferenceFieldValue: getPreferenceFieldValueMock
-    }}
+    <ElectronApiContext.Provider value={
+      {
+        chooseDownloadLocation,
+        setDownloadLocation,
+        setPreferenceFieldValue,
+        getPreferenceFieldValue: getPreferenceFieldValueMock
+      }
+    }
     >
       <Settings
         hasActiveDownloads={mockHasActiveDownloads}
@@ -99,6 +106,7 @@ describe('Settings dialog', () => {
     const getPreferenceFieldValueMock = jest.fn((field) => {
       if (field === 'concurrentDownloads') return 5
       if (field === 'defaultDownloadLocation') return '/test/location/'
+
       return null
     })
 
@@ -128,7 +136,7 @@ describe('Settings dialog', () => {
 
     await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
     await user.type(screen.getByLabelText('Simultaneous Downloads'), '3')
-    // trigger blur by leaving the text field
+    // Trigger blur by leaving the text field
     await user.tab()
 
     await waitFor(() => {
@@ -147,11 +155,11 @@ describe('Settings dialog', () => {
     await user.type(screen.getByLabelText('Simultaneous Downloads'), '-')
     await user.type(screen.getByLabelText('Simultaneous Downloads'), 'a')
     await user.type(screen.getByLabelText('Simultaneous Downloads'), '0')
-    // trigger blur by leaving the text field
+    // Trigger blur by leaving the text field
     await user.tab()
 
     await waitFor(() => {
-      // negative values or non-numerical changes to the input should not attempt to change the json store
+      // Negative values or non-numerical changes to the input should not attempt to change the json store
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(0)
     })
   })
@@ -162,11 +170,11 @@ describe('Settings dialog', () => {
     const settingsDialogIsOpen = true
     const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
     await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
-    // trigger blur by leaving the text field
+    // Trigger blur by leaving the text field
     await user.tab()
 
     await waitFor(() => {
-    // leaving the text field empty will not update the store
+    // Leaving the text field empty will not update the store
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(0)
     })
   })
@@ -176,13 +184,15 @@ describe('Settings dialog', () => {
     const setPreferenceFieldValue = jest.fn()
     const getPreferenceFieldValue = () => 5
 
-    // render
+    // Render
     const { rerender } = render(
-      <ElectronApiContext.Provider value={{
-        setDownloadLocation,
-        setPreferenceFieldValue,
-        getPreferenceFieldValue
-      }}
+      <ElectronApiContext.Provider value={
+        {
+          setDownloadLocation,
+          setPreferenceFieldValue,
+          getPreferenceFieldValue
+        }
+      }
       >
         <Settings
           hasActiveDownloads={false}
@@ -194,13 +204,15 @@ describe('Settings dialog', () => {
     await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
     await user.type(screen.getByLabelText('Simultaneous Downloads'), '6')
 
-    // re-render
+    // Re-render
     rerender(
-      <ElectronApiContext.Provider value={{
-        setDownloadLocation,
-        setPreferenceFieldValue,
-        getPreferenceFieldValue
-      }}
+      <ElectronApiContext.Provider value={
+        {
+          setDownloadLocation,
+          setPreferenceFieldValue,
+          getPreferenceFieldValue
+        }
+      }
       >
         <Settings
           hasActiveDownloads={false}

@@ -37,8 +37,8 @@ class CurrentDownloadItems {
       const items = this.getAllItemsInDownload(downloadId)
 
       if (items) {
-        Object.keys(items).forEach((filename) => {
-          items[filename].cancel()
+        Object.keys(items).forEach((itemFilename) => {
+          items[itemFilename].cancel()
         })
       }
     } else {
@@ -46,8 +46,8 @@ class CurrentDownloadItems {
         const items = this.getAllItemsInDownload(id)
 
         if (items) {
-          Object.keys(items).forEach((filename) => {
-            items[filename].cancel()
+          Object.keys(items).forEach((itemFilename) => {
+            items[itemFilename].cancel()
           })
         }
       })
@@ -82,8 +82,8 @@ class CurrentDownloadItems {
       return Object.keys(this.getAllItemsInDownload(downloadId)).length
     }
 
-    return Object.keys(this.downloadItems).reduce((sum, downloadId) => {
-      const itemsByDownloadId = this.downloadItems[downloadId]
+    return Object.keys(this.downloadItems).reduce((sum, downloadIdKey) => {
+      const itemsByDownloadId = this.downloadItems[downloadIdKey]
 
       return sum + Object.keys(itemsByDownloadId).length
     }, 0)
@@ -103,8 +103,8 @@ class CurrentDownloadItems {
       const items = this.getAllItemsInDownload(downloadId)
 
       if (items) {
-        Object.keys(items).forEach((filename) => {
-          items[filename].pause()
+        Object.keys(items).forEach((itemFilename) => {
+          items[itemFilename].pause()
         })
       }
     } else {
@@ -112,8 +112,8 @@ class CurrentDownloadItems {
         const items = this.getAllItemsInDownload(id)
 
         if (items) {
-          Object.keys(items).forEach((filename) => {
-            items[filename].pause()
+          Object.keys(items).forEach((itemFilename) => {
+            items[itemFilename].pause()
           })
         }
       })
@@ -153,8 +153,8 @@ class CurrentDownloadItems {
       const items = this.getAllItemsInDownload(downloadId)
 
       if (items) {
-        Object.keys(items).forEach((filename) => {
-          items[filename].resume()
+        Object.keys(items).forEach((itemFilename) => {
+          items[itemFilename].resume()
         })
       }
     } else {
@@ -162,8 +162,8 @@ class CurrentDownloadItems {
         const items = this.getAllItemsInDownload(id)
 
         if (items) {
-          Object.keys(items).forEach((filename) => {
-            items[filename].resume()
+          Object.keys(items).forEach((itemFilename) => {
+            items[itemFilename].resume()
           })
         }
       })

@@ -81,6 +81,7 @@ describe('fetchLinks', () => {
         method: 'get'
       }
     )
+
     expect(fetch).toHaveBeenCalledWith(
       'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&cursor=mock-cursor',
       {
@@ -99,6 +100,7 @@ describe('fetchLinks', () => {
         state: downloadStates.starting
       }
     )
+
     expect(database.updateDownloadById).toHaveBeenCalledWith(
       'shortName_versionId-20230501_000000',
       {
@@ -111,6 +113,7 @@ describe('fetchLinks', () => {
       'shortName_versionId-20230501_000000',
       ['https://example.com/file1.png']
     )
+
     expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
       'shortName_versionId-20230501_000000',
       ['https://example.com/file2.png']
@@ -165,6 +168,7 @@ describe('fetchLinks', () => {
         state: downloadStates.starting
       }
     )
+
     expect(database.updateDownloadById).toHaveBeenCalledWith(
       'shortName_versionId-20230501_000000',
       {
@@ -225,6 +229,7 @@ describe('fetchLinks', () => {
         state: downloadStates.starting
       }
     )
+
     expect(database.updateDownloadById).toHaveBeenCalledWith(
       'shortName_versionId-20230501_000000',
       {
@@ -239,14 +244,24 @@ If you wish to have this link included in the list of trusted sources please con
 
     expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(0)
 
-    // we should not have fetched anything
+    // We should not have fetched anything
     expect(fetch).toHaveBeenCalledTimes(0)
   })
 
   test.each([
-    ['bad cursor type', { cursor: 1234, links: ['https://example.com/file1.png'] }],
-    ['bad links type', { cursor: 'abc', links: 'https://example.com/file1.png' }],
-    ['bad done type', { done: 'yes', cursor: 'abc', links: 'https://example.com/file1.png' }],
+    ['bad cursor type', {
+      cursor: 1234,
+      links: ['https://example.com/file1.png']
+    }],
+    ['bad links type', {
+      cursor: 'abc',
+      links: 'https://example.com/file1.png'
+    }],
+    ['bad done type', {
+      done: 'yes',
+      cursor: 'abc',
+      links: 'https://example.com/file1.png'
+    }],
     ['missing links', { cursor: 'abc' }],
     ['empty response', '']
   ])('halts on invalid JSON response: %s', async ([, badResponse]) => {
@@ -298,6 +313,7 @@ If you wish to have this link included in the list of trusted sources please con
         state: downloadStates.starting
       }
     )
+
     expect(database.updateDownloadById).toHaveBeenCalledWith(
       'shortName_versionId-20230501_000000',
       {

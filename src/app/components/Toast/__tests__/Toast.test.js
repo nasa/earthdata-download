@@ -37,9 +37,11 @@ window.HTMLElement.prototype.hasPointerCapture = jest.fn()
 describe('Toast component', () => {
   test('renders the message', () => {
     render(
-      <AppContext.Provider value={{
-        toasts: {}
-      }}
+      <AppContext.Provider value={
+        {
+          toasts: {}
+        }
+      }
       >
         <ToastProvider>
           <Toast
@@ -57,9 +59,11 @@ describe('Toast component', () => {
 
   test('renders the correct icon', () => {
     render(
-      <AppContext.Provider value={{
-        toasts: {}
-      }}
+      <AppContext.Provider value={
+        {
+          toasts: {}
+        }
+      }
       >
         <ToastProvider>
           <Toast
@@ -139,14 +143,16 @@ describe('Toast component', () => {
             id="mock-toast-id"
             dismissToast={() => {}}
             message="This is a mock message"
-            actions={[{
-              altText: 'Mock alt text',
-              buttonProps: {
-                variant: 'danger',
-                onClick: actionOnClickMock
-              },
-              buttonText: 'Mock action'
-            }]}
+            actions={
+              [{
+                altText: 'Mock alt text',
+                buttonProps: {
+                  variant: 'danger',
+                  onClick: actionOnClickMock
+                },
+                buttonText: 'Mock action'
+              }]
+            }
           />
           <ToastViewport />
         </ToastProvider>
@@ -166,14 +172,16 @@ describe('Toast component', () => {
             id="mock-toast-id"
             dismissToast={() => {}}
             message="This is a mock message"
-            actions={[{
-              altText: 'Mock alt text',
-              buttonProps: {
-                variant: 'danger',
-                onClick: actionOnClickMock
-              },
-              buttonText: 'Mock action'
-            }]}
+            actions={
+              [{
+                altText: 'Mock alt text',
+                buttonProps: {
+                  variant: 'danger',
+                  onClick: actionOnClickMock
+                },
+                buttonText: 'Mock action'
+              }]
+            }
           />
           <ToastViewport />
         </ToastProvider>

@@ -13,6 +13,7 @@ jest.mock('../../utils/startPendingDownloads', () => ({
   __esModule: true,
   default: jest.fn(() => {})
 }))
+
 jest.mock('../../utils/startNextDownload', () => ({
   __esModule: true,
   default: jest.fn(() => {})

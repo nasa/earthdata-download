@@ -86,7 +86,7 @@ const Dialog = ({
                       <RadixDialog.Title className={styles.title}>{title}</RadixDialog.Title>
                     </VisuallyHidden.Root>
                   )
-                }
+              }
               {
                 description && (
                   <RadixDialog.Description className={styles.description}>

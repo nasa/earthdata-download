@@ -37,6 +37,7 @@ class EddDatabase {
   async getPreferencesByField(field) {
     const preferences = await this.db('preferences').where({ id: this.preferencesId }).first().select(field)
     const { [field]: fieldValue } = preferences
+
     return fieldValue
   }
 
@@ -119,6 +120,7 @@ class EddDatabase {
    */
   async deleteDownloadById(downloadId) {
     await this.db('files').delete().where({ downloadId })
+
     return this.db('downloads').delete().where({ id: downloadId })
   }
 
@@ -127,6 +129,7 @@ class EddDatabase {
    */
   async deleteAllDownloads() {
     await this.db('files').delete()
+
     return this.db('downloads').delete()
   }
 

@@ -38,6 +38,7 @@ export const toastsReducer = (state, action) => {
         }
       }
     }
+
     case 'DISMISS_TOAST': {
       const dismissedToastId = action.payload
 
@@ -46,7 +47,6 @@ export const toastsReducer = (state, action) => {
 
       return {
         ...state,
-        // activeToasts: state.activeToasts.filter((toast) => toast.id !== dismissedToastId),
         activeToasts: {
           ...state.activeToasts,
           [dismissedToastId]: undefined
@@ -57,6 +57,7 @@ export const toastsReducer = (state, action) => {
         }
       }
     }
+
     case 'DELETE_ALL_TOASTS_BY_ID': {
       // Delete all toasts related to the payload id
       const toastId = action.payload
@@ -65,7 +66,6 @@ export const toastsReducer = (state, action) => {
 
       return {
         ...state,
-        // activeToasts: state.activeToasts.filter((toast) => toast.id !== toastId),
         activeToasts: {
           ...state.activeToasts,
           [toastId]: undefined
@@ -76,6 +76,7 @@ export const toastsReducer = (state, action) => {
         }
       }
     }
+
     default:
       throw new Error(`Unhandled action type (${action.type}) in toast reducer`)
   }

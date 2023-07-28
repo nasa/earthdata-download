@@ -101,7 +101,9 @@ const ListPage = ({
           : (
             <div className={styles.content}>
               {
-                Icon && <Icon className={styles.icon} />
+                Icon && (
+                  <Icon className={styles.icon} />
+                )
               }
               <p className={styles.message}>{emptyMessage}</p>
               {

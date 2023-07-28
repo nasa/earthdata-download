@@ -58,7 +58,10 @@ describe('reportProgress', () => {
       send: jest.fn()
     }
 
-    await reportProgress({ database, webContents })
+    await reportProgress({
+      database,
+      webContents
+    })
 
     expect(database.getAllDownloads).toHaveBeenCalledTimes(1)
 
@@ -116,7 +119,10 @@ describe('reportProgress', () => {
       send: jest.fn()
     }
 
-    await reportProgress({ database, webContents })
+    await reportProgress({
+      database,
+      webContents
+    })
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
     expect(webContents.send).toHaveBeenCalledWith('reportProgress', { progressReport: [] })
@@ -149,7 +155,10 @@ describe('reportProgress', () => {
       send: jest.fn()
     }
 
-    await reportProgress({ database, webContents })
+    await reportProgress({
+      database,
+      webContents
+    })
 
     expect(database.getAllDownloads).toHaveBeenCalledTimes(1)
 

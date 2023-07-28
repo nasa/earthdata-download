@@ -15,10 +15,18 @@ const setup = () => {
   const retryErroredDownloadItem = jest.fn()
 
   render(
-    <ElectronApiContext.Provider value={{ cancelErroredDownloadItem, retryErroredDownloadItem }}>
-      <AppContext.Provider value={{
-        deleteAllToastsById
-      }}
+    <ElectronApiContext.Provider value={
+      {
+        cancelErroredDownloadItem,
+        retryErroredDownloadItem
+      }
+    }
+    >
+      <AppContext.Provider value={
+        {
+          deleteAllToastsById
+        }
+      }
       >
         <MoreErrorInfo
           downloadId="mock-download-id"

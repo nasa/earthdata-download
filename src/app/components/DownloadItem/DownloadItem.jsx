@@ -1,4 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, {
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import {
@@ -258,15 +262,15 @@ const DownloadItem = ({
                         <>
                           {commafy(finishedFiles)}
                           {
-                          !loadingMoreFiles && (
-                            <>
-                              {' '}
-                              of
-                              {' '}
-                              {commafy(totalFiles)}
-                            </>
-                          )
-                        }
+                            !loadingMoreFiles && (
+                              <>
+                                {' '}
+                                of
+                                {' '}
+                                {commafy(totalFiles)}
+                              </>
+                            )
+                          }
                           {' '}
                           files
                         </>
@@ -344,9 +348,7 @@ const DownloadItem = ({
             }
           </div>
           <div className={styles.metaSecondary}>
-            {
-              primaryActions
-            }
+            {primaryActions}
             <Dropdown actionsList={actionsList} />
           </div>
         </div>

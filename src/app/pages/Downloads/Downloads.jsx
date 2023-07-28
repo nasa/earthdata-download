@@ -1,4 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, {
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 import PropTypes from 'prop-types'
 import {
   FaBan,
@@ -160,7 +164,11 @@ const Downloads = ({
   }
 
   const showMoreInfoDialog = (downloadId, numberErrors) => {
-    setActiveMoreInfoDownloadInfo({ downloadId, numberErrors })
+    setActiveMoreInfoDownloadInfo({
+      downloadId,
+      numberErrors
+    })
+
     setMoreErrorInfoIsOpen(true)
   }
 
@@ -188,12 +196,15 @@ const Downloads = ({
     setAllDownloadsPaused(!!(runningDownloads.length && runningDownloads.every(
       ({ state }) => (state === downloadStates.paused || state === downloadStates.completed)
     )))
+
     setAllDownloadsCompleted(!!(runningDownloads.length && runningDownloads.every(
       ({ state }) => state === downloadStates.completed
     )))
+
     setHasActiveDownload(!!(runningDownloads.length && runningDownloads.some(
       ({ state }) => state === downloadStates.active
     )))
+
     setHasPausedDownload(!!(runningDownloads.length && runningDownloads.some(
       ({ state }) => state === downloadStates.paused
     )))
@@ -202,6 +213,7 @@ const Downloads = ({
       (acc, cur) => cur.progress.totalFiles + acc,
       0
     ))
+
     setTotalCompletedFiles(runningDownloads.length && runningDownloads.reduce(
       (acc, cur) => cur.progress.finishedFiles + acc,
       0
@@ -211,16 +223,19 @@ const Downloads = ({
   useEffect(() => {
     if (allDownloadsCompleted) {
       setDerivedStateFromDownloads(downloadStates.completed)
+
       return
     }
 
     if (allDownloadsPaused) {
       setDerivedStateFromDownloads(downloadStates.paused)
+
       return
     }
 
     if (hasActiveDownload) {
       setDerivedStateFromDownloads(downloadStates.active)
+
       return
     }
 
@@ -265,8 +280,6 @@ const Downloads = ({
       const shouldDisableOpenFolder = finishedFiles === 0
       const isComplete = state === downloadStates.completed
       const shouldShowLogin = state === downloadStates.waitingForAuth
-      const shouldShowEula = state === downloadStates.waitingForEula
-      // const shouldShowError = state === downloadStates.error
 
       // Add errors
       if (state !== downloadStates.cancelled && errors) {
@@ -431,20 +444,21 @@ const Downloads = ({
         />
       </Dialog>
       <ListPage
-        actions={(
-          <>
-            <Button
-              className={styles.emptyActionButton}
-              size="lg"
-              Icon={FaSearch}
-              href="https://search.earthdata.nasa.gov/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Find data in Earthdata Search
-            </Button>
-            {/* Hiding nav buttons until EDD-18 */}
-            {/* <Button
+        actions={
+          (
+            <>
+              <Button
+                className={styles.emptyActionButton}
+                size="lg"
+                Icon={FaSearch}
+                href="https://search.earthdata.nasa.gov/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Find data in Earthdata Search
+              </Button>
+              {/* Hiding nav buttons until EDD-18 */}
+              {/* <Button
               className={styles.button}
               size="lg"
               Icon={FaHistory}
@@ -452,8 +466,9 @@ const Downloads = ({
             >
               View Download History
             </Button> */}
-          </>
-        )}
+            </>
+          )
+        }
         emptyMessage="No downloads in progress"
         header={
           !!runningDownloads.length && (
@@ -569,6 +584,7 @@ const Downloads = ({
     </>
   )
 }
+
 Downloads.propTypes = {
   hasActiveDownload: PropTypes.oneOfType([
     PropTypes.bool,

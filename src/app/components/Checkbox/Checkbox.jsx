@@ -59,11 +59,13 @@ const Checkbox = ({
       </RadixCheckbox.Root>
       <label className={styles.label} htmlFor={id}>
         {label}
-        {labelNote && (
-          <span className={styles.labelNote}>
-            {labelNote}
-          </span>
-        )}
+        {
+          labelNote && (
+            <span className={styles.labelNote}>
+              {labelNote}
+            </span>
+          )
+        }
       </label>
     </div>
   </form>

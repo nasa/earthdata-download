@@ -8,12 +8,12 @@ import AppContext from '../../../context/AppContext'
 
 describe('Downloads component', () => {
   test('renders the downloads page', () => {
-    // props
+    // Props
     const setCurrentPage = jest.fn()
     const setHasActiveDownload = jest.fn()
     const hasActiveDownload = false
 
-    // context functions
+    // Context functions
     const beginDownload = jest.fn()
     const initializeDownload = jest.fn()
     const setDownloadLocation = jest.fn()
@@ -41,11 +41,13 @@ describe('Downloads component', () => {
         }
       }
       >
-        <AppContext.Provider value={{
-          toasts: {
-            addToast: () => {}
+        <AppContext.Provider value={
+          {
+            toasts: {
+              addToast: () => {}
+            }
           }
-        }}
+        }
         >
           <Downloads
             setCurrentPage={setCurrentPage}

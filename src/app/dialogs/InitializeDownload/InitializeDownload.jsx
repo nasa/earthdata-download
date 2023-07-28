@@ -1,6 +1,10 @@
 import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
-import { FaBan, FaDownload, FaFolder } from 'react-icons/fa'
+import {
+  FaBan,
+  FaDownload,
+  FaFolder
+} from 'react-icons/fa'
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import MiddleEllipsis from 'react-middle-ellipsis'
 
@@ -97,7 +101,7 @@ const InitializeDownload = ({
             <span className={styles.downloadLocationWrapper}>
               <FaFolder className={styles.downloadLocationIcon} />
               <VisuallyHidden.Root>
-                <span>{`${downloadLocation}`}</span>
+                <span>{downloadLocation}</span>
               </VisuallyHidden.Root>
               <MiddleEllipsis key={downloadLocation}>
                 <span
@@ -118,9 +122,11 @@ const InitializeDownload = ({
           label="Set this as my default download location and do not ask again next time"
           labelNote="The default download location can be changed in the “Settings” menu"
           checked={makeDefaultDownloadLocation}
-          onChange={(checked) => {
-            setMakeDefaultDownloadLocation(checked)
-          }}
+          onChange={
+            (checked) => {
+              setMakeDefaultDownloadLocation(checked)
+            }
+          }
         />
       </div>
       <div className={styles.actions}>

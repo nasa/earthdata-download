@@ -48,12 +48,12 @@ const WaitingForLogin = ({
           className={styles.actionsButton}
           size="lg"
           Icon={FaSignInAlt}
-          onClick={() => sendToLogin({
-            downloadId,
-            forceLogin: true
-            // TODO EDD-13, might want to be able to send a fileId as well
-            // fileId
-          })}
+          onClick={
+            () => sendToLogin({
+              downloadId,
+              forceLogin: true
+            })
+          }
           dataTestId="waiting-for-login-log-in-with-edl"
         >
           Log In with Earthdata Login

@@ -33,20 +33,19 @@ const Dropdown = ({
         showSeparator = showSeparator || action.isActive
         // Create dropdown item element for each action object
         dropdownOptions.push(
-          (action.isActive) && (
-          <RadixDropdown.Item
-            key={action.label}
-            className={styles.item}
-            disabled={action.disabled}
-            onSelect={action.callback}
-          >
-            {
-              action.label
-            }
-          </RadixDropdown.Item>
+          action.isActive && (
+            <RadixDropdown.Item
+              key={action.label}
+              className={styles.item}
+              disabled={action.disabled}
+              onSelect={action.callback}
+            >
+              {action.label}
+            </RadixDropdown.Item>
           )
         )
       })
+
       // Create separator element between each group of actions
       dropdownOptions.push(
         showSeparator && <RadixDropdown.Separator key={actionGroup} className={styles.separator} />
@@ -83,9 +82,7 @@ const Dropdown = ({
         onCloseAutoFocus={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.stopPropagation()}
       >
-        {
-          dropdownOptions
-        }
+        {dropdownOptions}
       </RadixDropdown.Content>
     </RadixDropdown.Root>
   )

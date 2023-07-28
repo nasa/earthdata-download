@@ -35,6 +35,7 @@ const Alert = ({
     },
     className
   ])
+
   return (
     <div className={alertClassNames}>
       {children}

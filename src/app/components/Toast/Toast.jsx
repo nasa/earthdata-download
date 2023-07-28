@@ -60,10 +60,12 @@ const Toast = ({
   variant
 }) => (
   <RadixToast.Root
-    className={classNames([
-      styles.toast,
-      styles[createVariantClassName(variant)]
-    ])}
+    className={
+      classNames([
+        styles.toast,
+        styles[createVariantClassName(variant)]
+      ])
+    }
     open
   >
     <div className={styles.primary}>
@@ -80,10 +82,12 @@ const Toast = ({
       {
         variant === 'spinner' && (
           <FaSpinner
-            className={classNames([
-              styles.icon,
-              styles.spinner
-            ])}
+            className={
+              classNames([
+                styles.icon,
+                styles.spinner
+              ])
+            }
           />
         )
       }

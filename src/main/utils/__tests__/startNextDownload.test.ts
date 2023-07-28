@@ -176,6 +176,7 @@ describe('startNextDownload', () => {
         percent: 0
       }
     }))
+
     expect(downloadFile).toHaveBeenCalledWith(expect.objectContaining({
       file: {
         id: 456,

@@ -19,7 +19,10 @@ describe('openDownloadFolder', () => {
       getDownloadById: jest.fn().mockReturnValue({ downloadLocation })
     }
 
-    await openDownloadFolder({ database, info })
+    await openDownloadFolder({
+      database,
+      info
+    })
 
     expect(database.getDownloadById).toHaveBeenCalledTimes(1)
     expect(database.getDownloadById).toHaveBeenCalledWith('shortName_version-1-20230514_012554')

@@ -44,6 +44,9 @@ describe('WaitingForLogin component', () => {
     await user.click(screen.getByTestId('waiting-for-login-log-in-with-edl'))
 
     expect(sendToLogin).toHaveBeenCalledTimes(1)
-    expect(sendToLogin).toHaveBeenCalledWith({ downloadId: 'download-id', forceLogin: true })
+    expect(sendToLogin).toHaveBeenCalledWith({
+      downloadId: 'download-id',
+      forceLogin: true
+    })
   })
 })

@@ -11,6 +11,7 @@ const getPreferenceFieldValue = async ({
   field
 }) => {
   const preferenceFieldValue = await database.getPreferencesByField(field)
+
   return preferenceFieldValue
 }
 

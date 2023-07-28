@@ -1,7 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-// eslint-disable-next-line no-unused-vars
-import { FaDownload, FaHistory, FaSearch } from 'react-icons/fa'
+// eslint-disable-next-line import-newlines/enforce
+import {
+  // eslint-disable-next-line no-unused-vars
+  FaDownload,
+  FaHistory,
+  FaSearch
+} from 'react-icons/fa'
 
 import Button from '../../components/Button/Button'
 import ListPage from '../../components/ListPage/ListPage'
@@ -31,20 +36,21 @@ import * as styles from './DownloadHistory.module.scss'
 // eslint-disable-next-line no-unused-vars
 const DownloadHistory = ({ setCurrentPage }) => (
   <ListPage
-    actions={(
-      <>
-        <Button
-          className={styles.button}
-          size="lg"
-          Icon={FaSearch}
-          href="https://search.earthdata.nasa.gov/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Find data in Earthdata Search
-        </Button>
-        {/* Hiding nav buttons until EDD-18 */}
-        {/* <Button
+    actions={
+      (
+        <>
+          <Button
+            className={styles.button}
+            size="lg"
+            Icon={FaSearch}
+            href="https://search.earthdata.nasa.gov/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Find data in Earthdata Search
+          </Button>
+          {/* Hiding nav buttons until EDD-18 */}
+          {/* <Button
           className={styles.button}
           Icon={FaDownload}
           size="lg"
@@ -52,8 +58,9 @@ const DownloadHistory = ({ setCurrentPage }) => (
         >
           View Downloads
         </Button> */}
-      </>
-    )}
+        </>
+      )
+    }
     emptyMessage="Download history is empty"
     Icon={FaHistory}
     items={[]}

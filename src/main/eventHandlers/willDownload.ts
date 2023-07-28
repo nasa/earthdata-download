@@ -38,6 +38,7 @@ const willDownload = async ({
   // If no downloadIdContext is available for this download, cancel the download
   if (!context) {
     item.cancel()
+
     return
   }
 

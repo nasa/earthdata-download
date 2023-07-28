@@ -9,7 +9,10 @@ describe('Get the current value in the preferences file for provided field', () 
         defaultDownloadLocation: '/mock/default/location'
       })
     }
-    const retrievedField = await getPreferenceFieldValue({ database, field: 'defaultDownloadLocation' })
+    const retrievedField = await getPreferenceFieldValue({
+      database,
+      field: 'defaultDownloadLocation'
+    })
     expect(database.getPreferencesByField).toHaveBeenCalledTimes(1)
     expect(retrievedField).toEqual({ defaultDownloadLocation: '/mock/default/location' })
   })

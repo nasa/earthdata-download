@@ -15,6 +15,7 @@ mac:
       arch:
         - x64
         - arm64
+
 win:
   # signAndEditExecutable: false
   target:

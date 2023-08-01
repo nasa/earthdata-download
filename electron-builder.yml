@@ -10,6 +10,7 @@ extraResources:
   - seeds/*
 artifactName: ${productName}-${arch}.${ext}
 mac:
+  icon: 'build/default/icons/icon.icns'
   target:
     - target: default
       arch:
@@ -17,6 +18,8 @@ mac:
         - arm64
 
 win:
+  # signAndEditExecutable: false
+  icon: 'build/alt/icons/icon.ico'
   target:
     - target: nsis
       arch:
@@ -25,6 +28,7 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
 linux:
+  icon: 'build/default/icons'
   target:
     - target: AppImage
       arch:

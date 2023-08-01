@@ -17,7 +17,6 @@ mac:
         - arm64
 
 win:
-  # signAndEditExecutable: false
   target:
     - target: nsis
       arch:

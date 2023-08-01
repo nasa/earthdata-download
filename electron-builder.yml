@@ -17,7 +17,6 @@ mac:
         - x64
         - arm64
 win:
-  # signAndEditExecutable: false
   icon: 'build/alt/icons/icon.ico'
   target:
     - target: nsis

@@ -9,6 +9,8 @@ extraResources:
   - migrations/*
   - seeds/*
 artifactName: ${productName}-${arch}.${ext}
+extraMetadata:
+  description: Earthdata Download
 mac:
   icon: './build/default/icons/icon.icns'
   target:

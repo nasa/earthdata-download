@@ -38,7 +38,7 @@ const FileDownloads = ({
 
   const [fileDownloadsProgressReport, setFileDownloadsProgressReport] = useState([])
 
-  // Todo EDD-26 this is state var controlling the download report
+  // TODO EDD-26 this is state var controlling the download report
   const [downloadReport, setDownloadReport] = useState({})
 
   const [hideCompleted, setHideCompleted] = useState(false)

@@ -35,7 +35,7 @@ const reportFilesProgress = async ({
     }
   })
 
-  // Todo EDD-26 to be more performant all 3 of these SQL calls should be consolidated to a single one
+  // TODO EDD-26 to be more performant all 3 of these SQL calls should be consolidated to a single one
   // Await SQL read from the downloads
   const downloadsProgressReport = await database.getDownloadFilesProgressByDownloadId(downloadId)
   const downloadInformation = await database.getDownloadById(downloadId)

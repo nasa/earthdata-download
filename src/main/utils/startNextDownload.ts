@@ -12,7 +12,7 @@ import downloadStates from '../../app/constants/downloadStates'
  * @param {Object} params.currentDownloadItems CurrentDownloadItems class instance that holds all of the active DownloadItems instances
  * @param {Object} params.database `EddDatabase` instance
  * @param {Object} params.downloadIdContext Object where we can associate a newly created download to a downloadId
- * @param {Number} params.fileId Optional file ID to start downloading
+ * @param {String} params.fileId Optional file ID to start downloading
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
 const startNextDownload = async ({

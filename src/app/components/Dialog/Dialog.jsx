@@ -48,15 +48,15 @@ const Dialog = ({
   children,
   closeButton,
   description,
+  onEscapeKeyDown,
+  onInteractOutside,
+  onPointerDownOutside,
   open,
   setOpen,
   showTitle,
   size,
   title,
-  TitleIcon,
-  onEscapeKeyDown,
-  onPointerDownOutside,
-  onInteractOutside
+  TitleIcon
 }) => {
   const headerClassNames = classNames([
     styles.header,
@@ -137,38 +137,30 @@ Dialog.defaultProps = {
   children: null,
   closeButton: false,
   description: null,
+  onEscapeKeyDown: null,
+  onPointerDownOutside: null,
+  onInteractOutside: null,
   open: false,
-  primaryAction: {
-    className: null,
-    title: null
-  },
   setOpen: null,
   showTitle: false,
   size: null,
   title: null,
-  TitleIcon: null,
-  onEscapeKeyDown: null,
-  onPointerDownOutside: null,
-  onInteractOutside: null
+  TitleIcon: null
 }
 
 Dialog.propTypes = {
   children: PropTypes.node,
   closeButton: PropTypes.bool,
   description: PropTypes.string,
+  onEscapeKeyDown: PropTypes.func,
+  onInteractOutside: PropTypes.func,
+  onPointerDownOutside: PropTypes.func,
   open: PropTypes.bool,
-  primaryAction: PropTypes.shape({
-    className: PropTypes.string,
-    title: PropTypes.string
-  }),
   setOpen: PropTypes.func,
   showTitle: PropTypes.bool,
   size: PropTypes.string,
   title: PropTypes.string,
-  TitleIcon: PropTypes.func,
-  onEscapeKeyDown: PropTypes.func,
-  onPointerDownOutside: PropTypes.func,
-  onInteractOutside: PropTypes.func
+  TitleIcon: PropTypes.func
 }
 
 export default Dialog

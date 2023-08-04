@@ -49,7 +49,7 @@ const FileDownloadsHeader = ({
     startReportingDownloads
   } = useContext(ElectronApiContext)
 
-  // Todo EDD-26 the destructure and parse progress for downloads
+  // TODO EDD-26 the destructure and parse progress for downloads
   const { downloadLocation, id: downloadId } = downloadReport
 
   const [allFilesPaused, setAllFilesPaused] = useState(false)
@@ -96,7 +96,7 @@ const FileDownloadsHeader = ({
         }
         checked={checked}
       />
-      {/* TODO EDD-26 todo this currently implementation of pause all does not allow us to leave the
+      {/* TODO EDD-26 TODO this currently implementation of pause all does not allow us to leave the
       fileDownloads page and then navigate back in to `fileDownloads` to resume all */}
       {
         !allFilesPaused
@@ -132,22 +132,22 @@ const FileDownloadsHeader = ({
         Downloading to
         {downloadLocation}
       </p>
-      {/* Todo EDD-26 Add Pause all button */}
-      {/* Todo EDD-26 Add Cancel all button */}
-      {/* Todo EDD-26 We need to recalculate progress here because we are not polling the downloads anymore
+      {/* TODO EDD-26 Add Pause all button */}
+      {/* TODO EDD-26 Add Cancel all button */}
+      {/* TODO EDD-26 We need to recalculate progress here because we are not polling the downloads anymore
       */}
     </div>
   )
 }
 
-// Todo `downloadReport` maybe should be required EDD-26
+// TODO `downloadReport` maybe should be required EDD-26
 FileDownloadsHeader.defaultProps = {
   downloadReport: {}
 }
 
 FileDownloadsHeader.propTypes = {
   checked: PropTypes.bool.isRequired,
-  // Todo EDD-26 this type need to be improved
+  // TODO EDD-26 this type need to be improved
   downloadReport: PropTypes.shape({
     id: PropTypes.string,
     downloadLocation: PropTypes.string

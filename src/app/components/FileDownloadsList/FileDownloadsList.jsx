@@ -137,6 +137,8 @@ const FileDownloadsList = ({
           const shouldShowBytes = receivedBytes !== 0 && state !== downloadStates.cancelled
         && state !== downloadStates.pending
 
+          const humanizedDownloadState = getHumanizedDownloadStates(state, percent)
+
           const actionsList = [
             [
               {
@@ -230,7 +232,7 @@ const FileDownloadsList = ({
                       )
                     }
                     {
-                      getHumanizedDownloadStates(state, percent) && (
+                      humanizedDownloadState && (
                         <div
                           className={styles.displayStatus}
                         >
@@ -251,7 +253,7 @@ const FileDownloadsList = ({
                               <FaCheckCircle className={styles.statusDescriptionIcon} />
                             )
                           }
-                          {getHumanizedDownloadStates(state, percent)}
+                          {humanizedDownloadState}
                         </div>
                       )
                     }

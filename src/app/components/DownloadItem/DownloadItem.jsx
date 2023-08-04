@@ -128,7 +128,6 @@ const DownloadItem = ({
               hideLabel
               onClick={
                 (event) => {
-                // Stop the parent div's click event from going off
                   event.stopPropagation()
                   action.callback()
                 }

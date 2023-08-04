@@ -18,11 +18,11 @@ describe('convertBytes with different sizes', () => {
 
   test('byte < 1024 sized files render correctly', async () => {
     const humanizedBytes = convertBytes(567)
-    expect(humanizedBytes).toEqual('567 bytes')
+    expect(humanizedBytes).toEqual('567 b')
   })
 
   test('null case return 0 bytes being processed', async () => {
     const humanizedBytes = convertBytes(null)
-    expect(humanizedBytes).toEqual('0 bytes')
+    expect(humanizedBytes).toEqual('0 b')
   })
 })

@@ -149,7 +149,7 @@
   flex-shrink: 1;
   align-items: center;
 
-  // TODO Revisit this method of adding the margin
+  // TODO EDD-44 Revisit this method of adding the margin
   & > div {
     margin-right: var(--size__200);
 

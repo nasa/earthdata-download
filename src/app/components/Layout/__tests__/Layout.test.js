@@ -58,7 +58,10 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
         isLinux: false,
         autoUpdateAvailable: jest.fn(),
         autoUpdateInstallLater: jest.fn(),
+        beginDownload: jest.fn(),
         autoUpdateProgress: jest.fn(),
+        initializeDownload: jest.fn(),
+        setDownloadLocation: jest.fn(),
         windowsLinuxTitleBar: jest.fn(),
         ...apiContextValue
       }
@@ -129,20 +132,6 @@ describe('Layout component', () => {
     await user.click(screen.getByText('Settings'))
 
     expect(Settings).toHaveBeenCalledTimes(1)
-  })
-
-  test('Settings dialog modal can be escaped using Radix close', async () => {
-    const user = userEvent.setup()
-
-    setup()
-
-    await user.click(screen.getByRole('button', { name: 'Settings' }))
-
-    expect(Settings).toHaveBeenCalledTimes(1)
-
-    const modalTitle = screen.getAllByText('Settings')[1]
-    expect(modalTitle).toBeInTheDocument()
-    expect(modalTitle).toHaveClass('title')
   })
 
   test('renders the settings button on a mac', () => {
@@ -238,6 +227,20 @@ describe('Layout component', () => {
     await user.click(screen.getByTestId('minimize-window'))
 
     expect(minimizeWindow).toHaveBeenCalledTimes(1)
+  })
+
+  test('settings dialog modal can be escaped using Radix close', async () => {
+    const user = userEvent.setup()
+
+    setup()
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }))
+
+    expect(Settings).toHaveBeenCalledTimes(1)
+
+    const modalTitle = screen.getAllByText('Settings')[1]
+    expect(modalTitle).toBeInTheDocument()
+    expect(modalTitle).toHaveClass('title')
   })
 
   describe('when toasts are not defined in the app context', () => {

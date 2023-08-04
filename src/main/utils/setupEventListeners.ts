@@ -15,16 +15,19 @@ import copyDownloadPath from '../eventHandlers/copyDownloadPath'
 import getPreferenceFieldValue from '../eventHandlers/getPreferenceFieldValue'
 import openDownloadFolder from '../eventHandlers/openDownloadFolder'
 import pauseDownloadItem from '../eventHandlers/pauseDownloadItem'
-import reportProgress from '../eventHandlers/reportProgress'
 import restartDownload from '../eventHandlers/restartDownload'
 import resumeDownloadItem from '../eventHandlers/resumeDownloadItem'
+import deleteDownload from '../eventHandlers/deleteDownload'
 import retryErroredDownloadItem from '../eventHandlers/retryErroredDownloadItem'
+import sendToEula from '../eventHandlers/sendToEula'
 import sendToLogin from '../eventHandlers/sendToLogin'
 import setPreferenceFieldValue from '../eventHandlers/setPreferenceFieldValue'
 import willDownload from '../eventHandlers/willDownload'
 
 import startPendingDownloads from '../utils/startPendingDownloads'
-import sendToEula from '../eventHandlers/sendToEula'
+
+import startReportingDownloads from './startReportingDownloads'
+import startReportingFiles from './startReportingFiles'
 
 /**
  * Sets up event listeners for the main process
@@ -45,6 +48,9 @@ const setupEventListeners = ({
   downloadsWaitingForEula,
   setUpdateAvailable
 }) => {
+  let reportInterval
+  const intervalTime = 1000
+
   /**
    * Browser Window event listeners
    */
@@ -121,19 +127,18 @@ const setupEventListeners = ({
    */
 
   // Set a preferences value
-  ipcMain.on('setPreferenceFieldValue', async (event, field, value) => {
+  ipcMain.on('setPreferenceFieldValue', async (event, info) => {
     await setPreferenceFieldValue({
       database,
-      field,
-      value
+      info
     })
   })
 
   // Get a preferences value
-  ipcMain.handle('getPreferenceFieldValue', async (event, field) => {
+  ipcMain.handle('getPreferenceFieldValue', async (event, info) => {
     const value = await getPreferenceFieldValue({
       database,
-      field
+      info
     })
 
     return value
@@ -215,6 +220,14 @@ const setupEventListeners = ({
     })
   })
 
+  // Remove a downloadItem
+  ipcMain.on('deleteDownload', async (event, info) => {
+    await deleteDownload({
+      database,
+      info
+    })
+  })
+
   // Retry and errored downloadItem
   ipcMain.on('retryErroredDownloadItem', async (event, info) => {
     await retryErroredDownloadItem({
@@ -226,17 +239,9 @@ const setupEventListeners = ({
     })
   })
 
-  // Set up an interval to report progress to the renderer process every 1s
-  const reportProgressInterval = setInterval(async () => {
-    await reportProgress({
-      database,
-      webContents: appWindow.webContents
-    })
-  }, 1000)
-
   // When the window is going to close, clear the reportProgressInterval
   appWindow.on('close', () => {
-    if (reportProgressInterval) clearInterval(reportProgressInterval)
+    if (reportInterval) clearInterval(reportInterval)
   })
 
   /**
@@ -261,7 +266,7 @@ const setupEventListeners = ({
     })
   })
 
-  // Called when an error occurrs with the autoUpdate
+  // Called when an error occurs with the autoUpdate
   autoUpdater.on('error', async (error) => {
     console.log(`Error in auto-updater. ${error}`)
     setUpdateAvailable(false)
@@ -324,12 +329,38 @@ const setupEventListeners = ({
     })
   })
 
+  ipcMain.on('startReportingFiles', async (event, info) => {
+    const { webContents } = appWindow
+    // Update report interval for the new progress report type
+    reportInterval = await startReportingFiles({
+      database,
+      webContents,
+      reportInterval,
+      intervalTime
+    }, {
+      info
+    })
+  })
+
+  ipcMain.on('startReportingDownloads', async () => {
+    const { webContents } = appWindow
+    // Update report interval for the new progress report type
+    reportInterval = await startReportingDownloads({
+      database,
+      webContents,
+      reportInterval,
+      intervalTime
+    })
+  })
+
   /**
    * Other listeners
    */
 
   // When the application finished loading, show the appWindow
   appWindow.webContents.once('did-finish-load', async () => {
+    const { webContents } = appWindow
+
     // Show the electron appWindow
     appWindow.show()
 
@@ -337,6 +368,14 @@ const setupEventListeners = ({
     if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })
 
     await autoUpdater.checkForUpdates()
+
+    // Start the downloads interval since `Downloads` page opens when app starts
+    reportInterval = await startReportingDownloads({
+      database,
+      webContents,
+      reportInterval,
+      intervalTime
+    })
 
     // Locally, start pending downloads unless `forceDevUpdateConfig` is enabled
     if (!app.isPackaged && !autoUpdater.forceDevUpdateConfig) {

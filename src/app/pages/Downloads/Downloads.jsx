@@ -9,15 +9,14 @@ import {
   FaCheckCircle,
   FaClipboard,
   FaDownload,
-  FaExclamationCircle,
   FaFolderOpen,
   FaInfoCircle,
   FaPause,
   FaPlay,
-  FaRedo,
   FaSearch,
   FaSignInAlt,
-  FaSpinner
+  FaSpinner,
+  FaRedo
 } from 'react-icons/fa'
 import classNames from 'classnames'
 
@@ -25,23 +24,23 @@ import downloadStates from '../../constants/downloadStates'
 import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
 import createVariantClassName from '../../utils/createVariantName'
-import pluralize from '../../utils/pluralize'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
-import InitializeDownload from '../../dialogs/InitializeDownload/InitializeDownload'
-import MoreErrorInfo from '../../dialogs/MoreErrorInfo/MoreErrorInfo'
 import Button from '../../components/Button/Button'
-import Dialog from '../../components/Dialog/Dialog'
 import ListPage from '../../components/ListPage/ListPage'
 import DownloadItem from '../../components/DownloadItem/DownloadItem'
 
 import useAppContext from '../../hooks/useAppContext'
 
-import * as styles from './Downloads.module.scss'
+import pluralize from '../../utils/pluralize'
 
+import * as styles from './Downloads.module.scss'
 /**
  * @typedef {Object} DownloadsProps
+ * @property {Boolean|Number} hasActiveDownload A boolean for whether there is an active download taking place.
  * @property {Function} setCurrentPage A function which sets the active page.
+ * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout
+ * @property {Function} setHasActiveDownload A function to set whether a download is active.
 
 /**
  * Renders a `Downloads` page.
@@ -51,12 +50,17 @@ import * as styles from './Downloads.module.scss'
  *
  * return (
  *   <Downloads
+ *     hasActiveDownload={hasActiveDownload}
  *     setCurrentPage={setCurrentPage}
+ *     showMoreInfoDialog={showMoreInfoDialog}
+ *     setHasActiveDownload={setHasActiveDownload}
  *   />
  * )
  */
 const Downloads = ({
   hasActiveDownload,
+  setCurrentPage,
+  showMoreInfoDialog,
   setHasActiveDownload
 }) => {
   const appContext = useAppContext()
@@ -65,27 +69,18 @@ const Downloads = ({
     deleteAllToastsById
   } = appContext
   const {
-    beginDownload,
     cancelDownloadItem,
     copyDownloadPath,
-    initializeDownload,
     openDownloadFolder,
     pauseDownloadItem,
-    reportProgress,
+    reportDownloadsProgress,
     restartDownload,
     resumeDownloadItem,
     retryErroredDownloadItem,
     sendToEula,
-    sendToLogin,
-    setDownloadLocation
+    sendToLogin
   } = useContext(ElectronApiContext)
 
-  const [downloadIds, setDownloadIds] = useState(null)
-  const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
-  const [useDefaultLocation, setUseDefaultLocation] = useState(false)
-  const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
-  const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
-  const [activeMoreInfoDownloadInfo, setActiveMoreInfoDownloadInfo] = useState({})
   const [runningDownloads, setRunningDownloads] = useState([])
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
@@ -97,39 +92,6 @@ const Downloads = ({
     derivedStateFromDownloads,
     setDerivedStateFromDownloads
   ] = useState(downloadStates.completed)
-
-  // When a new downloadLocation has been selected from the main process, update the state
-  const onSetDownloadLocation = (event, info) => {
-    const { downloadLocation: newDownloadLocation } = info
-    setSelectedDownloadLocation(newDownloadLocation)
-  }
-
-  // When a download needs to be initialized (show the starting modal, or start the download)
-  const onInitializeDownload = (event, info) => {
-    const {
-      downloadIds: newDownloadIds,
-      downloadLocation: newDownloadLocation,
-      shouldUseDefaultLocation
-    } = info
-
-    setDownloadIds(newDownloadIds)
-    setSelectedDownloadLocation(newDownloadLocation)
-    setUseDefaultLocation(shouldUseDefaultLocation)
-
-    // If shouldUseDefaultLocation is true, start the download(s)
-    if (shouldUseDefaultLocation) {
-      // TODO this is calling beginDownload twice
-      beginDownload({
-        downloadIds: newDownloadIds,
-        downloadLocation: newDownloadLocation,
-        makeDefaultDownloadLocation: true
-      })
-    }
-  }
-
-  const onCloseChooseLocationDialog = () => {
-    setChooseDownloadLocationIsOpen(false)
-  }
 
   const onPauseDownloadItem = (downloadId) => {
     pauseDownloadItem({ downloadId })
@@ -157,38 +119,20 @@ const Downloads = ({
     resumeDownloadItem({ downloadId })
   }
 
-  const onReportProgress = (event, info) => {
+  const onReportDownloadsProgress = (event, info) => {
     const { progressReport } = info
 
     setRunningDownloads(progressReport)
   }
 
-  const showMoreInfoDialog = (downloadId, numberErrors) => {
-    setActiveMoreInfoDownloadInfo({
-      downloadId,
-      numberErrors
-    })
-
-    setMoreErrorInfoIsOpen(true)
-  }
-
   // Setup event listeners
   useEffect(() => {
-    setDownloadLocation(true, onSetDownloadLocation)
-    initializeDownload(true, onInitializeDownload)
-    reportProgress(true, onReportProgress)
+    reportDownloadsProgress(true, onReportDownloadsProgress)
 
     return () => {
-      setDownloadLocation(false, onSetDownloadLocation)
-      initializeDownload(false, onInitializeDownload)
-      reportProgress(false, onReportProgress)
+      reportDownloadsProgress(false, onReportDownloadsProgress)
     }
   }, [])
-
-  // Open the modal when there is no default location set and a download id exists
-  useEffect(() => {
-    if (!useDefaultLocation && downloadIds) setChooseDownloadLocationIsOpen(true)
-  }, [useDefaultLocation, downloadIds])
 
   useEffect(() => {
     // TODO Consider improving how we are determining these states. For downloads with
@@ -244,6 +188,8 @@ const Downloads = ({
     }
   }, [runningDownloads])
 
+  const erroredDownloadIds = []
+
   useEffect(() => {
     // Create the downloadItems array from the runningDownloads reported from the main process
     const items = runningDownloads.map((runningDownload) => {
@@ -285,6 +231,7 @@ const Downloads = ({
       // Add errors
       if (state !== downloadStates.cancelled && errors) {
         const numberErrors = errors.length
+        erroredDownloadIds.push(downloadId)
 
         addToast({
           id: downloadId,
@@ -326,8 +273,6 @@ const Downloads = ({
             callback: () => sendToLogin({
               downloadId: downloadName,
               forceLogin: true
-              // TODO EDD-13, might want to be able to send a fileId as well
-              // fileId
             }),
             icon: FaSignInAlt
           },
@@ -338,8 +283,6 @@ const Downloads = ({
             callback: () => sendToEula({
               downloadId: downloadName,
               forceLogin: true
-              // TODO EDD-13, might want to be able to send a fileId as well
-              // fileId
             }),
             icon: FaSignInAlt
           },
@@ -396,13 +339,14 @@ const Downloads = ({
 
       return (
         <DownloadItem
-          key={downloadId}
+          actionsList={actionsList}
           downloadName={downloadName}
           hasErrors={errors && errors.length > 0}
+          key={downloadId}
           loadingMoreFiles={loadingMoreFiles}
           progress={progress}
+          setCurrentPage={setCurrentPage}
           state={state}
-          actionsList={actionsList}
         />
       )
     })
@@ -410,56 +354,23 @@ const Downloads = ({
     setDownloadItems(items)
   }, [runningDownloads])
 
-  const {
-    downloadId: moreInfoDownloadId,
-    numberErrors
-  } = activeMoreInfoDownloadInfo
-
   return (
-    <>
-      <Dialog
-        open={chooseDownloadLocationIsOpen}
-        setOpen={setChooseDownloadLocationIsOpen}
-        showTitle
-        title="Choose a download location"
-        TitleIcon={FaDownload}
-      >
-        <InitializeDownload
-          downloadIds={downloadIds}
-          downloadLocation={selectedDownloadLocation}
-          setDownloadIds={setDownloadIds}
-          onCloseChooseLocationDialog={onCloseChooseLocationDialog}
-        />
-      </Dialog>
-      <Dialog
-        open={moreErrorInfoIsOpen}
-        setOpen={setMoreErrorInfoIsOpen}
-        showTitle
-        title="Errors occurred while downloading files"
-        TitleIcon={FaExclamationCircle}
-      >
-        <MoreErrorInfo
-          downloadId={moreInfoDownloadId}
-          numberErrors={numberErrors}
-          onCloseMoreErrorInfoDialog={setMoreErrorInfoIsOpen}
-        />
-      </Dialog>
-      <ListPage
-        actions={
-          (
-            <>
-              <Button
-                className={styles.emptyActionButton}
-                size="lg"
-                Icon={FaSearch}
-                href="https://search.earthdata.nasa.gov/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Find data in Earthdata Search
-              </Button>
-              {/* Hiding nav buttons until EDD-18 */}
-              {/* <Button
+    <ListPage
+      actions={
+        (
+          <>
+            <Button
+              className={styles.emptyActionButton}
+              size="lg"
+              Icon={FaSearch}
+              href="https://search.earthdata.nasa.gov/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Find data in Earthdata Search
+            </Button>
+            {/* Hiding nav buttons until EDD-18 */}
+            {/* <Button
               className={styles.button}
               size="lg"
               Icon={FaHistory}
@@ -467,103 +378,91 @@ const Downloads = ({
             >
               View Download History
             </Button> */}
-            </>
-          )
-        }
-        emptyMessage="No downloads in progress"
-        header={
-          !!runningDownloads.length && (
-            <div
-              className={
-                classNames([
-                  styles.listHeader,
-                  styles[createVariantClassName(derivedStateFromDownloads)]
-                ])
+          </>
+        )
+      }
+      emptyMessage="No downloads in progress"
+      header={
+        !!runningDownloads.length && (
+          <div
+            className={
+              classNames([
+                styles.listHeader,
+                styles[createVariantClassName(derivedStateFromDownloads)]
+              ])
+            }
+          >
+            <div className={styles.listHeaderPrimary}>
+              {
+                derivedStateFromDownloads === downloadStates.active && (
+                  <FaSpinner className={styles.derivedStatusIcon} />
+                )
               }
-            >
-              <div className={styles.listHeaderPrimary}>
+              {
+                derivedStateFromDownloads === downloadStates.paused && (
+                  <FaPause className={styles.derivedStatusIcon} />
+                )
+              }
+              {
+                derivedStateFromDownloads === downloadStates.completed && (
+                  <FaCheckCircle className={styles.derivedStatusIcon} />
+                )
+              }
+              <span className={styles.derivedStatus}>
                 {
                   derivedStateFromDownloads === downloadStates.active && (
-                    <FaSpinner className={styles.derivedStatusIcon} />
+                    getHumanizedDownloadStates(downloadStates.active)
                   )
                 }
                 {
                   derivedStateFromDownloads === downloadStates.paused && (
-                    <FaPause className={styles.derivedStatusIcon} />
+                    getHumanizedDownloadStates(downloadStates.paused)
                   )
                 }
                 {
                   derivedStateFromDownloads === downloadStates.completed && (
-                    <FaCheckCircle className={styles.derivedStatusIcon} />
+                    getHumanizedDownloadStates(downloadStates.completed)
                   )
                 }
-                <span className={styles.derivedStatus}>
-                  {
-                    derivedStateFromDownloads === downloadStates.active && (
-                      getHumanizedDownloadStates(downloadStates.active)
-                    )
-                  }
-                  {
-                    derivedStateFromDownloads === downloadStates.paused && (
-                      getHumanizedDownloadStates(downloadStates.paused)
-                    )
-                  }
-                  {
-                    derivedStateFromDownloads === downloadStates.completed && (
-                      getHumanizedDownloadStates(downloadStates.completed)
-                    )
-                  }
-                </span>
-                <span className={styles.humanizedStatus}>
-                  {totalCompletedFiles}
-                  {' '}
-                  of
-                  {' '}
-                  {totalDownloadFiles}
-                  {' '}
-                  files done
-                </span>
-              </div>
-              <div className={styles.listHeaderSecondary}>
-                {
-                  !allDownloadsCompleted
-                    ? (
-                      <>
-                        {
-                          !allDownloadsPaused
-                            ? (
-                              <Button
-                                className={styles.headerButton}
-                                size="sm"
-                                Icon={FaPause}
-                                onClick={() => onPauseDownloadItem()}
-                              >
-                                Pause All
-                              </Button>
-                            )
-                            : (
-                              <Button
-                                className={styles.headerButton}
-                                size="sm"
-                                Icon={FaPlay}
-                                onClick={() => onResumeDownloadItem()}
-                              >
-                                Resume All
-                              </Button>
-                            )
-                        }
-                        <Button
-                          className={styles.headerButton}
-                          size="sm"
-                          Icon={FaBan}
-                          variant="danger"
-                          onClick={() => onCancelDownloadItem()}
-                        >
-                          Cancel All
-                        </Button>
-                      </>
-                    )
-                    : (
+              </span>
+              <span className={styles.humanizedStatus}>
+                {totalCompletedFiles}
+                {' '}
+                of
+                {' '}
+                {totalDownloadFiles}
+                {' '}
+                files done
+              </span>
+            </div>
+            <div className={styles.listHeaderSecondary}>
+              {
+                !allDownloadsCompleted
+                  ? (
+                    <>
+                      {
+                        !allDownloadsPaused
+                          ? (
+                            <Button
+                              className={styles.headerButton}
+                              size="sm"
+                              Icon={FaPause}
+                              onClick={() => onPauseDownloadItem()}
+                            >
+                              Pause All
+                            </Button>
+                          )
+                          : (
+                            <Button
+                              className={styles.headerButton}
+                              size="sm"
+                              Icon={FaPlay}
+                              onClick={() => onResumeDownloadItem()}
+                            >
+                              Resume All
+                            </Button>
+                          )
+                      }
                       <Button
                         className={styles.headerButton}
                         size="sm"
@@ -571,18 +470,29 @@ const Downloads = ({
                         variant="danger"
                         onClick={() => onCancelDownloadItem()}
                       >
-                        Clear Downloads
+                        Cancel All
                       </Button>
-                    )
-                }
-              </div>
+                    </>
+                  )
+                  : (
+                    <Button
+                      className={styles.headerButton}
+                      size="sm"
+                      Icon={FaBan}
+                      variant="danger"
+                      onClick={() => onCancelDownloadItem()}
+                    >
+                      Clear Downloads
+                    </Button>
+                  )
+              }
             </div>
-          )
-        }
-        Icon={FaDownload}
-        items={downloadItems}
-      />
-    </>
+          </div>
+        )
+      }
+      Icon={FaDownload}
+      items={downloadItems}
+    />
   )
 }
 
@@ -591,7 +501,9 @@ Downloads.propTypes = {
     PropTypes.bool,
     PropTypes.number
   ]).isRequired,
-  setHasActiveDownload: PropTypes.func.isRequired
+  setCurrentPage: PropTypes.func.isRequired,
+  setHasActiveDownload: PropTypes.func.isRequired,
+  showMoreInfoDialog: PropTypes.func.isRequired
 }
 
 export default Downloads

@@ -12,8 +12,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   deleteCookies: () => ipcRenderer.send('deleteCookies'),
   sendToEula: (data) => ipcRenderer.send('sendToEula', data),
   sendToLogin: (data) => ipcRenderer.send('sendToLogin', data),
-  setPreferenceFieldValue: (field, value) => ipcRenderer.send('setPreferenceFieldValue', field, value),
-  getPreferenceFieldValue: (field) => ipcRenderer.invoke('getPreferenceFieldValue', field),
+  setPreferenceFieldValue: (data) => ipcRenderer.send('setPreferenceFieldValue', data),
+  getPreferenceFieldValue: (data) => ipcRenderer.invoke('getPreferenceFieldValue', data),
 
   autoUpdateInstallLater: () => ipcRenderer.send('autoUpdateInstallLater'),
   cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
@@ -26,17 +26,25 @@ contextBridge.exposeInMainWorld('electronApi', {
   pauseDownloadItem: (data) => ipcRenderer.send('pauseDownloadItem', data),
   restartDownload: (data) => ipcRenderer.send('restartDownload', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),
+  deleteDownload: (data) => ipcRenderer.send('deleteDownload', data),
   retryErroredDownloadItem: (data) => ipcRenderer.send('retryErroredDownloadItem', data),
 
   // Messages to be received by the renderer process
   autoUpdateAvailable: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('autoUpdateAvailable', callback),
   autoUpdateProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('autoUpdateProgress', callback),
   initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('initializeDownload', callback),
-  reportProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('reportProgress', callback),
   setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('setDownloadLocation', callback),
   showWaitingForEulaDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForEulaDialog', callback),
   showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForLoginDialog', callback),
   windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('windowsLinuxTitleBar', callback),
+
+  // Messages polled at intervals
+  reportDownloadsProgress: (on, callback) => ipcRenderer[on ? 'on' : 'off']('reportDownloadsProgress', callback),
+  reportFilesProgress: (on, callback) => ipcRenderer[on ? 'on' : 'off']('reportFilesProgress', callback),
+
+  // Start functions to report files and downloads and kickoff interval polling
+  startReportingFiles: (data) => ipcRenderer.send('startReportingFiles', data),
+  startReportingDownloads: () => ipcRenderer.send('startReportingDownloads'),
 
   // System values for renderer
   isMac: process.platform === 'darwin',

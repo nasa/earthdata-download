@@ -8,19 +8,19 @@ import InitializeDownload from '../InitializeDownload'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 
 const setup = () => {
-  const setDownloadIds = jest.fn()
-  const cancelDownloadItem = jest.fn()
-  const chooseDownloadLocation = jest.fn()
   const beginDownload = jest.fn()
+  const chooseDownloadLocation = jest.fn()
   const onCloseChooseLocationDialog = jest.fn()
+  const deleteDownload = jest.fn()
+  const setDownloadIds = jest.fn()
 
   render(
     <ElectronApiContext.Provider
       value={
         {
           beginDownload,
-          cancelDownloadItem,
-          chooseDownloadLocation
+          chooseDownloadLocation,
+          deleteDownload
         }
       }
     >
@@ -35,8 +35,8 @@ const setup = () => {
 
   return {
     beginDownload,
-    cancelDownloadItem,
-    chooseDownloadLocation
+    chooseDownloadLocation,
+    deleteDownload
   }
 }
 
@@ -91,12 +91,12 @@ describe('InitializeDownload component', () => {
   test('clicking the cancel button sends a message to the main process', async () => {
     const user = userEvent.setup()
 
-    const { cancelDownloadItem } = setup()
+    const { deleteDownload } = setup()
 
     await user.click(screen.getByTestId('initialize-download-cancel-download'))
 
-    expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
-    expect(cancelDownloadItem).toHaveBeenCalledWith({
+    expect(deleteDownload).toHaveBeenCalledTimes(1)
+    expect(deleteDownload).toHaveBeenCalledWith({
       downloadId: 'mock-id'
     })
   })

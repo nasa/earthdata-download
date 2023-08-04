@@ -108,10 +108,20 @@ class EddDatabase {
   /**
    * Updates downloads that match the whereIn criteria.
    * @param {Object} whereIn Knex `whereIn` object to select downloads to be updated.
-   * @param {Object} data data The data of the download to be updated.
+   * @param {Object} data The data of the download to be updated.
    */
   async updateDownloadsWhereIn(whereIn, data) {
     return this.db('downloads').update(data).whereIn(...whereIn)
+  }
+
+  /**
+   * Updates downloads that match the where and the whereNot criteria.
+   * @param {Object} whereIn Knex `whereIn` object to select downloads to be updated.
+   * @param {Object} whereNot Knex `whereNot` object to select downloads which properties they should not have
+   * @param {Object} data The data of the download to be updated.
+   */
+  async updateFilesWhereAndWhereNot(where, whereNot, data) {
+    return this.db('files').update(data).where(where).whereNot(whereNot)
   }
 
   /**

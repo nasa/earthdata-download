@@ -1,16 +1,16 @@
 // @ts-nocheck
 
 /**
- * gets the concurrency download from the user preferences
+ * Gets the specific value for a provided field in preferences table
  * @param {Object} params
  * @param {Object} params.database `EddDatabase` instance
- * @param {String} params.field Name of the preferences field
+ * @param {String} params.info `info` parameter from ipc message
  */
 const getPreferenceFieldValue = async ({
   database,
-  field
+  info
 }) => {
-  const preferenceFieldValue = await database.getPreferencesByField(field)
+  const preferenceFieldValue = await database.getPreferencesByField(info)
 
   return preferenceFieldValue
 }

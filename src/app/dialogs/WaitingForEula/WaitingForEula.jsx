@@ -52,8 +52,6 @@ const WaitingForEula = ({
             () => sendToEula({
               downloadId,
               forceLogin: true
-            // TODO EDD-13, might want to be able to send a fileId as well
-            // fileId
             })
           }
           dataTestId="waiting-for-eula-accept-eula"

@@ -22,12 +22,21 @@
   margin: var(--size__250);
   margin-bottom: var(--size__200);
   background-color: var(--color__white);
+  cursor: pointer;
   text-align: left;
   transition: all 200ms cubic-bezier(0.65, 0, 0.35, 1);
 
   &:hover,
   &:focus-visible  {
     background-color: var(--color__black--050);
+  }
+
+  .isStarting & {
+    cursor: default;
+  }
+
+  .isPending & {
+    cursor: default;
   }
 
   .isCompleted & {
@@ -140,7 +149,7 @@
   flex-shrink: 1;
   align-items: center;
 
-  // TODO Revisit this method of adding the margin
+  // TODO EDD-44 Revisit this method of adding the margin
   & > div {
     margin-right: var(--size__200);
 

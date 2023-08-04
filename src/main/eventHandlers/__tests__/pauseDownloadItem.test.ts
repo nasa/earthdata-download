@@ -1,4 +1,5 @@
 import pauseDownloadItem from '../pauseDownloadItem'
+import downloadStates from '../../../app/constants/downloadStates'
 
 describe('pauseDownloadItem', () => {
   describe('when downloadId and name are provided', () => {
@@ -8,11 +9,12 @@ describe('pauseDownloadItem', () => {
       }
       const info = {
         downloadId: 'mock-download-id',
-        name: 'mock-filename.png'
+        filename: 'mock-filename.png'
       }
       const database = {
         updateDownloadById: jest.fn(),
-        updateDownloadsWhereIn: jest.fn()
+        updateDownloadsWhereIn: jest.fn(),
+        updateFilesWhere: jest.fn()
       }
 
       await pauseDownloadItem({
@@ -23,6 +25,13 @@ describe('pauseDownloadItem', () => {
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
+
+      // Pause specific files on the `files` table
+      expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
+      expect(database.updateFilesWhere).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id',
+        filename: 'mock-filename.png'
+      }, { state: downloadStates.paused })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(0)
@@ -84,9 +93,9 @@ describe('pauseDownloadItem', () => {
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledWith(
         [
           'state',
-          ['ACTIVE', 'PENDING']
+          [downloadStates.active, downloadStates.pending]
         ],
-        { state: 'PAUSED' }
+        { state: downloadStates.paused }
       )
     })
   })

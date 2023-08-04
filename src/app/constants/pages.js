@@ -4,5 +4,6 @@
 export const PAGES = {
   downloads: 'DOWNLOADS',
   downloadHistory: 'DOWNLOAD_HISTORY',
-  settings: 'SETTINGS'
+  settings: 'SETTINGS',
+  fileDownloads: 'FILE_DOWNLOADS'
 }

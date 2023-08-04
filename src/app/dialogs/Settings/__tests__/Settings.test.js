@@ -123,7 +123,10 @@ describe('Settings dialog', () => {
     await waitFor(() => {
       screen.getByText('Choose download location')
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
-      expect(setPreferenceFieldValue).toHaveBeenCalledWith('defaultDownloadLocation', null)
+      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+        field: 'defaultDownloadLocation',
+        value: null
+      })
     })
   })
 
@@ -142,7 +145,10 @@ describe('Settings dialog', () => {
     await waitFor(() => {
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
       // Ensure that the string argument to being converted to a numerical
-      expect(setPreferenceFieldValue).toHaveBeenCalledWith('concurrentDownloads', 3)
+      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+        field: 'concurrentDownloads',
+        value: 3
+      })
     })
   })
 
@@ -223,7 +229,10 @@ describe('Settings dialog', () => {
 
     await waitFor(() => {
       expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
-      expect(setPreferenceFieldValue).toHaveBeenCalledWith('concurrentDownloads', 6)
+      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+        field: 'concurrentDownloads',
+        value: 6
+      })
     })
   })
 })

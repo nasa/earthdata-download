@@ -4,7 +4,11 @@ import React, {
   useState
 } from 'react'
 import classNames from 'classnames'
-import { FaCog } from 'react-icons/fa'
+import {
+  FaCog,
+  FaDownload,
+  FaExclamationCircle
+} from 'react-icons/fa'
 import {
   VscChromeRestore,
   VscChromeMaximize,
@@ -16,8 +20,11 @@ import Button from '../Button/Button'
 import Dialog from '../Dialog/Dialog'
 import DownloadHistory from '../../pages/DownloadHistory/DownloadHistory'
 import Downloads from '../../pages/Downloads/Downloads'
+import FileDownloads from '../../pages/FileDownloads/FileDownloads'
 import Settings from '../../dialogs/Settings/Settings'
 import ToastList from '../ToastList/ToastList'
+import InitializeDownload from '../../dialogs/InitializeDownload/InitializeDownload'
+import MoreErrorInfo from '../../dialogs/MoreErrorInfo/MoreErrorInfo'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
@@ -43,12 +50,15 @@ const Layout = () => {
     autoUpdateAvailable,
     autoUpdateInstallLater,
     autoUpdateProgress,
+    beginDownload,
+    initializeDownload,
     closeWindow,
     minimizeWindow,
     maximizeWindow,
     isMac,
     isWin,
     isLinux,
+    setDownloadLocation,
     windowsLinuxTitleBar
   } = useContext(ElectronApiContext)
 
@@ -60,15 +70,29 @@ const Layout = () => {
   } = appContext
   const { activeToasts = {} } = toasts
 
+  const [activeMoreInfoDownloadInfo, setActiveMoreInfoDownloadInfo] = useState({})
   const [currentPage, setCurrentPage] = useState(PAGES.downloads)
+  const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
+  const [downloadIds, setDownloadIds] = useState(null)
+  const [hasActiveDownload, setHasActiveDownload] = useState(false)
   const [isWindowMaximized, setIsWindowMaximized] = useState(false)
+  const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
+  const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
+  const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
+  const [useDefaultLocation, setUseDefaultLocation] = useState(false)
+
+  const showMoreInfoDialog = (downloadId, numberErrors) => {
+    setActiveMoreInfoDownloadInfo({
+      downloadId,
+      numberErrors
+    })
+
+    setMoreErrorInfoIsOpen(true)
+  }
 
   const onWindowMaximized = (event, windowMaximized) => {
     setIsWindowMaximized(windowMaximized)
   }
-
-  const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
-  const [hasActiveDownload, setHasActiveDownload] = useState(false)
 
   const onDismissToast = (id) => {
     if (id === updateAvailableToastId) {
@@ -87,6 +111,10 @@ const Layout = () => {
       numberErrors: 0,
       variant: 'spinner'
     })
+  }
+
+  const onCloseChooseLocationDialog = () => {
+    setChooseDownloadLocationIsOpen(false)
   }
 
   // Update the toast with the status as the download progresses
@@ -115,6 +143,33 @@ const Layout = () => {
     }
   }
 
+  const onInitializeDownload = (event, info) => {
+    const {
+      downloadIds: newDownloadIds,
+      downloadLocation: newDownloadLocation,
+      shouldUseDefaultLocation
+    } = info
+
+    setDownloadIds(newDownloadIds)
+    setSelectedDownloadLocation(newDownloadLocation)
+    setUseDefaultLocation(shouldUseDefaultLocation)
+
+    // If shouldUseDefaultLocation is true, start the download(s)
+    if (shouldUseDefaultLocation) {
+      beginDownload({
+        downloadIds: newDownloadIds,
+        downloadLocation: newDownloadLocation,
+        makeDefaultDownloadLocation: true
+      })
+    }
+  }
+
+  // When a new downloadLocation has been selected from the main process, update the state
+  const onSetDownloadLocation = (event, info) => {
+    const { downloadLocation: newDownloadLocation } = info
+    setSelectedDownloadLocation(newDownloadLocation)
+  }
+
   let pageComponent
 
   switch (currentPage) {
@@ -124,6 +179,7 @@ const Layout = () => {
           setCurrentPage={setCurrentPage}
           hasActiveDownload={hasActiveDownload}
           setHasActiveDownload={setHasActiveDownload}
+          showMoreInfoDialog={showMoreInfoDialog}
         />
       )
 
@@ -134,21 +190,42 @@ const Layout = () => {
       )
 
       break
+    case PAGES.fileDownloads:
+      pageComponent = (
+        <FileDownloads setCurrentPage={setCurrentPage} />
+      )
+
+      break
     default:
       break
   }
 
   useEffect(() => {
+    if (!useDefaultLocation && downloadIds) {
+      setChooseDownloadLocationIsOpen(true)
+    }
+  }, [useDefaultLocation, downloadIds])
+
+  useEffect(() => {
     windowsLinuxTitleBar(true, onWindowMaximized)
     autoUpdateAvailable(true, onAutoUpdateAvailable)
     autoUpdateProgress(true, onAutoUpdateProgress)
+    setDownloadLocation(true, onSetDownloadLocation)
+    initializeDownload(true, onInitializeDownload)
 
     return () => {
       windowsLinuxTitleBar(false, onWindowMaximized)
       autoUpdateAvailable(false, onAutoUpdateAvailable)
       autoUpdateProgress(false, onAutoUpdateProgress)
+      setDownloadLocation(false, onSetDownloadLocation)
+      initializeDownload(false, onInitializeDownload)
     }
   }, [])
+
+  const {
+    downloadId: moreInfoDownloadId,
+    numberErrors
+  } = activeMoreInfoDownloadInfo
 
   return (
     <div className={styles.wrapper}>
@@ -308,6 +385,36 @@ const Layout = () => {
           <Settings
             hasActiveDownloads={hasActiveDownload}
             settingsDialogIsOpen={settingsDialogIsOpen}
+          />
+        </Dialog>
+        <Dialog
+          open={chooseDownloadLocationIsOpen}
+          setOpen={setChooseDownloadLocationIsOpen}
+          showTitle
+          title="Choose a download location"
+          TitleIcon={FaDownload}
+          onEscapeKeyDown={(event) => event.preventDefault()}
+          onPointerDownOutside={(event) => event.preventDefault()}
+          onInteractOutside={(event) => event.preventDefault()}
+        >
+          <InitializeDownload
+            downloadIds={downloadIds}
+            downloadLocation={selectedDownloadLocation}
+            setDownloadIds={setDownloadIds}
+            onCloseChooseLocationDialog={onCloseChooseLocationDialog}
+          />
+        </Dialog>
+        <Dialog
+          open={moreErrorInfoIsOpen}
+          setOpen={setMoreErrorInfoIsOpen}
+          showTitle
+          title="Errors occurred while downloading files"
+          TitleIcon={FaExclamationCircle}
+        >
+          <MoreErrorInfo
+            downloadId={moreInfoDownloadId}
+            numberErrors={numberErrors}
+            onCloseMoreErrorInfoDialog={setMoreErrorInfoIsOpen}
           />
         </Dialog>
       </main>

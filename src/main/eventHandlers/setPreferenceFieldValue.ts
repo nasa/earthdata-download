@@ -1,16 +1,16 @@
 // @ts-nocheck
 
 /**
- * Clears the default download from the user preferences
+ * Set the preference field to a specific value
  * @param {Object} params
- * @param {Object} params.database `EddDatabase` instance
- * @param {Object} params.field user defined concurrent downloads
+ * @param {Object} params.database `EddDatabase` instance.
+ * @param {Object} params.info `info` parameter from ipc message
  */
 const setPreferenceFieldValue = async ({
   database,
-  field,
-  value
+  info
 }) => {
+  const { field, value } = info
   database.setPreferences({
     [field]: value
   })

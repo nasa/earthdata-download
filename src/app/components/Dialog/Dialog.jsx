@@ -14,6 +14,9 @@ import Button from '../Button/Button'
  * @property {Boolean} [closeButton] An optional boolean flag which triggers the display of the close button.
  * @property {String} [description] An optional string to be used as the description for the dialog window.
  * @property {Boolean} open A boolean flag that determines the visibility of the dialog.
+ * @property {Function} [onEscapeKeyDown] An optional event handler called when the escape key is down.
+ * @property {Function} [onPointerDownOutside] An optional event handler called when a pointer event occurs outside the bounds of the component
+ * @property {Function} [onInteractOutside] An optional event handler called when an interaction (pointer or focus event) happens outside the bounds of the component.
  * @property {Function} setOpen A function to set the open prop when the modal is closed.
  * @property {Boolean} [showTitle] An optional boolean flag that determines the visibility of the dialog title.
  * @property {String} [size] An optional string designating a size (ex: "lg").
@@ -45,6 +48,9 @@ const Dialog = ({
   children,
   closeButton,
   description,
+  onEscapeKeyDown,
+  onInteractOutside,
+  onPointerDownOutside,
   open,
   setOpen,
   showTitle,
@@ -67,11 +73,20 @@ const Dialog = ({
   ])
 
   return (
-    <RadixDialog.Root open={open} onOpenChange={setOpen}>
+    <RadixDialog.Root
+      open={open}
+      onOpenChange={setOpen}
+      onClose
+    >
       <RadixDialog.Portal>
         <RadixDialog.Overlay className={styles.overlay} />
         <div className={styles.contentWrapper}>
-          <RadixDialog.Content className={contentClassNames}>
+          <RadixDialog.Content
+            className={contentClassNames}
+            onEscapeKeyDown={onEscapeKeyDown}
+            onPointerDownOutside={onPointerDownOutside}
+            onInteractOutside={onInteractOutside}
+          >
             <header className={headerClassNames}>
               {
                 showTitle
@@ -122,11 +137,10 @@ Dialog.defaultProps = {
   children: null,
   closeButton: false,
   description: null,
+  onEscapeKeyDown: null,
+  onPointerDownOutside: null,
+  onInteractOutside: null,
   open: false,
-  primaryAction: {
-    className: null,
-    title: null
-  },
   setOpen: null,
   showTitle: false,
   size: null,
@@ -138,11 +152,10 @@ Dialog.propTypes = {
   children: PropTypes.node,
   closeButton: PropTypes.bool,
   description: PropTypes.string,
+  onEscapeKeyDown: PropTypes.func,
+  onInteractOutside: PropTypes.func,
+  onPointerDownOutside: PropTypes.func,
   open: PropTypes.bool,
-  primaryAction: PropTypes.shape({
-    className: PropTypes.string,
-    title: PropTypes.string
-  }),
   setOpen: PropTypes.func,
   showTitle: PropTypes.bool,
   size: PropTypes.string,

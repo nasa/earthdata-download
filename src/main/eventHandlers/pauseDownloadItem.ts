@@ -14,11 +14,20 @@ const pauseDownloadItem = async ({
   database,
   info
 }) => {
-  const { downloadId, name } = info
+  const { downloadId, filename } = info
 
-  currentDownloadItems.pauseItem(downloadId, name)
+  currentDownloadItems.pauseItem(downloadId, filename)
 
-  if (downloadId && !name) {
+  if (downloadId && filename) {
+    await database.updateFilesWhere({
+      downloadId,
+      filename
+    }, {
+      state: downloadStates.paused
+    })
+  }
+
+  if (downloadId && !filename) {
     await database.updateDownloadById(downloadId, {
       state: downloadStates.paused
     })

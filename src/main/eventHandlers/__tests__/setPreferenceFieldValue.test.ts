@@ -7,11 +7,13 @@ describe('set a field in the preferences', () => {
     const database = {
       setPreferences: jest.fn()
     }
-
-    await setPreferenceFieldValue({
-      database,
+    const info = {
       field: 'concurrentDownloads',
       value: '2'
+    }
+    await setPreferenceFieldValue({
+      database,
+      info
     })
 
     expect(database.setPreferences).toHaveBeenCalledTimes(1)

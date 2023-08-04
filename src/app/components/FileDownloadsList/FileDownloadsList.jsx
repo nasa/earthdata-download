@@ -82,14 +82,6 @@ const FileDownloadsList = ({
 
   const isNotCompleted = (downloadFile) => downloadFile.state !== downloadStates.completed
 
-  const getHumanizedRemainingTime = (remainingTime) => {
-    if (remainingTime) {
-      return humanizeDuration(remainingTime * 1000)
-    }
-
-    return ''
-  }
-
   let filteredFiles = fileDownloadsProgressReport
 
   if (hideCompleted) filteredFiles = fileDownloadsProgressReport.filter(isNotCompleted)
@@ -176,12 +168,13 @@ const FileDownloadsList = ({
           ]
 
           // Render the actionsList
-          const primaryActions = []
+          let primaryActions = []
 
           if (actionsList) {
             actionsList.forEach((actionGroup) => {
               actionGroup.forEach((action) => {
-                primaryActions.push(
+                primaryActions = [
+                  ...primaryActions,
                   (action.isActive && action.isPrimary) && (
                     <Button
                       className={styles.action}
@@ -196,7 +189,7 @@ const FileDownloadsList = ({
                       {action.label}
                     </Button>
                   )
-                )
+                ]
               })
             })
           }
@@ -271,7 +264,7 @@ const FileDownloadsList = ({
                                 shouldShowTime && (
                                   <>
                                     {' '}
-                                    {getHumanizedRemainingTime(remainingTime)}
+                                    {remainingTime ? humanizeDuration(remainingTime * 1000) : ''}
                                     {' '}
                                     remaining
                                     {' '}

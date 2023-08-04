@@ -113,12 +113,13 @@ const DownloadItem = ({
     totalTime
   } = progress
 
-  const primaryActions = []
+  let primaryActions = []
 
   if (actionsList) {
     actionsList.forEach((actionGroup) => {
       actionGroup.forEach((action) => {
-        primaryActions.push(
+        primaryActions = [
+          ...primaryActions,
           (action.isActive && action.isPrimary) && (
             <Button
               className={styles.action}
@@ -139,7 +140,7 @@ const DownloadItem = ({
               {action.label}
             </Button>
           )
-        )
+        ]
       })
     })
   }

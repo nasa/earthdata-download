@@ -26,35 +26,7 @@ const restartDownload = async ({
 
   currentDownloadItems.cancelItem(downloadId, filename)
 
-  if (downloadId && filename) {
-    // Restart a specific file
-    await database.updateFilesWhere({
-      downloadId,
-      filename
-    }, {
-      state: downloadStates.pending,
-      percent: 0,
-      timeStart: null,
-      timeEnd: null,
-      errors: null,
-      receivedBytes: null,
-      totalBytes: null
-    })
-
-    await startNextDownload({
-      currentDownloadItems,
-      database,
-      downloadIdContext,
-      webContents
-    })
-
-    return
-  }
-
-  // Set the files to pending
-  await database.updateFilesWhere({
-    downloadId
-  }, {
+  const resetFileValues = {
     state: downloadStates.pending,
     percent: 0,
     timeStart: null,
@@ -62,15 +34,36 @@ const restartDownload = async ({
     errors: null,
     receivedBytes: null,
     totalBytes: null
-  })
+  }
 
-  // Set the download to active
-  await database.updateDownloadById(downloadId, {
-    state: downloadStates.active,
-    timeStart: new Date().getTime(),
-    timeEnd: null,
-    errors: null
-  })
+  if (downloadId && filename) {
+    await database.updateFilesWhere({
+      downloadId,
+      filename
+    }, resetFileValues)
+
+    // Set the download to active
+    await database.updateDownloadById(downloadId, {
+      state: downloadStates.active,
+      timeEnd: null,
+      errors: null
+    })
+  }
+
+  if (downloadId && !filename) {
+    // Set the files to pending
+    await database.updateFilesWhere({
+      downloadId
+    }, resetFileValues)
+
+    // Set the download to active
+    await database.updateDownloadById(downloadId, {
+      state: downloadStates.active,
+      timeStart: new Date().getTime(),
+      timeEnd: null,
+      errors: null
+    })
+  }
 
   await startNextDownload({
     currentDownloadItems,

@@ -21,7 +21,7 @@ beforeEach(() => {
 
 describe('restartDownload', () => {
   describe('when only downloadId is provided', () => {
-    test('updates the files and calls startNextDownload', async () => {
+    test('updates the download and files and calls startNextDownload', async () => {
       const currentDownloadItems = {
         cancelItem: jest.fn()
       }
@@ -113,6 +113,13 @@ describe('restartDownload', () => {
         errors: null,
         receivedBytes: null,
         totalBytes: null
+      })
+
+      expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', {
+        errors: null,
+        state: 'ACTIVE',
+        timeEnd: null
       })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)

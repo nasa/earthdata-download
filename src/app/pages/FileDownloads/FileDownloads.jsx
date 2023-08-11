@@ -4,12 +4,15 @@ import React, {
   useState
 } from 'react'
 import PropTypes from 'prop-types'
+import { FaDownload } from 'react-icons/fa'
 
-import FileDownloadsHeader from '../../components/FileDownloadsHeader/FileDownloadsHeader'
-import FileDownloadsList from '../../components/FileDownloadsList/FileDownloadsList'
 import { PAGES } from '../../constants/pages'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
+
+import FileDownloadsHeader from '../../components/FileDownloadsHeader/FileDownloadsHeader'
+import FileListItem from '../../components/FileListItem/FileListItem'
+import ListPage from '../../components/ListPage/ListPage'
 
 /**
  * @typedef {Object} FileDownloadsProps
@@ -33,25 +36,54 @@ const FileDownloads = ({
   const {
     initializeDownload,
     reportFilesProgress,
-    startReportingDownloads
+    startReportingDownloads,
+    cancelDownloadItem,
+    copyDownloadPath,
+    openDownloadFolder,
+    restartDownload
   } = useContext(ElectronApiContext)
-
-  const [fileDownloadsProgressReport, setFileDownloadsProgressReport] = useState([])
-
-  // TODO EDD-26 this is state var controlling the download report
-  const [downloadReport, setDownloadReport] = useState({})
 
   const [hideCompleted, setHideCompleted] = useState(false)
 
+  const onCancelDownloadItem = (downloadId, filename) => {
+    cancelDownloadItem({
+      downloadId,
+      filename
+    })
+  }
+
+  const onOpenDownloadFolder = (downloadId, filename) => {
+    openDownloadFolder({
+      downloadId,
+      filename
+    })
+  }
+
+  const onCopyDownloadPath = (downloadId, filename) => {
+    copyDownloadPath({
+      downloadId,
+      filename
+    })
+  }
+
+  const onRestartDownload = (downloadId, filename) => {
+    restartDownload({
+      downloadId,
+      filename
+    })
+  }
+
+  const [downloadReport, setDownloadReport] = useState({})
+  const [filesReport, setFilesReport] = useState([])
+
   const onReportFilesProgressReport = (event, info) => {
-    // eslint-disable-next-line no-shadow
-    const { fileDownloadsProgressReport, downloadReport } = info
+    const {
+      downloadReport: newDownloadReport,
+      filesReport: newFilesReport
+    } = info
 
-    // Update fileDownloads report.
-    setFileDownloadsProgressReport(fileDownloadsProgressReport)
-
-    // Update download report to send to the `fileDownloadsHeader`.
-    setDownloadReport(downloadReport)
+    setFilesReport(newFilesReport)
+    setDownloadReport(newDownloadReport)
   }
 
   const onInitializeDownload = () => {
@@ -71,24 +103,35 @@ const FileDownloads = ({
   }, [])
 
   return (
-    <>
-      {/* TODO expand on this FileDownloadsHeader component in EDD-26.
-       */}
-      <FileDownloadsHeader
-        checked={hideCompleted}
-        downloadReport={downloadReport}
-        setCheckboxState={setHideCompleted}
-        setCurrentPage={setCurrentPage}
-      />
-      <FileDownloadsList
-        fileDownloadsProgressReport={fileDownloadsProgressReport}
-        hideCompleted={hideCompleted}
-      />
-    </>
+    <ListPage
+      emptyMessage="No file downloads in progress"
+      header={
+        (
+          <FileDownloadsHeader
+            hideCompleted={hideCompleted}
+            downloadReport={downloadReport}
+            setHideCompleted={setHideCompleted}
+            setCurrentPage={setCurrentPage}
+          />
+        )
+      }
+      Icon={FaDownload}
+      items={
+        filesReport.map((file) => (
+          <FileListItem
+            key={file.filename}
+            onCancelDownloadItem={onCancelDownloadItem}
+            onOpenDownloadFolder={onOpenDownloadFolder}
+            onCopyDownloadPath={onCopyDownloadPath}
+            onRestartDownload={onRestartDownload}
+            file={file}
+            hideCompleted={hideCompleted}
+          />
+        ))
+      }
+    />
   )
 }
-
-FileDownloads.defaultProps = {}
 
 FileDownloads.propTypes = {
   setCurrentPage: PropTypes.func.isRequired

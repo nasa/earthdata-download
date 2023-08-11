@@ -13,6 +13,7 @@ import packageDetails from '../../../package.json'
 
 const ajv = new Ajv()
 
+// TODO move to own file
 /**
  * Tests a link against the trustedSources.json file
  * @param {String} link Link to test

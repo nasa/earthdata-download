@@ -16,8 +16,8 @@ describe('startReportingFiles', () => {
       jest.spyOn(global, 'clearInterval')
       jest.spyOn(global, 'setInterval')
 
-      const mockDownloadName = 'mock-download-id'
-      const info = { downloadName: mockDownloadName }
+      const downloadId = 'mock-download-id'
+      const info = { downloadId }
       const database = { getAllDownloads: jest.fn() }
       const webContents = {}
       const reportInterval = 1
@@ -25,10 +25,11 @@ describe('startReportingFiles', () => {
 
       const newReportInterval = await startReportingFiles({
         database,
-        webContents,
+        info,
+        intervalTime,
         reportInterval,
-        intervalTime
-      }, { info })
+        webContents
+      })
 
       expect(clearInterval).toHaveBeenCalledTimes(1)
       expect(clearInterval).toHaveBeenCalledWith(reportInterval)
@@ -37,7 +38,7 @@ describe('startReportingFiles', () => {
       expect(reportFilesProgress).toHaveBeenCalledWith({
         database,
         webContents,
-        downloadId: mockDownloadName
+        downloadId
       })
 
       expect(setInterval).toHaveBeenCalledTimes(1)
@@ -57,7 +58,7 @@ describe('startReportingFiles', () => {
       expect(reportFilesProgress).toHaveBeenCalledWith({
         database,
         webContents,
-        downloadId: mockDownloadName
+        downloadId
       })
 
       // `setInterval` Returns the intervalID see, https://developer.mozilla.org/en-US/docs/Web/API/setInterval
@@ -73,8 +74,8 @@ describe('startReportingFiles', () => {
       jest.spyOn(global, 'clearInterval')
       jest.spyOn(global, 'setInterval')
 
-      const mockDownloadName = 'mock-download-id'
-      const info = { downloadName: mockDownloadName }
+      const downloadId = 'mock-download-id'
+      const info = { downloadId }
       const database = { getAllDownloads: jest.fn() }
       const webContents = {}
       const reportInterval = null
@@ -82,10 +83,11 @@ describe('startReportingFiles', () => {
 
       const newReportInterval = await startReportingFiles({
         database,
-        webContents,
+        info,
+        intervalTime,
         reportInterval,
-        intervalTime
-      }, { info })
+        webContents
+      })
 
       expect(clearInterval).toHaveBeenCalledTimes(0)
 
@@ -93,7 +95,7 @@ describe('startReportingFiles', () => {
       expect(reportFilesProgress).toHaveBeenCalledWith({
         database,
         webContents,
-        downloadId: mockDownloadName
+        downloadId
       })
 
       expect(setInterval).toHaveBeenCalledTimes(1)
@@ -113,7 +115,7 @@ describe('startReportingFiles', () => {
       expect(reportFilesProgress).toHaveBeenCalledWith({
         database,
         webContents,
-        downloadId: mockDownloadName
+        downloadId
       })
 
       // `setInterval` Returns the intervalID see, https://developer.mozilla.org/en-US/docs/Web/API/setInterval

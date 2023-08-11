@@ -1,23 +1,35 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  FaArrowLeft,
   FaBan,
+  FaCheckCircle,
+  FaChevronLeft,
   FaPause,
-  FaPlay
+  FaPlay,
+  FaSpinner
 } from 'react-icons/fa'
+import humanizeDuration from 'humanize-duration'
+import MiddleEllipsis from 'react-middle-ellipsis'
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
+
+import classNames from 'classnames'
 import Button from '../Button/Button'
 import Checkbox from '../Checkbox/Checkbox'
+import Progress from '../Progress/Progress'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import { PAGES } from '../../constants/pages'
 
-// TODO EDD-26 add styling to component
+import * as styles from './FileDownloadsHeader.module.scss'
+import downloadStates from '../../constants/downloadStates'
+import createVariantClassName from '../../utils/createVariantClassName'
+import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
+
 /**
  * @typedef {Object} FileDownloadsHeaderProps
- * @property {Boolean} checked State of the hide completed checkbox.
+ * @property {Boolean} hideCompleted State of the hide completed checkbox.
  * @property {Function} setCheckboxState A function to update the state of the  `hide completed` checkbox.
- * @property {Function} setCurrentPage A function which sets the active page.
+ * @property {Function} setHideCompleted A function which sets the active page.
  * @property {Object} downloadsProgressReport An Object containing the progress of the download in view.
 
 /**
@@ -28,18 +40,17 @@ import { PAGES } from '../../constants/pages'
  *
  * return (
  *   <FileDownloadsHeader
- *     checked={hideCompleted}
- *     setCheckboxState={setHideCompleted}
+ *     hideCompleted={hideCompleted}
+ *     setHideCompleted={setHideCompleted}
  *     setCurrentPage={setCurrentPage}
  *     downloadsProgressReport={downloadsProgressReport}
  *   />
  * )
  */
-
 const FileDownloadsHeader = ({
-  checked,
+  hideCompleted,
   downloadReport,
-  setCheckboxState,
+  setHideCompleted,
   setCurrentPage
 }) => {
   const {
@@ -49,112 +60,242 @@ const FileDownloadsHeader = ({
     startReportingDownloads
   } = useContext(ElectronApiContext)
 
-  // TODO EDD-26 the destructure and parse progress for downloads
-  const { downloadLocation, id: downloadId } = downloadReport
-
-  const [allFilesPaused, setAllFilesPaused] = useState(false)
+  const {
+    downloadLocation,
+    id: downloadId,
+    totalTimeRemaining,
+    finishedFiles,
+    totalFiles,
+    percent,
+    state,
+    totalTime
+  } = downloadReport
 
   const onCancelDownloadItem = () => {
     cancelDownloadItem({ downloadId })
   }
 
   const onPauseDownloadItem = () => {
-    setAllFilesPaused(true)
     pauseDownloadItem({ downloadId })
   }
 
   const onResumeDownloadItem = () => {
-    setAllFilesPaused(false)
     resumeDownloadItem({ downloadId })
   }
 
-  return (
-    <div>
-      <h3>
-        {downloadId}
-      </h3>
-      <Button
-        Icon={FaArrowLeft}
-        size="lg"
-        onClick={
-          () => {
-            // We start interval to poll the state of the downloads
-            startReportingDownloads()
-            setCurrentPage(PAGES.downloads)
-          }
-        }
-      >
-        Back to View Downloads
-      </Button>
-      <Checkbox
-        id="hideCompleted"
-        label="Hide completed"
-        onChange={
-          () => {
-            setCheckboxState(!checked)
-          }
-        }
-        checked={checked}
-      />
-      {/* TODO EDD-26 TODO this currently implementation of pause all does not allow us to leave the
-      fileDownloads page and then navigate back in to `fileDownloads` to resume all */}
-      {
-        !allFilesPaused
-          ? (
-            <Button
-              size="sm"
-              Icon={FaPause}
-              onClick={() => onPauseDownloadItem(downloadId)}
-            >
-              Pause All
-            </Button>
-          )
-          : (
-            <Button
-              size="sm"
-              Icon={FaPlay}
-              onClick={() => onResumeDownloadItem(downloadId)}
-            >
-              Resume All
-            </Button>
-          )
-      }
+  const shouldShowPause = [
+    downloadStates.error,
+    downloadStates.active
+  ].includes(state)
+  const shouldShowResume = [
+    downloadStates.paused,
+    downloadStates.error,
+    downloadStates.interrupted
+  ].includes(state)
+  const shouldShowCancel = [
+    downloadStates.paused,
+    downloadStates.active,
+    downloadStates.error,
+    downloadStates.interrupted,
+    downloadStates.waitingForAuth
+  ].includes(state)
 
-      <Button
-        size="sm"
-        Icon={FaBan}
-        variant="danger"
-        onClick={() => onCancelDownloadItem(downloadId)}
-      >
-        Cancel All
-      </Button>
-      <p>
-        Downloading to
-        {downloadLocation}
-      </p>
-      {/* TODO EDD-26 Add Pause all button */}
-      {/* TODO EDD-26 Add Cancel all button */}
-      {/* TODO EDD-26 We need to recalculate progress here because we are not polling the downloads anymore
-      */}
+  const isComplete = state === downloadStates.completed
+
+  const fileProgressMessage = `${finishedFiles} of ${totalFiles} files completed in ${humanizeDuration(totalTime * 1000, {
+    largest: 1,
+    round: true
+  })}`
+
+  const remainingTimeMessage = `${humanizeDuration(totalTimeRemaining * 1000, {
+    largest: 1,
+    round: true
+  })} remaining`
+
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.header}>
+        <Button
+          className={styles.backLink}
+          Icon={FaChevronLeft}
+          size="lg"
+          onClick={
+            () => {
+              // We start interval to poll the state of the downloads
+              startReportingDownloads()
+              setCurrentPage(PAGES.downloads)
+            }
+          }
+        >
+          Back to Downloads
+        </Button>
+      </div>
+
+      <div className={styles.progress}>
+        <div className={styles.statusDescription}>
+          <div className={
+            classNames([
+              styles.statusDescriptionPrimary,
+              styles[createVariantClassName(state)]
+            ])
+          }
+          >
+            {
+              state === downloadStates.active && (
+                <FaSpinner className={
+                  classNames([
+                    styles.statusDescriptionIcon,
+                    styles.spinner
+                  ])
+                }
+                />
+              )
+            }
+            {
+              state === downloadStates.paused && (
+                <FaPause className={styles.statusDescriptionIcon} />
+              )
+            }
+            {
+              state === downloadStates.completed && (
+                <FaCheckCircle className={styles.statusDescriptionIcon} />
+              )
+            }
+
+            <span className={styles.status}>
+              {getHumanizedDownloadStates(state)}
+              {/* TODO EDD-27 'Downloading with errors'? */}
+            </span>
+
+            <span className={styles.statusPercent}>
+              {percent}
+              %
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <div className={styles.progressFiles}>
+            {fileProgressMessage}
+          </div>
+
+          <div className={styles.progressRemaining}>
+            {/* TODO this makes the progress bar jump up when the remaining time should not be displayed */}
+            {!isComplete && remainingTimeMessage}
+          </div>
+        </div>
+
+        <div className={styles.actions}>
+          {
+            // TODO when completed, file progress jumps to the right of the page because no buttons are visible
+            shouldShowResume && (
+              <Button
+                className={styles.actionsButton}
+                size="sm"
+                Icon={FaPlay}
+                onClick={() => onResumeDownloadItem(downloadId)}
+              >
+                Resume All
+              </Button>
+            )
+          }
+          {
+            shouldShowPause && (
+              <Button
+                className={styles.actionsButton}
+                size="sm"
+                Icon={FaPause}
+                onClick={() => onPauseDownloadItem(downloadId)}
+              >
+                Pause All
+              </Button>
+            )
+          }
+          {
+            shouldShowCancel && (
+              <Button
+                className={styles.actionsButton}
+                size="sm"
+                Icon={FaBan}
+                variant="danger"
+                onClick={() => onCancelDownloadItem(downloadId)}
+              >
+                Cancel All
+              </Button>
+            )
+          }
+        </div>
+      </div>
+
+      <div className={styles.progressBarWrapper}>
+        <Progress
+          className={styles.progressBar}
+          progress={percent}
+          state={state}
+        />
+      </div>
+
+      <div className={styles.footer}>
+        <div className={styles.downloadLocation}>
+          <VisuallyHidden.Root>
+            <span>
+              Downloading to
+              {' '}
+              {downloadLocation}
+            </span>
+          </VisuallyHidden.Root>
+
+          <MiddleEllipsis key={downloadLocation}>
+            <span
+              className={styles.downloadLocationText}
+              aria-hidden="true"
+            >
+              Downloading to
+              {' '}
+              {downloadLocation}
+            </span>
+          </MiddleEllipsis>
+        </div>
+
+        <Checkbox
+          id="hideCompleted"
+          label="Hide Completed"
+          onChange={
+            () => {
+              setHideCompleted(!hideCompleted)
+            }
+          }
+          checked={hideCompleted}
+        />
+      </div>
     </div>
   )
 }
 
+// TODO fixed header, only scroll the items
+// /Users/macrouch/edsc_workspace/earthdata-download/tmp/downloads/MODIS_A-JPL-L2P-v2019.0_2019.0-20230808_191037
+
 // TODO `downloadReport` maybe should be required EDD-26
-FileDownloadsHeader.defaultProps = {
-  downloadReport: {}
-}
+// FileDownloadsHeader.defaultProps = {
+//   downloadReport: {}
+// }
 
 FileDownloadsHeader.propTypes = {
-  checked: PropTypes.bool.isRequired,
-  // TODO EDD-26 this type need to be improved
+  hideCompleted: PropTypes.bool.isRequired,
   downloadReport: PropTypes.shape({
+    downloadLocation: PropTypes.string,
+    finishedFiles: PropTypes.number,
     id: PropTypes.string,
-    downloadLocation: PropTypes.string
-  }),
-
+    percent: PropTypes.number,
+    percentSum: PropTypes.number,
+    state: PropTypes.string,
+    timeStart: PropTypes.number,
+    totalFiles: PropTypes.number,
+    totalTime: PropTypes.number,
+    totalTimeRemaining: PropTypes.number
+  }).isRequired,
   setCurrentPage: PropTypes.func.isRequired,
-  setCheckboxState: PropTypes.func.isRequired
+  setHideCompleted: PropTypes.func.isRequired
 }
 
 export default FileDownloadsHeader

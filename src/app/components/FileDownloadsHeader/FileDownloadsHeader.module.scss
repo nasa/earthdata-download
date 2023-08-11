@@ -1,0 +1,149 @@
+@use "../../css/vars/colors" as colors;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  align-items: start;
+  justify-content: left;
+  background-color: var(--color__blue--600);
+
+  .backLink {
+    width: 100%;
+    flex-grow: 1;
+    justify-content: start;
+    border: 0;
+    border-radius: 0;
+    background-color: var(--color__blue--600);
+    color: var(--color__white);
+  }
+}
+
+.progress {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--size__200) var(--size__200);
+  padding-left: var(--size__300);
+
+  .statusDescription {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .statusDescriptionPrimary {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--size__200);
+    color: var(--color__black--650);
+    font-weight: 500;
+
+    &.isActive {
+      color: var(--color__blue--600);
+    }
+
+    &.isCompleted {
+      color: var(--color__green--600);
+    }
+
+    &.isError {
+      color: var(--color__red--600);
+    }
+
+    &.isCancelled {
+      color: var(--color__grey--600);
+    }
+  }
+
+  .status {
+    display: block;
+    margin-right: var(--size__200);
+    font-size: var(--text__normal);
+    font-weight: 600;
+  }
+
+  .statusPercent {
+    font-weight: 400;
+  }
+
+  .statusDescriptionIcon {
+    flex-shrink: 0;
+    margin-right: var(--size__200);
+    font-size: var(--text__normal);
+
+    &.spinner {
+      animation: spinnerRotate 2s linear infinite;
+    }
+  }
+
+  .progressFiles {
+    color: var(--color__blue--600);
+    font-size: var(--text__normal);
+  }
+
+  .progressRemaining {
+    color: var(--color__gray);
+    font-size: var(--text__smaller);
+  }
+
+  .actions {
+    text-align: center;
+  }
+
+  .actionsButton {
+    margin-right: var(--size__200);
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.progressBarWrapper {
+  display: flex;
+  width: 100%;
+  padding: 0 var(--size__200);
+}
+
+.progressBar {
+  border-radius: var(--size__100);
+}
+
+.footer {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  justify-content: space-between;
+  padding: var(--size__200) var(--size__200);
+  padding-left: var(--size__300);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  .downloadLocation {
+    display: flex;
+    overflow: hidden;
+    margin-right: var(--size__500);
+    color: var(--color__gray);
+    font-size: var(--text__smaller);
+  }
+}
+
+@keyframes spinnerRotate {
+  from {
+    transform:rotate(0deg);
+  }
+
+  to {
+    transform:rotate(360deg);
+  }
+}

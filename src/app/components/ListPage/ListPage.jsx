@@ -131,7 +131,7 @@ ListPage.propTypes = {
   actions: PropTypes.node,
   emptyMessage: PropTypes.string,
   header: PropTypes.node,
-  items: PropTypes.arrayOf(PropTypes.node).isRequired,
+  items: PropTypes.node.isRequired,
   Icon: PropTypes.func
 }
 

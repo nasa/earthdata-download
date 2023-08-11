@@ -3,19 +3,17 @@ import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 
-import { FaPause, FaSignInAlt } from 'react-icons/fa'
+import { FaPause } from 'react-icons/fa'
 
 import DownloadItem from '../DownloadItem'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import downloadStates from '../../../constants/downloadStates'
 import { PAGES } from '../../../constants/pages'
+import Progress from '../../Progress/Progress'
 
-const progress = {
-  percent: 0,
-  finishedFiles: 0,
-  totalFiles: 1,
-  totalTime: 0
-}
+jest.mock('../../Progress/Progress', () => jest.fn(() => (
+  <mock-Progress data-testid="Progress" />
+)))
 
 const setup = (overrideProps) => {
   const showWaitingForEulaDialog = jest.fn()
@@ -24,17 +22,17 @@ const setup = (overrideProps) => {
   const setCurrentPage = jest.fn()
 
   const props = {
-    downloadName: 'download-name',
-    loadingMoreFiles: false,
-    progress,
-    state: downloadStates.active,
     actionsList: [],
-    runningFileDownloads: {},
+    downloadId: 'download-id',
+    itemName: 'Test download',
+    percent: 42,
     setCurrentPage,
+    state: downloadStates.active,
+    status: {},
     ...overrideProps
   }
 
-  render(
+  const { container } = render(
     <ElectronApiContext.Provider
       value={
         {
@@ -49,6 +47,7 @@ const setup = (overrideProps) => {
   )
 
   return {
+    container,
     setCurrentPage,
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
@@ -58,41 +57,77 @@ const setup = (overrideProps) => {
 
 describe('DownloadItem component', () => {
   describe('when a download is starting', () => {
-    test('clicking on the `DownloadItem` will not redirect to `fileDownloads` page', async () => {
-      const { startReportingFiles, setCurrentPage } = setup({
-        state: downloadStates.starting,
-        loadingMoreFiles: true
+    test('displays the correct download information', () => {
+      const { container } = setup({
+        percent: 0,
+        state: downloadStates.starting
       })
+
+      expect(screen.getByRole('heading', {
+        level: 3,
+        value: 'Test download'
+      })).toBeInTheDocument()
+
+      expect(screen.getByRole('listitem')).toHaveClass('wrapper isStarting')
+
+      expect(Progress).toHaveBeenCalledTimes(1)
+      expect(Progress).toHaveBeenCalledWith({
+        className: 'progress',
+        progress: 0,
+        state: downloadStates.starting
+      }, {})
+
+      expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 0%')
+    })
+
+    test('the download item is not clickable', async () => {
+      const { startReportingFiles, setCurrentPage } = setup({
+        state: downloadStates.starting
+      })
+
       const fileDownloadsPortal = screen.getByTestId('download-item-open-file-downloads')
       expect(fileDownloadsPortal).toBeInTheDocument()
+
       await userEvent.click(fileDownloadsPortal)
 
       expect(setCurrentPage).toHaveBeenCalledTimes(0)
-
       expect(startReportingFiles).toHaveBeenCalledTimes(0)
     })
   })
 
   describe('when a download is pending', () => {
     test('displays the correct download information', () => {
-      setup({
-        state: downloadStates.pending,
-        loadingMoreFiles: true
+      const { container } = setup({
+        percent: 0,
+        state: downloadStates.pending
       })
 
-      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-      expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
-      expect(screen.queryByTestId('download-item-status-description')).not.toBeInTheDocument()
-      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Initializing')
+      expect(screen.getByRole('heading', {
+        level: 3,
+        value: 'Test download'
+      })).toBeInTheDocument()
+
+      expect(screen.getByRole('listitem')).toHaveClass('wrapper isPending')
+
+      expect(Progress).toHaveBeenCalledTimes(1)
+      expect(Progress).toHaveBeenCalledWith({
+        className: 'progress',
+        progress: 0,
+        state: downloadStates.pending
+      }, {})
+
+      expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 0%')
     })
 
-    test('clicking on the `DownloadItem` will not redirect to the `fileDownloads` page', async () => {
+    test('the download item is not clickable', async () => {
       const { startReportingFiles, setCurrentPage } = setup({
         state: downloadStates.pending,
         loadingMoreFiles: true
       })
+
       const fileDownloadsPortal = screen.getByTestId('download-item-open-file-downloads')
       expect(fileDownloadsPortal).toBeInTheDocument()
+
       await userEvent.click(fileDownloadsPortal)
 
       expect(setCurrentPage).toHaveBeenCalledTimes(0)
@@ -103,48 +138,45 @@ describe('DownloadItem component', () => {
 
   describe('when a download is active', () => {
     test('displays the correct download information', () => {
-      setup()
+      const { container } = setup()
 
-      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-      expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
-      expect(screen.getByTestId('download-item-spinner')).toBeInTheDocument()
-      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Downloading')
-      expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('0 of 1 files done in 0 seconds')
+      expect(screen.getByRole('heading', {
+        level: 3,
+        value: 'Test download'
+      })).toBeInTheDocument()
+
+      expect(screen.getByRole('listitem')).toHaveClass('wrapper isActive')
+
+      expect(Progress).toHaveBeenCalledTimes(1)
+      expect(Progress).toHaveBeenCalledWith({
+        className: 'progress',
+        progress: 42,
+        state: downloadStates.active
+      }, {})
+
+      expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 42%')
     })
 
-    describe('when more files are loading', () => {
-      test('displays the correct download information', () => {
-        setup({
-          loadingMoreFiles: true
-        })
-
-        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-        expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
-        expect(screen.getByTestId('download-item-spinner')).toBeInTheDocument()
-        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Downloading')
-        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('0 files done in 0 seconds (determining file count)')
-      })
-    })
-
-    describe('when clicking on a `DownloadItem`', () => {
+    describe('when clicking on the `DownloadItem`', () => {
       test('calls `setCurrentPage` and `startReportingFiles` ', async () => {
         const { startReportingFiles, setCurrentPage } = setup({
-          state: downloadStates.active,
-          loadingMoreFiles: true
+          state: downloadStates.active
         })
+
         const fileDownloadsPortal = screen.getByTestId('download-item-open-file-downloads')
         expect(fileDownloadsPortal).toBeInTheDocument()
+
         await userEvent.click(fileDownloadsPortal)
 
         expect(setCurrentPage).toHaveBeenCalledTimes(1)
         expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
 
         expect(startReportingFiles).toHaveBeenCalledTimes(1)
-        expect(startReportingFiles).toHaveBeenCalledWith({ downloadName: 'download-name' })
+        expect(startReportingFiles).toHaveBeenCalledWith({ downloadId: 'download-id' })
       })
     })
 
-    describe('when pressing enter on a `DownloadItem`', () => {
+    describe('when pressing enter on the `DownloadItem`', () => {
       test('calls setCurrentPage and startReportingFiles', async () => {
         const { startReportingFiles, setCurrentPage } = setup({
           state: downloadStates.active,
@@ -153,17 +185,18 @@ describe('DownloadItem component', () => {
 
         // Focus screen on the `div-button` then trigger onKeyDown
         screen.getByTestId('download-item-open-file-downloads').focus()
+
         await userEvent.keyboard('{Enter}')
 
         expect(setCurrentPage).toHaveBeenCalledTimes(1)
         expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
 
         expect(startReportingFiles).toHaveBeenCalledTimes(1)
-        expect(startReportingFiles).toHaveBeenCalledWith({ downloadName: 'download-name' })
+        expect(startReportingFiles).toHaveBeenCalledWith({ downloadId: 'download-id' })
       })
     })
 
-    describe('when pressing spacebar on a `DownloadItem`', () => {
+    describe('when pressing spacebar on the `DownloadItem`', () => {
       test('calls setCurrentPage and startReportingFiles', async () => {
         const { startReportingFiles, setCurrentPage } = setup({
           state: downloadStates.active,
@@ -180,11 +213,11 @@ describe('DownloadItem component', () => {
         expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
 
         expect(startReportingFiles).toHaveBeenCalledTimes(1)
-        expect(startReportingFiles).toHaveBeenCalledWith({ downloadName: 'download-name' })
+        expect(startReportingFiles).toHaveBeenCalledWith({ downloadId: 'download-id' })
       })
     })
 
-    describe('when pressing a non-enter key on a `DownloadItem`', () => {
+    describe('when pressing a non-enter key on the `DownloadItem`', () => {
       test('does not call setCurrentPage or startReportingFiles', async () => {
         const { startReportingFiles, setCurrentPage } = setup({
           state: downloadStates.active,
@@ -313,123 +346,126 @@ describe('DownloadItem component', () => {
 
   describe('when a download is paused', () => {
     test('displays the correct download information', () => {
-      setup({
+      const { container } = setup({
+        percent: 42,
         state: downloadStates.paused
       })
 
-      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-      expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
-      expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
-      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Paused')
-      expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('0 of 1 files done in 0 seconds')
+      expect(screen.getByRole('heading', {
+        level: 3,
+        value: 'Test download'
+      })).toBeInTheDocument()
+
+      expect(screen.getByRole('listitem')).toHaveClass('wrapper isPaused')
+
+      expect(Progress).toHaveBeenCalledTimes(1)
+      expect(Progress).toHaveBeenCalledWith({
+        className: 'progress',
+        progress: 42,
+        state: downloadStates.paused
+      }, {})
+
+      expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 42%')
     })
   })
 
   describe('when a download is completed', () => {
     test('displays the correct download information', () => {
-      setup({
-        progress: {
-          ...progress,
-          finishedFiles: 1,
-          percent: 100
-        },
+      const { container } = setup({
+        percent: 100,
         state: downloadStates.completed
       })
 
-      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-      expect(screen.getByTestId('download-item-percent')).toHaveTextContent('100%')
-      expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
-      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Completed')
-      expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 1 files done in 0 seconds')
+      expect(screen.getByRole('heading', {
+        level: 3,
+        value: 'Test download'
+      })).toBeInTheDocument()
+
+      expect(screen.getByRole('listitem')).toHaveClass('wrapper isCompleted')
+
+      expect(Progress).toHaveBeenCalledTimes(1)
+      expect(Progress).toHaveBeenCalledWith({
+        className: 'progress',
+        progress: 100,
+        state: downloadStates.completed
+      }, {})
+
+      expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 100%')
     })
   })
 
   describe('when a download has errors', () => {
     test('displays the correct download information', () => {
-      setup({
-        hasErrors: true,
-        progress: {
-          ...progress,
-          percent: 0
-        },
-        state: downloadStates.active
+      const { container } = setup({
+        percent: 0,
+        state: downloadStates.error
       })
 
-      expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-      expect(screen.getByTestId('download-item-percent')).toHaveTextContent('0%')
-      expect(screen.queryByTestId('download-item-spinner')).toBeInTheDocument()
-      expect(screen.queryByTestId('download-item-error')).toBeInTheDocument()
-      expect(screen.getByTestId('download-item-state')).toHaveTextContent('Downloading with errors')
-      expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('0 of 1 files done in 0 seconds')
+      expect(screen.getByRole('heading', {
+        level: 3,
+        value: 'Test download'
+      })).toBeInTheDocument()
+
+      expect(screen.getByRole('listitem')).toHaveClass('wrapper isError')
+
+      expect(Progress).toHaveBeenCalledTimes(1)
+      expect(Progress).toHaveBeenCalledWith({
+        className: 'progress',
+        progress: 0,
+        state: downloadStates.error
+      }, {})
+
+      expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 0%')
     })
   })
 
   describe('when a download is waiting for authentication', () => {
     describe('when the download has not started yet', () => {
       test('displays the correct download information', () => {
-        setup({
+        const { container } = setup({
+          percent: 0,
           state: downloadStates.waitingForAuth
         })
 
-        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-        expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
-        expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
-        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Initializing')
-        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('Waiting for log in with Earthdata Login More Info')
+        expect(screen.getByRole('heading', {
+          level: 3,
+          value: 'Test download'
+        })).toBeInTheDocument()
+
+        expect(screen.getByRole('listitem')).toHaveClass('wrapper isPending')
+
+        expect(Progress).toHaveBeenCalledTimes(1)
+        expect(Progress).toHaveBeenCalledWith({
+          className: 'progress',
+          progress: 0,
+          state: downloadStates.waitingForAuth
+        }, {})
+
+        expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 0%')
       })
     })
 
     describe('when the download has some progress', () => {
       test('displays the correct download information', () => {
-        setup({
-          progress: {
-            ...progress,
-            finishedFiles: 1,
-            totalFiles: 2,
-            percent: 50
-          },
+        const { container } = setup({
           state: downloadStates.waitingForAuth
         })
 
-        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-        expect(screen.getByTestId('download-item-percent')).toHaveTextContent('50%')
-        expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
-        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Interrupted')
-        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 2 files Waiting for log in with Earthdata Login More Info')
-      })
-    })
+        expect(screen.getByRole('heading', {
+          level: 3,
+          value: 'Test download'
+        })).toBeInTheDocument()
 
-    describe('when clicking a primary action button', () => {
-      test('sends a message to the main process', async () => {
-        const sendToLogin = jest.fn()
-        const actionsList = [
-          [
-            {
-              label: 'Log In with Earthdata Login',
-              isActive: true,
-              isPrimary: true,
-              callback: sendToLogin,
-              icon: FaSignInAlt
-            }
-          ]
-        ]
+        expect(screen.getByRole('listitem')).toHaveClass('wrapper isInterrupted')
 
-        setup({
-          actionsList,
-          progress: {
-            ...progress,
-            finishedFiles: 1,
-            totalFiles: 2,
-            percent: 50
-          },
+        expect(Progress).toHaveBeenCalledTimes(1)
+        expect(Progress).toHaveBeenCalledWith({
+          className: 'progress',
+          progress: 42,
           state: downloadStates.waitingForAuth
-        })
+        }, {})
 
-        const loginButton = screen.getAllByTestId('download-item-Log In with Earthdata Login')[0]
-
-        await userEvent.click(loginButton)
-
-        expect(sendToLogin).toHaveBeenCalledTimes(1)
+        expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 42%')
       })
     })
   })
@@ -437,68 +473,50 @@ describe('DownloadItem component', () => {
   describe('when a download is waiting for EULA acceptance', () => {
     describe('when the download has not started yet', () => {
       test('displays the correct download information', () => {
-        setup({
+        const { container } = setup({
+          percent: 0,
           state: downloadStates.waitingForEula
         })
 
-        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-        expect(screen.queryByTestId('download-item-percent')).not.toBeInTheDocument()
-        expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
-        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Initializing')
-        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('Accept license agreement to continue More Info')
+        expect(screen.getByRole('heading', {
+          level: 3,
+          value: 'Test download'
+        })).toBeInTheDocument()
+
+        expect(screen.getByRole('listitem')).toHaveClass('wrapper isPending')
+
+        expect(Progress).toHaveBeenCalledTimes(1)
+        expect(Progress).toHaveBeenCalledWith({
+          className: 'progress',
+          progress: 0,
+          state: downloadStates.waitingForEula
+        }, {})
+
+        expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 0%')
       })
     })
 
     describe('when the download has some progress', () => {
       test('displays the correct download information', () => {
-        setup({
-          progress: {
-            ...progress,
-            finishedFiles: 1,
-            totalFiles: 2,
-            percent: 50
-          },
+        const { container } = setup({
           state: downloadStates.waitingForEula
         })
 
-        expect(screen.getByTestId('download-item-name')).toHaveTextContent('download-name')
-        expect(screen.getByTestId('download-item-percent')).toHaveTextContent('50%')
-        expect(screen.queryByTestId('download-item-spinner')).not.toBeInTheDocument()
-        expect(screen.getByTestId('download-item-state')).toHaveTextContent('Interrupted')
-        expect(screen.getByTestId('download-item-status-description')).toHaveTextContent('1 of 2 files Accept license agreement to continue More Info')
-      })
-    })
+        expect(screen.getByRole('heading', {
+          level: 3,
+          value: 'Test download'
+        })).toBeInTheDocument()
 
-    describe('when clicking a primary action button', () => {
-      test('sends a message to the main process', async () => {
-        const sendToEula = jest.fn()
-        const actionsList = [
-          [
-            {
-              label: 'Log In with Earthdata Login',
-              isActive: true,
-              isPrimary: true,
-              callback: sendToEula,
-              icon: FaSignInAlt
-            }
-          ]
-        ]
-        setup({
-          actionsList,
-          progress: {
-            ...progress,
-            finishedFiles: 1,
-            totalFiles: 2,
-            percent: 50
-          },
+        expect(screen.getByRole('listitem')).toHaveClass('wrapper isInterrupted')
+
+        expect(Progress).toHaveBeenCalledTimes(1)
+        expect(Progress).toHaveBeenCalledWith({
+          className: 'progress',
+          progress: 42,
           state: downloadStates.waitingForEula
-        })
+        }, {})
 
-        const loginButton = screen.getAllByTestId('download-item-Log In with Earthdata Login')[0]
-
-        await userEvent.click(loginButton)
-
-        expect(sendToEula).toHaveBeenCalledTimes(1)
+        expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 42%')
       })
     })
   })

@@ -1,4 +1,4 @@
-import createVariantClassName from '../createVariantName'
+import createVariantClassName from '../createVariantClassName'
 
 describe('createVariantClassName', () => {
   describe('when no variant is passed', () => {

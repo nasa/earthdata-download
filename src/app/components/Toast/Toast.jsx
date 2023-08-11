@@ -12,8 +12,9 @@ import {
 
 import Button from '../Button/Button'
 
+import createVariantClassName from '../../utils/createVariantClassName'
+
 import * as styles from './Toast.module.scss'
-import createVariantClassName from '../../utils/createVariantName'
 
 /**
  * @typedef {Object} ToastAction

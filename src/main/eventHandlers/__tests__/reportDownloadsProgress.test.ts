@@ -76,7 +76,6 @@ describe('reportDownloadsProgress', () => {
     expect(webContents.send).toHaveBeenCalledWith('reportDownloadsProgress', {
       progressReport: [{
         downloadId: 'download-id-1',
-        downloadName: 'download-id-1',
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -87,7 +86,6 @@ describe('reportDownloadsProgress', () => {
         state: downloadStates.pending
       }, {
         downloadId: 'download-id-2',
-        downloadName: 'download-id-2',
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 0,
@@ -98,7 +96,6 @@ describe('reportDownloadsProgress', () => {
         state: 'ACTIVE'
       }, {
         downloadId: 'download-id-3',
-        downloadName: 'download-id-3',
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 2,
@@ -175,7 +172,6 @@ describe('reportDownloadsProgress', () => {
     expect(webContents.send).toHaveBeenCalledWith('reportDownloadsProgress', {
       progressReport: [{
         downloadId: 'download-id-1',
-        downloadName: 'download-id-1',
         errors: [{
           id: 123,
           filename: 'mock-filename.png',

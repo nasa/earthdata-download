@@ -334,11 +334,10 @@ const setupEventListeners = ({
     // Update report interval for the new progress report type
     reportInterval = await startReportingFiles({
       database,
-      webContents,
+      info,
+      intervalTime,
       reportInterval,
-      intervalTime
-    }, {
-      info
+      webContents
     })
   })
 

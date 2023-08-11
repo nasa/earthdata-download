@@ -5,30 +5,19 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import {
-  FaCheckCircle,
-  FaExclamationCircle,
-  FaInfoCircle,
-  FaSignInAlt,
-  FaSpinner
-} from 'react-icons/fa'
-import humanizeDuration from 'humanize-duration'
+import { FaSignInAlt } from 'react-icons/fa'
 
 import Button from '../Button/Button'
 import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
-
-import Tooltip from '../Tooltip/Tooltip'
 
 import Dialog from '../Dialog/Dialog'
 import WaitingForLogin from '../../dialogs/WaitingForLogin/WaitingForLogin'
 import WaitingForEula from '../../dialogs/WaitingForEula/WaitingForEula'
 
 import downloadStates from '../../constants/downloadStates'
-import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
-import commafy from '../../utils/commafy'
-import createVariantClassName from '../../utils/createVariantName'
+import createVariantClassName from '../../utils/createVariantClassName'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import { PAGES } from '../../constants/pages'
@@ -37,7 +26,7 @@ import * as styles from './DownloadItem.module.scss'
 
 /**
  * @typedef {Object} DownloadItemProps
- * @property {String} downloadName The name of the DownloadItem.
+ * @property {String} downloadId The name of the DownloadItem.
  * @property {Boolean} hasErrors Does this download item have errors.
  * @property {Boolean} loadingMoreFiles Is EDD loading more download files.
  * @property {Object} progress The progress of the DownloadItem.
@@ -52,7 +41,7 @@ import * as styles from './DownloadItem.module.scss'
  * return (
  *   <DownloadItem
  *     key={downloadId}
- *     downloadName={downloadName}
+ *     downloadId={downloadId}
  *     loadingMoreFiles,
  *     progress={progress}
  *     state={state}
@@ -62,18 +51,24 @@ import * as styles from './DownloadItem.module.scss'
  */
 const DownloadItem = ({
   actionsList,
-  downloadName,
-  hasErrors,
-  loadingMoreFiles,
-  progress,
+  downloadId,
+  itemName,
+  percent,
   setCurrentPage,
-  state
+  state,
+  status
 }) => {
   const {
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
     startReportingFiles
   } = useContext(ElectronApiContext)
+
+  const {
+    primary: primaryStatus,
+    secondary: secondaryStatus,
+    tertiary: tertiaryStatus
+  } = status
 
   const [waitingForEulaDialogIsOpen, setWaitingForEulaDialogIsOpen] = useState(false)
   const [waitingForLoginDialogIsOpen, setWaitingForLoginDialogIsOpen] = useState(false)
@@ -88,9 +83,13 @@ const DownloadItem = ({
     setWaitingForLoginDialogIsOpen(showDialog)
   }
 
+  const shouldBeClickable = !!setCurrentPage
+    && state !== downloadStates.starting
+    && state !== downloadStates.pending
+
   const onSelectDownloadItem = () => {
-    if (state !== downloadStates.starting && state !== downloadStates.pending) {
-      startReportingFiles({ downloadName })
+    if (shouldBeClickable) {
+      startReportingFiles({ downloadId })
       setCurrentPage(PAGES.fileDownloads)
     }
   }
@@ -105,13 +104,6 @@ const DownloadItem = ({
       showWaitingForLoginDialog(false, onShowWaitingForLoginDialog)
     }
   }, [])
-
-  const {
-    percent = 0,
-    finishedFiles,
-    totalFiles,
-    totalTime
-  } = progress
 
   let primaryActions = []
 
@@ -145,26 +137,15 @@ const DownloadItem = ({
     })
   }
 
-  const shouldShowProgress = (state !== downloadStates.pending)
-    && (
-      percent > 0
-      || (
-        state !== downloadStates.waitingForEula
-        && state !== downloadStates.waitingForAuth
-      )
-    )
-
-  const shouldShowTime = state !== downloadStates.pending
-    && state !== downloadStates.waitingForEula
-    && state !== downloadStates.waitingForAuth
-    && totalFiles > 0
-
   let stateForClassName = state
 
-  if (state === downloadStates.waitingForAuth && percent === 0) {
+  if (
+    (state === downloadStates.waitingForAuth || state === downloadStates.waitingForEula)
+    && percent === 0
+  ) {
     // If waitingForAuth and no progress has been made, show the `pending` state
     stateForClassName = downloadStates.pending
-  } else if (state === downloadStates.waitingForAuth) {
+  } else if (state === downloadStates.waitingForAuth || state === downloadStates.waitingForEula) {
     // If waitingForAuth and some progress has been made, show the `interrupted` state
     stateForClassName = downloadStates.interrupted
   }
@@ -179,6 +160,7 @@ const DownloadItem = ({
       }
       data-testid="download-item"
     >
+      {/* ?? Should these dialogs be present on files view? */}
       <Dialog
         open={waitingForEulaDialogIsOpen}
         setOpen={setWaitingForEulaDialogIsOpen}
@@ -188,7 +170,7 @@ const DownloadItem = ({
         TitleIcon={FaSignInAlt}
       >
         <WaitingForEula
-          downloadId={downloadName}
+          downloadId={downloadId}
         />
       </Dialog>
       <Dialog
@@ -200,12 +182,18 @@ const DownloadItem = ({
         TitleIcon={FaSignInAlt}
       >
         <WaitingForLogin
-          downloadId={downloadName}
+          downloadId={downloadId}
         />
       </Dialog>
+
       <div
         data-testid="download-item-open-file-downloads"
-        className={styles.innerWrapper}
+        className={
+          classNames([
+            styles.innerWrapper,
+            { [styles.isClickable]: shouldBeClickable }
+          ])
+        }
         onClick={onSelectDownloadItem}
         onKeyDown={
           (event) => {
@@ -222,159 +210,34 @@ const DownloadItem = ({
           className={styles.name}
           data-testid="download-item-name"
         >
-          {downloadName}
+          {itemName}
         </h3>
+
         <div className={styles.meta}>
           <div className={styles.metaPrimary}>
-            {
-              shouldShowProgress && (
-                <div
-                  className={styles.percentComplete}
-                  data-testid="download-item-percent"
-                >
-                  {percent}
-                  %
-                </div>
-              )
-            }
-            {
-              getHumanizedDownloadStates(state, percent, hasErrors) && (
-                <div
-                  className={styles.displayStatus}
-                  data-testid="download-item-state"
-                >
-                  {
-                    state === downloadStates.active && (
-                      <FaSpinner
-                        className={
-                          classNames([
-                            styles.statusDescriptionIcon,
-                            styles.spinner
-                          ])
-                        }
-                        data-testid="download-item-spinner"
-                      />
-                    )
-                  }
-                  {
-                    state === downloadStates.completed && (
-                      <FaCheckCircle className={styles.statusDescriptionIcon} />
-                    )
-                  }
-                  {
-                    hasErrors && (
-                      <FaExclamationCircle
-                        className={styles.hasErrorsIcon}
-                        data-testid="download-item-error"
-                      />
-                    )
-                  }
-                  {getHumanizedDownloadStates(state, percent, hasErrors)}
-                </div>
-              )
-            }
-            {
-              (state !== downloadStates.pending && state !== downloadStates.error) && (
-                <div
-                  className={styles.statusDescription}
-                  data-testid="download-item-status-description"
-                >
-                  <p className={styles.statusInformation}>
-                    {
-                      shouldShowProgress && (
-                        <>
-                          {commafy(finishedFiles)}
-                          {
-                            !loadingMoreFiles && (
-                              <>
-                                {' '}
-                                of
-                                {' '}
-                                {commafy(totalFiles)}
-                              </>
-                            )
-                          }
-                          {' '}
-                          files
-                        </>
-                      )
-                    }
-                    {
-                      (
-                        shouldShowTime && (
-                          <>
-                            {' '}
-                            done in
-                            {' '}
-                            {humanizeDuration(totalTime * 1000)}
-                          </>
-                        )
-                      )
-                    }
-                    {
-                      loadingMoreFiles && (
-                        <>
-                          {' '}
-                          (determining file count)
-                        </>
-                      )
-                    }
-                    {
-                      state === downloadStates.waitingForAuth && (
-                        <>
-                          {' '}
-                          Waiting for log in with Earthdata Login
-                          {' '}
-                          <Tooltip
-                            content="This download requires authentication with Earthdata Login. If your browser did not automatically open, click Log In."
-                          >
-                            <span className={styles.statusInformationTooltip}>
-                              <FaInfoCircle className={styles.statusInformationIcon} />
-                              <span>More Info</span>
-                            </span>
-                          </Tooltip>
-                        </>
-                      )
-                    }
-                    {
-                      state === downloadStates.waitingForEula && (
-                        <>
-                          {' '}
-                          Accept license agreement to continue
-                          {' '}
-                          <Tooltip
-                            content="Accept the license agreement to access the data you've requested. If your browser did not automatically open, click View & Accept License Agreement."
-                          >
-                            <span className={styles.statusInformationTooltip}>
-                              <FaInfoCircle className={styles.statusInformationIcon} />
-                              <span>More Info</span>
-                            </span>
-                          </Tooltip>
-                        </>
-                      )
-                    }
-                  </p>
-                </div>
-              )
-            }
-            {
+            {primaryStatus}
+            {secondaryStatus}
+            {tertiaryStatus}
+            {/* {
+              // TODO EDD-27?
               state === downloadStates.error && (
                 <div
                   className={styles.statusDescription}
-                  data-testid="download-item-status-description"
                 >
                   <FaInfoCircle />
                   {' '}
                   More Info
                 </div>
               )
-            }
+            } */}
           </div>
+
           <div className={styles.metaSecondary}>
             {primaryActions}
             <Dropdown actionsList={actionsList} />
           </div>
         </div>
+
         <div>
           <Progress
             className={styles.progress}
@@ -382,7 +245,11 @@ const DownloadItem = ({
             state={state}
           />
         </div>
-        <div style={{ width: `${percent}%` }} className={styles.progressBackground} />
+
+        <div
+          style={{ width: `${percent}%` }}
+          className={styles.progressBackground}
+        />
       </div>
     </li>
   )
@@ -390,8 +257,8 @@ const DownloadItem = ({
 
 DownloadItem.defaultProps = {
   actionsList: null,
-  hasErrors: false,
-  loadingMoreFiles: false
+  setCurrentPage: null,
+  status: {}
 }
 
 DownloadItem.propTypes = {
@@ -408,17 +275,16 @@ DownloadItem.propTypes = {
       })
     )
   ),
-  downloadName: PropTypes.string.isRequired,
-  hasErrors: PropTypes.bool,
-  loadingMoreFiles: PropTypes.bool,
-  progress: PropTypes.shape({
-    percent: PropTypes.number,
-    finishedFiles: PropTypes.number,
-    totalFiles: PropTypes.number,
-    totalTime: PropTypes.number
-  }).isRequired,
-  setCurrentPage: PropTypes.func.isRequired,
-  state: PropTypes.string.isRequired
+  downloadId: PropTypes.string.isRequired,
+  itemName: PropTypes.string.isRequired,
+  percent: PropTypes.number.isRequired,
+  setCurrentPage: PropTypes.func,
+  state: PropTypes.string.isRequired,
+  status: PropTypes.shape({
+    primary: PropTypes.node,
+    secondary: PropTypes.node,
+    tertiary: PropTypes.node
+  })
 }
 
 export default DownloadItem

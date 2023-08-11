@@ -6,7 +6,7 @@ import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import Tooltip from '../Tooltip/Tooltip'
 
 import * as styles from './Button.module.scss'
-import createVariantClassName from '../../utils/createVariantName'
+import createVariantClassName from '../../utils/createVariantClassName'
 
 /**
  * @typedef {Object} ButtonProps

@@ -12,10 +12,14 @@ const reportFilesProgress = async ({
   webContents,
   downloadId
 }) => {
-  const fileDownloadsProgressReport = await database.getFilesWhere({ downloadId })
-
-  fileDownloadsProgressReport.forEach((fileDownload) => {
-    const { timeStart, receivedBytes, totalBytes } = fileDownload
+  const files = await database.getFilesWhere({ downloadId })
+  let totalTimeRemaining = 0
+  const filesReport = files.map((fileDownload) => {
+    const {
+      timeStart,
+      receivedBytes,
+      totalBytes
+    } = fileDownload
 
     const currentTime = new Date().getTime()
 
@@ -23,31 +27,52 @@ const reportFilesProgress = async ({
 
     const bytesRemaining = totalBytes - receivedBytes
 
+    let remainingTime
     // There is a delay with the report for a specific file while its being initialized
-    // Where `receivedBytes` is 0
+    // where `receivedBytes` is 0
     if (receivedBytes > 0) {
-      const remainingTime = Math.ceil(((timeTaken / receivedBytes) * bytesRemaining) / 1000)
-      // eslint-disable-next-line no-param-reassign
-      fileDownload.remainingTime = remainingTime
+      remainingTime = Math.ceil(((timeTaken / receivedBytes) * bytesRemaining) / 1000)
+      totalTimeRemaining += remainingTime
     } else {
-      // eslint-disable-next-line no-param-reassign
-      fileDownload.remainingTime = null
+      remainingTime = null
+    }
+
+    return {
+      ...fileDownload,
+      remainingTime
     }
   })
 
-  // TODO EDD-26 to be more performant all 3 of these SQL calls should be consolidated to a single one
-  // Await SQL read from the downloads
-  const downloadsProgressReport = await database.getDownloadFilesProgressByDownloadId(downloadId)
-  const downloadInformation = await database.getDownloadById(downloadId)
+  // TODO only return fields we need from database calls
+  const downloadReport = await database.getDownloadData(downloadId)
 
-  const downloadReport = {
-    ...downloadsProgressReport,
-    ...downloadInformation
+  const {
+    createdAt,
+    percentSum,
+    timeEnd,
+    timeStart,
+    totalFiles
+  } = downloadReport
+
+  let percent = 0
+
+  if (totalFiles > 0) {
+    // Round to 1 decimal place
+    percent = Math.round((percentSum / totalFiles) * 10) / 10
   }
 
+  const now = new Date().getTime()
+  const lastTime = timeEnd || now
+  const totalTime = Math.ceil((lastTime - (timeStart || createdAt)) / 1000)
+
   webContents.send('reportFilesProgress', {
-    fileDownloadsProgressReport,
-    downloadReport
+    downloadReport: {
+      ...downloadReport,
+      totalTimeRemaining,
+      percent,
+      totalTime
+    },
+    filesReport
   })
 }
 

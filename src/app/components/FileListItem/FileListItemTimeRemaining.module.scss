@@ -1,0 +1,17 @@
+.statusDescription {
+  overflow: hidden;
+  flex-grow: 1;
+  flex-shrink: 1;
+  float: left;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusInformation {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  float:left;
+  font-style: bold
+}

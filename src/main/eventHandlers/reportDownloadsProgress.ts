@@ -28,7 +28,6 @@ const reportDownloadsProgress = async ({
       createdAt,
       id: downloadId,
       loadingMoreFiles,
-      name: downloadName = downloadId,
       state,
       timeEnd,
       timeStart
@@ -40,6 +39,7 @@ const reportDownloadsProgress = async ({
       totalFiles,
       finishedFiles
     } = await database.getDownloadFilesProgressByDownloadId(downloadId)
+    // TODO only return fields we need from database calls
 
     // If any erroredFiles exist, get the files
     let errors
@@ -72,7 +72,6 @@ const reportDownloadsProgress = async ({
 
     return {
       downloadId,
-      downloadName,
       errors,
       // Sqlite booleans are actually integers 1/0
       loadingMoreFiles: loadingMoreFiles === 1,

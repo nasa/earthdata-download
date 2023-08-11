@@ -80,6 +80,7 @@ const Layout = () => {
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
+  const [allFilesPaused, setAllFilesPaused] = useState(false)
 
   const showMoreInfoDialog = (downloadId, numberErrors) => {
     setActiveMoreInfoDownloadInfo({
@@ -192,7 +193,11 @@ const Layout = () => {
       break
     case PAGES.fileDownloads:
       pageComponent = (
-        <FileDownloads setCurrentPage={setCurrentPage} />
+        <FileDownloads
+          setCurrentPage={setCurrentPage}
+          allFilesPaused={allFilesPaused}
+          setAllFilesPaused={setAllFilesPaused}
+        />
       )
 
       break

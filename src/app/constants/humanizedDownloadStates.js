@@ -7,7 +7,7 @@ const humanizedDownloadStates = {
   [downloadStates.error]: 'An error occurred',
   [downloadStates.interrupted]: 'Interrupted',
   [downloadStates.paused]: 'Paused',
-  [downloadStates.pending]: 'Initializing',
+  [downloadStates.pending]: 'Not yet started',
   [downloadStates.starting]: 'Initializing'
 }
 

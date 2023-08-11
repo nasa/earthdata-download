@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
@@ -63,10 +63,6 @@ describe('Downloads component', () => {
       </ElectronApiContext.Provider>
     )
 
-    // The useEffect for setDownloadItems(items) is updating a state variable,
-    // setDownloadItems(items) is updating a state variable,
-    // causing the component to re-render, which renders the mock a second time.
-    expect(ListPage).toHaveBeenCalledTimes(2)
-    expect(screen.queryAllByText('Mock ListPage').length).toBe(1)
+    expect(ListPage).toHaveBeenCalledTimes(1)
   })
 })

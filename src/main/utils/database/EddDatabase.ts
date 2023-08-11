@@ -276,6 +276,29 @@ class EddDatabase {
 
     return result
   }
+
+  async getDownloadData(downloadId) {
+    const [result] = await this.db('files')
+      .select('downloads.*')
+      .sum({
+        // Return the sum of the `percent` column as `percentSum`
+        percentSum: 'files.percent'
+      })
+      .count({
+        // Return the count of the `id` column as `totalFiles`
+        totalFiles: 'files.id',
+        // Return the count of the `state` column when the value is `COMPLETED` as `finishedFiles`
+        finishedFiles: this.db.raw('CASE "files"."state" WHEN "COMPLETED" THEN 1 ELSE NULL END'),
+        // Return the count of the `state` column when the value is `ERROR` as `totalErroredFiles`
+        erroredFiles: this.db.raw('CASE "files"."state" WHEN "ERROR" THEN 1 ELSE NULL END')
+      })
+      .join('downloads', { 'files.downloadId': 'downloads.id' })
+      .where({
+        downloadId
+      })
+
+    return result
+  }
 }
 
 export default EddDatabase

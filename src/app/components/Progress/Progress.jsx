@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import * as RadixProgress from '@radix-ui/react-progress'
 
-import createVariantClassName from '../../utils/createVariantName'
+import createVariantClassName from '../../utils/createVariantClassName'
 
 import * as styles from './Progress.module.scss'
 

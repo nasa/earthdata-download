@@ -22,6 +22,26 @@ import DownloadListItemFileProgress from './DownloadListItemFileProgress'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import useAppContext from '../../hooks/useAppContext'
 
+/**
+ * @typedef {Object} DownloadListItemProps
+ * @property {Object} download State of the download item.
+ * @property {Function} setCurrentPage A function which sets the active page.
+ * @property {Function} showMoreInfoDialog A function which shows the MoreIntoDialog.
+ */
+
+/**
+ * Renders a `DownloadListItem` component
+ * @param {DownloadListItemProps} props
+ *
+ * @example <caption>Renders a `DownloadListItem` component</caption>
+ * return (
+ *   <DownloadListItem
+ *     download={download}
+ *     setCurrentPage={setCurrentPage}
+ *     showMoreInfoDialog={showMoreInfoDialog}
+ *   />
+ * )
+ */
 const DownloadListItem = ({
   download,
   setCurrentPage,
@@ -214,32 +234,34 @@ const DownloadListItem = ({
       state={state}
       itemName={downloadId}
       percent={percent}
-      status={
-        {
-          primary: (
-            <DownloadListItemPercent
-              percent={percent}
-            />
-          ),
-          secondary: (
-            <DownloadListItemState
-              state={state}
-              percent={percent}
-              hasErrors={hasErrors}
-            />
-          ),
-          tertiary: (
-            <DownloadListItemFileProgress
-              finishedFiles={finishedFiles}
-              loadingMoreFiles={loadingMoreFiles}
-              shouldShowProgress={shouldShowProgress}
-              shouldShowTime={shouldShowTime}
-              state={state}
-              totalFiles={totalFiles}
-              totalTime={totalTime}
-            />
-          )
-        }
+      primaryStatus={
+        (
+          <DownloadListItemPercent
+            percent={percent}
+          />
+        )
+      }
+      secondaryStatus={
+        (
+          <DownloadListItemState
+            state={state}
+            percent={percent}
+            hasErrors={hasErrors}
+          />
+        )
+      }
+      tertiaryStatus={
+        (
+          <DownloadListItemFileProgress
+            finishedFiles={finishedFiles}
+            loadingMoreFiles={loadingMoreFiles}
+            shouldShowProgress={shouldShowProgress}
+            shouldShowTime={shouldShowTime}
+            state={state}
+            totalFiles={totalFiles}
+            totalTime={totalTime}
+          />
+        )
       }
     />
   )

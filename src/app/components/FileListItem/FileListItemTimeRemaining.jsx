@@ -7,6 +7,28 @@ import downloadStates from '../../constants/downloadStates'
 import * as styles from './FileListItemTimeRemaining.module.scss'
 import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
+/**
+ * @typedef {Object} FileListItemTimeRemainingProps
+ * @property {Number} percent The download percent of the DownloadItem.
+ * @property {Number} remainingTime Remaining time in the download.
+ * @property {Boolean} shouldShowTime Should the component show the time.
+ * @property {String} state The state of the DownloadItem.
+ */
+
+/**
+ * Renders a `FileListItemTimeRemaining` component
+ * @param {FileListItemTimeRemainingProps} props
+ *
+ * @example <caption>Renders a `FileListItemTimeRemaining` component</caption>
+ * return (
+ *   <FileListItemTimeRemaining
+ *     percent={percent}
+ *     remainingTime={remainingTime}
+ *     shouldShowTime={shouldShowTime}
+ *     state={state}
+ *   />
+ * )
+ */
 const FileListItemTimeRemaining = ({
   percent,
   remainingTime,

@@ -12,6 +12,26 @@ import downloadStates from '../../constants/downloadStates'
 
 import * as styles from './DownloadListItemState.module.scss'
 
+/**
+ * @typedef {Object} DownloadListItemStateProps
+ * @property {String} state The state of the download.
+ * @property {Number} percent The download percent of the DownloadItem.
+ * @property {Boolean} hasErrors Does the download have any errors.
+ */
+
+/**
+ * Renders a `DownloadListItemState` component
+ * @param {DownloadListItemStateProps} props
+ *
+ * @example <caption>Renders a `DownloadListItemState` component</caption>
+ * return (
+ *   <DownloadListItemState
+ *     state={state}
+ *     percent={percent}
+ *     hasErrors={hasErrors}
+ *   />
+ * )
+ */
 const DownloadListItemState = ({
   state,
   percent,

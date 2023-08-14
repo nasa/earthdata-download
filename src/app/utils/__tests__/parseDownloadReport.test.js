@@ -73,7 +73,7 @@ describe('parseDownloadReport', () => {
         derivedStateFromDownloads: downloadStates.active,
         hasActiveDownload: true,
         totalCompletedFiles: 5,
-        totalDownloadFiles: 8
+        totalFiles: 8
       })
     })
   })
@@ -88,7 +88,7 @@ describe('parseDownloadReport', () => {
         derivedStateFromDownloads: downloadStates.paused,
         hasActiveDownload: false,
         totalCompletedFiles: 13,
-        totalDownloadFiles: 16
+        totalFiles: 16
       })
     })
   })
@@ -103,7 +103,7 @@ describe('parseDownloadReport', () => {
         derivedStateFromDownloads: downloadStates.paused,
         hasActiveDownload: false,
         totalCompletedFiles: 5,
-        totalDownloadFiles: 8
+        totalFiles: 8
       })
     })
   })
@@ -118,7 +118,7 @@ describe('parseDownloadReport', () => {
         derivedStateFromDownloads: downloadStates.completed,
         hasActiveDownload: false,
         totalCompletedFiles: 8,
-        totalDownloadFiles: 8
+        totalFiles: 8
       })
     })
   })
@@ -133,7 +133,7 @@ describe('parseDownloadReport', () => {
         derivedStateFromDownloads: downloadStates.completed,
         hasActiveDownload: false,
         totalCompletedFiles: 7,
-        totalDownloadFiles: 8
+        totalFiles: 8
       })
     })
   })

@@ -21,9 +21,9 @@ const setup = (overrideProps) => {
   const props = {
     allDownloadsCompleted: false,
     allDownloadsPaused: false,
-    derivedStateFromDownloads: downloadStates.pending,
+    state: downloadStates.pending,
     totalCompletedFiles: 0,
-    totalDownloadFiles: 0,
+    totalFiles: 0,
     ...overrideProps
   }
 
@@ -90,9 +90,9 @@ describe('DownloadHeader component', () => {
   describe('when there are active downloads', () => {
     test('displays the correct information', () => {
       setup({
-        derivedStateFromDownloads: downloadStates.active,
+        state: downloadStates.active,
         totalCompletedFiles: 5,
-        totalDownloadFiles: 10
+        totalFiles: 10
       })
 
       expect(screen.getByText('Downloading')).toHaveClass('derivedStatus')
@@ -108,9 +108,9 @@ describe('DownloadHeader component', () => {
     test('displays the correct information', () => {
       setup({
         allDownloadsCompleted: true,
-        derivedStateFromDownloads: downloadStates.completed,
+        state: downloadStates.completed,
         totalCompletedFiles: 10,
-        totalDownloadFiles: 10
+        totalFiles: 10
       })
 
       expect(screen.getByText('Completed')).toHaveClass('derivedStatus')
@@ -126,9 +126,9 @@ describe('DownloadHeader component', () => {
     test('displays the correct information', () => {
       setup({
         allDownloadsPaused: true,
-        derivedStateFromDownloads: downloadStates.paused,
+        state: downloadStates.paused,
         totalCompletedFiles: 5,
-        totalDownloadFiles: 10
+        totalFiles: 10
       })
 
       expect(screen.getByText('Paused')).toHaveClass('derivedStatus')

@@ -22,7 +22,7 @@ import * as styles from './Downloads.module.scss'
 /**
  * @typedef {Object} DownloadsProps
  * @property {Function} setCurrentPage A function which sets the active page.
- * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout
+ * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout.
  * @property {Function} setHasActiveDownload A function to set whether a download is active.
 
 /**
@@ -51,7 +51,7 @@ const Downloads = ({
   const [downloadsReport, setDownloadsReport] = useState([])
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
-  const [totalDownloadFiles, setTotalDownloadFiles] = useState(0)
+  const [totalFiles, setTotalFiles] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
   const [
     derivedStateFromDownloads,
@@ -71,13 +71,13 @@ const Downloads = ({
       derivedStateFromDownloads: reportDerivedStateFromDownloads,
       hasActiveDownload: reportHasActiveDownload,
       totalCompletedFiles: reportTotalCompletedFiles,
-      totalDownloadFiles: reportTotalDownloadFiles
+      totalFiles: reportTotalFiles
     } = parsedReport
 
     setAllDownloadsPaused(reportAllDownloadsPaused)
     setAllDownloadsCompleted(reportAllDownloadsCompleted)
     setHasActiveDownload(reportHasActiveDownload)
-    setTotalDownloadFiles(reportTotalDownloadFiles)
+    setTotalFiles(reportTotalFiles)
     setTotalCompletedFiles(reportTotalCompletedFiles)
     setDerivedStateFromDownloads(reportDerivedStateFromDownloads)
   }
@@ -124,9 +124,9 @@ const Downloads = ({
           <DownloadHeader
             allDownloadsCompleted={allDownloadsCompleted}
             allDownloadsPaused={allDownloadsPaused}
-            derivedStateFromDownloads={derivedStateFromDownloads}
+            state={derivedStateFromDownloads}
             totalCompletedFiles={totalCompletedFiles}
-            totalDownloadFiles={totalDownloadFiles}
+            totalFiles={totalFiles}
           />
         )
       }

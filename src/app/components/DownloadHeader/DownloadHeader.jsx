@@ -17,12 +17,36 @@ import * as styles from './DownloadHeader.module.scss'
 import Button from '../Button/Button'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
+/**
+ * @typedef {Object} DownloadHeaderProps
+ * @property {Boolean} allDownloadsCompleted Are all downloads completed
+ * @property {Boolean} allDownloadsPaused Are all downloads paused
+ * @property {String} state State of the downloads
+ * @property {Number} totalCompletedFiles Total number of completed files
+ * @property {Number} totalFiles Total number of files
+ */
+
+/**
+ * Renders a `DownloadHeader` component
+ * @param {DownloadHeaderProps} props
+ *
+ * @example <caption>Renders a `DownloadHeader` component</caption>
+ * return (
+ *   <DownloadHeader
+ *     allDownloadsCompleted={allDownloadsCompleted}
+ *     allDownloadsPaused={allDownloadsPaused}
+ *     state={derivedStateFromDownloads}
+ *     totalCompletedFiles={totalCompletedFiles}
+ *     totalFiles={totalFiles}
+ *   />
+ * )
+ */
 const DownloadHeader = ({
   allDownloadsCompleted,
   allDownloadsPaused,
-  derivedStateFromDownloads,
+  state,
   totalCompletedFiles,
-  totalDownloadFiles
+  totalFiles
 }) => {
   const {
     cancelDownloadItem,
@@ -47,13 +71,13 @@ const DownloadHeader = ({
       className={
         classNames([
           styles.listHeader,
-          styles[createVariantClassName(derivedStateFromDownloads)]
+          styles[createVariantClassName(state)]
         ])
       }
     >
       <div className={styles.listHeaderPrimary}>
         {
-          derivedStateFromDownloads === downloadStates.active && (
+          state === downloadStates.active && (
             <FaSpinner
               className={
                 classNames([
@@ -65,28 +89,28 @@ const DownloadHeader = ({
           )
         }
         {
-          derivedStateFromDownloads === downloadStates.paused && (
+          state === downloadStates.paused && (
             <FaPause className={styles.derivedStatusIcon} />
           )
         }
         {
-          derivedStateFromDownloads === downloadStates.completed && (
+          state === downloadStates.completed && (
             <FaCheckCircle className={styles.derivedStatusIcon} />
           )
         }
         <span className={styles.derivedStatus}>
           {
-            derivedStateFromDownloads === downloadStates.active && (
+            state === downloadStates.active && (
               getHumanizedDownloadStates(downloadStates.active)
             )
           }
           {
-            derivedStateFromDownloads === downloadStates.paused && (
+            state === downloadStates.paused && (
               getHumanizedDownloadStates(downloadStates.paused)
             )
           }
           {
-            derivedStateFromDownloads === downloadStates.completed && (
+            state === downloadStates.completed && (
               getHumanizedDownloadStates(downloadStates.completed)
             )
           }
@@ -96,7 +120,7 @@ const DownloadHeader = ({
           {' '}
           of
           {' '}
-          {totalDownloadFiles}
+          {totalFiles}
           {' '}
           files done
         </span>
@@ -160,9 +184,9 @@ const DownloadHeader = ({
 DownloadHeader.propTypes = {
   allDownloadsCompleted: PropTypes.bool.isRequired,
   allDownloadsPaused: PropTypes.bool.isRequired,
-  derivedStateFromDownloads: PropTypes.string.isRequired,
+  state: PropTypes.string.isRequired,
   totalCompletedFiles: PropTypes.number.isRequired,
-  totalDownloadFiles: PropTypes.number.isRequired
+  totalFiles: PropTypes.number.isRequired
 }
 
 export default DownloadHeader

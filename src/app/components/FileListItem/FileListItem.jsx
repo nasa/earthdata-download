@@ -16,22 +16,22 @@ import FileListItemPercent from './FileListItemPercent'
 import FileListItemTimeRemaining from './FileListItemTimeRemaining'
 import FileListItemSizeProgress from './FileListItemSizeProgress'
 
-/* {
-  "id": 424,
-  "downloadId": "MODIS_A-JPL-L2P-v2019.0_2019.0-20230810_175626",
-  "filename": "STScI-01GK2KMYS6HADS6ND8NRHG53RP.png",
-  "state": "COMPLETED",
-  "url": "https://stsci-opo.org/STScI-01GK2KMYS6HADS6ND8NRHG53RP.png",
-  "percent": 100,
-  "createdAt": 1691690191124,
-  "timeStart": 1691690280763,
-  "timeEnd": 1691690286388,
-  "errors": null,
-  "receivedBytes": 61587289,
-  "totalBytes": 61587289,
-  "remainingTime": 0
-}
-*/
+/**
+ * @typedef {Object} FileListItemProps
+ * @property {Object} file State of the file download.
+ */
+
+/**
+ * Renders a `FileListItem` component
+ * @param {FileListItemProps} props
+ *
+ * @example <caption>Renders a `FileListItem` component</caption>
+ * return (
+ *   <FileListItem
+ *     file={file}
+ *   />
+ * )
+ */
 const FileListItem = ({
   file
 }) => {
@@ -136,29 +136,31 @@ const FileListItem = ({
       itemName={filename}
       percent={percent}
       state={state}
-      status={
-        {
-          primary: (
-            <FileListItemPercent
-              percent={percent}
-            />
-          ),
-          secondary: (
-            <FileListItemTimeRemaining
-              percent={percent}
-              remainingTime={remainingTime}
-              shouldShowTime={shouldShowTime}
-              state={state}
-            />
-          ),
-          tertiary: (
-            <FileListItemSizeProgress
-              receivedBytes={receivedBytes}
-              shouldShowBytes={shouldShowBytes}
-              totalBytes={totalBytes}
-            />
-          )
-        }
+      primaryStatus={
+        (
+          <FileListItemPercent
+            percent={percent}
+          />
+        )
+      }
+      secondaryStatus={
+        (
+          <FileListItemTimeRemaining
+            percent={percent}
+            remainingTime={remainingTime}
+            shouldShowTime={shouldShowTime}
+            state={state}
+          />
+        )
+      }
+      tertiaryStatus={
+        (
+          <FileListItemSizeProgress
+            receivedBytes={receivedBytes}
+            shouldShowBytes={shouldShowBytes}
+            totalBytes={totalBytes}
+          />
+        )
       }
     />
   )

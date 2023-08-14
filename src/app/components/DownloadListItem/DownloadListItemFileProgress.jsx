@@ -10,6 +10,34 @@ import Tooltip from '../Tooltip/Tooltip'
 
 import * as styles from './DownloadListItemFileProgress.module.scss'
 
+/**
+ * @typedef {Object} DownloadListItemFileProgressProps
+ * @property {Number} finishedFiles Number of finished files in the download.
+ * @property {Boolean} loadingMoreFiles Is the download still loading more download links.
+ * @property {Boolean} shouldShowProgress Should the component show the files progress.
+ * @property {Boolean} shouldShowTime Should the component show the time.
+ * @property {String} state The state of the DownloadItem.
+ * @property {Number} totalFiles Total number of files in the download.
+ * @property {Number} totalTime Total time the download has taken.
+ */
+
+/**
+ * Renders a `DownloadListItemFileProgress` component
+ * @param {DownloadListItemFileProgressProps} props
+ *
+ * @example <caption>Renders a `DownloadListItemFileProgress` component</caption>
+ * return (
+ *   <DownloadListItemFileProgress
+ *     finishedFiles={finishedFiles}
+ *     loadingMoreFiles={loadingMoreFiles}
+ *     shouldShowProgress={shouldShowProgress}
+ *     shouldShowTime={shouldShowTime}
+ *     state={state}
+ *     totalFiles={totalFiles}
+ *     totalTime={totalTime}
+ *   />
+ * )
+ */
 const DownloadListItemFileProgress = ({
   finishedFiles,
   loadingMoreFiles,

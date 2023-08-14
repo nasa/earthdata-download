@@ -26,12 +26,17 @@ import * as styles from './DownloadItem.module.scss'
 
 /**
  * @typedef {Object} DownloadItemProps
- * @property {String} downloadId The name of the DownloadItem.
- * @property {Boolean} hasErrors Does this download item have errors.
- * @property {Boolean} loadingMoreFiles Is EDD loading more download files.
- * @property {Object} progress The progress of the DownloadItem.
- * @property {String} state The state of the DownloadItem.
  * @property {Array} actionsList A 2-D array of objects detailing action attributes.
+ * @property {String} downloadId The ID of the DownloadItem.
+ * @property {String} itemName The name of the DownloadItem.
+ * @property {Number} percent The download percent of the DownloadItem.
+ * @property {Function} setCurrentPage A function which sets the active page.
+ * @property {String} state The state of the DownloadItem.
+ * @property {Object} primaryStatus Component for the primary status of the DownloadItem.
+ * @property {Object} secondaryStatus Component for the secondary status of the DownloadItem.
+ * @property {Object} tertiaryStatus Component for the tertiary status of the DownloadItem.
+ */
+
 /**
  * Renders a DownloadItem
  * @param {DownloadItemProps} props
@@ -40,12 +45,15 @@ import * as styles from './DownloadItem.module.scss'
  *
  * return (
  *   <DownloadItem
- *     key={downloadId}
+ *     actionsList={actionsList}
  *     downloadId={downloadId}
- *     loadingMoreFiles,
- *     progress={progress}
+ *     itemName={filename}
+ *     percent={percent}
+ *     setCurrentPage={setCurrentPage}
  *     state={state}
- *     actionsList={actionsList},
+ *     primaryStatus={(<PrimaryStatus ... />)}
+ *     secondaryStatus={(<SecondaryStatus ... />)}
+ *     tertiaryStatus={(<TertiaryStatus ... />)}
  *   />
  * )
  */
@@ -56,19 +64,15 @@ const DownloadItem = ({
   percent,
   setCurrentPage,
   state,
-  status
+  primaryStatus,
+  secondaryStatus,
+  tertiaryStatus
 }) => {
   const {
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
     startReportingFiles
   } = useContext(ElectronApiContext)
-
-  const {
-    primary: primaryStatus,
-    secondary: secondaryStatus,
-    tertiary: tertiaryStatus
-  } = status
 
   const [waitingForEulaDialogIsOpen, setWaitingForEulaDialogIsOpen] = useState(false)
   const [waitingForLoginDialogIsOpen, setWaitingForLoginDialogIsOpen] = useState(false)
@@ -258,7 +262,9 @@ const DownloadItem = ({
 DownloadItem.defaultProps = {
   actionsList: null,
   setCurrentPage: null,
-  status: {}
+  primaryStatus: null,
+  secondaryStatus: null,
+  tertiaryStatus: null
 }
 
 DownloadItem.propTypes = {
@@ -280,11 +286,9 @@ DownloadItem.propTypes = {
   percent: PropTypes.number.isRequired,
   setCurrentPage: PropTypes.func,
   state: PropTypes.string.isRequired,
-  status: PropTypes.shape({
-    primary: PropTypes.node,
-    secondary: PropTypes.node,
-    tertiary: PropTypes.node
-  })
+  primaryStatus: PropTypes.node,
+  secondaryStatus: PropTypes.node,
+  tertiaryStatus: PropTypes.node
 }
 
 export default DownloadItem

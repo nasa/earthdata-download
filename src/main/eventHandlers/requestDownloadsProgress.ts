@@ -8,20 +8,23 @@ import downloadStates from '../../app/constants/downloadStates'
  * @param {Object} params.database `EddDatabase` instance
  * @param {Object} params.webContents Electron BrowserWindow instance's webContents
  */
-const reportDownloadsProgress = async ({
+const requestDownloadsProgress = async ({
   database,
-  webContents
+  info
 }) => {
-  // Pull download status for each download in the database
-  const downloads = await database.getAllDownloads()
+  const {
+    limit = 10,
+    offset = 0
+  } = info
 
-  if (downloads.length === 0) {
-    webContents.send('reportDownloadsProgress', {
-      progressReport: []
-    })
+  const totalDownloads = await database.getAllDownloadsCount()
 
-    return
+  if (totalDownloads.length === 0) {
+    return []
   }
+
+  // Pull download status for each download in the database
+  const downloads = await database.getDownloadsReport(limit, offset)
 
   const promises = downloads.map(async (download) => {
     const {
@@ -38,8 +41,7 @@ const reportDownloadsProgress = async ({
       erroredFiles,
       totalFiles,
       finishedFiles
-    } = await database.getDownloadFilesProgressByDownloadId(downloadId)
-    // TODO only return fields we need from database calls
+    } = await database.getDownloadReport(downloadId)
 
     // If any erroredFiles exist, get the files
     let errors
@@ -80,9 +82,12 @@ const reportDownloadsProgress = async ({
     }
   })
 
-  const progressReport = await Promise.all(promises)
+  const downloadsReport = await Promise.all(promises)
 
-  webContents.send('reportDownloadsProgress', { progressReport })
+  return {
+    downloadsReport,
+    totalDownloads
+  }
 }
 
-export default reportDownloadsProgress
+export default requestDownloadsProgress

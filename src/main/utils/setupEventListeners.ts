@@ -26,8 +26,8 @@ import willDownload from '../eventHandlers/willDownload'
 
 import startPendingDownloads from '../utils/startPendingDownloads'
 
-import startReportingDownloads from './startReportingDownloads'
-import startReportingFiles from './startReportingFiles'
+import requestFilesProgress from '../eventHandlers/requestFilesProgress'
+import requestDownloadsProgress from '../eventHandlers/requestDownloadsProgress'
 
 /**
  * Sets up event listeners for the main process
@@ -49,7 +49,6 @@ const setupEventListeners = ({
   setUpdateAvailable
 }) => {
   let reportInterval
-  const intervalTime = 1000
 
   /**
    * Browser Window event listeners
@@ -245,6 +244,30 @@ const setupEventListeners = ({
   })
 
   /**
+   * Reporting event listeners
+   */
+
+  // Called when the Downloads list needs a progress report
+  ipcMain.handle('requestDownloadsProgress', async (event, info) => {
+    const report = await requestDownloadsProgress({
+      database,
+      info
+    })
+
+    return report
+  })
+
+  // Called when the Files list needs a progress report
+  ipcMain.handle('requestFilesProgress', async (event, info) => {
+    const report = await requestFilesProgress({
+      database,
+      info
+    })
+
+    return report
+  })
+
+  /**
    * AutoUpdater event listeners
    */
 
@@ -329,37 +352,12 @@ const setupEventListeners = ({
     })
   })
 
-  ipcMain.on('startReportingFiles', async (event, info) => {
-    const { webContents } = appWindow
-    // Update report interval for the new progress report type
-    reportInterval = await startReportingFiles({
-      database,
-      info,
-      intervalTime,
-      reportInterval,
-      webContents
-    })
-  })
-
-  ipcMain.on('startReportingDownloads', async () => {
-    const { webContents } = appWindow
-    // Update report interval for the new progress report type
-    reportInterval = await startReportingDownloads({
-      database,
-      webContents,
-      reportInterval,
-      intervalTime
-    })
-  })
-
   /**
    * Other listeners
    */
 
   // When the application finished loading, show the appWindow
   appWindow.webContents.once('did-finish-load', async () => {
-    const { webContents } = appWindow
-
     // Show the electron appWindow
     appWindow.show()
 
@@ -367,14 +365,6 @@ const setupEventListeners = ({
     if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })
 
     await autoUpdater.checkForUpdates()
-
-    // Start the downloads interval since `Downloads` page opens when app starts
-    reportInterval = await startReportingDownloads({
-      database,
-      webContents,
-      reportInterval,
-      intervalTime
-    })
 
     // Locally, start pending downloads unless `forceDevUpdateConfig` is enabled
     if (!app.isPackaged && !autoUpdater.forceDevUpdateConfig) {

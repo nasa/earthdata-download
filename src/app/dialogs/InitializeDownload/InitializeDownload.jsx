@@ -78,7 +78,6 @@ const InitializeDownload = ({
   }
 
   const onCancel = () => {
-    // TODO Can we add an undo functionality?
     // Delete the download entirely if it is canceled here
     downloadIds.forEach((downloadId) => deleteDownload({ downloadId }))
     onCloseChooseLocationDialog()

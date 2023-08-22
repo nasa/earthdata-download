@@ -46,7 +46,7 @@ const cancelDownloadItem = async ({
     )
   }
 
-  // TODO EDD-30 put the downloads into a cancelled state
+  // TODO EDD-18 put the downloads into a cancelled state, clear button will move them
   if (!downloadId) {
     await database.deleteAllDownloads()
   }

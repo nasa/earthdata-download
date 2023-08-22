@@ -1,68 +1,128 @@
 import React from 'react'
-import { render } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import Downloads from '../Downloads'
-import AppContext from '../../../context/AppContext'
 import ListPage from '../../../components/ListPage/ListPage'
+import downloadStates from '../../../constants/downloadStates'
 
 jest.mock('../../../components/ListPage/ListPage', () => jest.fn(
   () => <mock-ListPage>Mock ListPage</mock-ListPage>
 ))
 
-describe('Downloads component', () => {
-  test('renders the downloads page', () => {
-    // Props
-    const setCurrentPage = jest.fn()
-    const hasActiveDownload = false
-    const setHasActiveDownload = jest.fn()
-    const showMoreInfoDialog = jest.fn()
+const setup = (overrideProps) => {
+  const setCurrentPage = jest.fn()
+  const setHasActiveDownload = jest.fn()
+  const setSelectedDownloadId = jest.fn()
+  const showMoreInfoDialog = jest.fn()
 
-    // Context functions
-    const cancelDownloadItem = jest.fn()
-    const copyDownloadPath = jest.fn()
-    const openDownloadFolder = jest.fn()
-    const pauseDownloadItem = jest.fn()
-    const reportDownloadsProgress = jest.fn()
-    const restartDownload = jest.fn()
-    const resumeDownloadItem = jest.fn()
-    const sendToEula = jest.fn()
-    const sendToLogin = jest.fn()
-
-    render(
-      <ElectronApiContext.Provider value={
-        {
-          cancelDownloadItem,
-          copyDownloadPath,
-          openDownloadFolder,
-          pauseDownloadItem,
-          reportDownloadsProgress,
-          restartDownload,
-          resumeDownloadItem,
-          sendToEula,
-          sendToLogin
-        }
+  const requestDownloadsProgress = jest.fn().mockResolvedValue({
+    downloadsReport: [
+      {
+        downloadId: 'mock-download-id-2',
+        loadingMoreFiles: false,
+        progress: {
+          percent: 100,
+          finishedFiles: 7,
+          totalFiles: 7,
+          totalTime: 101
+        },
+        state: downloadStates.completed
+      },
+      {
+        downloadId: 'mock-download-id-1',
+        loadingMoreFiles: false,
+        progress: {
+          percent: 100,
+          finishedFiles: 7,
+          totalFiles: 7,
+          totalTime: 100
+        },
+        state: downloadStates.completed
       }
-      >
-        <AppContext.Provider value={
-          {
-            toasts: {
-              addToast: () => {}
-            }
-          }
-        }
-        >
-          <Downloads
-            hasActiveDownload={hasActiveDownload}
-            setCurrentPage={setCurrentPage}
-            showMoreInfoDialog={showMoreInfoDialog}
-            setHasActiveDownload={setHasActiveDownload}
-          />
-        </AppContext.Provider>
-      </ElectronApiContext.Provider>
-    )
+    ],
+    totalDownloads: 2
+  })
 
-    expect(ListPage).toHaveBeenCalledTimes(1)
+  // Props
+  const props = {
+    setCurrentPage,
+    setHasActiveDownload,
+    setSelectedDownloadId,
+    showMoreInfoDialog,
+    ...overrideProps
+  }
+
+  render(
+    <ElectronApiContext.Provider value={
+      {
+        requestDownloadsProgress
+      }
+    }
+    >
+      <Downloads
+        {...props}
+      />
+    </ElectronApiContext.Provider>
+  )
+
+  return {
+    requestDownloadsProgress
+  }
+}
+
+beforeEach(() => {
+  jest.useFakeTimers()
+
+  jest.clearAllMocks()
+})
+
+afterEach(() => {
+  jest.runOnlyPendingTimers()
+  jest.useRealTimers()
+})
+
+describe('Downloads component', () => {
+  test('renders the ListPage', async () => {
+    const { requestDownloadsProgress } = setup()
+
+    // `waitFor` is necessary because the useEffects are triggering updates to the
+    // component after the initial render
+    await waitFor(() => {
+      expect(ListPage).toHaveBeenCalledTimes(1)
+      expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
+      expect(requestDownloadsProgress).toHaveBeenCalledWith({
+        limit: 10,
+        offset: 0
+      })
+    })
+  })
+
+  test('renders the ListPage with a new report every second', async () => {
+    const { requestDownloadsProgress } = setup()
+
+    // `waitFor` is necessary because the useEffects are triggering updates to the
+    // component after the initial render
+    await waitFor(() => {
+      expect(ListPage).toHaveBeenCalledTimes(1)
+      expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
+      expect(requestDownloadsProgress).toHaveBeenCalledWith({
+        limit: 10,
+        offset: 0
+      })
+    })
+
+    jest.clearAllMocks()
+    jest.advanceTimersByTime(1000)
+
+    await waitFor(() => {
+      expect(ListPage).toHaveBeenCalledTimes(1)
+      expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
+      expect(requestDownloadsProgress).toHaveBeenCalledWith({
+        limit: 10,
+        offset: 0
+      })
+    })
   })
 })

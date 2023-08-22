@@ -1,0 +1,62 @@
+.skeleton {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  padding: var(--size__200);
+  padding-top: var(--size__350);
+  padding-bottom: var(--size__500);
+  border: 1px solid var(--color__black--200);
+  border-radius: var(--size__100);
+  margin: var(--size__250);
+  margin-top: 0;
+  margin-bottom: var(--size__200);
+  background-color: var(--color__white);
+}
+
+.skeletonInner {
+  position: absolute;
+  overflow: hidden;
+  background-color: transparent;
+  inset: 0;
+  mix-blend-mode: multiply;
+}
+
+.skeletonItem {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  max-width: 100%;
+  background-color: var(--color__black--300);
+}
+
+.skeletonItemInner {
+  position: absolute;
+  overflow: hidden;
+  border-radius: inherit;
+  inset: 0;
+
+  &::after {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    animation: pulse 1s infinite;
+    background-color: var(--color__black--200);
+    content: '';
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

@@ -45,6 +45,7 @@ import useAppContext from '../../hooks/useAppContext'
 const DownloadListItem = ({
   download,
   setCurrentPage,
+  setSelectedDownloadId,
   showMoreInfoDialog
 }) => {
   const appContext = useAppContext()
@@ -231,6 +232,7 @@ const DownloadListItem = ({
       actionsList={actionsList}
       downloadId={downloadId}
       setCurrentPage={setCurrentPage}
+      setSelectedDownloadId={setSelectedDownloadId}
       state={state}
       itemName={downloadId}
       percent={percent}
@@ -283,7 +285,8 @@ DownloadListItem.propTypes = {
     state: PropTypes.string
   }).isRequired,
   setCurrentPage: PropTypes.func.isRequired,
-  showMoreInfoDialog: PropTypes.func.isRequired
+  showMoreInfoDialog: PropTypes.func.isRequired,
+  setSelectedDownloadId: PropTypes.func.isRequired
 }
 
 export default DownloadListItem

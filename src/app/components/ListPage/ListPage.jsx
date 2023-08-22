@@ -7,6 +7,10 @@ import React, {
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import SimpleBar from 'simplebar-react'
+import { FixedSizeList } from 'react-window'
+import AutoSizer from 'react-virtualized-auto-sizer'
+
+import ListPageListItem from './ListPageListItem'
 
 import * as styles from './ListPage.module.scss'
 
@@ -40,15 +44,24 @@ const ListPage = ({
   actions,
   emptyMessage,
   header,
+  hideCompleted,
   Icon,
-  items
+  items,
+  listRef,
+  setWindowState
 }) => {
   const scrollableNodeRef = useRef(null)
+  const infiniteLoaderRef = useRef(null)
   const [hasScrolledList, setHasScrolledList] = useState(false)
 
   const onScrollList = useCallback(({ target }) => {
     const { scrollTop } = target
+
     setHasScrolledList(scrollTop !== 0)
+
+    if (infiniteLoaderRef.current) {
+      infiniteLoaderRef.current.resetloadMoreItemsCache()
+    }
   }, [scrollableNodeRef])
 
   useEffect(() => {
@@ -63,6 +76,12 @@ const ListPage = ({
     }
   }, [scrollableNodeRef.current])
 
+  const onItemsRendered = (props) => {
+    setWindowState(props)
+  }
+
+  // TODO simplebar-mouse-entered is getting added to the simplebar element and causing a tiny dot to appear and top and left of y & x scrollbars
+  // TODO Y scrollbar has too much space beside it, between scrollbar and right edge of DownloadItem
   return (
     <section className={
       classNames([
@@ -75,7 +94,7 @@ const ListPage = ({
     }
     >
       {
-        items && items.length
+        (items && items.length) || hideCompleted
           ? (
             <>
               {
@@ -87,12 +106,43 @@ const ListPage = ({
               }
               <div className={styles.contentWrapper}>
                 <div className={styles.scrollableWrapper}>
-                  <SimpleBar scrollableNodeProps={{ ref: scrollableNodeRef }} className={styles.listWrapper} style={{ height: '100%' }}>
-                    <ul
-                      className={styles.list}
-                    >
-                      {items}
-                    </ul>
+                  {
+                    // TODO this screws up the header width
+                    hideCompleted && items.length === 0 && (
+                      <div>
+                        No Items remaining
+                      </div>
+                    )
+                  }
+
+                  <SimpleBar
+                    className={styles.listWrapper}
+                    style={{ height: '100%' }}
+                  >
+                    {
+                      ({ contentNodeRef }) => (
+                        <AutoSizer className={styles.list}>
+                          {
+                            ({ height, width }) => (
+                              <FixedSizeList
+                                height={height}
+                                itemCount={items.length}
+                                onItemsRendered={onItemsRendered}
+                                itemSize={97}
+                                width={width}
+                                itemData={items}
+                                innerRef={contentNodeRef}
+                                outerRef={scrollableNodeRef}
+                                ref={listRef}
+                                overscanCount={4}
+                              >
+                                {ListPageListItem}
+                              </FixedSizeList>
+                            )
+                          }
+                        </AutoSizer>
+                      )
+                    }
                   </SimpleBar>
                 </div>
               </div>
@@ -124,15 +174,23 @@ ListPage.defaultProps = {
   actions: null,
   emptyMessage: null,
   header: null,
-  Icon: null
+  hideCompleted: false,
+  Icon: null,
+  listRef: {},
+  setWindowState: () => {}
 }
 
 ListPage.propTypes = {
   actions: PropTypes.node,
   emptyMessage: PropTypes.string,
   header: PropTypes.node,
-  items: PropTypes.node.isRequired,
-  Icon: PropTypes.func
+  Icon: PropTypes.func,
+  items: PropTypes.arrayOf(
+    PropTypes.shape({})
+  ).isRequired,
+  listRef: PropTypes.shape({}),
+  setWindowState: PropTypes.func,
+  hideCompleted: PropTypes.bool
 }
 
 export default ListPage

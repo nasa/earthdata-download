@@ -10,14 +10,14 @@ import { PAGES } from '../../../constants/pages'
 
 import downloadStates from '../../../constants/downloadStates'
 
-const downloadReport = {
+const headerReport = {
   percent: 0,
   totalFiles: 1,
   finishedFiles: 0,
   erroredFiles: 0,
-  totalTimeRemaining: 0,
+  estimatedTotalTimeRemaining: 0,
   state: downloadStates.pending,
-  totalTime: 0,
+  elapsedTime: 0,
   downloadLocation: '/mock/location',
   id: 'mock-download-id'
 }
@@ -37,7 +37,7 @@ const setup = (overrideProps) => {
     hideCompleted: false,
     setCurrentPage,
     setHideCompleted,
-    downloadReport,
+    headerReport,
     ...overrideProps
   }
 
@@ -85,8 +85,8 @@ describe('FileDownloadsHeader component', () => {
   describe('when clicking the Pause All button', () => {
     test('calls pauseDownloadItem', async () => {
       const { pauseDownloadItem } = setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           state: downloadStates.active
         }
       })
@@ -102,8 +102,8 @@ describe('FileDownloadsHeader component', () => {
   describe('when clicking the Resume All button', () => {
     test('calls resumeDownloadItem', async () => {
       const { resumeDownloadItem } = setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           state: downloadStates.paused
         }
       })
@@ -119,8 +119,8 @@ describe('FileDownloadsHeader component', () => {
   describe('when clicking the Cancel All button', () => {
     test('calls cancelDownloadItem', async () => {
       const { cancelDownloadItem } = setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           state: downloadStates.active
         }
       })
@@ -136,8 +136,8 @@ describe('FileDownloadsHeader component', () => {
   describe('when checking the Hide Completed checkbox', () => {
     test('calls setHideCompleted', async () => {
       const { setHideCompleted } = setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           state: downloadStates.active
         }
       })
@@ -153,8 +153,8 @@ describe('FileDownloadsHeader component', () => {
   describe('when the download is pending', () => {
     test('displays the correct information', () => {
       setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           state: downloadStates.pending
         }
       })
@@ -178,8 +178,8 @@ describe('FileDownloadsHeader component', () => {
   describe('when the download is starting', () => {
     test('displays the correct information', () => {
       setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           state: downloadStates.starting
         }
       })
@@ -203,8 +203,8 @@ describe('FileDownloadsHeader component', () => {
   describe('when the download is active', () => {
     test('displays the correct information', () => {
       setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           percent: 42,
           state: downloadStates.active
         }
@@ -229,11 +229,11 @@ describe('FileDownloadsHeader component', () => {
   describe('when the download is paused', () => {
     test('displays the correct information', () => {
       setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           percent: 42,
-          totalTime: 234,
-          totalTimeRemaining: 123,
+          elapsedTime: 234,
+          estimatedTotalTimeRemaining: 123,
           state: downloadStates.paused
         }
       })
@@ -257,8 +257,8 @@ describe('FileDownloadsHeader component', () => {
   describe('when the download is cancelled', () => {
     test('displays the correct information', () => {
       setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           state: downloadStates.cancelled
         }
       })
@@ -282,8 +282,8 @@ describe('FileDownloadsHeader component', () => {
   describe('when the download is completed', () => {
     test('displays the correct information', () => {
       setup({
-        downloadReport: {
-          ...downloadReport,
+        headerReport: {
+          ...headerReport,
           percent: 100,
           finishedFiles: 1,
           state: downloadStates.completed

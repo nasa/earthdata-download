@@ -1,6 +1,7 @@
 import React, {
   useContext,
   useEffect,
+  useRef,
   useState
 } from 'react'
 import PropTypes from 'prop-types'
@@ -13,7 +14,6 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
 import Button from '../../components/Button/Button'
 import ListPage from '../../components/ListPage/ListPage'
 import DownloadHeader from '../../components/DownloadHeader/DownloadHeader'
-import DownloadListItem from '../../components/DownloadListItem/DownloadListItem'
 
 import parseDownloadReport from '../../utils/parseDownloadReport'
 
@@ -41,55 +41,107 @@ import * as styles from './Downloads.module.scss'
  */
 const Downloads = ({
   setCurrentPage,
-  showMoreInfoDialog,
-  setHasActiveDownload
+  setHasActiveDownload,
+  setSelectedDownloadId,
+  showMoreInfoDialog
 }) => {
   const {
-    reportDownloadsProgress
+    requestDownloadsProgress
   } = useContext(ElectronApiContext)
 
-  const [downloadsReport, setDownloadsReport] = useState([])
+  const listRef = useRef()
+
+  const [items, setItems] = useState([])
+  const [windowState, setWindowState] = useState({})
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
   const [totalFiles, setTotalFiles] = useState(0)
+  const [totalDownloads, setTotalDownloads] = useState(null)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
   const [
     derivedStateFromDownloads,
     setDerivedStateFromDownloads
   ] = useState(downloadStates.completed)
 
-  const onReportDownloadsProgress = (event, info) => {
-    const { progressReport } = info
-
-    setDownloadsReport(progressReport)
-
-    const parsedReport = parseDownloadReport(progressReport)
+  const buildItems = (report, newWindowState) => {
+    const {
+      downloadsReport,
+      totalDownloads: newTotalDownloads
+    } = report
 
     const {
-      allDownloadsCompleted: reportAllDownloadsCompleted,
-      allDownloadsPaused: reportAllDownloadsPaused,
-      derivedStateFromDownloads: reportDerivedStateFromDownloads,
-      hasActiveDownload: reportHasActiveDownload,
-      totalCompletedFiles: reportTotalCompletedFiles,
-      totalFiles: reportTotalFiles
-    } = parsedReport
+      overscanStartIndex,
+      overscanStopIndex
+    } = newWindowState
 
-    setAllDownloadsPaused(reportAllDownloadsPaused)
-    setAllDownloadsCompleted(reportAllDownloadsCompleted)
-    setHasActiveDownload(reportHasActiveDownload)
-    setTotalFiles(reportTotalFiles)
-    setTotalCompletedFiles(reportTotalCompletedFiles)
-    setDerivedStateFromDownloads(reportDerivedStateFromDownloads)
+    // Build real items
+    const realItems = downloadsReport.map((download) => ({
+      download,
+      setCurrentPage,
+      setSelectedDownloadId,
+      showMoreInfoDialog,
+      type: 'download'
+    }))
+
+    setItems([
+      ...Array.from({ length: overscanStartIndex }),
+      ...realItems,
+      ...Array.from({ length: newTotalDownloads - overscanStopIndex - 1 })
+    ])
+
+    setTotalDownloads(newTotalDownloads)
   }
 
-  // Setup event listeners
   useEffect(() => {
-    reportDownloadsProgress(true, onReportDownloadsProgress)
+    const loadItems = async () => {
+      const {
+        overscanStartIndex = 0,
+        // Default to 10 items
+        overscanStopIndex = 10
+      } = windowState
+
+      const stopIndex = totalDownloads || overscanStopIndex
+      const limit = stopIndex - overscanStartIndex
+      const offset = overscanStartIndex
+
+      const report = await requestDownloadsProgress({
+        limit,
+        offset
+      })
+
+      const { downloadsReport } = report
+
+      const parsedReport = parseDownloadReport(downloadsReport)
+
+      const {
+        allDownloadsCompleted: reportAllDownloadsCompleted,
+        allDownloadsPaused: reportAllDownloadsPaused,
+        derivedStateFromDownloads: reportDerivedStateFromDownloads,
+        hasActiveDownload: reportHasActiveDownload,
+        totalCompletedFiles: reportTotalCompletedFiles,
+        totalFiles: reportTotalFiles
+      } = parsedReport
+
+      setAllDownloadsPaused(reportAllDownloadsPaused)
+      setAllDownloadsCompleted(reportAllDownloadsCompleted)
+      setHasActiveDownload(reportHasActiveDownload)
+      setTotalFiles(reportTotalFiles)
+      setTotalCompletedFiles(reportTotalCompletedFiles)
+      setDerivedStateFromDownloads(reportDerivedStateFromDownloads)
+
+      buildItems(report, windowState)
+    }
+
+    loadItems()
+
+    const interval = setInterval(() => {
+      loadItems()
+    }, 1000)
 
     return () => {
-      reportDownloadsProgress(false, onReportDownloadsProgress)
+      clearInterval(interval)
     }
-  }, [])
+  }, [windowState])
 
   return (
     <ListPage
@@ -120,7 +172,7 @@ const Downloads = ({
       }
       emptyMessage="No downloads in progress"
       header={
-        !!downloadsReport.length && (
+        !!items.length && (
           <DownloadHeader
             allDownloadsCompleted={allDownloadsCompleted}
             allDownloadsPaused={allDownloadsPaused}
@@ -131,16 +183,9 @@ const Downloads = ({
         )
       }
       Icon={FaDownload}
-      items={
-        downloadsReport.map((download) => (
-          <DownloadListItem
-            key={download.downloadId}
-            download={download}
-            setCurrentPage={setCurrentPage}
-            showMoreInfoDialog={showMoreInfoDialog}
-          />
-        ))
-      }
+      items={items}
+      listRef={listRef}
+      setWindowState={setWindowState}
     />
   )
 }
@@ -148,6 +193,7 @@ const Downloads = ({
 Downloads.propTypes = {
   setCurrentPage: PropTypes.func.isRequired,
   setHasActiveDownload: PropTypes.func.isRequired,
+  setSelectedDownloadId: PropTypes.func.isRequired,
   showMoreInfoDialog: PropTypes.func.isRequired
 }
 

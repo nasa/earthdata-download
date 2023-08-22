@@ -54,8 +54,8 @@ const FileListItemTimeRemaining = ({
             <>
               {
                 humanizeDuration(remainingTime * 1000, {
-                  round: 1,
-                  largest: 1
+                  largest: 1,
+                  round: 1
                 })
               }
               {' '}

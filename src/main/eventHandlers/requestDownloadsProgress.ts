@@ -19,7 +19,7 @@ const requestDownloadsProgress = async ({
 
   const totalDownloads = await database.getAllDownloadsCount()
 
-  if (totalDownloads.length === 0) {
+  if (totalDownloads === 0) {
     return []
   }
 

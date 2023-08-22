@@ -25,9 +25,11 @@ const downloadItemSkeleton = [
 ]
 
 /**
- *
- * @param {*} param0
- * @returns
+ * Renders a `react-window` list item
+ * @param {Object} params
+ * @param {Object} params.data Data for all list items
+ * @param {Number} params.index Index within data to find the item data
+ * @param {Object} params.style Style to apply to each list item
  */
 const ListPageListItem = ({
   data,

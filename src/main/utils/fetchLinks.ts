@@ -126,7 +126,11 @@ const fetchLinks = async ({
         return
       }
 
-      const { cursor: responseCursor, done, links = [] } = jsonResponse
+      const {
+        cursor: responseCursor,
+        done,
+        links = []
+      } = jsonResponse
 
       // If no links exist, set `loadingMoreFiles` to false and exit the loop
       if (links.length === 0) {
@@ -149,6 +153,13 @@ const fetchLinks = async ({
           downloadIds: [downloadId],
           database,
           webContents: appWindow.webContents
+        })
+      }
+
+      // If `done` is true, set `loadingMoreFiles` to false
+      if (done) {
+        await database.updateDownloadById(downloadId, {
+          loadingMoreFiles: false
         })
       }
 

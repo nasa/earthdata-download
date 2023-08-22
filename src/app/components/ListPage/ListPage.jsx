@@ -76,8 +76,8 @@ const ListPage = ({
     }
   }, [scrollableNodeRef.current])
 
-  const onItemsRendered = (props) => {
-    setWindowState(props)
+  const onItemsRendered = (windowState) => {
+    setWindowState(windowState)
   }
 
   // TODO simplebar-mouse-entered is getting added to the simplebar element and causing a tiny dot to appear and top and left of y & x scrollbars
@@ -126,14 +126,14 @@ const ListPage = ({
                             ({ height, width }) => (
                               <FixedSizeList
                                 height={height}
-                                itemCount={items.length}
-                                onItemsRendered={onItemsRendered}
-                                itemSize={97}
-                                width={width}
-                                itemData={items}
                                 innerRef={contentNodeRef}
+                                itemCount={items.length}
+                                itemData={items}
+                                itemSize={97}
+                                onItemsRendered={onItemsRendered}
                                 outerRef={scrollableNodeRef}
                                 ref={listRef}
+                                width={width}
                                 overscanCount={4}
                               >
                                 {ListPageListItem}

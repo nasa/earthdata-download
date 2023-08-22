@@ -285,7 +285,6 @@ class EddDatabase {
    * Returns the files progress for the given downloadId
    * @param {String} downloadId ID of download to return progress
    */
-  // async getDownloadFilesProgressByDownloadId(downloadId) {
   async getDownloadReport(downloadId) {
     const [result] = await this.db('files')
       .sum({
@@ -427,7 +426,6 @@ class EddDatabase {
   async getDownloadsReport(limit, offset) {
     return this.db('downloads')
       .select(
-        // 'downloads.*',
         'downloads.createdAt',
         'downloads.id',
         'downloads.loadingMoreFiles',

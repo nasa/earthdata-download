@@ -26,6 +26,7 @@ import useAppContext from '../../hooks/useAppContext'
  * @typedef {Object} DownloadListItemProps
  * @property {Object} download State of the download item.
  * @property {Function} setCurrentPage A function which sets the active page.
+ * @property {Function} setSelectedDownloadId A function which sets the setSelectedDownloadId.
  * @property {Function} showMoreInfoDialog A function which shows the MoreIntoDialog.
  */
 
@@ -38,6 +39,7 @@ import useAppContext from '../../hooks/useAppContext'
  *   <DownloadListItem
  *     download={download}
  *     setCurrentPage={setCurrentPage}
+ *     setSelectedDownloadId={setSelectedDownloadId}
  *     showMoreInfoDialog={showMoreInfoDialog}
  *   />
  * )

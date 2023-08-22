@@ -26,7 +26,7 @@ describe('fetchLinks', () => {
 
   test('loads the links and calls initializeDownload', async () => {
     const appWindow = {}
-    const downloadId = 'shortName_versionId-20230501_000000'
+    const downloadId = 'mock-download-id'
     const getLinksUrl = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
     const database = {
       updateDownloadById: jest.fn(),
@@ -94,7 +94,7 @@ describe('fetchLinks', () => {
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
     expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       {
         loadingMoreFiles: true,
         state: downloadStates.starting
@@ -102,7 +102,7 @@ describe('fetchLinks', () => {
     )
 
     expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       {
         loadingMoreFiles: false
       }
@@ -110,24 +110,94 @@ describe('fetchLinks', () => {
 
     expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(2)
     expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       ['https://example.com/file1.png']
     )
 
     expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       ['https://example.com/file2.png']
     )
 
     expect(initializeDownload).toHaveBeenCalledTimes(1)
     expect(initializeDownload).toHaveBeenCalledWith(expect.objectContaining({
-      downloadIds: ['shortName_versionId-20230501_000000']
+      downloadIds: ['mock-download-id']
+    }))
+  })
+
+  test('loads the links and calls initializeDownload when done is true', async () => {
+    const appWindow = {}
+    const downloadId = 'mock-download-id'
+    const getLinksUrl = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
+    const database = {
+      updateDownloadById: jest.fn(),
+      addLinksByDownloadId: jest.fn()
+    }
+    const getLinksToken = 'Bearer mock-token'
+
+    const page1Response = {
+      json: jest.fn().mockReturnValue({
+        done: true,
+        links: [
+          'https://example.com/file1.png'
+        ]
+      })
+    }
+
+    fetch
+      .mockImplementationOnce(() => page1Response)
+
+    await fetchLinks({
+      appWindow,
+      authUrl: '',
+      database,
+      downloadId,
+      getLinksToken,
+      getLinksUrl
+    })
+
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(fetch).toHaveBeenCalledWith(
+      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
+      {
+        headers: {
+          Authorization: 'Bearer mock-token'
+        },
+        method: 'get'
+      }
+    )
+
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
+    expect(database.updateDownloadById).toHaveBeenCalledWith(
+      'mock-download-id',
+      {
+        loadingMoreFiles: true,
+        state: downloadStates.starting
+      }
+    )
+
+    expect(database.updateDownloadById).toHaveBeenCalledWith(
+      'mock-download-id',
+      {
+        loadingMoreFiles: false
+      }
+    )
+
+    expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(1)
+    expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
+      'mock-download-id',
+      ['https://example.com/file1.png']
+    )
+
+    expect(initializeDownload).toHaveBeenCalledTimes(1)
+    expect(initializeDownload).toHaveBeenCalledWith(expect.objectContaining({
+      downloadIds: ['mock-download-id']
     }))
   })
 
   test('saves the error on error', async () => {
     const appWindow = {}
-    const downloadId = 'shortName_versionId-20230501_000000'
+    const downloadId = 'mock-download-id'
     const getLinksUrl = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
     const database = {
       updateDownloadById: jest.fn(),
@@ -162,7 +232,7 @@ describe('fetchLinks', () => {
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
     expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       {
         loadingMoreFiles: true,
         state: downloadStates.starting
@@ -170,7 +240,7 @@ describe('fetchLinks', () => {
     )
 
     expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       {
         errors: '{}',
         loadingMoreFiles: false,
@@ -195,7 +265,7 @@ describe('fetchLinks', () => {
     'noprotocol/granule_links?id=309'
   ])('does not download links from untrusted sources: [%s]', async (badLink) => {
     const appWindow = {}
-    const downloadId = 'shortName_versionId-20230501_000000'
+    const downloadId = 'mock-download-id'
 
     const database = {
       updateDownloadById: jest.fn(),
@@ -223,7 +293,7 @@ describe('fetchLinks', () => {
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
     expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       {
         loadingMoreFiles: true,
         state: downloadStates.starting
@@ -231,7 +301,7 @@ describe('fetchLinks', () => {
     )
 
     expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       {
         errors: [{
           message: `The host [${badLink}] is not a trusted source and Earthdata Downloader will not continue.
@@ -266,7 +336,7 @@ If you wish to have this link included in the list of trusted sources please con
     ['empty response', '']
   ])('halts on invalid JSON response: %s', async ([, badResponse]) => {
     const appWindow = {}
-    const downloadId = 'shortName_versionId-20230501_000000'
+    const downloadId = 'mock-download-id'
     const getLinksUrl = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
     const database = {
       updateDownloadById: jest.fn(),
@@ -307,7 +377,7 @@ If you wish to have this link included in the list of trusted sources please con
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
     expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       {
         loadingMoreFiles: true,
         state: downloadStates.starting
@@ -315,7 +385,7 @@ If you wish to have this link included in the list of trusted sources please con
     )
 
     expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       {
         errors: [{
           message: 'The returned data does not match the expected schema.'
@@ -327,7 +397,7 @@ If you wish to have this link included in the list of trusted sources please con
 
     expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(1)
     expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
-      'shortName_versionId-20230501_000000',
+      'mock-download-id',
       ['https://example.com/file1.png']
     )
 

@@ -421,9 +421,9 @@ describe('EddDatabase', () => {
         expect(query.sql).toEqual('select * from `files` where `downloadId` = ? order by `createdAt` asc')
         expect(query.bindings).toEqual(['mock-download-1'])
 
-        query.response({
+        query.response([{
           id: 'mock-file-1'
-        })
+        }])
       })
 
       const database = new EddDatabase('./')
@@ -432,38 +432,33 @@ describe('EddDatabase', () => {
         downloadId: 'mock-download-1'
       })
 
-      expect(result).toEqual({
+      expect(result).toEqual([{
         id: 'mock-file-1'
-      })
+      }])
     })
+  })
 
-    test('returns requested files with limit and offset', async () => {
+  describe('getErroredFilesByDownloadId', () => {
+    test('returns requested files', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select * from `files` where `downloadId` = ? order by `createdAt` asc limit ? offset ?')
+        expect(query.sql).toEqual('select `id` from `files` where `downloadId` = ? and `state` = ?')
         expect(query.bindings).toEqual([
           'mock-download-1',
-          1,
-          5
+          downloadStates.error
         ])
 
-        query.response({
+        query.response([{
           id: 'mock-file-1'
-        })
+        }])
       })
 
       const database = new EddDatabase('./')
 
-      const result = await database.getFilesWhere(
-        {
-          downloadId: 'mock-download-1'
-        },
-        1,
-        5
-      )
+      const result = await database.getErroredFilesByDownloadId('mock-download-1')
 
-      expect(result).toEqual({
+      expect(result).toEqual([{
         id: 'mock-file-1'
-      })
+      }])
     })
   })
 

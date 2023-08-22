@@ -1,7 +1,5 @@
 // @ts-nocheck
 
-import downloadStates from '../../app/constants/downloadStates'
-
 /**
  * Reports current progress on downloads
  * @param {Object} params
@@ -49,10 +47,7 @@ const requestDownloadsProgress = async ({
     // If any erroredFiles exist, get the files
     let errors
     if (erroredFiles > 0) {
-      errors = await database.getFilesWhere({
-        downloadId,
-        state: downloadStates.error
-      })
+      errors = await database.getErroredFilesByDownloadId(downloadId)
     }
 
     let percent = 0

@@ -189,21 +189,25 @@ class EddDatabase {
    * Returns the selected files.
    * @param {Object} where Knex `where` object to select downloads.
    */
-  async getFilesWhere(where, limit, offset = 0) {
-    let query = this.db('files')
+  async getFilesWhere(where) {
+    return this.db('files')
       .select()
       .where(where)
       .orderBy('createdAt', 'asc')
+  }
 
-    if (limit) {
-      query = query.limit(limit)
-    }
-
-    if (offset) {
-      query = query.offset(offset)
-    }
-
-    return query
+  /**
+   * Returns the selected files.
+   * @param {String} downloadId Id of the download to retrieve errored files.
+   */
+  async getErroredFilesByDownloadId(downloadId) {
+    return this.db('files')
+      // Add additional fields to this select if we need to display any error info
+      .select('id')
+      .where({
+        downloadId,
+        state: downloadStates.error
+      })
   }
 
   /**

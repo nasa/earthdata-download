@@ -11,7 +11,7 @@ beforeEach(() => {
 })
 
 describe('requestFilesProgress', () => {
-  test.only('reports the file progress', async () => {
+  test('reports the file progress', async () => {
     const database = {
       getFilesReport: jest.fn()
         .mockResolvedValue([{
@@ -104,7 +104,7 @@ describe('requestFilesProgress', () => {
     })
   })
 
-  test.only('reports the file progress with completed files hidden', async () => {
+  test('reports the file progress with completed files hidden', async () => {
     const database = {
       getFilesReport: jest.fn()
         .mockResolvedValue([{

@@ -20,7 +20,10 @@ const requestDownloadsProgress = async ({
   const totalDownloads = await database.getAllDownloadsCount()
 
   if (totalDownloads === 0) {
-    return []
+    return {
+      downloadsReport: [],
+      totalDownloads
+    }
   }
 
   // Pull download status for each download in the database

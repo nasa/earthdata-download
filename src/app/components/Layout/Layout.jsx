@@ -80,7 +80,7 @@ const Layout = () => {
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
-  const [allFilesPaused, setAllFilesPaused] = useState(false)
+  const [selectedDownloadId, setSelectedDownloadId] = useState(null)
 
   const showMoreInfoDialog = (downloadId, numberErrors) => {
     setActiveMoreInfoDownloadInfo({
@@ -177,6 +177,7 @@ const Layout = () => {
     case PAGES.downloads:
       pageComponent = (
         <Downloads
+          setSelectedDownloadId={setSelectedDownloadId}
           setCurrentPage={setCurrentPage}
           hasActiveDownload={hasActiveDownload}
           setHasActiveDownload={setHasActiveDownload}
@@ -194,9 +195,8 @@ const Layout = () => {
     case PAGES.fileDownloads:
       pageComponent = (
         <FileDownloads
+          downloadId={selectedDownloadId}
           setCurrentPage={setCurrentPage}
-          allFilesPaused={allFilesPaused}
-          setAllFilesPaused={setAllFilesPaused}
         />
       )
 
@@ -266,6 +266,7 @@ const Layout = () => {
           >
             Downloads
           </Button>
+
           <Button
             className={
               classNames(
@@ -329,6 +330,7 @@ const Layout = () => {
               >
                 Minimize
               </Button>
+
               <Button
                 className={
                   classNames(
@@ -348,6 +350,7 @@ const Layout = () => {
               >
                 Maximize/Restore
               </Button>
+
               <Button
                 className={
                   classNames(
@@ -372,13 +375,16 @@ const Layout = () => {
           )
         }
       </header>
+
       <main className={styles.main}>
         {pageComponent}
+
         <ToastList
           className={styles.toastList}
           dismissToast={onDismissToast}
           toasts={Object.values(activeToasts).filter(Boolean)}
         />
+
         <Dialog
           open={settingsDialogIsOpen}
           setOpen={setSettingsDialogIsOpen}
@@ -392,6 +398,7 @@ const Layout = () => {
             settingsDialogIsOpen={settingsDialogIsOpen}
           />
         </Dialog>
+
         <Dialog
           open={chooseDownloadLocationIsOpen}
           setOpen={setChooseDownloadLocationIsOpen}
@@ -409,6 +416,7 @@ const Layout = () => {
             onCloseChooseLocationDialog={onCloseChooseLocationDialog}
           />
         </Dialog>
+
         <Dialog
           open={moreErrorInfoIsOpen}
           setOpen={setMoreErrorInfoIsOpen}

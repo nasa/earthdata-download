@@ -38,13 +38,14 @@ const setup = (overrideProps = {}) => {
   const sendToEula = jest.fn()
   const sendToLogin = jest.fn()
   const setCurrentPage = jest.fn()
+  const setSelectedDownloadId = jest.fn()
   const showMoreInfoDialog = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
-  const startReportingFiles = jest.fn()
 
   const props = {
     setCurrentPage,
+    setSelectedDownloadId,
     showMoreInfoDialog,
     download,
     ...overrideProps
@@ -64,8 +65,7 @@ const setup = (overrideProps = {}) => {
           sendToEula,
           sendToLogin,
           showWaitingForEulaDialog,
-          showWaitingForLoginDialog,
-          startReportingFiles
+          showWaitingForLoginDialog
         }
       }
     >
@@ -95,7 +95,7 @@ const setup = (overrideProps = {}) => {
     sendToLogin,
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
-    startReportingFiles
+    setSelectedDownloadId
   }
 }
 

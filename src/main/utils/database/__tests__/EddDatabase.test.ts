@@ -69,6 +69,8 @@ describe('EddDatabase', () => {
             name: '20230717153820_add_byte_columns_to_files_table.js'
           }, {
             name: '20230724200528_add_eulaUrl_to_downloads.js'
+          }, {
+            name: '20230818181842_change_files_url_type.js'
           }])
         } else if (step === 5) {
           // Query: select `name` from `knex_migrations` order by `id` asc'
@@ -413,6 +415,58 @@ describe('EddDatabase', () => {
     })
   })
 
+  describe('getFilesWhere', () => {
+    test('returns requested files', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select * from `files` where `downloadId` = ? order by `createdAt` asc')
+        expect(query.bindings).toEqual(['mock-download-1'])
+
+        query.response({
+          id: 'mock-file-1'
+        })
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getFilesWhere({
+        downloadId: 'mock-download-1'
+      })
+
+      expect(result).toEqual({
+        id: 'mock-file-1'
+      })
+    })
+
+    test('returns requested files with limit and offset', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select * from `files` where `downloadId` = ? order by `createdAt` asc limit ? offset ?')
+        expect(query.bindings).toEqual([
+          'mock-download-1',
+          1,
+          5
+        ])
+
+        query.response({
+          id: 'mock-file-1'
+        })
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getFilesWhere(
+        {
+          downloadId: 'mock-download-1'
+        },
+        1,
+        5
+      )
+
+      expect(result).toEqual({
+        id: 'mock-file-1'
+      })
+    })
+  })
+
   describe('getFilesToStart', () => {
     test('returns requested files', async () => {
       dbTracker.on('query', (query) => {
@@ -467,29 +521,6 @@ describe('EddDatabase', () => {
       }, {
         id: 456
       }])
-    })
-  })
-
-  describe('getFilesWhere', () => {
-    test('returns requested files', async () => {
-      dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select * from `files` where `downloadId` = ? order by `createdAt` asc')
-        expect(query.bindings).toEqual(['mock-download-1'])
-
-        query.response({
-          id: 'mock-download-1'
-        })
-      })
-
-      const database = new EddDatabase('./')
-
-      const result = await database.getFilesWhere({
-        downloadId: 'mock-download-1'
-      })
-
-      expect(result).toEqual({
-        id: 'mock-download-1'
-      })
     })
   })
 
@@ -603,7 +634,7 @@ describe('EddDatabase', () => {
   })
 
   describe('addLinksByDownloadId', () => {
-    test('updates the requested file', async () => {
+    test('add links to the download', async () => {
       dbTracker.on('query', (query) => {
         expect(query.sql).toEqual('insert into `files` (`createdAt`, `downloadId`, `filename`, `percent`, `state`, `url`) select ? as `createdAt`, ? as `downloadId`, ? as `filename`, ? as `percent`, ? as `state`, ? as `url` union all select ? as `createdAt`, ? as `downloadId`, ? as `filename`, ? as `percent`, ? as `state`, ? as `url` union all select ? as `createdAt`, ? as `downloadId`, ? as `filename`, ? as `percent`, ? as `state`, ? as `url`')
         expect(query.bindings).toEqual([
@@ -641,8 +672,8 @@ describe('EddDatabase', () => {
     })
   })
 
-  describe('getDownloadFilesProgressByDownloadId', () => {
-    test('updates the requested file', async () => {
+  describe('getDownloadReport', () => {
+    test('returns the report', async () => {
       dbTracker.on('query', (query) => {
         expect(query.sql).toEqual('select sum(`percent`) as `percentSum`, count(`id`) as `totalFiles`, count(CASE "state" WHEN "COMPLETED" THEN 1 ELSE NULL END) as `finishedFiles`, count(CASE "state" WHEN "ERROR" THEN 1 ELSE NULL END) as `erroredFiles` from `files` where `downloadId` = ?')
         expect(query.bindings).toEqual(['mock-download-1'])
@@ -656,12 +687,211 @@ describe('EddDatabase', () => {
 
       const database = new EddDatabase('./')
 
-      const result = await database.getDownloadFilesProgressByDownloadId('mock-download-1')
+      const result = await database.getDownloadReport('mock-download-1')
 
       expect(result).toEqual({
         percentSum: 42,
         totalFiles: 10,
         finishedFiles: 0
+      })
+    })
+  })
+
+  describe('getFilesReport', () => {
+    test('returns the report', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select `files`.`downloadId`, `files`.`filename`, `files`.`state`, `files`.`percent`, `files`.`receivedBytes`, `files`.`totalBytes`, ((((UNIXEPOCH() * 1000.0) - timeStart) / receivedBytes) * (totalBytes - receivedBytes)) / 1000 as remainingTime from `files` where `downloadId` = ? order by `createdAt` asc limit ?')
+        expect(query.bindings).toEqual([
+          'mock-download-1',
+          2
+        ])
+
+        query.response([{
+          downloadId: 'mock-download-id',
+          filename: 'file1.png',
+          state: downloadStates.active,
+          percent: 42,
+          receivedBytes: 518,
+          totalBytes: 1234,
+          remainingTime: 5678
+        }, {
+          downloadId: 'mock-download-id',
+          filename: 'file2.png',
+          state: downloadStates.active,
+          percent: 32,
+          receivedBytes: 400,
+          totalBytes: 1234,
+          remainingTime: 6789
+        }])
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getFilesReport({
+        downloadId: 'mock-download-1',
+        hideCompleted: false,
+        limit: 2,
+        offset: 0
+      })
+
+      expect(result).toEqual([{
+        downloadId: 'mock-download-id',
+        filename: 'file1.png',
+        state: downloadStates.active,
+        percent: 42,
+        receivedBytes: 518,
+        totalBytes: 1234,
+        remainingTime: 5678
+      }, {
+        downloadId: 'mock-download-id',
+        filename: 'file2.png',
+        state: downloadStates.active,
+        percent: 32,
+        receivedBytes: 400,
+        totalBytes: 1234,
+        remainingTime: 6789
+      }])
+    })
+
+    test('returns the report when hiding completed files', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select `files`.`downloadId`, `files`.`filename`, `files`.`state`, `files`.`percent`, `files`.`receivedBytes`, `files`.`totalBytes`, ((((UNIXEPOCH() * 1000.0) - timeStart) / receivedBytes) * (totalBytes - receivedBytes)) / 1000 as remainingTime from `files` where `downloadId` = ? and not `state` = ? order by `createdAt` asc limit ?')
+        expect(query.bindings).toEqual([
+          'mock-download-1',
+          downloadStates.completed,
+          2
+        ])
+
+        query.response([{
+          downloadId: 'mock-download-id',
+          filename: 'file1.png',
+          state: downloadStates.active,
+          percent: 42,
+          receivedBytes: 518,
+          totalBytes: 1234,
+          remainingTime: 5678
+        }, {
+          downloadId: 'mock-download-id',
+          filename: 'file2.png',
+          state: downloadStates.active,
+          percent: 32,
+          receivedBytes: 400,
+          totalBytes: 1234,
+          remainingTime: 6789
+        }])
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getFilesReport({
+        downloadId: 'mock-download-1',
+        hideCompleted: true,
+        limit: 2,
+        offset: 0
+      })
+
+      expect(result).toEqual([{
+        downloadId: 'mock-download-id',
+        filename: 'file1.png',
+        state: downloadStates.active,
+        percent: 42,
+        receivedBytes: 518,
+        totalBytes: 1234,
+        remainingTime: 5678
+      }, {
+        downloadId: 'mock-download-id',
+        filename: 'file2.png',
+        state: downloadStates.active,
+        percent: 32,
+        receivedBytes: 400,
+        totalBytes: 1234,
+        remainingTime: 6789
+      }])
+    })
+  })
+
+  describe('getTotalFilesPerFilesReport', () => {
+    test('returns the report', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select count(`id`) from `files` where `downloadId` = ?')
+        expect(query.bindings).toEqual(['mock-download-1'])
+
+        query.response([{ 'count(`id`)': 42 }])
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getTotalFilesPerFilesReport({
+        downloadId: 'mock-download-1',
+        hideCompleted: false
+      })
+
+      expect(result).toEqual(42)
+    })
+
+    test('returns the report when hiding completed files', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select count(`id`) from `files` where `downloadId` = ? and not `state` = ?')
+        expect(query.bindings).toEqual([
+          'mock-download-1',
+          downloadStates.completed
+        ])
+
+        query.response([{ 'count(`id`)': 42 }])
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getTotalFilesPerFilesReport({
+        downloadId: 'mock-download-1',
+        hideCompleted: true
+      })
+
+      expect(result).toEqual(42)
+    })
+  })
+
+  describe('getFilesHeaderReport', () => {
+    test('returns the report', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select `downloads`.`id`, `downloads`.`downloadLocation`, `downloads`.`state`, `downloads`.`createdAt`, `downloads`.`timeEnd`, `downloads`.`timeStart`, sum(`files`.`percent`) as `percentSum`, sum(`files`.`receivedBytes`) as `receivedBytesSum`, sum(`files`.`totalBytes`) as `totalBytesSum`, count(`files`.`id`) as `totalFiles`, count(CASE WHEN "percent" > 0 THEN 1 ELSE NULL END) as `filesWithProgress`, count(CASE "files"."state" WHEN "COMPLETED" THEN 1 ELSE NULL END) as `finishedFiles`, count(CASE "files"."state" WHEN "ERROR" THEN 1 ELSE NULL END) as `erroredFiles` from `files` inner join `downloads` on `files`.`downloadId` = `downloads`.`id` where `downloadId` = ?')
+        expect(query.bindings).toEqual(['mock-download-1'])
+
+        query.response([{
+          id: 'mock-download-id',
+          downloadLocation: '/mock/downloads/path',
+          state: downloadStates.active,
+          createdAt: 12345,
+          timeEnd: 23456,
+          timeStart: 12345,
+          percentSum: 50,
+          receivedBytesSum: 50000,
+          totalBytesSum: 100000,
+          totalFiles: 100,
+          filesWithProgress: 5,
+          finishedFiles: 50,
+          erroredFiles: 0
+        }])
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getFilesHeaderReport('mock-download-1')
+
+      expect(result).toEqual({
+        id: 'mock-download-id',
+        downloadLocation: '/mock/downloads/path',
+        state: downloadStates.active,
+        createdAt: 12345,
+        timeEnd: 23456,
+        timeStart: 12345,
+        percentSum: 50,
+        receivedBytesSum: 50000,
+        totalBytesSum: 100000,
+        totalFiles: 100,
+        filesWithProgress: 5,
+        finishedFiles: 50,
+        erroredFiles: 0
       })
     })
   })

@@ -1,6 +1,7 @@
 import React, {
   useContext,
   useEffect,
+  useRef,
   useState
 } from 'react'
 import PropTypes from 'prop-types'
@@ -11,7 +12,6 @@ import { PAGES } from '../../constants/pages'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import FileDownloadsHeader from '../../components/FileDownloadsHeader/FileDownloadsHeader'
-import FileListItem from '../../components/FileListItem/FileListItem'
 import ListPage from '../../components/ListPage/ListPage'
 
 /**
@@ -31,76 +31,110 @@ import ListPage from '../../components/ListPage/ListPage'
  * )
  */
 const FileDownloads = ({
+  downloadId,
   setCurrentPage
 }) => {
   const {
     initializeDownload,
-    reportFilesProgress,
     startReportingDownloads,
-    cancelDownloadItem,
-    copyDownloadPath,
-    openDownloadFolder,
-    restartDownload
+    requestFilesProgress
   } = useContext(ElectronApiContext)
 
   const [hideCompleted, setHideCompleted] = useState(false)
+  const [items, setItems] = useState([])
+  const [windowState, setWindowState] = useState({})
+  const [headerReport, setHeaderReport] = useState({})
+  const [totalFiles, setTotalFiles] = useState(null)
 
-  const onCancelDownloadItem = (downloadId, filename) => {
-    cancelDownloadItem({
-      downloadId,
-      filename
-    })
-  }
-
-  const onOpenDownloadFolder = (downloadId, filename) => {
-    openDownloadFolder({
-      downloadId,
-      filename
-    })
-  }
-
-  const onCopyDownloadPath = (downloadId, filename) => {
-    copyDownloadPath({
-      downloadId,
-      filename
-    })
-  }
-
-  const onRestartDownload = (downloadId, filename) => {
-    restartDownload({
-      downloadId,
-      filename
-    })
-  }
-
-  const [downloadReport, setDownloadReport] = useState({})
-  const [filesReport, setFilesReport] = useState([])
-
-  const onReportFilesProgressReport = (event, info) => {
-    const {
-      downloadReport: newDownloadReport,
-      filesReport: newFilesReport
-    } = info
-
-    setFilesReport(newFilesReport)
-    setDownloadReport(newDownloadReport)
-  }
+  const listRef = useRef(null)
 
   const onInitializeDownload = () => {
     startReportingDownloads()
+
     // If there is a new download return to the downloads page
     setCurrentPage(PAGES.downloads)
   }
 
+  const onSetHideCompleted = (value) => {
+    setHideCompleted(value)
+    listRef.current.scrollToItem(0)
+  }
+
   useEffect(() => {
-    reportFilesProgress(true, onReportFilesProgressReport)
     initializeDownload(true, onInitializeDownload)
 
     return () => {
-      reportFilesProgress(false, onReportFilesProgressReport)
       initializeDownload(false, onInitializeDownload)
     }
   }, [])
+
+  const buildItems = (report) => {
+    const {
+      overscanStartIndex,
+      overscanStopIndex
+    } = windowState
+
+    const {
+      filesReport: newFilesReport
+    } = report || {}
+
+    const {
+      files,
+      totalFiles: newTotalFiles
+    } = newFilesReport
+
+    // Build real items
+    const realItems = files.map((file) => ({
+      file,
+      type: 'file'
+    }))
+
+    setItems([
+      ...Array.from({ length: overscanStartIndex }),
+      ...realItems,
+      ...Array.from({ length: newTotalFiles - overscanStopIndex - 1 })
+    ])
+
+    setTotalFiles(newTotalFiles)
+  }
+
+  useEffect(() => {
+    const loadItems = async () => {
+      const {
+        overscanStartIndex = 0,
+        // Default to 10 items
+        overscanStopIndex = 10
+      } = windowState
+
+      const stopIndex = totalFiles || overscanStopIndex
+      const limit = stopIndex - overscanStartIndex
+      const offset = overscanStartIndex
+
+      const report = await requestFilesProgress({
+        downloadId,
+        limit,
+        offset,
+        hideCompleted
+      })
+
+      const {
+        headerReport: newHeaderReport
+      } = report || {}
+
+      buildItems(report)
+      setHeaderReport(newHeaderReport)
+    }
+
+    loadItems()
+
+    const interval = setInterval(() => {
+      loadItems()
+    }, 1000)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [windowState, hideCompleted])
 
   return (
     <ListPage
@@ -109,31 +143,23 @@ const FileDownloads = ({
         (
           <FileDownloadsHeader
             hideCompleted={hideCompleted}
-            downloadReport={downloadReport}
-            setHideCompleted={setHideCompleted}
+            headerReport={headerReport}
+            setHideCompleted={onSetHideCompleted}
             setCurrentPage={setCurrentPage}
           />
         )
       }
+      hideCompleted={hideCompleted}
       Icon={FaDownload}
-      items={
-        filesReport.map((file) => (
-          <FileListItem
-            key={file.filename}
-            onCancelDownloadItem={onCancelDownloadItem}
-            onOpenDownloadFolder={onOpenDownloadFolder}
-            onCopyDownloadPath={onCopyDownloadPath}
-            onRestartDownload={onRestartDownload}
-            file={file}
-            hideCompleted={hideCompleted}
-          />
-        ))
-      }
+      items={items}
+      listRef={listRef}
+      setWindowState={setWindowState}
     />
   )
 }
 
 FileDownloads.propTypes = {
+  downloadId: PropTypes.string.isRequired,
   setCurrentPage: PropTypes.func.isRequired
 }
 

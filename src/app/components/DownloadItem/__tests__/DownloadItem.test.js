@@ -18,8 +18,8 @@ jest.mock('../../Progress/Progress', () => jest.fn(() => (
 const setup = (overrideProps) => {
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
-  const startReportingFiles = jest.fn()
   const setCurrentPage = jest.fn()
+  const setSelectedDownloadId = jest.fn()
 
   const props = {
     actionsList: [],
@@ -27,6 +27,7 @@ const setup = (overrideProps) => {
     itemName: 'Test download',
     percent: 42,
     setCurrentPage,
+    setSelectedDownloadId,
     state: downloadStates.active,
     status: {},
     ...overrideProps
@@ -37,8 +38,7 @@ const setup = (overrideProps) => {
       value={
         {
           showWaitingForEulaDialog,
-          showWaitingForLoginDialog,
-          startReportingFiles
+          showWaitingForLoginDialog
         }
       }
     >
@@ -49,9 +49,9 @@ const setup = (overrideProps) => {
   return {
     container,
     setCurrentPage,
+    setSelectedDownloadId,
     showWaitingForEulaDialog,
-    showWaitingForLoginDialog,
-    startReportingFiles
+    showWaitingForLoginDialog
   }
 }
 
@@ -81,7 +81,7 @@ describe('DownloadItem component', () => {
     })
 
     test('the download item is not clickable', async () => {
-      const { startReportingFiles, setCurrentPage } = setup({
+      const { setSelectedDownloadId, setCurrentPage } = setup({
         state: downloadStates.starting
       })
 
@@ -91,7 +91,7 @@ describe('DownloadItem component', () => {
       await userEvent.click(fileDownloadsPortal)
 
       expect(setCurrentPage).toHaveBeenCalledTimes(0)
-      expect(startReportingFiles).toHaveBeenCalledTimes(0)
+      expect(setSelectedDownloadId).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -120,7 +120,7 @@ describe('DownloadItem component', () => {
     })
 
     test('the download item is not clickable', async () => {
-      const { startReportingFiles, setCurrentPage } = setup({
+      const { setSelectedDownloadId, setCurrentPage } = setup({
         state: downloadStates.pending,
         loadingMoreFiles: true
       })
@@ -132,7 +132,7 @@ describe('DownloadItem component', () => {
 
       expect(setCurrentPage).toHaveBeenCalledTimes(0)
 
-      expect(startReportingFiles).toHaveBeenCalledTimes(0)
+      expect(setSelectedDownloadId).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -158,8 +158,8 @@ describe('DownloadItem component', () => {
     })
 
     describe('when clicking on the `DownloadItem`', () => {
-      test('calls `setCurrentPage` and `startReportingFiles` ', async () => {
-        const { startReportingFiles, setCurrentPage } = setup({
+      test('calls `setCurrentPage` and `setSelectedDownloadId` ', async () => {
+        const { setSelectedDownloadId, setCurrentPage } = setup({
           state: downloadStates.active
         })
 
@@ -171,14 +171,14 @@ describe('DownloadItem component', () => {
         expect(setCurrentPage).toHaveBeenCalledTimes(1)
         expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
 
-        expect(startReportingFiles).toHaveBeenCalledTimes(1)
-        expect(startReportingFiles).toHaveBeenCalledWith({ downloadId: 'download-id' })
+        expect(setSelectedDownloadId).toHaveBeenCalledTimes(1)
+        expect(setSelectedDownloadId).toHaveBeenCalledWith('download-id')
       })
     })
 
     describe('when pressing enter on the `DownloadItem`', () => {
-      test('calls setCurrentPage and startReportingFiles', async () => {
-        const { startReportingFiles, setCurrentPage } = setup({
+      test('calls setCurrentPage and setSelectedDownloadId', async () => {
+        const { setSelectedDownloadId, setCurrentPage } = setup({
           state: downloadStates.active,
           loadingMoreFiles: true
         })
@@ -191,14 +191,14 @@ describe('DownloadItem component', () => {
         expect(setCurrentPage).toHaveBeenCalledTimes(1)
         expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
 
-        expect(startReportingFiles).toHaveBeenCalledTimes(1)
-        expect(startReportingFiles).toHaveBeenCalledWith({ downloadId: 'download-id' })
+        expect(setSelectedDownloadId).toHaveBeenCalledTimes(1)
+        expect(setSelectedDownloadId).toHaveBeenCalledWith('download-id')
       })
     })
 
     describe('when pressing spacebar on the `DownloadItem`', () => {
-      test('calls setCurrentPage and startReportingFiles', async () => {
-        const { startReportingFiles, setCurrentPage } = setup({
+      test('calls setCurrentPage and setSelectedDownloadId', async () => {
+        const { setSelectedDownloadId, setCurrentPage } = setup({
           state: downloadStates.active,
           loadingMoreFiles: true
         })
@@ -212,14 +212,14 @@ describe('DownloadItem component', () => {
         expect(setCurrentPage).toHaveBeenCalledTimes(1)
         expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
 
-        expect(startReportingFiles).toHaveBeenCalledTimes(1)
-        expect(startReportingFiles).toHaveBeenCalledWith({ downloadId: 'download-id' })
+        expect(setSelectedDownloadId).toHaveBeenCalledTimes(1)
+        expect(setSelectedDownloadId).toHaveBeenCalledWith('download-id')
       })
     })
 
     describe('when pressing a non-enter key on the `DownloadItem`', () => {
-      test('does not call setCurrentPage or startReportingFiles', async () => {
-        const { startReportingFiles, setCurrentPage } = setup({
+      test('does not call setCurrentPage or setSelectedDownloadId', async () => {
+        const { setSelectedDownloadId, setCurrentPage } = setup({
           state: downloadStates.active,
           loadingMoreFiles: true
         })
@@ -229,7 +229,7 @@ describe('DownloadItem component', () => {
         await userEvent.keyboard('{a}')
 
         expect(setCurrentPage).toHaveBeenCalledTimes(0)
-        expect(startReportingFiles).toHaveBeenCalledTimes(0)
+        expect(setSelectedDownloadId).toHaveBeenCalledTimes(0)
       })
     })
   })

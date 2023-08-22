@@ -63,6 +63,7 @@ const DownloadItem = ({
   itemName,
   percent,
   setCurrentPage,
+  setSelectedDownloadId,
   state,
   primaryStatus,
   secondaryStatus,
@@ -70,8 +71,7 @@ const DownloadItem = ({
 }) => {
   const {
     showWaitingForEulaDialog,
-    showWaitingForLoginDialog,
-    startReportingFiles
+    showWaitingForLoginDialog
   } = useContext(ElectronApiContext)
 
   const [waitingForEulaDialogIsOpen, setWaitingForEulaDialogIsOpen] = useState(false)
@@ -93,7 +93,7 @@ const DownloadItem = ({
 
   const onSelectDownloadItem = () => {
     if (shouldBeClickable) {
-      startReportingFiles({ downloadId })
+      setSelectedDownloadId(downloadId)
       setCurrentPage(PAGES.fileDownloads)
     }
   }
@@ -262,6 +262,7 @@ const DownloadItem = ({
 DownloadItem.defaultProps = {
   actionsList: null,
   setCurrentPage: null,
+  setSelectedDownloadId: null,
   primaryStatus: null,
   secondaryStatus: null,
   tertiaryStatus: null
@@ -285,6 +286,7 @@ DownloadItem.propTypes = {
   itemName: PropTypes.string.isRequired,
   percent: PropTypes.number.isRequired,
   setCurrentPage: PropTypes.func,
+  setSelectedDownloadId: PropTypes.func,
   state: PropTypes.string.isRequired,
   primaryStatus: PropTypes.node,
   secondaryStatus: PropTypes.node,

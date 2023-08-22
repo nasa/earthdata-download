@@ -38,9 +38,9 @@ contextBridge.exposeInMainWorld('electronApi', {
   showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForLoginDialog', callback),
   windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('windowsLinuxTitleBar', callback),
 
-  // Messages polled at intervals
-  reportDownloadsProgress: (on, callback) => ipcRenderer[on ? 'on' : 'off']('reportDownloadsProgress', callback),
-  reportFilesProgress: (on, callback) => ipcRenderer[on ? 'on' : 'off']('reportFilesProgress', callback),
+  // Reporting
+  requestDownloadsProgress: (data) => ipcRenderer.invoke('requestDownloadsProgress', data),
+  requestFilesProgress: (data) => ipcRenderer.invoke('requestFilesProgress', data),
 
   // Start functions to report files and downloads and kickoff interval polling
   startReportingFiles: (data) => ipcRenderer.send('startReportingFiles', data),

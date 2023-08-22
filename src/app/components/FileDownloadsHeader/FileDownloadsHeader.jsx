@@ -18,12 +18,15 @@ import Checkbox from '../Checkbox/Checkbox'
 import Progress from '../Progress/Progress'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
-import { PAGES } from '../../constants/pages'
 
-import * as styles from './FileDownloadsHeader.module.scss'
+import { PAGES } from '../../constants/pages'
+import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
+
 import downloadStates from '../../constants/downloadStates'
 import createVariantClassName from '../../utils/createVariantClassName'
-import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
+import commafy from '../../utils/commafy'
+
+import * as styles from './FileDownloadsHeader.module.scss'
 
 /**
  * @typedef {Object} FileDownloadsHeaderProps
@@ -49,7 +52,7 @@ import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
  */
 const FileDownloadsHeader = ({
   hideCompleted,
-  downloadReport,
+  headerReport,
   setHideCompleted,
   setCurrentPage
 }) => {
@@ -63,13 +66,13 @@ const FileDownloadsHeader = ({
   const {
     downloadLocation,
     id: downloadId,
-    totalTimeRemaining,
+    estimatedTotalTimeRemaining,
     finishedFiles,
     totalFiles,
     percent,
     state,
-    totalTime
-  } = downloadReport
+    elapsedTime
+  } = headerReport
 
   const onCancelDownloadItem = () => {
     cancelDownloadItem({ downloadId })
@@ -102,12 +105,13 @@ const FileDownloadsHeader = ({
 
   const isComplete = state === downloadStates.completed
 
-  const fileProgressMessage = `${finishedFiles} of ${totalFiles} files completed in ${humanizeDuration(totalTime * 1000, {
+  // TODO needs to handle loading more files
+  const fileProgressMessage = `${commafy(finishedFiles)} of ${commafy(totalFiles)} files completed in ${humanizeDuration(elapsedTime * 1000, {
     largest: 1,
     round: true
   })}`
 
-  const remainingTimeMessage = `${humanizeDuration(totalTimeRemaining * 1000, {
+  const remainingTimeMessage = `${humanizeDuration(estimatedTotalTimeRemaining * 1000, {
     largest: 1,
     round: true
   })} remaining`
@@ -272,18 +276,12 @@ const FileDownloadsHeader = ({
   )
 }
 
-// TODO fixed header, only scroll the items
-// /Users/macrouch/edsc_workspace/earthdata-download/tmp/downloads/MODIS_A-JPL-L2P-v2019.0_2019.0-20230808_191037
-
-// TODO `downloadReport` maybe should be required EDD-26
-// FileDownloadsHeader.defaultProps = {
-//   downloadReport: {}
-// }
-
 FileDownloadsHeader.propTypes = {
   hideCompleted: PropTypes.bool.isRequired,
-  downloadReport: PropTypes.shape({
+  headerReport: PropTypes.shape({
     downloadLocation: PropTypes.string,
+    estimatedTotalTimeRemaining: PropTypes.number,
+    elapsedTime: PropTypes.number,
     finishedFiles: PropTypes.number,
     id: PropTypes.string,
     percent: PropTypes.number,

@@ -197,7 +197,7 @@ class EddDatabase {
   }
 
   /**
-   * Returns the selected files.
+   * Returns the errored files.
    * @param {String} downloadId Id of the download to retrieve errored files.
    */
   async getErroredFilesByDownloadId(downloadId) {
@@ -391,6 +391,7 @@ class EddDatabase {
       .select(
         'downloads.id',
         'downloads.downloadLocation',
+        'downloads.loadingMoreFiles',
         'downloads.state',
         'downloads.createdAt',
         'downloads.timeEnd',

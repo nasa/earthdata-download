@@ -42,10 +42,6 @@ contextBridge.exposeInMainWorld('electronApi', {
   requestDownloadsProgress: (data) => ipcRenderer.invoke('requestDownloadsProgress', data),
   requestFilesProgress: (data) => ipcRenderer.invoke('requestFilesProgress', data),
 
-  // Start functions to report files and downloads and kickoff interval polling
-  startReportingFiles: (data) => ipcRenderer.send('startReportingFiles', data),
-  startReportingDownloads: () => ipcRenderer.send('startReportingDownloads'),
-
   // System values for renderer
   isMac: process.platform === 'darwin',
   isWin: process.platform === 'win32',

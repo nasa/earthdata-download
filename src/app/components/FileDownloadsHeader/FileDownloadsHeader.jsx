@@ -59,19 +59,19 @@ const FileDownloadsHeader = ({
   const {
     cancelDownloadItem,
     pauseDownloadItem,
-    resumeDownloadItem,
-    startReportingDownloads
+    resumeDownloadItem
   } = useContext(ElectronApiContext)
 
   const {
     downloadLocation,
-    id: downloadId,
+    elapsedTime,
     estimatedTotalTimeRemaining,
     finishedFiles,
-    totalFiles,
+    id: downloadId,
+    loadingMoreFiles,
     percent,
     state,
-    elapsedTime
+    totalFiles
   } = headerReport
 
   const onCancelDownloadItem = () => {
@@ -105,11 +105,21 @@ const FileDownloadsHeader = ({
 
   const isComplete = state === downloadStates.completed
 
-  // TODO needs to handle loading more files
-  const fileProgressMessage = `${commafy(finishedFiles)} of ${commafy(totalFiles)} files completed in ${humanizeDuration(elapsedTime * 1000, {
+  let fileProgressMessage = commafy(finishedFiles)
+
+  // Sqlite booleans are actually integers 1/0
+  if (loadingMoreFiles === 0) {
+    fileProgressMessage += ` of ${commafy(totalFiles)}`
+  }
+
+  fileProgressMessage += ` files completed in ${humanizeDuration(elapsedTime * 1000, {
     largest: 1,
     round: true
   })}`
+
+  if (loadingMoreFiles === 1) {
+    fileProgressMessage += ' (determining file count)'
+  }
 
   const remainingTimeMessage = `${humanizeDuration(estimatedTotalTimeRemaining * 1000, {
     largest: 1,
@@ -123,13 +133,7 @@ const FileDownloadsHeader = ({
           className={styles.backLink}
           Icon={FaChevronLeft}
           size="lg"
-          onClick={
-            () => {
-              // We start interval to poll the state of the downloads
-              startReportingDownloads()
-              setCurrentPage(PAGES.downloads)
-            }
-          }
+          onClick={() => setCurrentPage(PAGES.downloads)}
         >
           Back to Downloads
         </Button>
@@ -284,6 +288,8 @@ FileDownloadsHeader.propTypes = {
     elapsedTime: PropTypes.number,
     finishedFiles: PropTypes.number,
     id: PropTypes.string,
+    // Sqlite booleans are actually integers 1/0
+    loadingMoreFiles: PropTypes.number,
     percent: PropTypes.number,
     percentSum: PropTypes.number,
     state: PropTypes.string,

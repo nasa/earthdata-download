@@ -32,7 +32,6 @@ const setup = (overrideProps = {}) => {
   const restartDownload = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
-  const startReportingFiles = jest.fn()
 
   const props = {
     file,
@@ -48,8 +47,7 @@ const setup = (overrideProps = {}) => {
           openDownloadFolder,
           restartDownload,
           showWaitingForEulaDialog,
-          showWaitingForLoginDialog,
-          startReportingFiles
+          showWaitingForLoginDialog
         }
       }
     >

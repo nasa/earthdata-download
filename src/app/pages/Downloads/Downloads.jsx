@@ -22,8 +22,9 @@ import * as styles from './Downloads.module.scss'
 /**
  * @typedef {Object} DownloadsProps
  * @property {Function} setCurrentPage A function which sets the active page.
- * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout.
  * @property {Function} setHasActiveDownload A function to set whether a download is active.
+ * @property {Function} setSelectedDownloadId A function to set the selectedDownloadId.
+ * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout.
 
 /**
  * Renders a `Downloads` page.
@@ -34,8 +35,9 @@ import * as styles from './Downloads.module.scss'
  * return (
  *   <Downloads
  *     setCurrentPage={setCurrentPage}
- *     showMoreInfoDialog={showMoreInfoDialog}
  *     setHasActiveDownload={setHasActiveDownload}
+ *     setSelectedDownloadId={setSelectedDownloadId}
+ *     showMoreInfoDialog={showMoreInfoDialog}
  *   />
  * )
  */
@@ -56,7 +58,7 @@ const Downloads = ({
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
   const [totalFiles, setTotalFiles] = useState(0)
-  const [totalDownloads, setTotalDownloads] = useState(null)
+  const [totalDownloads, setTotalDownloads] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
   const [
     derivedStateFromDownloads,

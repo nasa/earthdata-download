@@ -11,15 +11,16 @@ import { PAGES } from '../../../constants/pages'
 import downloadStates from '../../../constants/downloadStates'
 
 const headerReport = {
-  percent: 0,
-  totalFiles: 1,
-  finishedFiles: 0,
+  downloadLocation: '/mock/location',
+  elapsedTime: 0,
   erroredFiles: 0,
   estimatedTotalTimeRemaining: 0,
+  finishedFiles: 0,
+  id: 'mock-download-id',
+  loadingMoreFiles: 0,
+  percent: 0,
   state: downloadStates.pending,
-  elapsedTime: 0,
-  downloadLocation: '/mock/location',
-  id: 'mock-download-id'
+  totalFiles: 1
 }
 
 const setup = (overrideProps) => {
@@ -27,7 +28,6 @@ const setup = (overrideProps) => {
   const cancelDownloadItem = jest.fn()
   const pauseDownloadItem = jest.fn()
   const resumeDownloadItem = jest.fn()
-  const startReportingDownloads = jest.fn()
 
   // Props
   const setCurrentPage = jest.fn()
@@ -46,8 +46,7 @@ const setup = (overrideProps) => {
       {
         cancelDownloadItem,
         pauseDownloadItem,
-        resumeDownloadItem,
-        startReportingDownloads
+        resumeDownloadItem
       }
     }
     >
@@ -62,23 +61,20 @@ const setup = (overrideProps) => {
     setCurrentPage,
     cancelDownloadItem,
     pauseDownloadItem,
-    resumeDownloadItem,
-    startReportingDownloads
+    resumeDownloadItem
   }
 }
 
 describe('FileDownloadsHeader component', () => {
   describe('when clicking the Back to Downloads button', () => {
-    test('calls startReportingDownloads and setCurrentPage', async () => {
-      const { setCurrentPage, startReportingDownloads } = setup()
+    test('calls setCurrentPage', async () => {
+      const { setCurrentPage } = setup()
 
       const button = screen.getByRole('button', { name: 'Back to Downloads' })
       await userEvent.click(button)
 
       expect(setCurrentPage).toHaveBeenCalledTimes(1)
       expect(setCurrentPage).toHaveBeenCalledWith(PAGES.downloads)
-
-      expect(startReportingDownloads).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -150,31 +146,6 @@ describe('FileDownloadsHeader component', () => {
     })
   })
 
-  describe('when the download is pending', () => {
-    test('displays the correct information', () => {
-      setup({
-        headerReport: {
-          ...headerReport,
-          state: downloadStates.pending
-        }
-      })
-
-      expect(screen.getByText('Not yet started')).toHaveClass('status')
-      expect(screen.getByText('0%')).toHaveClass('statusPercent')
-
-      expect(screen.getByText('0 of 1 files completed in 0 seconds')).toHaveClass('progressFiles')
-      expect(screen.getByText('0 seconds remaining')).toHaveClass('progressRemaining')
-
-      expect(screen.queryByRole('button', { name: 'Pause All' })).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Resume All' })).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Cancel All' })).not.toBeInTheDocument()
-
-      expect(screen.getAllByText('Downloading to /mock/location')).toHaveLength(2)
-
-      expect(screen.getByRole('checkbox', { name: 'Hide Completed' })).toBeInTheDocument()
-    })
-  })
-
   describe('when the download is starting', () => {
     test('displays the correct information', () => {
       setup({
@@ -223,6 +194,33 @@ describe('FileDownloadsHeader component', () => {
       expect(screen.getAllByText('Downloading to /mock/location')).toHaveLength(2)
 
       expect(screen.getByRole('checkbox', { name: 'Hide Completed' })).toBeInTheDocument()
+    })
+
+    describe('when the download is loading more files', () => {
+      test('displays the correct information', () => {
+        setup({
+          headerReport: {
+            ...headerReport,
+            loadingMoreFiles: 1,
+            percent: 42,
+            state: downloadStates.active
+          }
+        })
+
+        expect(screen.getByText('Downloading')).toHaveClass('status')
+        expect(screen.getByText('42%')).toHaveClass('statusPercent')
+
+        expect(screen.getByText('0 files completed in 0 seconds (determining file count)')).toHaveClass('progressFiles')
+        expect(screen.getByText('0 seconds remaining')).toHaveClass('progressRemaining')
+
+        expect(screen.getByRole('button', { name: 'Pause All' })).toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: 'Resume All' })).not.toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Cancel All' })).toBeInTheDocument()
+
+        expect(screen.getAllByText('Downloading to /mock/location')).toHaveLength(2)
+
+        expect(screen.getByRole('checkbox', { name: 'Hide Completed' })).toBeInTheDocument()
+      })
     })
   })
 

@@ -36,7 +36,6 @@ const FileDownloads = ({
 }) => {
   const {
     initializeDownload,
-    startReportingDownloads,
     requestFilesProgress
   } = useContext(ElectronApiContext)
 
@@ -49,8 +48,6 @@ const FileDownloads = ({
   const listRef = useRef(null)
 
   const onInitializeDownload = () => {
-    startReportingDownloads()
-
     // If there is a new download return to the downloads page
     setCurrentPage(PAGES.downloads)
   }

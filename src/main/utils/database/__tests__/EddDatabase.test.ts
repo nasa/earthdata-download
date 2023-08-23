@@ -849,7 +849,7 @@ describe('EddDatabase', () => {
   describe('getFilesHeaderReport', () => {
     test('returns the report', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select `downloads`.`id`, `downloads`.`downloadLocation`, `downloads`.`state`, `downloads`.`createdAt`, `downloads`.`timeEnd`, `downloads`.`timeStart`, sum(`files`.`percent`) as `percentSum`, sum(`files`.`receivedBytes`) as `receivedBytesSum`, sum(`files`.`totalBytes`) as `totalBytesSum`, count(`files`.`id`) as `totalFiles`, count(CASE WHEN "percent" > 0 THEN 1 ELSE NULL END) as `filesWithProgress`, count(CASE "files"."state" WHEN "COMPLETED" THEN 1 ELSE NULL END) as `finishedFiles`, count(CASE "files"."state" WHEN "ERROR" THEN 1 ELSE NULL END) as `erroredFiles` from `files` inner join `downloads` on `files`.`downloadId` = `downloads`.`id` where `downloadId` = ?')
+        expect(query.sql).toEqual('select `downloads`.`id`, `downloads`.`downloadLocation`, `downloads`.`loadingMoreFiles`, `downloads`.`state`, `downloads`.`createdAt`, `downloads`.`timeEnd`, `downloads`.`timeStart`, sum(`files`.`percent`) as `percentSum`, sum(`files`.`receivedBytes`) as `receivedBytesSum`, sum(`files`.`totalBytes`) as `totalBytesSum`, count(`files`.`id`) as `totalFiles`, count(CASE WHEN "percent" > 0 THEN 1 ELSE NULL END) as `filesWithProgress`, count(CASE "files"."state" WHEN "COMPLETED" THEN 1 ELSE NULL END) as `finishedFiles`, count(CASE "files"."state" WHEN "ERROR" THEN 1 ELSE NULL END) as `erroredFiles` from `files` inner join `downloads` on `files`.`downloadId` = `downloads`.`id` where `downloadId` = ?')
         expect(query.bindings).toEqual(['mock-download-1'])
 
         query.response([{

@@ -15,7 +15,6 @@ jest.mock('../../../components/ListPage/ListPage', () => jest.fn(
 const setup = (overrideProps) => {
   // Context functions
   const initializeDownload = jest.fn()
-  const startReportingDownloads = jest.fn()
   const setCurrentPage = jest.fn()
 
   const requestFilesProgress = jest.fn().mockResolvedValue({
@@ -73,7 +72,6 @@ const setup = (overrideProps) => {
     <ElectronApiContext.Provider value={
       {
         initializeDownload,
-        startReportingDownloads,
         requestFilesProgress
       }
     }

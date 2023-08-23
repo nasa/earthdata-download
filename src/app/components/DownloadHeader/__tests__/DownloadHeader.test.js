@@ -13,7 +13,6 @@ const setup = (overrideProps) => {
   const cancelDownloadItem = jest.fn()
   const pauseDownloadItem = jest.fn()
   const resumeDownloadItem = jest.fn()
-  const startReportingDownloads = jest.fn()
 
   // Props
   const setCurrentPage = jest.fn()
@@ -46,8 +45,7 @@ const setup = (overrideProps) => {
     setCurrentPage,
     cancelDownloadItem,
     pauseDownloadItem,
-    resumeDownloadItem,
-    startReportingDownloads
+    resumeDownloadItem
   }
 }
 

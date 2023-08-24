@@ -890,4 +890,77 @@ describe('EddDatabase', () => {
       })
     })
   })
+
+  describe('getDownloadsReport', () => {
+    test('returns the report', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select `downloads`.`createdAt`, `downloads`.`id`, `downloads`.`loadingMoreFiles`, `downloads`.`state`, `downloads`.`timeEnd`, `downloads`.`timeStart` from `downloads` order by `createdAt` desc limit ? offset ?')
+        expect(query.bindings).toEqual([
+          10,
+          10
+        ])
+
+        query.response([
+          {
+            createdAt: 1692731224799,
+            id: 'mock-download-id-1',
+            loadingMoreFiles: 1,
+            state: downloadStates.active,
+            timeEnd: null,
+            timeStart: 1692731225946
+          },
+          {
+            createdAt: 1692731213513,
+            id: 'mock-download-id-2',
+            loadingMoreFiles: 0,
+            state: downloadStates.active,
+            timeEnd: null,
+            timeStart: 1692731217041
+          }
+        ])
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getDownloadsReport(10, 10)
+
+      expect(result).toEqual([
+        {
+          createdAt: 1692731224799,
+          id: 'mock-download-id-1',
+          loadingMoreFiles: 1,
+          state: downloadStates.active,
+          timeEnd: null,
+          timeStart: 1692731225946
+        },
+        {
+          createdAt: 1692731213513,
+          id: 'mock-download-id-2',
+          loadingMoreFiles: 0,
+          state: downloadStates.active,
+          timeEnd: null,
+          timeStart: 1692731217041
+        }
+      ])
+    })
+  })
+
+  describe('getAllDownloadsCount', () => {
+    test('returns the report', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select count(`id`) from `downloads`')
+        expect(query.bindings).toEqual([])
+
+        query.response([{
+          'count(`id`)': 5
+        }])
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getAllDownloadsCount()
+
+      expect(result).toEqual(5)
+    })
+  })
 })

@@ -62,7 +62,7 @@ export const Skeleton = ({
       style={{ ...normalizedStyles }}
     >
       <div
-        className={styles.skeleton__inner}
+        className={styles.skeletonInner}
       >
         {shapeElements}
       </div>

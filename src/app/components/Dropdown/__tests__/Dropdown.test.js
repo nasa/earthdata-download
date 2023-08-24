@@ -22,7 +22,7 @@ describe('Dropdown component', () => {
       <Dropdown actionsList={actionsList} />
     )
 
-    const trigger = screen.queryByRole('button')
+    const trigger = screen.queryByRole('button', { name: 'More Actions' })
     await userEvent.click(trigger)
 
     expect(screen.queryByText('test-label')).toBeInTheDocument()
@@ -30,13 +30,14 @@ describe('Dropdown component', () => {
 
   describe('when a dropdown option is picked', () => {
     test('associated function is triggered', async () => {
+      const callback = jest.fn()
       const actionsList = [
         [
           {
             label: 'test-label',
             isActive: true,
             isPrimary: true,
-            callback: jest.fn(),
+            callback,
             icon: null
           }
         ]
@@ -51,7 +52,8 @@ describe('Dropdown component', () => {
       const testButton = screen.queryByText('test-label')
       await userEvent.click(testButton)
 
-      expect(actionsList[0][0].callback).toHaveBeenCalledTimes(1)
+      expect(callback).toHaveBeenCalledTimes(1)
+      expect(callback).toHaveBeenCalledWith()
     })
   })
 })

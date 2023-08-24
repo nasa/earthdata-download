@@ -8,6 +8,7 @@ import PropTypes from 'prop-types'
 import { FaDownload, FaSearch } from 'react-icons/fa'
 
 import downloadStates from '../../constants/downloadStates'
+import { REPORT_INTERVAL } from '../../constants/reportInterval'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
@@ -58,23 +59,21 @@ const Downloads = ({
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
   const [totalFiles, setTotalFiles] = useState(0)
-  const [totalDownloads, setTotalDownloads] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
   const [
     derivedStateFromDownloads,
     setDerivedStateFromDownloads
   ] = useState(downloadStates.completed)
 
-  const buildItems = (report, newWindowState) => {
+  const buildItems = (report) => {
     const {
-      downloadsReport,
-      totalDownloads: newTotalDownloads
-    } = report
+      overscanStartIndex
+    } = windowState
 
     const {
-      overscanStartIndex,
-      overscanStopIndex
-    } = newWindowState
+      downloadsReport,
+      totalDownloads
+    } = report
 
     // Build real items
     const realItems = downloadsReport.map((download) => ({
@@ -88,10 +87,8 @@ const Downloads = ({
     setItems([
       ...Array.from({ length: overscanStartIndex }),
       ...realItems,
-      ...Array.from({ length: newTotalDownloads - overscanStopIndex - 1 })
+      ...Array.from({ length: totalDownloads - overscanStartIndex - realItems.length })
     ])
-
-    setTotalDownloads(newTotalDownloads)
   }
 
   useEffect(() => {
@@ -102,7 +99,8 @@ const Downloads = ({
         overscanStopIndex = 10
       } = windowState
 
-      const stopIndex = totalDownloads || overscanStopIndex
+      // React window doesn't handle lists smaller than the window very well, and sets the overscanStopIndex lower than the list of items. Never set the limit to less than 10
+      const stopIndex = Math.max(10, overscanStopIndex)
       const limit = stopIndex - overscanStartIndex
       const offset = overscanStartIndex
 
@@ -131,14 +129,14 @@ const Downloads = ({
       setTotalCompletedFiles(reportTotalCompletedFiles)
       setDerivedStateFromDownloads(reportDerivedStateFromDownloads)
 
-      buildItems(report, windowState)
+      buildItems(report)
     }
 
     loadItems()
 
     const interval = setInterval(() => {
       loadItems()
-    }, 1000)
+    }, REPORT_INTERVAL)
 
     return () => {
       clearInterval(interval)

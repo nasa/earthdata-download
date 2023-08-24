@@ -246,12 +246,14 @@
   visibility: hidden;
 
   &:focus-within,
+  .isDropdownActive &,
   .innerWrapper:hover &,
   .innerWrapper:focus-visible & {
     position: relative;
     display: flex;
     width: auto;
     animation: metaSecondaryShow 500ms forwards var(--animation__spring);
+    opacity: 1;
     pointer-events: all;
     user-select: initial;
     visibility: visible;

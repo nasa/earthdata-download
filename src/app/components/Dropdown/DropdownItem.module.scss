@@ -1,0 +1,16 @@
+@use "../../css/vars/colors" as colors;
+
+.item {
+  padding: 5px;
+  padding-left: var(--size__500);
+  font-weight: 500;
+}
+
+.item[data-highlighted] {
+  background-color: var(--color__black--300);
+  color: var(--color__white);
+}
+
+.item[data-disabled] {
+  color: var(--color__black--300);
+}

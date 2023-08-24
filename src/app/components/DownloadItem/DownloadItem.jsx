@@ -7,9 +7,9 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { FaSignInAlt } from 'react-icons/fa'
 
-import Button from '../Button/Button'
 import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
+import DownloadItemActionButton from './DownloadItemActionButton'
 
 import Dialog from '../Dialog/Dialog'
 import WaitingForLogin from '../../dialogs/WaitingForLogin/WaitingForLogin'
@@ -22,12 +22,15 @@ import createVariantClassName from '../../utils/createVariantClassName'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import { PAGES } from '../../constants/pages'
 
+import useAccessibleEvent from '../../hooks/useAccessibleEvent'
+
 import * as styles from './DownloadItem.module.scss'
 
 /**
  * @typedef {Object} DownloadItemProps
  * @property {Array} actionsList A 2-D array of objects detailing action attributes.
  * @property {String} downloadId The ID of the DownloadItem.
+ * @property {Boolean} isFile Is the DownloadItem rendering a file item.
  * @property {String} itemName The name of the DownloadItem.
  * @property {Number} percent The download percent of the DownloadItem.
  * @property {Function} setCurrentPage A function which sets the active page.
@@ -60,6 +63,7 @@ import * as styles from './DownloadItem.module.scss'
 const DownloadItem = ({
   actionsList,
   downloadId,
+  isFile,
   itemName,
   percent,
   setCurrentPage,
@@ -76,6 +80,7 @@ const DownloadItem = ({
 
   const [waitingForEulaDialogIsOpen, setWaitingForEulaDialogIsOpen] = useState(false)
   const [waitingForLoginDialogIsOpen, setWaitingForLoginDialogIsOpen] = useState(false)
+  const [moreActionsOpen, setMoreActionsOpen] = useState(false)
 
   const onShowWaitingForEulaDialog = (event, info) => {
     const { showDialog } = info
@@ -98,14 +103,23 @@ const DownloadItem = ({
     }
   }
 
+  const accessibleEventProps = useAccessibleEvent((event) => {
+    onSelectDownloadItem()
+    event.stopPropagation()
+  })
+
   // Setup event listeners
   useEffect(() => {
-    showWaitingForEulaDialog(true, onShowWaitingForEulaDialog)
-    showWaitingForLoginDialog(true, onShowWaitingForLoginDialog)
+    if (!isFile) {
+      showWaitingForEulaDialog(true, onShowWaitingForEulaDialog)
+      showWaitingForLoginDialog(true, onShowWaitingForLoginDialog)
+    }
 
     return () => {
-      showWaitingForEulaDialog(false, onShowWaitingForEulaDialog)
-      showWaitingForLoginDialog(false, onShowWaitingForLoginDialog)
+      if (!isFile) {
+        showWaitingForEulaDialog(false, onShowWaitingForEulaDialog)
+        showWaitingForLoginDialog(false, onShowWaitingForLoginDialog)
+      }
     }
   }, [])
 
@@ -117,24 +131,22 @@ const DownloadItem = ({
         primaryActions = [
           ...primaryActions,
           (action.isActive && action.isPrimary) && (
-            <Button
-              className={styles.action}
+            <DownloadItemActionButton
               key={action.label}
-              size="sm"
-              Icon={action.icon}
-              hideLabel
-              onClick={
-                (event) => {
-                  event.stopPropagation()
-                  action.callback()
+              label={action.label}
+              callback={action.callback}
+              buttonProps={
+                {
+                  className: styles.action,
+                  size: 'sm',
+                  Icon: action.icon,
+                  hideLabel: true,
+                  variant: action.variant,
+                  dataTestId: `download-item-${action.label}`,
+                  tooltipDelayDuration: 300
                 }
               }
-              variant={action.variant}
-              dataTestId={`download-item-${action.label}`}
-              tooltipDelayDuration={300}
-            >
-              {action.label}
-            </Button>
+            />
           )
         ]
       })
@@ -164,51 +176,52 @@ const DownloadItem = ({
       }
       data-testid="download-item"
     >
-      {/* ?? Should these dialogs be present on files view? */}
-      <Dialog
-        open={waitingForEulaDialogIsOpen}
-        setOpen={setWaitingForEulaDialogIsOpen}
-        showTitle
-        closeButton
-        title="Accept the license agreement to continue your download."
-        TitleIcon={FaSignInAlt}
-      >
-        <WaitingForEula
-          downloadId={downloadId}
-        />
-      </Dialog>
-      <Dialog
-        open={waitingForLoginDialogIsOpen}
-        setOpen={setWaitingForLoginDialogIsOpen}
-        showTitle
-        closeButton
-        title="You must log in with Earthdata Login to download this data."
-        TitleIcon={FaSignInAlt}
-      >
-        <WaitingForLogin
-          downloadId={downloadId}
-        />
-      </Dialog>
+      {/* TODO EDD-39 Move these layouts to dialog */}
+      {
+        !isFile && (
+          <>
+            <Dialog
+              open={waitingForEulaDialogIsOpen}
+              setOpen={setWaitingForEulaDialogIsOpen}
+              showTitle
+              closeButton
+              title="Accept the license agreement to continue your download."
+              TitleIcon={FaSignInAlt}
+            >
+              <WaitingForEula
+                downloadId={downloadId}
+              />
+            </Dialog>
+
+            <Dialog
+              open={waitingForLoginDialogIsOpen}
+              setOpen={setWaitingForLoginDialogIsOpen}
+              showTitle
+              closeButton
+              title="You must log in with Earthdata Login to download this data."
+              TitleIcon={FaSignInAlt}
+            >
+              <WaitingForLogin
+                downloadId={downloadId}
+              />
+            </Dialog>
+          </>
+        )
+      }
 
       <div
         data-testid="download-item-open-file-downloads"
         className={
           classNames([
             styles.innerWrapper,
-            { [styles.isClickable]: shouldBeClickable }
+            { [styles.isClickable]: shouldBeClickable },
+            { [styles.isDropdownActive]: moreActionsOpen }
           ])
-        }
-        onClick={onSelectDownloadItem}
-        onKeyDown={
-          (event) => {
-            // If the enter key or the Spacebar key is pressed
-            if (event.key === 'Enter' || event.key === ' ') {
-              onSelectDownloadItem()
-            }
-          }
         }
         role="button"
         tabIndex="0"
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...accessibleEventProps}
       >
         <h3
           className={styles.name}
@@ -238,7 +251,10 @@ const DownloadItem = ({
 
           <div className={styles.metaSecondary}>
             {primaryActions}
-            <Dropdown actionsList={actionsList} />
+            <Dropdown
+              onOpenChange={setMoreActionsOpen}
+              actionsList={actionsList}
+            />
           </div>
         </div>
 
@@ -261,6 +277,7 @@ const DownloadItem = ({
 
 DownloadItem.defaultProps = {
   actionsList: null,
+  isFile: false,
   setCurrentPage: null,
   setSelectedDownloadId: null,
   primaryStatus: null,
@@ -283,6 +300,7 @@ DownloadItem.propTypes = {
     )
   ),
   downloadId: PropTypes.string.isRequired,
+  isFile: PropTypes.bool,
   itemName: PropTypes.string.isRequired,
   percent: PropTypes.number.isRequired,
   setCurrentPage: PropTypes.func,

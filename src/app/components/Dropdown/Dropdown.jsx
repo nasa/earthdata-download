@@ -1,14 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu'
 import { FaEllipsisV } from 'react-icons/fa'
-import * as styles from './Dropdown.module.scss'
+
 import Button from '../Button/Button'
 import Tooltip from '../Tooltip/Tooltip'
+import DropdownItem from './DropdownItem'
+
+import useAccessibleEvent from '../../hooks/useAccessibleEvent'
+
+import * as styles from './Dropdown.module.scss'
 
 /**
  * @typedef {Object} DropdownProps
  * @property {Array} actionsList A 2-D array of objects detailing action attributes.
+ * @property {Function} onOpenChange Callback for the Radix Dropdown when the open state changes.
 /**
  * Renders a Dropdown component
  * @param {DropdownProps} props
@@ -18,13 +24,19 @@ import Tooltip from '../Tooltip/Tooltip'
  * return (
  *  <Dropdown
  *    actionsList={actionsList}
+ *    onOpenChange={onOpenChange}
  *  >
  *  </Dropdown>
  * )
  */
 const Dropdown = ({
-  actionsList
+  actionsList,
+  onOpenChange
 }) => {
+  const accessibleEventProps = useAccessibleEvent((event) => event.stopPropagation())
+
+  const [didClickToClose, setDidClickToClose] = useState(false)
+
   const dropdownOptions = []
   if (actionsList) {
     actionsList.forEach((actionGroup) => {
@@ -34,14 +46,13 @@ const Dropdown = ({
         // Create dropdown item element for each action object
         dropdownOptions.push(
           action.isActive && (
-            <RadixDropdown.Item
+            <DropdownItem
               key={action.label}
-              className={styles.item}
+              callback={action.callback}
               disabled={action.disabled}
-              onSelect={action.callback}
-            >
-              {action.label}
-            </RadixDropdown.Item>
+              label={action.label}
+              setDidClickToClose={setDidClickToClose}
+            />
           )
         )
       })
@@ -57,41 +68,54 @@ const Dropdown = ({
   dropdownOptions.pop()
 
   return (
-    <RadixDropdown.Root modal="false">
+    <RadixDropdown.Root onOpenChange={onOpenChange}>
       <Tooltip
         content="More Actions"
       >
-        <RadixDropdown.Trigger asChild className={styles.trigger}>
+        <RadixDropdown.Trigger
+          asChild
+          className={styles.trigger}
+        >
           <Button
-            data-testid="dropdown-trigger"
             className={styles.action}
             size="sm"
             Icon={FaEllipsisV}
             hideLabel
             tabIndex="0"
             tooltipDelayDuration={300}
-            onClick={(event) => { event.stopPropagation() }}
+            {...accessibleEventProps}
           >
             More Actions
           </Button>
         </RadixDropdown.Trigger>
       </Tooltip>
-      <RadixDropdown.Content
-        className={styles.content}
-        align="end"
-        sideOffset={4}
-        onCloseAutoFocus={(event) => event.preventDefault()}
-        onInteractOutside={(event) => event.stopPropagation()}
-        onClick={(event) => { event.stopPropagation() }}
-      >
-        {dropdownOptions}
-      </RadixDropdown.Content>
+
+      <RadixDropdown.Portal>
+        <RadixDropdown.Content
+          className={styles.content}
+          align="end"
+          sideOffset={4}
+          onCloseAutoFocus={
+            (event) => {
+              // If the user clicked outside the portal to close, call preventDefault to lose focus on the trigger button
+              if (didClickToClose) event.preventDefault()
+
+              // Reset the didClickToClose
+              setDidClickToClose(false)
+            }
+          }
+          onInteractOutside={() => setDidClickToClose(true)}
+        >
+          {dropdownOptions}
+        </RadixDropdown.Content>
+      </RadixDropdown.Portal>
     </RadixDropdown.Root>
   )
 }
 
 Dropdown.defaultProps = {
-  actionsList: null
+  actionsList: null,
+  onOpenChange: null
 }
 
 Dropdown.propTypes = {
@@ -103,7 +127,8 @@ Dropdown.propTypes = {
     callback: PropTypes.func.isRequired,
     icon: PropTypes.func,
     disabled: PropTypes.bool
-  })))
+  }))),
+  onOpenChange: PropTypes.func
 }
 
 export default Dropdown

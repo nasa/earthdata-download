@@ -8,6 +8,7 @@ import PropTypes from 'prop-types'
 import { FaDownload } from 'react-icons/fa'
 
 import { PAGES } from '../../constants/pages'
+import { REPORT_INTERVAL } from '../../constants/reportInterval'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
@@ -43,7 +44,6 @@ const FileDownloads = ({
   const [items, setItems] = useState([])
   const [windowState, setWindowState] = useState({})
   const [headerReport, setHeaderReport] = useState({})
-  const [totalFiles, setTotalFiles] = useState(null)
 
   const listRef = useRef(null)
 
@@ -67,8 +67,7 @@ const FileDownloads = ({
 
   const buildItems = (report) => {
     const {
-      overscanStartIndex,
-      overscanStopIndex
+      overscanStartIndex
     } = windowState
 
     const {
@@ -77,7 +76,7 @@ const FileDownloads = ({
 
     const {
       files,
-      totalFiles: newTotalFiles
+      totalFiles
     } = newFilesReport
 
     // Build real items
@@ -89,10 +88,8 @@ const FileDownloads = ({
     setItems([
       ...Array.from({ length: overscanStartIndex }),
       ...realItems,
-      ...Array.from({ length: newTotalFiles - overscanStopIndex - 1 })
+      ...Array.from({ length: totalFiles - overscanStartIndex - realItems.length })
     ])
-
-    setTotalFiles(newTotalFiles)
   }
 
   useEffect(() => {
@@ -103,7 +100,7 @@ const FileDownloads = ({
         overscanStopIndex = 10
       } = windowState
 
-      const stopIndex = totalFiles || overscanStopIndex
+      const stopIndex = Math.max(10, overscanStopIndex)
       const limit = stopIndex - overscanStartIndex
       const offset = overscanStartIndex
 
@@ -126,7 +123,7 @@ const FileDownloads = ({
 
     const interval = setInterval(() => {
       loadItems()
-    }, 1000)
+    }, REPORT_INTERVAL)
 
     return () => {
       clearInterval(interval)

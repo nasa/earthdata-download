@@ -27,7 +27,6 @@ const DownloadListItemPercent = ({
   return (
     <div
       className={styles.percentComplete}
-      data-testid="download-item-percent"
     >
       {percent}
       %

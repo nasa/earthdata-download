@@ -307,7 +307,7 @@ describe('DownloadItem component', () => {
           actionsList
         })
 
-        const dropdownTrigger = screen.getByTestId('dropdown-trigger')
+        const dropdownTrigger = screen.getByRole('button', { name: 'More Actions' })
 
         await userEvent.click(dropdownTrigger)
 
@@ -332,7 +332,7 @@ describe('DownloadItem component', () => {
             actionsList
           })
 
-          const dropdownTrigger = screen.getByTestId('dropdown-trigger')
+          const dropdownTrigger = screen.getByRole('button', { name: 'More Actions' })
 
           await userEvent.click(dropdownTrigger)
           const testButton = screen.getByRole('menuitem')

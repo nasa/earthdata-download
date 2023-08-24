@@ -101,7 +101,6 @@ describe('FileListItem component', () => {
         ])
       ],
       downloadId: 'mock-download-id',
-      filename: 'mock-file.png',
       itemName: 'mock-file.png',
       percent: 42,
       state: downloadStates.active

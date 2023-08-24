@@ -87,7 +87,7 @@ const ListPage = ({
       classNames([
         styles.listPage,
         {
-          [styles.isEmptyState]: !items.length,
+          [styles.isEmptyState]: !items.length && !hideCompleted,
           [styles.hasScrolledList]: hasScrolledList
         }
       ])
@@ -107,7 +107,7 @@ const ListPage = ({
               <div className={styles.contentWrapper}>
                 <div className={styles.scrollableWrapper}>
                   {
-                    // TODO this screws up the header width
+                    // TODO make pretty
                     hideCompleted && items.length === 0 && (
                       <div>
                         No Items remaining

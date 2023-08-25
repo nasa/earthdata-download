@@ -10,6 +10,7 @@ import onUpdated from './willDownloadEvents/onUpdated'
 
 import downloadStates from '../../app/constants/downloadStates'
 import verifyDownload from '../utils/verifyDownload'
+import finishDownload from './willDownloadEvents/finishDownload'
 
 /**
  * Handles the DownloadItem events
@@ -32,8 +33,11 @@ const willDownload = async ({
   webContents
 }) => {
   const [originalUrl] = item.getURLChain()
-
   const context = downloadIdContext[originalUrl]
+
+  const filename = item.getFilename()
+  const receivedBytes = item.getReceivedBytes()
+  const totalBytes = item.getTotalBytes()
 
   // If no downloadIdContext is available for this download, cancel the download
   if (!context) {
@@ -48,7 +52,30 @@ const willDownload = async ({
     fileId
   } = context
 
-  const filename = item.getFilename()
+  // Add the DownloadItem to the currentDownloadItems
+  currentDownloadItems.addItem(downloadId, filename, item)
+
+  // Setup event handlers for the download item
+  item.on('updated', async (event, state) => {
+    await onUpdated({
+      database,
+      downloadId,
+      item,
+      state
+    })
+  })
+
+  item.once('done', async (event, state) => {
+    await onDone({
+      currentDownloadItems,
+      database,
+      downloadId,
+      downloadIdContext,
+      item,
+      state,
+      webContents
+    })
+  })
 
   // Set the save path for the DownloadItem
   item.setSavePath(path.join(downloadLocation, filename))
@@ -61,7 +88,7 @@ const willDownload = async ({
 
   // If the last item in the urlChain is EDL, set the download to pending and forward the user to EDL
   if (lastUrl.includes('oauth/authorize')) {
-    item.cancel()
+    currentDownloadItems.cancelItem(downloadId, filename)
 
     await database.updateDownloadById(downloadId, {
       state: downloadStates.waitingForAuth
@@ -90,20 +117,19 @@ const willDownload = async ({
   })
 
   if (!downloadCheck) {
-    item.cancel()
+    currentDownloadItems.cancelItem(downloadId, filename)
 
     return
   }
 
   // If the file has no totalBytes, report an error
-  const totalBytes = item.getTotalBytes()
   if (totalBytes === 0) {
     await database.updateFileById(fileId, {
       state: downloadStates.error,
       errors: 'This file could not be downloaded'
     })
 
-    item.cancel()
+    currentDownloadItems.cancelItem(downloadId, filename)
 
     // Start the next download
     await startNextDownload({
@@ -117,34 +143,36 @@ const willDownload = async ({
     return
   }
 
-  // Add the DownloadItem to the currentDownloadItems
-  currentDownloadItems.addItem(downloadId, filename, item)
-
-  // Update the start time for the file
-  await database.updateFileById(fileId, {
-    timeStart: new Date().getTime()
-  })
-
-  // Setup event handlers for the download item
-  item.on('updated', async (event, state) => {
-    await onUpdated({
-      database,
-      downloadId,
-      item,
-      state
+  if (receivedBytes === totalBytes) {
+    // The file is already done, mark it as completed
+    await database.updateFileById(fileId, {
+      percent: 100,
+      state: downloadStates.completed,
+      timeStart: new Date().getTime(),
+      timeEnd: new Date().getTime()
     })
-  })
 
-  item.once('done', async (event, state) => {
-    await onDone({
+    // Start the next download
+    await startNextDownload({
       currentDownloadItems,
       database,
       downloadId,
       downloadIdContext,
-      item,
-      state,
       webContents
     })
+
+    // Finish the download
+    await finishDownload({
+      database,
+      downloadId
+    })
+
+    return
+  }
+
+  // Update the start time for the file
+  await database.updateFileById(fileId, {
+    timeStart: new Date().getTime()
   })
 }
 

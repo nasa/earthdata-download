@@ -84,6 +84,7 @@ const setup = (overrideProps = {}) => {
 
   return {
     addToast,
+    deleteAllToastsById,
     cancelDownloadItem,
     copyDownloadPath,
     openDownloadFolder,
@@ -168,35 +169,6 @@ describe('DownloadListItem component', () => {
     }), {})
   })
 
-  describe('when errors exist', () => {
-    test('calls addToast', () => {
-      const { addToast } = setup({
-        download: {
-          ...download,
-          errors: [{ mock: 'error' }]
-        }
-      })
-
-      expect(addToast).toHaveBeenCalledTimes(1)
-      expect(addToast).toHaveBeenCalledWith(expect.objectContaining({
-        actions: expect.arrayContaining([
-          expect.objectContaining({
-            altText: 'Retry',
-            buttonText: 'Retry'
-          }, {
-            altText: 'More Info',
-            buttonText: 'More Info'
-          })
-        ]),
-        id: 'mock-download-id',
-        message: '1 file failed to download in mock-download-id',
-        numberErrors: 1,
-        title: 'An error occurred',
-        variant: 'danger'
-      }))
-    })
-  })
-
   describe('when clicking `Log In with Earthdata Login`', () => {
     test('calls sendToLogin', async () => {
       const { sendToLogin } = setup({
@@ -262,8 +234,8 @@ describe('DownloadListItem component', () => {
   })
 
   describe('when clicking `Cancel Download`', () => {
-    test('calls cancelDownloadItem', async () => {
-      const { cancelDownloadItem } = setup({
+    test('calls cancelDownloadItem and deleteAllToastsById', async () => {
+      const { cancelDownloadItem, deleteAllToastsById } = setup({
         download: {
           ...download,
           state: downloadStates.active
@@ -274,6 +246,8 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
     })
   })
 
@@ -317,7 +291,7 @@ describe('DownloadListItem component', () => {
 
   describe('when clicking `Restart Download`', () => {
     test('calls restartDownload', async () => {
-      const { restartDownload } = setup({
+      const { restartDownload, deleteAllToastsById } = setup({
         download: {
           ...download,
           state: downloadStates.completed
@@ -331,6 +305,9 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(restartDownload).toHaveBeenCalledTimes(1)
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
     })
   })
 })

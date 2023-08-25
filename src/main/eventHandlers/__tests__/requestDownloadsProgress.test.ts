@@ -17,7 +17,7 @@ describe('requestDownloadsProgress', () => {
         .mockResolvedValue(0),
       getDownloadsReport: jest.fn(),
       getDownloadReport: jest.fn(),
-      getErroredFilesByDownloadId: jest.fn()
+      getErroredFiles: jest.fn()
     }
 
     const result = await requestDownloadsProgress({
@@ -37,7 +37,7 @@ describe('requestDownloadsProgress', () => {
 
     expect(database.getDownloadsReport).toHaveBeenCalledTimes(0)
     expect(database.getDownloadReport).toHaveBeenCalledTimes(0)
-    expect(database.getErroredFilesByDownloadId).toHaveBeenCalledTimes(0)
+    expect(database.getErroredFiles).toHaveBeenCalledTimes(0)
   })
 
   test('returns the downloads report', async () => {
@@ -76,8 +76,8 @@ describe('requestDownloadsProgress', () => {
           totalFiles: 7,
           finishedFiles: 5
         }),
-      getErroredFilesByDownloadId: jest.fn()
-        .mockResolvedValue()
+      getErroredFiles: jest.fn()
+        .mockResolvedValue([])
     }
 
     const result = await requestDownloadsProgress({
@@ -91,7 +91,6 @@ describe('requestDownloadsProgress', () => {
     expect(result).toEqual({
       downloadsReport: [{
         downloadId: 'mock-download-id-1',
-        errors: undefined,
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -102,7 +101,6 @@ describe('requestDownloadsProgress', () => {
         state: 'ACTIVE'
       }, {
         downloadId: 'mock-download-id-2',
-        errors: undefined,
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 5,
@@ -112,6 +110,7 @@ describe('requestDownloadsProgress', () => {
         },
         state: 'ACTIVE'
       }],
+      errors: {},
       totalDownloads: 2
     })
 
@@ -124,7 +123,7 @@ describe('requestDownloadsProgress', () => {
     expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id-1')
     expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id-2')
 
-    expect(database.getErroredFilesByDownloadId).toHaveBeenCalledTimes(0)
+    expect(database.getErroredFiles).toHaveBeenCalledTimes(1)
   })
 
   test('returns the downloads report with errors', async () => {
@@ -163,9 +162,10 @@ describe('requestDownloadsProgress', () => {
           totalFiles: 7,
           finishedFiles: 5
         }),
-      getErroredFilesByDownloadId: jest.fn()
+      getErroredFiles: jest.fn()
         .mockResolvedValue([{
-          id: 92652
+          downloadId: 'mock-download-id-2',
+          numberErrors: 1
         }])
     }
 
@@ -180,7 +180,6 @@ describe('requestDownloadsProgress', () => {
     expect(result).toEqual({
       downloadsReport: [{
         downloadId: 'mock-download-id-1',
-        errors: undefined,
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -191,9 +190,6 @@ describe('requestDownloadsProgress', () => {
         state: 'ACTIVE'
       }, {
         downloadId: 'mock-download-id-2',
-        errors: [{
-          id: 92652
-        }],
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 5,
@@ -203,6 +199,11 @@ describe('requestDownloadsProgress', () => {
         },
         state: 'ACTIVE'
       }],
+      errors: {
+        'mock-download-id-2': {
+          numberErrors: 1
+        }
+      },
       totalDownloads: 2
     })
 
@@ -215,7 +216,6 @@ describe('requestDownloadsProgress', () => {
     expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id-1')
     expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id-2')
 
-    expect(database.getErroredFilesByDownloadId).toHaveBeenCalledTimes(1)
-    expect(database.getErroredFilesByDownloadId).toHaveBeenCalledWith('mock-download-id-2')
+    expect(database.getErroredFiles).toHaveBeenCalledTimes(1)
   })
 })

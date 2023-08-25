@@ -14,10 +14,14 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import FileDownloadsHeader from '../../components/FileDownloadsHeader/FileDownloadsHeader'
 import ListPage from '../../components/ListPage/ListPage'
+import addErrorToasts from '../../utils/addErrorToasts'
+import useAppContext from '../../hooks/useAppContext'
 
 /**
  * @typedef {Object} FileDownloadsProps
- * @property {function} setCurrentPage A function which sets the active page.
+ * @property {String} downloadId The downloadId of the files.
+ * @property {Function} setCurrentPage A function which sets the active page.
+ * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout.
 
 /**
  * Renders a FileDownloads
@@ -27,17 +31,25 @@ import ListPage from '../../components/ListPage/ListPage'
  *
  * return (
  *   <FileDownloads
+ *     downloadId={downloadId}
  *     setCurrentPage={setCurrentPage}
  *   />
  * )
  */
 const FileDownloads = ({
   downloadId,
-  setCurrentPage
+  setCurrentPage,
+  showMoreInfoDialog
 }) => {
+  const appContext = useAppContext()
+  const {
+    addToast,
+    deleteAllToastsById
+  } = appContext
   const {
     initializeDownload,
-    requestFilesProgress
+    requestFilesProgress,
+    retryErroredDownloadItem
   } = useContext(ElectronApiContext)
 
   const [hideCompleted, setHideCompleted] = useState(false)
@@ -115,8 +127,18 @@ const FileDownloads = ({
         headerReport: newHeaderReport
       } = report || {}
 
+      const { errors } = newHeaderReport
+
       buildItems(report)
       setHeaderReport(newHeaderReport)
+
+      addErrorToasts({
+        errors,
+        addToast,
+        deleteAllToastsById,
+        retryErroredDownloadItem,
+        showMoreInfoDialog
+      })
     }
 
     loadItems()
@@ -140,6 +162,7 @@ const FileDownloads = ({
             headerReport={headerReport}
             setHideCompleted={onSetHideCompleted}
             setCurrentPage={setCurrentPage}
+            showMoreInfoDialog={showMoreInfoDialog}
           />
         )
       }
@@ -154,7 +177,8 @@ const FileDownloads = ({
 
 FileDownloads.propTypes = {
   downloadId: PropTypes.string.isRequired,
-  setCurrentPage: PropTypes.func.isRequired
+  setCurrentPage: PropTypes.func.isRequired,
+  showMoreInfoDialog: PropTypes.func.isRequired
 }
 
 export default FileDownloads

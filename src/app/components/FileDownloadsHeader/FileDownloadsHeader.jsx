@@ -4,6 +4,7 @@ import {
   FaBan,
   FaCheckCircle,
   FaChevronLeft,
+  FaExclamationCircle,
   FaPause,
   FaPlay,
   FaSpinner
@@ -65,6 +66,7 @@ const FileDownloadsHeader = ({
   const {
     downloadLocation,
     elapsedTime,
+    errors = {},
     estimatedTotalTimeRemaining,
     finishedFiles,
     id: downloadId,
@@ -85,6 +87,8 @@ const FileDownloadsHeader = ({
   const onResumeDownloadItem = () => {
     resumeDownloadItem({ downloadId })
   }
+
+  const hasErrors = errors[downloadId] && errors[downloadId].numberErrors > 0
 
   const shouldShowPause = [
     downloadStates.error,
@@ -170,9 +174,15 @@ const FileDownloadsHeader = ({
               )
             }
 
+            {
+              hasErrors && (
+                <FaExclamationCircle
+                  className={styles.hasErrorsIcon}
+                />
+              )
+            }
             <span className={styles.status}>
-              {getHumanizedDownloadStates(state)}
-              {/* TODO EDD-27 'Downloading with errors'? */}
+              {getHumanizedDownloadStates(state, percent, hasErrors)}
             </span>
 
             <span className={styles.statusPercent}>
@@ -188,14 +198,14 @@ const FileDownloadsHeader = ({
           </div>
 
           <div className={styles.progressRemaining}>
-            {/* TODO this makes the progress bar jump up when the remaining time should not be displayed */}
+            {/* TODO Trevor this makes the progress bar jump up when the remaining time should not be displayed */}
             {!isComplete && remainingTimeMessage}
           </div>
         </div>
 
         <div className={styles.actions}>
           {
-            // TODO when completed, file progress jumps to the right of the page because no buttons are visible
+            // TODO Trevor when completed, file progress jumps to the right of the page because no buttons are visible
             shouldShowResume && (
               <Button
                 className={styles.actionsButton}
@@ -284,8 +294,9 @@ FileDownloadsHeader.propTypes = {
   hideCompleted: PropTypes.bool.isRequired,
   headerReport: PropTypes.shape({
     downloadLocation: PropTypes.string,
-    estimatedTotalTimeRemaining: PropTypes.number,
     elapsedTime: PropTypes.number,
+    errors: PropTypes.shape({}),
+    estimatedTotalTimeRemaining: PropTypes.number,
     finishedFiles: PropTypes.number,
     id: PropTypes.string,
     // Sqlite booleans are actually integers 1/0

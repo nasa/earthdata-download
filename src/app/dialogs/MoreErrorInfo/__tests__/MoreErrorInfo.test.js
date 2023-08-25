@@ -7,10 +7,13 @@ import '@testing-library/jest-dom'
 import MoreErrorInfo from '../MoreErrorInfo'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import AppContext from '../../../context/AppContext'
+import { PAGES } from '../../../constants/pages'
 
 const setup = () => {
   const cancelErroredDownloadItem = jest.fn()
   const deleteAllToastsById = jest.fn()
+  const setCurrentPage = jest.fn()
+  const setSelectedDownloadId = jest.fn()
   const onCloseMoreErrorInfoDialog = jest.fn()
   const retryErroredDownloadItem = jest.fn()
 
@@ -31,6 +34,8 @@ const setup = () => {
         <MoreErrorInfo
           downloadId="mock-download-id"
           numberErrors={3}
+          setCurrentPage={setCurrentPage}
+          setSelectedDownloadId={setSelectedDownloadId}
           onCloseMoreErrorInfoDialog={onCloseMoreErrorInfoDialog}
         />
       </AppContext.Provider>
@@ -40,7 +45,10 @@ const setup = () => {
   return {
     cancelErroredDownloadItem,
     deleteAllToastsById,
-    retryErroredDownloadItem
+    retryErroredDownloadItem,
+    setCurrentPage,
+    onCloseMoreErrorInfoDialog,
+    setSelectedDownloadId
   }
 }
 
@@ -49,8 +57,39 @@ describe('MoreErrorInfo component', () => {
     setup()
 
     expect(screen.getByText(
-      '3 files failed to download in mock-download-id.'
+      '3 files failed to download in'
     )).toBeInTheDocument()
+
+    expect(screen.getByRole('button', { name: 'mock-download-id' })).toBeInTheDocument()
+  })
+
+  test('clicking the downloadId button calls setCurrentPage, setSelectedDownloadId and closes the dialog', async () => {
+    const user = userEvent.setup()
+
+    const {
+      setCurrentPage,
+      setSelectedDownloadId,
+      onCloseMoreErrorInfoDialog
+    } = setup([
+      {
+        itemName: 'mock-filename-1.png',
+        url: 'http://example.com/mock-filename-1.png'
+      },
+      {
+        itemName: 'mock-filename-2.png',
+        url: 'http://example.com/mock-filename-2.png'
+      }
+    ])
+
+    await user.click(screen.getByRole('button', { name: 'mock-download-id' }))
+
+    expect(setCurrentPage).toHaveBeenCalledTimes(1)
+    expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
+
+    expect(setSelectedDownloadId).toHaveBeenCalledTimes(1)
+    expect(setSelectedDownloadId).toHaveBeenCalledWith('mock-download-id')
+
+    expect(onCloseMoreErrorInfoDialog).toHaveBeenCalledTimes(1)
   })
 
   test('clicking the Retry All Errored button sends a message to the main process', async () => {

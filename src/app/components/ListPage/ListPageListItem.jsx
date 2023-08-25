@@ -58,7 +58,6 @@ const ListPageListItem = ({
     file,
     setCurrentPage,
     setSelectedDownloadId,
-    showMoreInfoDialog,
     type
   } = item
 
@@ -79,7 +78,6 @@ const ListPageListItem = ({
         download={download}
         setCurrentPage={setCurrentPage}
         setSelectedDownloadId={setSelectedDownloadId}
-        showMoreInfoDialog={showMoreInfoDialog}
       />
     </div>
   )

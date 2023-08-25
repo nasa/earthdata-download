@@ -247,7 +247,8 @@ describe('Layout component', () => {
     test('renders the ToastList with the correct props', async () => {
       setup()
 
-      expect(ToastList).toHaveBeenCalledTimes(1)
+      // Rendering twice because of setPageComponent being called within the useEffect
+      expect(ToastList).toHaveBeenCalledTimes(2)
       expect(ToastList).toHaveBeenCalledWith(expect.objectContaining({
         toasts: []
       }), {})
@@ -265,7 +266,8 @@ describe('Layout component', () => {
         }
       })
 
-      expect(ToastList).toHaveBeenCalledTimes(1)
+      // Rendering twice because of setPageComponent being called within the useEffect
+      expect(ToastList).toHaveBeenCalledTimes(2)
       expect(ToastList).toHaveBeenCalledWith(expect.objectContaining({
         toasts: [
           expect.objectContaining({

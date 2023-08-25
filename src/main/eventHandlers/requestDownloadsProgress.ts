@@ -39,16 +39,9 @@ const requestDownloadsProgress = async ({
 
     const {
       percentSum,
-      erroredFiles,
       totalFiles,
       finishedFiles
     } = await database.getDownloadReport(downloadId)
-
-    // If any erroredFiles exist, get the files
-    let errors
-    if (erroredFiles > 0) {
-      errors = await database.getErroredFilesByDownloadId(downloadId)
-    }
 
     let percent = 0
 
@@ -72,7 +65,6 @@ const requestDownloadsProgress = async ({
 
     return {
       downloadId,
-      errors,
       // Sqlite booleans are actually integers 1/0
       loadingMoreFiles: loadingMoreFiles === 1,
       progress,
@@ -82,8 +74,19 @@ const requestDownloadsProgress = async ({
 
   const downloadsReport = await Promise.all(promises)
 
+  const errorResults = await database.getErroredFiles()
+  const errors = {}
+  errorResults.forEach((error) => {
+    const {
+      downloadId: erroredDownloadId,
+      numberErrors
+    } = error
+    errors[erroredDownloadId] = { numberErrors }
+  })
+
   return {
     downloadsReport,
+    errors,
     totalDownloads
   }
 }

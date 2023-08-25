@@ -6,6 +6,7 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import { FaDownload, FaSearch } from 'react-icons/fa'
+import { isEmpty } from 'lodash'
 
 import downloadStates from '../../constants/downloadStates'
 import { REPORT_INTERVAL } from '../../constants/reportInterval'
@@ -19,6 +20,8 @@ import DownloadHeader from '../../components/DownloadHeader/DownloadHeader'
 import parseDownloadReport from '../../utils/parseDownloadReport'
 
 import * as styles from './Downloads.module.scss'
+import addErrorToasts from '../../utils/addErrorToasts'
+import useAppContext from '../../hooks/useAppContext'
 
 /**
  * @typedef {Object} DownloadsProps
@@ -48,8 +51,14 @@ const Downloads = ({
   setSelectedDownloadId,
   showMoreInfoDialog
 }) => {
+  const appContext = useAppContext()
   const {
-    requestDownloadsProgress
+    addToast,
+    deleteAllToastsById
+  } = appContext
+  const {
+    requestDownloadsProgress,
+    retryErroredDownloadItem
   } = useContext(ElectronApiContext)
 
   const listRef = useRef()
@@ -72,17 +81,24 @@ const Downloads = ({
 
     const {
       downloadsReport,
+      errors,
       totalDownloads
     } = report
 
     // Build real items
-    const realItems = downloadsReport.map((download) => ({
-      download,
-      setCurrentPage,
-      setSelectedDownloadId,
-      showMoreInfoDialog,
-      type: 'download'
-    }))
+    const realItems = downloadsReport.map((download) => {
+      const { downloadId } = download
+
+      return {
+        download: {
+          ...download,
+          hasErrors: !isEmpty(errors[downloadId])
+        },
+        setCurrentPage,
+        setSelectedDownloadId,
+        type: 'download'
+      }
+    })
 
     setItems([
       ...Array.from({ length: overscanStartIndex }),
@@ -109,7 +125,10 @@ const Downloads = ({
         offset
       })
 
-      const { downloadsReport } = report
+      const {
+        downloadsReport,
+        errors
+      } = report
 
       const parsedReport = parseDownloadReport(downloadsReport)
 
@@ -130,6 +149,14 @@ const Downloads = ({
       setDerivedStateFromDownloads(reportDerivedStateFromDownloads)
 
       buildItems(report)
+
+      addErrorToasts({
+        errors,
+        addToast,
+        deleteAllToastsById,
+        retryErroredDownloadItem,
+        showMoreInfoDialog
+      })
     }
 
     loadItems()
@@ -179,6 +206,7 @@ const Downloads = ({
             state={derivedStateFromDownloads}
             totalCompletedFiles={totalCompletedFiles}
             totalFiles={totalFiles}
+            showMoreInfoDialog={showMoreInfoDialog}
           />
         )
       }

@@ -7,36 +7,12 @@ import initializeDownload from './initializeDownload'
 
 import downloadStates from '../../app/constants/downloadStates'
 
-import trustedSources from '../trustedSources.json'
 import getLinksSchema from '../getLinksSchema.json'
+import isTrustedLink from './isTrustedLink'
+
 import packageDetails from '../../../package.json'
 
 const ajv = new Ajv()
-
-// TODO move to own file
-/**
- * Tests a link against the trustedSources.json file
- * @param {String} link Link to test
- */
-const isTrustedLink = (link: string) => {
-  const protocolMatch = /^([a-z]*):\/\/\.*/i.exec(link)
-  const protocol = protocolMatch?.at(1)?.toLowerCase()
-
-  if (!protocolMatch || (protocol !== 'http' && protocol !== 'https')) {
-    return false
-  }
-
-  const host = link
-    .replace(/^https?:\/\//i, '')
-    .split('/')
-    .at(0)
-    ?.toLowerCase()
-    ?.split(':')
-    ?.at(0)
-  console.debug(`Checking [${host}] for matching trusted host`)
-
-  return host in trustedSources
-}
 
 /**
  * Fetches links for the given downloadId, adds links to the database.

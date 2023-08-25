@@ -253,17 +253,7 @@ describe('fetchLinks', () => {
     expect(initializeDownload).toHaveBeenCalledTimes(0)
   })
 
-  test.each([
-    'http://malicious:3000/granule_links?id=300&flattenLinks=true&linkTypes=data',
-    'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data',
-    'https://tricksy:3001/granule_links?id=302&flattenLinks=true&linkTypes=data',
-    'ftp://sneaky/granule_links?id=304',
-    'sftp://fictitious:1234/granule_links?id=305',
-    'sftp://fictitious/granule_links?id=306',
-    'file:///file:5431/granule_links?id=307',
-    '://noprotocol:5431/granule_links?id=308',
-    'noprotocol/granule_links?id=309'
-  ])('does not download links from untrusted sources: [%s]', async (badLink) => {
+  test('does not download links from an untrusted source', async () => {
     const appWindow = {}
     const downloadId = 'mock-download-id'
 
@@ -281,6 +271,7 @@ describe('fetchLinks', () => {
       })
     }
     fetch.mockImplementation(() => standardResponse)
+    const getLinksUrl = 'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data'
 
     await fetchLinks({
       appWindow,
@@ -288,7 +279,7 @@ describe('fetchLinks', () => {
       database,
       downloadId,
       getLinksToken,
-      getLinksUrl: badLink
+      getLinksUrl
     })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
@@ -304,7 +295,7 @@ describe('fetchLinks', () => {
       'mock-download-id',
       {
         errors: [{
-          message: `The host [${badLink}] is not a trusted source and Earthdata Downloader will not continue.
+          message: `The host [${getLinksUrl}] is not a trusted source and Earthdata Downloader will not continue.
 If you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
         }],
         loadingMoreFiles: false,

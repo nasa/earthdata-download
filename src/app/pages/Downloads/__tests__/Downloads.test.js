@@ -119,10 +119,12 @@ describe('Downloads component', () => {
     // `waitFor` is necessary because the useEffects are triggering updates to the
     // component after the initial render
     await waitFor(() => {
-      expect(ListPage).toHaveBeenCalledTimes(1)
+      // Called two times because the totalItemCount changes after the request is returned
+      expect(ListPage).toHaveBeenCalledTimes(2)
+
       expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
       expect(requestDownloadsProgress).toHaveBeenCalledWith({
-        limit: 10,
+        limit: 11,
         offset: 0
       })
     })
@@ -134,10 +136,12 @@ describe('Downloads component', () => {
     // `waitFor` is necessary because the useEffects are triggering updates to the
     // component after the initial render
     await waitFor(() => {
-      expect(ListPage).toHaveBeenCalledTimes(1)
+      // Called two times because the totalItemCount changes after the request is returned
+      expect(ListPage).toHaveBeenCalledTimes(2)
+
       expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
       expect(requestDownloadsProgress).toHaveBeenCalledWith({
-        limit: 10,
+        limit: 11,
         offset: 0
       })
     })
@@ -146,10 +150,12 @@ describe('Downloads component', () => {
     jest.advanceTimersByTime(1000)
 
     await waitFor(() => {
-      expect(ListPage).toHaveBeenCalledTimes(1)
-      expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
+      // Called two times because the totalItemCount changes after the request is returned
+      expect(ListPage).toHaveBeenCalledTimes(2)
+
+      expect(requestDownloadsProgress).toHaveBeenCalledTimes(2)
       expect(requestDownloadsProgress).toHaveBeenCalledWith({
-        limit: 10,
+        limit: 11,
         offset: 0
       })
     })

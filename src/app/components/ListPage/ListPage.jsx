@@ -46,6 +46,7 @@ const ListPage = ({
   header,
   hideCompleted,
   Icon,
+  totalItemCount,
   items,
   listRef,
   setWindowState
@@ -94,7 +95,7 @@ const ListPage = ({
     }
     >
       {
-        (items && items.length) || hideCompleted
+        totalItemCount > 0
           ? (
             <>
               {
@@ -108,7 +109,7 @@ const ListPage = ({
                 <div className={styles.scrollableWrapper}>
                   {
                     // TODO Trevor make pretty
-                    hideCompleted && items.length === 0 && (
+                    items.length === 0 && (
                       <div>
                         No Items remaining
                       </div>
@@ -127,7 +128,7 @@ const ListPage = ({
                               <FixedSizeList
                                 height={height}
                                 innerRef={contentNodeRef}
-                                itemCount={items.length}
+                                itemCount={totalItemCount}
                                 itemData={items}
                                 itemSize={97}
                                 onItemsRendered={onItemsRendered}
@@ -177,6 +178,7 @@ ListPage.defaultProps = {
   hideCompleted: false,
   Icon: null,
   listRef: {},
+  totalItemCount: 0,
   setWindowState: () => {}
 }
 
@@ -189,6 +191,7 @@ ListPage.propTypes = {
     PropTypes.shape({})
   ).isRequired,
   listRef: PropTypes.shape({}),
+  totalItemCount: PropTypes.number,
   setWindowState: PropTypes.func,
   hideCompleted: PropTypes.bool
 }

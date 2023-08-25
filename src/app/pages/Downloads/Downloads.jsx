@@ -68,6 +68,7 @@ const Downloads = ({
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
   const [totalFiles, setTotalFiles] = useState(0)
+  const [totalDownloads, setTotalDownloads] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
   const [
     derivedStateFromDownloads,
@@ -76,13 +77,14 @@ const Downloads = ({
 
   const buildItems = (report) => {
     const {
-      overscanStartIndex
+      overscanStartIndex,
+      overscanStopIndex
     } = windowState
 
     const {
       downloadsReport,
       errors,
-      totalDownloads
+      totalDownloads: reportTotalDownloads
     } = report
 
     // Build real items
@@ -100,11 +102,18 @@ const Downloads = ({
       }
     })
 
+    const preArrayLength = overscanStartIndex
+    const postArrayLength = reportTotalDownloads - overscanStopIndex + 1
+    const preArray = preArrayLength > 0 ? Array.from({ length: preArrayLength }) : []
+    const postArray = postArrayLength > 0 ? Array.from({ length: postArrayLength }) : []
+
     setItems([
-      ...Array.from({ length: overscanStartIndex }),
+      ...preArray,
       ...realItems,
-      ...Array.from({ length: totalDownloads - overscanStartIndex - realItems.length })
+      ...postArray
     ])
+
+    setTotalDownloads(reportTotalDownloads)
   }
 
   useEffect(() => {
@@ -116,7 +125,7 @@ const Downloads = ({
       } = windowState
 
       // React window doesn't handle lists smaller than the window very well, and sets the overscanStopIndex lower than the list of items. Never set the limit to less than 10
-      const stopIndex = Math.max(10, overscanStopIndex)
+      const stopIndex = Math.max(10, overscanStopIndex + 1)
       const limit = stopIndex - overscanStartIndex
       const offset = overscanStartIndex
 
@@ -213,6 +222,7 @@ const Downloads = ({
       Icon={FaDownload}
       items={items}
       listRef={listRef}
+      totalItemCount={totalDownloads}
       setWindowState={setWindowState}
     />
   )

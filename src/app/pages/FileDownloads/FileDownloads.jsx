@@ -56,6 +56,7 @@ const FileDownloads = ({
   const [items, setItems] = useState([])
   const [windowState, setWindowState] = useState({})
   const [headerReport, setHeaderReport] = useState({})
+  const [totalFiles, setTotalFiles] = useState(0)
 
   const listRef = useRef(null)
 
@@ -79,7 +80,8 @@ const FileDownloads = ({
 
   const buildItems = (report) => {
     const {
-      overscanStartIndex
+      overscanStartIndex,
+      overscanStopIndex
     } = windowState
 
     const {
@@ -88,7 +90,7 @@ const FileDownloads = ({
 
     const {
       files,
-      totalFiles
+      totalFiles: reportTotalFiles
     } = newFilesReport
 
     // Build real items
@@ -97,11 +99,18 @@ const FileDownloads = ({
       type: 'file'
     }))
 
+    const preArrayLength = overscanStartIndex
+    const postArrayLength = reportTotalFiles - overscanStopIndex + 1
+    const preArray = preArrayLength > 0 ? Array.from({ length: preArrayLength }) : []
+    const postArray = postArrayLength > 0 ? Array.from({ length: postArrayLength }) : []
+
     setItems([
-      ...Array.from({ length: overscanStartIndex }),
+      ...preArray,
       ...realItems,
-      ...Array.from({ length: totalFiles - overscanStartIndex - realItems.length })
+      ...postArray
     ])
+
+    setTotalFiles(reportTotalFiles)
   }
 
   useEffect(() => {
@@ -112,7 +121,7 @@ const FileDownloads = ({
         overscanStopIndex = 10
       } = windowState
 
-      const stopIndex = Math.max(10, overscanStopIndex)
+      const stopIndex = Math.max(10, overscanStopIndex + 1)
       const limit = stopIndex - overscanStartIndex
       const offset = overscanStartIndex
 
@@ -170,6 +179,7 @@ const FileDownloads = ({
       Icon={FaDownload}
       items={items}
       listRef={listRef}
+      totalItemCount={totalFiles}
       setWindowState={setWindowState}
     />
   )

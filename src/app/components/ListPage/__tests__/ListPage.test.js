@@ -20,6 +20,7 @@ const setup = (overrideProps = {}) => {
     hideCompleted: false,
     Icon: null,
     items: [],
+    totalItemCount: 0,
     setWindowState,
     ...overrideProps
   }
@@ -61,12 +62,27 @@ describe('ListPage', () => {
             remainingTime: 0
           },
           type: 'file'
-        }]
+        }],
+        totalItemCount: 1
       })
 
       expect(screen.getByTestId('mock-header')).toBeInTheDocument()
 
       expect(AutoSizer).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('when there are items, but none to display', () => {
+    test('renders the header and list', () => {
+      setup({
+        header: (
+          <div data-testid="mock-header">Mock Header</div>
+        ),
+        items: [],
+        totalItemCount: 1
+      })
+
+      expect(screen.getByText('No Items remaining')).toBeInTheDocument()
     })
   })
 })

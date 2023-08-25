@@ -134,12 +134,14 @@ describe('FileDownloads component', () => {
     // `waitFor` is necessary because the useEffects are triggering updates to the
     // component after the initial render
     await waitFor(() => {
-      expect(ListPage).toHaveBeenCalledTimes(1)
+      // Called two times because the totalItemCount changes after the request is returned
+      expect(ListPage).toHaveBeenCalledTimes(2)
+
       expect(requestFilesProgress).toHaveBeenCalledTimes(1)
       expect(requestFilesProgress).toHaveBeenCalledWith({
         downloadId: 'mock-download-id',
         hideCompleted: false,
-        limit: 10,
+        limit: 11,
         offset: 0
       })
     })
@@ -151,12 +153,14 @@ describe('FileDownloads component', () => {
     // `waitFor` is necessary because the useEffects are triggering updates to the
     // component after the initial render
     await waitFor(() => {
-      expect(ListPage).toHaveBeenCalledTimes(1)
+      // Called two times because the totalItemCount changes after the request is returned
+      expect(ListPage).toHaveBeenCalledTimes(2)
+
       expect(requestFilesProgress).toHaveBeenCalledTimes(1)
       expect(requestFilesProgress).toHaveBeenCalledWith({
         downloadId: 'mock-download-id',
         hideCompleted: false,
-        limit: 10,
+        limit: 11,
         offset: 0
       })
     })
@@ -165,12 +169,14 @@ describe('FileDownloads component', () => {
     jest.advanceTimersByTime(1000)
 
     await waitFor(() => {
-      expect(ListPage).toHaveBeenCalledTimes(1)
-      expect(requestFilesProgress).toHaveBeenCalledTimes(1)
+      // Called two times because the totalItemCount changes after the request is returned
+      expect(ListPage).toHaveBeenCalledTimes(2)
+
+      expect(requestFilesProgress).toHaveBeenCalledTimes(2)
       expect(requestFilesProgress).toHaveBeenCalledWith({
         downloadId: 'mock-download-id',
         hideCompleted: false,
-        limit: 10,
+        limit: 11,
         offset: 0
       })
     })

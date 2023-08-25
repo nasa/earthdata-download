@@ -72,6 +72,11 @@
     font-weight: 600;
   }
 
+  .hasErrorsIcon {
+    margin-right: var(--size__100);
+    color: var(--color__red--550);
+  }
+
   .statusPercent {
     font-weight: 400;
   }

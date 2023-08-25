@@ -71,16 +71,17 @@ const Layout = () => {
   const { activeToasts = {} } = toasts
 
   const [activeMoreInfoDownloadInfo, setActiveMoreInfoDownloadInfo] = useState({})
-  const [currentPage, setCurrentPage] = useState(PAGES.downloads)
   const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(PAGES.downloads)
   const [downloadIds, setDownloadIds] = useState(null)
   const [hasActiveDownload, setHasActiveDownload] = useState(false)
   const [isWindowMaximized, setIsWindowMaximized] = useState(false)
   const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
+  const [pageComponent, setPageComponent] = useState(null)
+  const [selectedDownloadId, setSelectedDownloadId] = useState(null)
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
-  const [selectedDownloadId, setSelectedDownloadId] = useState(null)
 
   const showMoreInfoDialog = (downloadId, numberErrors) => {
     setActiveMoreInfoDownloadInfo({
@@ -171,39 +172,43 @@ const Layout = () => {
     setSelectedDownloadLocation(newDownloadLocation)
   }
 
-  let pageComponent
+  useEffect(() => {
+    switch (currentPage) {
+      case PAGES.downloads:
+        setSelectedDownloadId(null)
+        setPageComponent(
+          <Downloads
+            setSelectedDownloadId={setSelectedDownloadId}
+            setCurrentPage={setCurrentPage}
+            hasActiveDownload={hasActiveDownload}
+            setHasActiveDownload={setHasActiveDownload}
+            showMoreInfoDialog={showMoreInfoDialog}
+          />
+        )
 
-  switch (currentPage) {
-    case PAGES.downloads:
-      pageComponent = (
-        <Downloads
-          setSelectedDownloadId={setSelectedDownloadId}
-          setCurrentPage={setCurrentPage}
-          hasActiveDownload={hasActiveDownload}
-          setHasActiveDownload={setHasActiveDownload}
-          showMoreInfoDialog={showMoreInfoDialog}
-        />
-      )
+        break
+      case PAGES.downloadHistory:
+        setSelectedDownloadId(null)
+        setPageComponent(
+          <DownloadHistory setCurrentPage={setCurrentPage} />
+        )
 
-      break
-    case PAGES.downloadHistory:
-      pageComponent = (
-        <DownloadHistory setCurrentPage={setCurrentPage} />
-      )
+        break
+      case PAGES.fileDownloads:
+        setPageComponent(
+          <FileDownloads
+            key={selectedDownloadId}
+            downloadId={selectedDownloadId}
+            setCurrentPage={setCurrentPage}
+            showMoreInfoDialog={showMoreInfoDialog}
+          />
+        )
 
-      break
-    case PAGES.fileDownloads:
-      pageComponent = (
-        <FileDownloads
-          downloadId={selectedDownloadId}
-          setCurrentPage={setCurrentPage}
-        />
-      )
-
-      break
-    default:
-      break
-  }
+        break
+      default:
+        break
+    }
+  }, [currentPage, selectedDownloadId])
 
   useEffect(() => {
     if (!useDefaultLocation && downloadIds) {
@@ -379,6 +384,7 @@ const Layout = () => {
       <main className={styles.main}>
         {pageComponent}
 
+        {/* TODO Trevor toastList maxWidth 80% is covering up click/scroll events on DownloadItems under the toast */}
         <ToastList
           className={styles.toastList}
           dismissToast={onDismissToast}
@@ -428,6 +434,8 @@ const Layout = () => {
             downloadId={moreInfoDownloadId}
             numberErrors={numberErrors}
             onCloseMoreErrorInfoDialog={setMoreErrorInfoIsOpen}
+            setCurrentPage={setCurrentPage}
+            setSelectedDownloadId={setSelectedDownloadId}
           />
         </Dialog>
       </main>

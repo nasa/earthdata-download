@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
   FaBan,
@@ -7,14 +7,12 @@ import {
   FaInfoCircle,
   FaPause,
   FaPlay,
-  FaRedo,
   FaSignInAlt
 } from 'react-icons/fa'
 
 import downloadStates from '../../constants/downloadStates'
 
 import DownloadItem from '../DownloadItem/DownloadItem'
-import pluralize from '../../utils/pluralize'
 
 import DownloadListItemState from './DownloadListItemState'
 import DownloadListItemPercent from './DownloadListItemPercent'
@@ -27,7 +25,6 @@ import useAppContext from '../../hooks/useAppContext'
  * @property {Object} download State of the download item.
  * @property {Function} setCurrentPage A function which sets the active page.
  * @property {Function} setSelectedDownloadId A function which sets the setSelectedDownloadId.
- * @property {Function} showMoreInfoDialog A function which shows the MoreIntoDialog.
  */
 
 /**
@@ -40,19 +37,16 @@ import useAppContext from '../../hooks/useAppContext'
  *     download={download}
  *     setCurrentPage={setCurrentPage}
  *     setSelectedDownloadId={setSelectedDownloadId}
- *     showMoreInfoDialog={showMoreInfoDialog}
  *   />
  * )
  */
 const DownloadListItem = ({
   download,
   setCurrentPage,
-  setSelectedDownloadId,
-  showMoreInfoDialog
+  setSelectedDownloadId
 }) => {
   const appContext = useAppContext()
   const {
-    addToast,
     deleteAllToastsById
   } = appContext
   const {
@@ -62,55 +56,17 @@ const DownloadListItem = ({
     pauseDownloadItem,
     restartDownload,
     resumeDownloadItem,
-    retryErroredDownloadItem,
     sendToEula,
     sendToLogin
   } = useContext(ElectronApiContext)
   // Create the downloadItems array from the runningDownloads reported from the main process
   const {
     downloadId,
-    errors,
+    hasErrors,
     loadingMoreFiles,
     progress,
     state
   } = download
-
-  useEffect(() => {
-    // Add errors
-    if (state !== downloadStates.cancelled && errors) {
-      const numberErrors = errors.length
-
-      addToast({
-        id: downloadId,
-        title: 'An error occurred',
-        message: `${numberErrors} ${pluralize('file', numberErrors)} failed to download in ${downloadId}`,
-        numberErrors,
-        variant: 'danger',
-        actions: [
-          {
-            altText: 'Retry',
-            buttonText: 'Retry',
-            buttonProps: {
-              Icon: FaRedo,
-              onClick: () => {
-                retryErroredDownloadItem({ downloadId })
-                deleteAllToastsById(downloadId)
-              }
-            }
-          },
-          {
-            altText: 'More Info',
-            buttonText: 'More Info',
-            buttonProps: {
-              Icon: FaInfoCircle,
-              hideLabel: true,
-              onClick: () => showMoreInfoDialog(downloadId, numberErrors)
-            }
-          }
-        ]
-      })
-    }
-  }, [errors])
 
   const {
     percent = 0,
@@ -118,8 +74,6 @@ const DownloadListItem = ({
     totalFiles,
     totalTime
   } = progress
-
-  const hasErrors = errors && errors.length > 0
 
   const shouldShowPause = [
     downloadStates.pending,
@@ -197,7 +151,10 @@ const DownloadListItem = ({
         isActive: shouldShowCancel,
         isPrimary: !isComplete,
         variant: 'danger',
-        callback: () => cancelDownloadItem({ downloadId }),
+        callback: () => {
+          deleteAllToastsById(downloadId)
+          cancelDownloadItem({ downloadId })
+        },
         icon: FaBan
       }
     ],
@@ -223,7 +180,10 @@ const DownloadListItem = ({
         label: 'Restart Download',
         isActive: true,
         isPrimary: false,
-        callback: () => restartDownload({ downloadId }),
+        callback: () => {
+          deleteAllToastsById(downloadId)
+          restartDownload({ downloadId })
+        },
         icon: FaInfoCircle
       }
     ]
@@ -274,9 +234,7 @@ const DownloadListItem = ({
 DownloadListItem.propTypes = {
   download: PropTypes.shape({
     downloadId: PropTypes.string,
-    errors: PropTypes.arrayOf(
-      PropTypes.shape({})
-    ),
+    hasErrors: PropTypes.bool,
     loadingMoreFiles: PropTypes.bool,
     progress: PropTypes.shape({
       percent: PropTypes.number,
@@ -287,7 +245,6 @@ DownloadListItem.propTypes = {
     state: PropTypes.string
   }).isRequired,
   setCurrentPage: PropTypes.func.isRequired,
-  showMoreInfoDialog: PropTypes.func.isRequired,
   setSelectedDownloadId: PropTypes.func.isRequired
 }
 

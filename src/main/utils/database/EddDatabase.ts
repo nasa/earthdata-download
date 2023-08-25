@@ -200,14 +200,17 @@ class EddDatabase {
    * Returns the errored files.
    * @param {String} downloadId Id of the download to retrieve errored files.
    */
-  async getErroredFilesByDownloadId(downloadId) {
+  async getErroredFiles() {
     return this.db('files')
       // Add additional fields to this select if we need to display any error info
-      .select('id')
+      .select(
+        'downloadId'
+      )
+      .count('id as numberErrors')
       .where({
-        downloadId,
         state: downloadStates.error
       })
+      .groupBy('downloadId')
   }
 
   /**
@@ -298,10 +301,8 @@ class EddDatabase {
       .count({
         // Return the count of the `id` column as `totalFiles`
         totalFiles: 'id',
-        // Return the count of the `state` column when the value is `COMPLETED` as `finishedFiles`
-        finishedFiles: this.db.raw('CASE "state" WHEN "COMPLETED" THEN 1 ELSE NULL END'),
-        // Return the count of the `state` column when the value is `ERROR` as `totalErroredFiles`
-        erroredFiles: this.db.raw('CASE "state" WHEN "ERROR" THEN 1 ELSE NULL END')
+        // Return the count of the `state` column when the value is "COMPLETED" as `finishedFiles`
+        finishedFiles: this.db.raw('CASE `state` WHEN "COMPLETED" THEN 1 ELSE NULL END')
       })
       .where({
         downloadId
@@ -409,11 +410,9 @@ class EddDatabase {
         // Return the count of the `id` column as `totalFiles`
         totalFiles: 'files.id',
         // Return the count of the `percent` field when the percent is greater than 0 as `filesWithProgress`
-        filesWithProgress: this.db.raw('CASE WHEN "percent" > 0 THEN 1 ELSE NULL END'),
-        // Return the count of the `state` column when the value is `COMPLETED` as `finishedFiles`
-        finishedFiles: this.db.raw('CASE "files"."state" WHEN "COMPLETED" THEN 1 ELSE NULL END'),
-        // Return the count of the `state` column when the value is `ERROR` as `totalErroredFiles`
-        erroredFiles: this.db.raw('CASE "files"."state" WHEN "ERROR" THEN 1 ELSE NULL END')
+        filesWithProgress: this.db.raw('CASE WHEN `percent` > 0 THEN 1 ELSE NULL END'),
+        // Return the count of the `state` column when the value is "COMPLETED" as `finishedFiles`
+        finishedFiles: this.db.raw('CASE `files`.`state` WHEN "COMPLETED" THEN 1 ELSE NULL END')
       })
       .join('downloads', { 'files.downloadId': 'downloads.id' })
       .where({

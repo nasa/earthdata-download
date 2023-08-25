@@ -25,15 +25,13 @@ describe('ListPageListItem', () => {
     test('renders a DownloadListItem', () => {
       const setCurrentPage = jest.fn()
       const setSelectedDownloadId = jest.fn()
-      const showMoreInfoDialog = jest.fn()
 
       setup({
         data: [{
           type: 'download',
           download: { mock: 'download' },
           setCurrentPage,
-          setSelectedDownloadId,
-          showMoreInfoDialog
+          setSelectedDownloadId
         }]
       })
 
@@ -43,8 +41,7 @@ describe('ListPageListItem', () => {
           mock: 'download'
         },
         setCurrentPage,
-        setSelectedDownloadId,
-        showMoreInfoDialog
+        setSelectedDownloadId
       }, {})
 
       expect(FileListItem).toHaveBeenCalledTimes(0)

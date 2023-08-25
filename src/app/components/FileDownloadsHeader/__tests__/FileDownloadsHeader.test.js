@@ -13,7 +13,7 @@ import downloadStates from '../../../constants/downloadStates'
 const headerReport = {
   downloadLocation: '/mock/location',
   elapsedTime: 0,
-  erroredFiles: 0,
+  errors: {},
   estimatedTotalTimeRemaining: 0,
   finishedFiles: 0,
   id: 'mock-download-id',
@@ -297,6 +297,39 @@ describe('FileDownloadsHeader component', () => {
       expect(screen.queryByRole('button', { name: 'Pause All' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Resume All' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Cancel All' })).not.toBeInTheDocument()
+
+      expect(screen.getAllByText('Downloading to /mock/location')).toHaveLength(2)
+
+      expect(screen.getByRole('checkbox', { name: 'Hide Completed' })).toBeInTheDocument()
+    })
+  })
+
+  describe('when the download has errors', () => {
+    test('displays the correct information', () => {
+      setup({
+        headerReport: {
+          ...headerReport,
+          errors: {
+            'mock-download-id': {
+              numberErrors: 1
+            }
+          },
+          percent: 50,
+          finishedFiles: 1,
+          totalFiles: 2,
+          state: downloadStates.active
+        }
+      })
+
+      expect(screen.getByText('Downloading with errors')).toHaveClass('status')
+      expect(screen.getByText('50%')).toHaveClass('statusPercent')
+
+      expect(screen.getByText('1 of 2 files completed in 0 seconds')).toHaveClass('progressFiles')
+      expect(screen.getByText('0 seconds remaining')).toHaveClass('progressRemaining')
+
+      expect(screen.getByRole('button', { name: 'Pause All' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Resume All' })).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Cancel All' })).toBeInTheDocument()
 
       expect(screen.getAllByText('Downloading to /mock/location')).toHaveLength(2)
 

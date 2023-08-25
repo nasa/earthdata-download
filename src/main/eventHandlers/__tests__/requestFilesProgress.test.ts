@@ -36,11 +36,12 @@ describe('requestFilesProgress', () => {
           totalBytesSum: 159494477,
           totalFiles: 67,
           filesWithProgress: 7,
-          finishedFiles: 4,
-          erroredFiles: 0
+          finishedFiles: 4
         }),
       getTotalFilesPerFilesReport: jest.fn()
-        .mockResolvedValue(67)
+        .mockResolvedValue(67),
+      getErroredFiles: jest.fn()
+        .mockResolvedValue([])
     }
 
     const result = await requestFilesProgress({
@@ -70,7 +71,7 @@ describe('requestFilesProgress', () => {
         createdAt: 1692631408517,
         downloadLocation: '/mock/download/location/mock-download-id',
         elapsedTime: -8601832,
-        erroredFiles: 0,
+        errors: {},
         estimatedTotalTimeRemaining: -105934996.21220204,
         filesWithProgress: 7,
         finishedFiles: 4,
@@ -129,11 +130,15 @@ describe('requestFilesProgress', () => {
           totalBytesSum: 159494477,
           totalFiles: 67,
           filesWithProgress: 7,
-          finishedFiles: 4,
-          erroredFiles: 0
+          finishedFiles: 4
         }),
       getTotalFilesPerFilesReport: jest.fn()
-        .mockResolvedValue(70)
+        .mockResolvedValue(70),
+      getErroredFiles: jest.fn()
+        .mockResolvedValue([{
+          downloadId: 'mock-download-id-2',
+          numberErrors: 1
+        }])
     }
 
     const result = await requestFilesProgress({
@@ -163,7 +168,11 @@ describe('requestFilesProgress', () => {
         createdAt: 1692631408517,
         downloadLocation: '/mock/download/location/mock-download-id',
         elapsedTime: -8601832,
-        erroredFiles: 0,
+        errors: {
+          'mock-download-id-2': {
+            numberErrors: 1
+          }
+        },
         estimatedTotalTimeRemaining: -105934996.21220204,
         filesWithProgress: 7,
         finishedFiles: 4,

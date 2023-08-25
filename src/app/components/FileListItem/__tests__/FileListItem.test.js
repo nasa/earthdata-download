@@ -8,6 +8,7 @@ import DownloadItem from '../../DownloadItem/DownloadItem'
 
 import downloadStates from '../../../constants/downloadStates'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
+import AppContext from '../../../context/AppContext'
 
 jest.mock('../../DownloadItem/DownloadItem')
 
@@ -32,6 +33,7 @@ const setup = (overrideProps = {}) => {
   const restartDownload = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
+  const deleteAllToastsById = jest.fn()
 
   const props = {
     file,
@@ -51,13 +53,21 @@ const setup = (overrideProps = {}) => {
         }
       }
     >
-      <FileListItem {...props} />
+      <AppContext.Provider value={
+        {
+          deleteAllToastsById
+        }
+      }
+      >
+        <FileListItem {...props} />
+      </AppContext.Provider>
     </ElectronApiContext.Provider>
   )
 
   return {
     cancelDownloadItem,
     copyDownloadPath,
+    deleteAllToastsById,
     openDownloadFolder,
     restartDownload
   }
@@ -178,6 +188,27 @@ describe('FileListItem component', () => {
       await userEvent.click(button)
 
       expect(restartDownload).toHaveBeenCalledTimes(1)
+    })
+
+    describe('when the file errored', () => {
+      test('calls restartDownload and deleteAllToastsById', async () => {
+        const { deleteAllToastsById, restartDownload } = setup({
+          file: {
+            ...file,
+            state: downloadStates.error
+          }
+        })
+
+        const moreActions = screen.getByText('More Actions')
+        await userEvent.click(moreActions)
+
+        const button = screen.getByText('Restart File')
+        await userEvent.click(button)
+
+        expect(restartDownload).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+      })
     })
   })
 })

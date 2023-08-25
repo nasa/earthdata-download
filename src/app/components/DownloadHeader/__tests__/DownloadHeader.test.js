@@ -7,12 +7,15 @@ import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import DownloadHeader from '../DownloadHeader'
 
 import downloadStates from '../../../constants/downloadStates'
+import AppContext from '../../../context/AppContext'
 
 const setup = (overrideProps) => {
   // ElectronApiContext functions
   const cancelDownloadItem = jest.fn()
   const pauseDownloadItem = jest.fn()
   const resumeDownloadItem = jest.fn()
+
+  const deleteAllToastsById = jest.fn()
 
   // Props
   const setCurrentPage = jest.fn()
@@ -35,17 +38,26 @@ const setup = (overrideProps) => {
       }
     }
     >
-      <DownloadHeader
-        {...props}
-      />
+      <AppContext.Provider
+        value={
+          {
+            deleteAllToastsById
+          }
+        }
+      >
+        <DownloadHeader
+          {...props}
+        />
+      </AppContext.Provider>
     </ElectronApiContext.Provider>
   )
 
   return {
-    setCurrentPage,
     cancelDownloadItem,
+    deleteAllToastsById,
     pauseDownloadItem,
-    resumeDownloadItem
+    resumeDownloadItem,
+    setCurrentPage
   }
 }
 
@@ -75,13 +87,15 @@ describe('DownloadHeader component', () => {
   })
 
   describe('when clicking the Cancel All button', () => {
-    test('calls cancelDownloadItem', async () => {
-      const { cancelDownloadItem } = setup()
+    test('calls cancelDownloadItem and deleteAllToastsById', async () => {
+      const { cancelDownloadItem, deleteAllToastsById } = setup()
 
       const button = screen.getByRole('button', { name: 'Cancel All' })
       await userEvent.click(button)
 
       expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith()
     })
   })
 

@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fa'
 
 import downloadStates from '../../constants/downloadStates'
-
+import useAppContext from '../../hooks/useAppContext'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import DownloadItem from '../DownloadItem/DownloadItem'
@@ -35,6 +35,10 @@ import FileListItemSizeProgress from './FileListItemSizeProgress'
 const FileListItem = ({
   file
 }) => {
+  const appContext = useAppContext()
+  const {
+    deleteAllToastsById
+  } = appContext
   const {
     cancelDownloadItem,
     copyDownloadPath,
@@ -80,6 +84,8 @@ const FileListItem = ({
     && state !== downloadStates.starting
     && state !== downloadStates.cancelled
 
+  const hasError = state === downloadStates.error
+
   const actionsList = [
     [
       {
@@ -119,10 +125,16 @@ const FileListItem = ({
         label: 'Restart File',
         isActive: !shouldDisableFileRestart,
         isPrimary: false,
-        callback: () => restartDownload({
-          downloadId,
-          filename
-        }),
+        callback: () => {
+          restartDownload({
+            downloadId,
+            filename
+          })
+
+          if (hasError) {
+            deleteAllToastsById(downloadId)
+          }
+        },
         icon: FaInfoCircle
       }
     ]

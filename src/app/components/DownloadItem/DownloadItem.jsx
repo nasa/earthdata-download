@@ -235,18 +235,6 @@ const DownloadItem = ({
             {primaryStatus}
             {secondaryStatus}
             {tertiaryStatus}
-            {/* {
-              // TODO EDD-27?
-              state === downloadStates.error && (
-                <div
-                  className={styles.statusDescription}
-                >
-                  <FaInfoCircle />
-                  {' '}
-                  More Info
-                </div>
-              )
-            } */}
           </div>
 
           <div className={styles.metaSecondary}>

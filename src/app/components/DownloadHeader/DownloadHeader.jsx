@@ -12,10 +12,13 @@ import classNames from 'classnames'
 import downloadStates from '../../constants/downloadStates'
 import createVariantClassName from '../../utils/createVariantClassName'
 import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
+import useAppContext from '../../hooks/useAppContext'
+
+import Button from '../Button/Button'
+
+import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import * as styles from './DownloadHeader.module.scss'
-import Button from '../Button/Button'
-import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 /**
  * @typedef {Object} DownloadHeaderProps
@@ -48,6 +51,10 @@ const DownloadHeader = ({
   totalCompletedFiles,
   totalFiles
 }) => {
+  const appContext = useAppContext()
+  const {
+    deleteAllToastsById
+  } = appContext
   const {
     cancelDownloadItem,
     pauseDownloadItem,
@@ -56,6 +63,7 @@ const DownloadHeader = ({
 
   const onCancelDownloadItem = () => {
     cancelDownloadItem({})
+    deleteAllToastsById()
   }
 
   const onPauseDownloadItem = () => {

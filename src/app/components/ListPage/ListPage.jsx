@@ -80,8 +80,8 @@ const ListPage = ({
     setWindowState(windowState)
   }
 
-  // TODO simplebar-mouse-entered is getting added to the simplebar element and causing a tiny dot to appear and top and left of y & x scrollbars
-  // TODO Y scrollbar has too much space beside it, between scrollbar and right edge of DownloadItem
+  // TODO Trevor simplebar-mouse-entered is getting added to the simplebar element and causing a tiny dot to appear and top and left of y & x scrollbars
+  // TODO Trevor Y scrollbar has too much space beside it, between scrollbar and right edge of DownloadItem
   return (
     <section className={
       classNames([
@@ -107,7 +107,7 @@ const ListPage = ({
               <div className={styles.contentWrapper}>
                 <div className={styles.scrollableWrapper}>
                   {
-                    // TODO make pretty
+                    // TODO Trevor make pretty
                     hideCompleted && items.length === 0 && (
                       <div>
                         No Items remaining

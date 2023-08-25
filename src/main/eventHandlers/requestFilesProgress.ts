@@ -29,13 +29,13 @@ const requestFilesProgress = async ({
 
   const {
     createdAt,
+    filesWithProgress,
     percentSum,
+    receivedBytesSum,
     timeEnd,
     timeStart,
-    totalFiles,
-    receivedBytesSum,
     totalBytesSum,
-    filesWithProgress
+    totalFiles
   } = headerReport
 
   let percent = 0
@@ -60,9 +60,20 @@ const requestFilesProgress = async ({
     hideCompleted
   })
 
+  const errorResults = await database.getErroredFiles()
+  const errors = {}
+  errorResults.forEach((error) => {
+    const {
+      downloadId: erroredDownloadId,
+      numberErrors
+    } = error
+    errors[erroredDownloadId] = { numberErrors }
+  })
+
   return {
     headerReport: {
       ...headerReport,
+      errors,
       percent,
       elapsedTime,
       estimatedTotalTimeRemaining

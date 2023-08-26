@@ -962,4 +962,27 @@ describe('EddDatabase', () => {
       expect(result).toEqual(5)
     })
   })
+
+  describe('getFilesTotals', () => {
+    test('returns the report', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select count(`files`.`id`) as `totalFiles`, count(CASE `files`.`state` WHEN "COMPLETED" THEN 1 ELSE NULL END) as `totalCompletedFiles` from `files`')
+        expect(query.bindings).toEqual([])
+
+        query.response([{
+          totalCompletedFiles: 5,
+          totalFiles: 14
+        }])
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getFilesTotals()
+
+      expect(result).toEqual({
+        totalCompletedFiles: 5,
+        totalFiles: 14
+      })
+    })
+  })
 })

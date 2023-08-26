@@ -34,6 +34,28 @@ const completedDownload = {
   },
   state: downloadStates.completed
 }
+const cancelledDownload = {
+  downloadId: 'cancelled-download-id',
+  loadingMoreFiles: false,
+  progress: {
+    percent: 50,
+    finishedFiles: 4,
+    totalFiles: 8,
+    totalTime: 5019
+  },
+  state: downloadStates.cancelled
+}
+const waitingForAuthDownload = {
+  downloadId: 'waiting-for-auth-download-id',
+  loadingMoreFiles: false,
+  progress: {
+    percent: 0,
+    finishedFiles: 0,
+    totalFiles: 8,
+    totalTime: 5019
+  },
+  state: downloadStates.waitingForAuth
+}
 const errorDownload = {
   downloadId: 'error-download-id',
   errors: [
@@ -71,24 +93,20 @@ describe('parseDownloadReport', () => {
         allDownloadsCompleted: false,
         allDownloadsPaused: false,
         derivedStateFromDownloads: downloadStates.active,
-        hasActiveDownload: true,
-        totalCompletedFiles: 5,
-        totalFiles: 8
+        hasActiveDownload: true
       })
     })
   })
 
   describe('when not all downloads are paused', () => {
     test('returns the correct values', () => {
-      const result = parseDownloadReport([pausedDownload, completedDownload])
+      const result = parseDownloadReport([pausedDownload, cancelledDownload])
 
       expect(result).toEqual({
         allDownloadsCompleted: false,
         allDownloadsPaused: false,
         derivedStateFromDownloads: downloadStates.paused,
-        hasActiveDownload: false,
-        totalCompletedFiles: 13,
-        totalFiles: 16
+        hasActiveDownload: false
       })
     })
   })
@@ -101,9 +119,20 @@ describe('parseDownloadReport', () => {
         allDownloadsCompleted: false,
         allDownloadsPaused: true,
         derivedStateFromDownloads: downloadStates.paused,
-        hasActiveDownload: false,
-        totalCompletedFiles: 5,
-        totalFiles: 8
+        hasActiveDownload: false
+      })
+    })
+  })
+
+  describe('when all downloads are paused or completed', () => {
+    test('returns the correct values', () => {
+      const result = parseDownloadReport([pausedDownload, completedDownload])
+
+      expect(result).toEqual({
+        allDownloadsCompleted: false,
+        allDownloadsPaused: false,
+        derivedStateFromDownloads: downloadStates.paused,
+        hasActiveDownload: false
       })
     })
   })
@@ -116,9 +145,7 @@ describe('parseDownloadReport', () => {
         allDownloadsCompleted: true,
         allDownloadsPaused: false,
         derivedStateFromDownloads: downloadStates.completed,
-        hasActiveDownload: false,
-        totalCompletedFiles: 8,
-        totalFiles: 8
+        hasActiveDownload: false
       })
     })
   })
@@ -131,9 +158,33 @@ describe('parseDownloadReport', () => {
         allDownloadsCompleted: true,
         allDownloadsPaused: false,
         derivedStateFromDownloads: downloadStates.completed,
-        hasActiveDownload: false,
-        totalCompletedFiles: 7,
-        totalFiles: 8
+        hasActiveDownload: false
+      })
+    })
+  })
+
+  describe('when all downloads are cancelled', () => {
+    test('returns the correct values', () => {
+      const result = parseDownloadReport([cancelledDownload])
+
+      expect(result).toEqual({
+        allDownloadsCompleted: false,
+        allDownloadsPaused: false,
+        derivedStateFromDownloads: downloadStates.cancelled,
+        hasActiveDownload: false
+      })
+    })
+  })
+
+  describe('when the default value is used', () => {
+    test('returns the correct values', () => {
+      const result = parseDownloadReport([waitingForAuthDownload])
+
+      expect(result).toEqual({
+        allDownloadsCompleted: false,
+        allDownloadsPaused: false,
+        derivedStateFromDownloads: downloadStates.active,
+        hasActiveDownload: false
       })
     })
   })

@@ -66,7 +66,7 @@ describe('windowStateKeeper', () => {
 
     const windowState = await windowStateKeeper(database)
 
-    // TODO how do I fire an event on my mocked window.
+    // ?? how do I fire an event on my mocked window.
     // Or how do I use a real BrowserWindow, not mocked by electronMock.js?
     windowState.track(window)
 

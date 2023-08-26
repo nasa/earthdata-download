@@ -160,7 +160,8 @@ describe('DownloadItem component', () => {
     describe('when clicking on the `DownloadItem`', () => {
       test('calls `setCurrentPage` and `setSelectedDownloadId` ', async () => {
         const { setSelectedDownloadId, setCurrentPage } = setup({
-          state: downloadStates.active
+          state: downloadStates.active,
+          shouldBeClickable: true
         })
 
         const fileDownloadsPortal = screen.getByTestId('download-item-open-file-downloads')
@@ -180,7 +181,8 @@ describe('DownloadItem component', () => {
       test('calls setCurrentPage and setSelectedDownloadId', async () => {
         const { setSelectedDownloadId, setCurrentPage } = setup({
           state: downloadStates.active,
-          loadingMoreFiles: true
+          loadingMoreFiles: true,
+          shouldBeClickable: true
         })
 
         // Focus screen on the `div-button` then trigger onKeyDown
@@ -200,7 +202,8 @@ describe('DownloadItem component', () => {
       test('calls setCurrentPage and setSelectedDownloadId', async () => {
         const { setSelectedDownloadId, setCurrentPage } = setup({
           state: downloadStates.active,
-          loadingMoreFiles: true
+          loadingMoreFiles: true,
+          shouldBeClickable: true
         })
 
         // Focus screen on the `div-button` then trigger onKeyDown

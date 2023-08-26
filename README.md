@@ -24,10 +24,6 @@ To run the Jest tests:
 
     npm test
 
-To run the Playwright tests:
-
-    npm run playwright
-
 To build the jsdoc documentation:
 
     npm run docs

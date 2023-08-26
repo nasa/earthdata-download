@@ -11,9 +11,6 @@ cypress/videos
 dist
 dist-electron
 /test-results/
-/playwright-report/
-/playwright/.cache/
-playwright-coverage
 results.xml
 docs/jsdoc
 release

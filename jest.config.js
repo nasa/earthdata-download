@@ -95,6 +95,7 @@ module.exports = {
   moduleNameMapper: {
     // Use the moduleNameMapper for all images except the logo.png that exist in the portals directory
     '(?<!/portals)(?<!/logo).(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/test-utils/fileMock.js',
+    '\\.(css|less)$': '<rootDir>/test-utils/styleMock.js',
     electron: '<rootDir>/__mocks__/electronMock.js'
   },
 
@@ -171,8 +172,7 @@ module.exports = {
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   testPathIgnorePatterns: [
     'mocks.js',
-    'node_modules',
-    '/playwright-tests'
+    'node_modules'
   ],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files

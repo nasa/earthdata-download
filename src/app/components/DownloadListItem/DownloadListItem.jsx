@@ -109,6 +109,9 @@ const DownloadListItem = ({
     && state !== downloadStates.waitingForEula
     && state !== downloadStates.waitingForAuth
     && totalFiles > 0
+  const shouldBeClickable = state !== downloadStates.starting
+    && state !== downloadStates.pending
+    && totalFiles > 0
 
   const actionsList = [
     [
@@ -195,6 +198,7 @@ const DownloadListItem = ({
       downloadId={downloadId}
       setCurrentPage={setCurrentPage}
       setSelectedDownloadId={setSelectedDownloadId}
+      shouldBeClickable={shouldBeClickable}
       state={state}
       itemName={downloadId}
       percent={percent}

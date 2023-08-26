@@ -158,6 +158,7 @@ describe('DownloadListItem component', () => {
       downloadId: 'mock-download-id',
       itemName: 'mock-download-id',
       percent: 50,
+      shouldBeClickable: true,
       state: downloadStates.active
       // TODO how can I verify props here
       // status: expect.objectContaining({

@@ -34,6 +34,8 @@ import * as styles from './DownloadItem.module.scss'
  * @property {String} itemName The name of the DownloadItem.
  * @property {Number} percent The download percent of the DownloadItem.
  * @property {Function} setCurrentPage A function which sets the active page.
+ * @property {Function} setSelectedDownloadId A function which sets the setSelectedDownloadId.
+ * @property {Boolean} shouldBeClickable Should the DownloadItem be clickable.
  * @property {String} state The state of the DownloadItem.
  * @property {Object} primaryStatus Component for the primary status of the DownloadItem.
  * @property {Object} secondaryStatus Component for the secondary status of the DownloadItem.
@@ -68,6 +70,7 @@ const DownloadItem = ({
   percent,
   setCurrentPage,
   setSelectedDownloadId,
+  shouldBeClickable,
   state,
   primaryStatus,
   secondaryStatus,
@@ -91,10 +94,6 @@ const DownloadItem = ({
     const { showDialog } = info
     setWaitingForLoginDialogIsOpen(showDialog)
   }
-
-  const shouldBeClickable = !!setCurrentPage
-    && state !== downloadStates.starting
-    && state !== downloadStates.pending
 
   const onSelectDownloadItem = () => {
     if (shouldBeClickable) {
@@ -268,6 +267,7 @@ DownloadItem.defaultProps = {
   isFile: false,
   setCurrentPage: null,
   setSelectedDownloadId: null,
+  shouldBeClickable: false,
   primaryStatus: null,
   secondaryStatus: null,
   tertiaryStatus: null
@@ -293,6 +293,7 @@ DownloadItem.propTypes = {
   percent: PropTypes.number.isRequired,
   setCurrentPage: PropTypes.func,
   setSelectedDownloadId: PropTypes.func,
+  shouldBeClickable: PropTypes.bool,
   state: PropTypes.string.isRequired,
   primaryStatus: PropTypes.node,
   secondaryStatus: PropTypes.node,

@@ -136,6 +136,8 @@ const Downloads = ({
 
       const {
         downloadsReport,
+        totalFiles: reportTotalFiles,
+        totalCompletedFiles: reportTotalCompletedFiles,
         errors
       } = report
 
@@ -145,9 +147,7 @@ const Downloads = ({
         allDownloadsCompleted: reportAllDownloadsCompleted,
         allDownloadsPaused: reportAllDownloadsPaused,
         derivedStateFromDownloads: reportDerivedStateFromDownloads,
-        hasActiveDownload: reportHasActiveDownload,
-        totalCompletedFiles: reportTotalCompletedFiles,
-        totalFiles: reportTotalFiles
+        hasActiveDownload: reportHasActiveDownload
       } = parsedReport
 
       setAllDownloadsPaused(reportAllDownloadsPaused)

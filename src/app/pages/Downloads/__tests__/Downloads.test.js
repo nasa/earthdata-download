@@ -59,7 +59,9 @@ const setup = (withErrors, overrideProps) => {
       }
     ],
     errors: withErrors ? errors : {},
-    totalDownloads: 2
+    totalCompletedFiles: 14,
+    totalDownloads: 2,
+    totalFiles: 14
   })
 
   // Props

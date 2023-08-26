@@ -14,7 +14,7 @@ import pluralize from './pluralize'
 const addErrorToasts = ({
   addToast,
   deleteAllToastsById,
-  errors,
+  errors = {},
   retryErroredDownloadItem,
   showMoreInfoDialog
 }) => {

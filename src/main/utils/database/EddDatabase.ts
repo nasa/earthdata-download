@@ -453,6 +453,21 @@ class EddDatabase {
 
     return number
   }
+
+  /**
+   * Returns the total number of files and completed files
+   */
+  async getFilesTotals() {
+    const [result] = await this.db('files')
+      .count({
+        // Return the count of the `id` column as `totalFiles`
+        totalFiles: 'files.id',
+        // Return the count of the `state` column when the value is "COMPLETED" as `finishedFiles`
+        totalCompletedFiles: this.db.raw('CASE `files`.`state` WHEN "COMPLETED" THEN 1 ELSE NULL END')
+      })
+
+    return result
+  }
 }
 
 export default EddDatabase

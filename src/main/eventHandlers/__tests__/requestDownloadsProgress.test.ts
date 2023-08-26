@@ -17,7 +17,8 @@ describe('requestDownloadsProgress', () => {
         .mockResolvedValue(0),
       getDownloadsReport: jest.fn(),
       getDownloadReport: jest.fn(),
-      getErroredFiles: jest.fn()
+      getErroredFiles: jest.fn(),
+      getFilesTotals: jest.fn()
     }
 
     const result = await requestDownloadsProgress({
@@ -77,7 +78,12 @@ describe('requestDownloadsProgress', () => {
           finishedFiles: 5
         }),
       getErroredFiles: jest.fn()
-        .mockResolvedValue([])
+        .mockResolvedValue([]),
+      getFilesTotals: jest.fn()
+        .mockResolvedValue({
+          totalCompletedFiles: 5,
+          totalFiles: 14
+        })
     }
 
     const result = await requestDownloadsProgress({
@@ -111,7 +117,9 @@ describe('requestDownloadsProgress', () => {
         state: 'ACTIVE'
       }],
       errors: {},
-      totalDownloads: 2
+      totalCompletedFiles: 5,
+      totalDownloads: 2,
+      totalFiles: 14
     })
 
     expect(database.getAllDownloadsCount).toHaveBeenCalledTimes(1)
@@ -166,7 +174,12 @@ describe('requestDownloadsProgress', () => {
         .mockResolvedValue([{
           downloadId: 'mock-download-id-2',
           numberErrors: 1
-        }])
+        }]),
+      getFilesTotals: jest.fn()
+        .mockResolvedValue({
+          totalCompletedFiles: 5,
+          totalFiles: 14
+        })
     }
 
     const result = await requestDownloadsProgress({
@@ -204,7 +217,9 @@ describe('requestDownloadsProgress', () => {
           numberErrors: 1
         }
       },
-      totalDownloads: 2
+      totalCompletedFiles: 5,
+      totalDownloads: 2,
+      totalFiles: 14
     })
 
     expect(database.getAllDownloadsCount).toHaveBeenCalledTimes(1)

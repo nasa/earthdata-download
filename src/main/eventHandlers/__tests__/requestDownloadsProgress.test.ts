@@ -104,7 +104,7 @@ describe('requestDownloadsProgress', () => {
           totalFiles: 7,
           totalTime: -8701625
         },
-        state: 'ACTIVE'
+        state: downloadStates.active
       }, {
         downloadId: 'mock-download-id-2',
         loadingMoreFiles: false,
@@ -114,7 +114,7 @@ describe('requestDownloadsProgress', () => {
           totalFiles: 7,
           totalTime: -8701617
         },
-        state: 'ACTIVE'
+        state: downloadStates.active
       }],
       errors: {},
       totalCompletedFiles: 5,
@@ -200,7 +200,7 @@ describe('requestDownloadsProgress', () => {
           totalFiles: 7,
           totalTime: -8701625
         },
-        state: 'ACTIVE'
+        state: downloadStates.active
       }, {
         downloadId: 'mock-download-id-2',
         loadingMoreFiles: false,
@@ -210,7 +210,7 @@ describe('requestDownloadsProgress', () => {
           totalFiles: 7,
           totalTime: -8701617
         },
-        state: 'ACTIVE'
+        state: downloadStates.active
       }],
       errors: {
         'mock-download-id-2': {

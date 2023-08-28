@@ -29,7 +29,6 @@ const setup = (overrideProps) => {
     setCurrentPage,
     setSelectedDownloadId,
     state: downloadStates.active,
-    status: {},
     ...overrideProps
   }
 

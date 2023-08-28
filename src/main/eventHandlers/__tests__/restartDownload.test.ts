@@ -118,7 +118,7 @@ describe('restartDownload', () => {
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', {
         errors: null,
-        state: 'ACTIVE',
+        state: downloadStates.active,
         timeEnd: null
       })
 

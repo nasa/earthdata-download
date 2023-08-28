@@ -8,14 +8,25 @@ import MoreErrorInfo from '../MoreErrorInfo'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import AppContext from '../../../context/AppContext'
 import { PAGES } from '../../../constants/pages'
+import downloadStates from '../../../constants/downloadStates'
 
-const setup = () => {
+const setup = (overrideProps = {}) => {
   const cancelErroredDownloadItem = jest.fn()
   const deleteAllToastsById = jest.fn()
   const setCurrentPage = jest.fn()
   const setSelectedDownloadId = jest.fn()
   const onCloseMoreErrorInfoDialog = jest.fn()
   const retryErroredDownloadItem = jest.fn()
+
+  const props = {
+    downloadId: 'mock-download-id',
+    numberErrors: 3,
+    state: undefined,
+    setCurrentPage,
+    setSelectedDownloadId,
+    onCloseMoreErrorInfoDialog,
+    ...overrideProps
+  }
 
   render(
     <ElectronApiContext.Provider value={
@@ -32,11 +43,7 @@ const setup = () => {
       }
       >
         <MoreErrorInfo
-          downloadId="mock-download-id"
-          numberErrors={3}
-          setCurrentPage={setCurrentPage}
-          setSelectedDownloadId={setSelectedDownloadId}
-          onCloseMoreErrorInfoDialog={onCloseMoreErrorInfoDialog}
+          {...props}
         />
       </AppContext.Provider>
     </ElectronApiContext.Provider>
@@ -53,92 +60,104 @@ const setup = () => {
 }
 
 describe('MoreErrorInfo component', () => {
-  test('renders the MoreErrorInfo modal page', () => {
-    setup()
+  describe('when the state is errorFetchingLinks', () => {
+    test('displays the error message', () => {
+      setup({
+        state: downloadStates.errorFetchingLinks
+      })
 
-    expect(screen.getByText(
-      '3 files failed to download in'
-    )).toBeInTheDocument()
-
-    expect(screen.getByRole('button', { name: 'mock-download-id' })).toBeInTheDocument()
+      expect(screen.getByText(
+        'This error failed to find download links. Try creating a new download to download your files.'
+      )).toBeInTheDocument()
+    })
   })
 
-  test('clicking the downloadId button calls setCurrentPage, setSelectedDownloadId and closes the dialog', async () => {
-    const user = userEvent.setup()
+  describe('when the state is not errorFetchingLinks', () => {
+    test('displays the error message and button to the files', () => {
+      setup()
 
-    const {
-      setCurrentPage,
-      setSelectedDownloadId,
-      onCloseMoreErrorInfoDialog
-    } = setup([
-      {
-        itemName: 'mock-filename-1.png',
-        url: 'http://example.com/mock-filename-1.png'
-      },
-      {
-        itemName: 'mock-filename-2.png',
-        url: 'http://example.com/mock-filename-2.png'
-      }
-    ])
+      expect(screen.getByText('3 files failed to download in')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'mock-download-id' }))
-
-    expect(setCurrentPage).toHaveBeenCalledTimes(1)
-    expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
-
-    expect(setSelectedDownloadId).toHaveBeenCalledTimes(1)
-    expect(setSelectedDownloadId).toHaveBeenCalledWith('mock-download-id')
-
-    expect(onCloseMoreErrorInfoDialog).toHaveBeenCalledTimes(1)
-  })
-
-  test('clicking the Retry All Errored button sends a message to the main process', async () => {
-    const user = userEvent.setup()
-
-    const { deleteAllToastsById, retryErroredDownloadItem } = setup([
-      {
-        itemName: 'mock-filename-1.png',
-        url: 'http://example.com/mock-filename-1.png'
-      },
-      {
-        itemName: 'mock-filename-2.png',
-        url: 'http://example.com/mock-filename-2.png'
-      }
-    ])
-
-    await user.click(screen.getByRole('button', { name: /Retry Failed Files/i }))
-
-    expect(retryErroredDownloadItem).toHaveBeenCalledTimes(1)
-    expect(retryErroredDownloadItem).toHaveBeenCalledWith({
-      downloadId: 'mock-download-id'
+      expect(screen.getByRole('button', { name: 'mock-download-id' })).toBeInTheDocument()
     })
 
-    expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
-    expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
-  })
+    test('clicking the downloadId button calls setCurrentPage, setSelectedDownloadId and closes the dialog', async () => {
+      const user = userEvent.setup()
 
-  test('clicking the Cancel All Errored button sends a message to the main process', async () => {
-    const user = userEvent.setup()
+      const {
+        setCurrentPage,
+        setSelectedDownloadId,
+        onCloseMoreErrorInfoDialog
+      } = setup([
+        {
+          itemName: 'mock-filename-1.png',
+          url: 'http://example.com/mock-filename-1.png'
+        },
+        {
+          itemName: 'mock-filename-2.png',
+          url: 'http://example.com/mock-filename-2.png'
+        }
+      ])
 
-    const { cancelErroredDownloadItem, deleteAllToastsById } = setup([
-      {
-        itemName: 'mock-filename-1.png',
-        url: 'http://example.com/mock-filename-1.png'
-      },
-      {
-        itemName: 'mock-filename-2.png',
-        url: 'http://example.com/mock-filename-2.png'
-      }
-    ])
+      await user.click(screen.getByRole('button', { name: 'mock-download-id' }))
 
-    await user.click(screen.getByRole('button', { name: /Cancel Failed Files/i }))
+      expect(setCurrentPage).toHaveBeenCalledTimes(1)
+      expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
 
-    expect(cancelErroredDownloadItem).toHaveBeenCalledTimes(1)
-    expect(cancelErroredDownloadItem).toHaveBeenCalledWith({
-      downloadId: 'mock-download-id'
+      expect(setSelectedDownloadId).toHaveBeenCalledTimes(1)
+      expect(setSelectedDownloadId).toHaveBeenCalledWith('mock-download-id')
+
+      expect(onCloseMoreErrorInfoDialog).toHaveBeenCalledTimes(1)
     })
 
-    expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
-    expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+    test('clicking the Retry All Errored button sends a message to the main process', async () => {
+      const user = userEvent.setup()
+
+      const { deleteAllToastsById, retryErroredDownloadItem } = setup([
+        {
+          itemName: 'mock-filename-1.png',
+          url: 'http://example.com/mock-filename-1.png'
+        },
+        {
+          itemName: 'mock-filename-2.png',
+          url: 'http://example.com/mock-filename-2.png'
+        }
+      ])
+
+      await user.click(screen.getByRole('button', { name: /Retry Failed Files/i }))
+
+      expect(retryErroredDownloadItem).toHaveBeenCalledTimes(1)
+      expect(retryErroredDownloadItem).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id'
+      })
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+    })
+
+    test('clicking the Cancel All Errored button sends a message to the main process', async () => {
+      const user = userEvent.setup()
+
+      const { cancelErroredDownloadItem, deleteAllToastsById } = setup([
+        {
+          itemName: 'mock-filename-1.png',
+          url: 'http://example.com/mock-filename-1.png'
+        },
+        {
+          itemName: 'mock-filename-2.png',
+          url: 'http://example.com/mock-filename-2.png'
+        }
+      ])
+
+      await user.click(screen.getByRole('button', { name: /Cancel Failed Files/i }))
+
+      expect(cancelErroredDownloadItem).toHaveBeenCalledTimes(1)
+      expect(cancelErroredDownloadItem).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id'
+      })
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+    })
   })
 })

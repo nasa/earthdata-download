@@ -51,7 +51,7 @@ describe('openUrl', () => {
           eulaRedirectUrl: null,
           getLinksToken: 'Bearer mock-token',
           getLinksUrl: 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data',
-          state: 'PENDING'
+          state: downloadStates.pending
         }
       )
 
@@ -88,7 +88,7 @@ describe('openUrl', () => {
           eulaRedirectUrl: null,
           getLinksToken: 'Bearer mock-token',
           getLinksUrl: 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data',
-          state: 'PENDING'
+          state: downloadStates.pending
         }
       )
 

@@ -28,7 +28,7 @@ describe('startNextDownload', () => {
         filename: 'mock-filename-1.png',
         downloadId,
         url: 'http://example.com/mock-filename-1.png',
-        state: 'PENDING',
+        state: downloadStates.pending,
         percent: 0
       }]),
       getFileCountWhere: jest.fn().mockResolvedValue(0)
@@ -63,7 +63,7 @@ describe('startNextDownload', () => {
         filename: 'mock-filename-1.png',
         downloadId,
         url: 'http://example.com/mock-filename-1.png',
-        state: 'PENDING',
+        state: downloadStates.pending,
         percent: 0
       }
     }))
@@ -79,7 +79,7 @@ describe('startNextDownload', () => {
         filename: 'mock-filename-1.png',
         downloadId,
         url: 'http://example.com/mock-filename-1.png',
-        state: 'PENDING',
+        state: downloadStates.pending,
         percent: 0
       }]),
       getFileCountWhere: jest.fn().mockResolvedValue(0)
@@ -114,7 +114,7 @@ describe('startNextDownload', () => {
         filename: 'mock-filename-1.png',
         downloadId,
         url: 'http://example.com/mock-filename-1.png',
-        state: 'PENDING',
+        state: downloadStates.pending,
         percent: 0
       }
     }))
@@ -130,14 +130,14 @@ describe('startNextDownload', () => {
         filename: 'mock-filename-1.png',
         downloadId,
         url: 'http://example.com/mock-filename-1.png',
-        state: 'PENDING',
+        state: downloadStates.pending,
         percent: 0
       }, {
         id: 456,
         filename: 'mock-filename-2.png',
         downloadId: 'mock-download-id2',
         url: 'http://example.com/mock-filename-2.png',
-        state: 'PENDING',
+        state: downloadStates.pending,
         percent: 0
       }]),
       getFileCountWhere: jest.fn().mockResolvedValue(0)
@@ -172,7 +172,7 @@ describe('startNextDownload', () => {
         filename: 'mock-filename-1.png',
         downloadId,
         url: 'http://example.com/mock-filename-1.png',
-        state: 'PENDING',
+        state: downloadStates.pending,
         percent: 0
       }
     }))
@@ -183,7 +183,7 @@ describe('startNextDownload', () => {
         filename: 'mock-filename-2.png',
         downloadId: 'mock-download-id2',
         url: 'http://example.com/mock-filename-2.png',
-        state: 'PENDING',
+        state: downloadStates.pending,
         percent: 0
       }
     }))

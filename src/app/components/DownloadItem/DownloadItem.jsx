@@ -5,7 +5,7 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { FaInfoCircle, FaSignInAlt } from 'react-icons/fa'
+import { FaSignInAlt } from 'react-icons/fa'
 
 import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
@@ -40,6 +40,7 @@ import * as styles from './DownloadItem.module.scss'
  * @property {Object} primaryStatus Component for the primary status of the DownloadItem.
  * @property {Object} secondaryStatus Component for the secondary status of the DownloadItem.
  * @property {Object} tertiaryStatus Component for the tertiary status of the DownloadItem.
+ * @property {Object} moreInfo Component for a 'More Info' link on the DownloadItem.
  */
 
 /**
@@ -74,7 +75,8 @@ const DownloadItem = ({
   state,
   primaryStatus,
   secondaryStatus,
-  tertiaryStatus
+  tertiaryStatus,
+  moreInfo
 }) => {
   const {
     showWaitingForEulaDialog,
@@ -236,6 +238,7 @@ const DownloadItem = ({
             {primaryStatus}
             {secondaryStatus}
             {tertiaryStatus}
+            {moreInfo}
           </div>
 
           {
@@ -276,7 +279,8 @@ DownloadItem.defaultProps = {
   shouldBeClickable: false,
   primaryStatus: null,
   secondaryStatus: null,
-  tertiaryStatus: null
+  tertiaryStatus: null,
+  moreInfo: null
 }
 
 DownloadItem.propTypes = {
@@ -303,7 +307,8 @@ DownloadItem.propTypes = {
   state: PropTypes.string.isRequired,
   primaryStatus: PropTypes.node,
   secondaryStatus: PropTypes.node,
-  tertiaryStatus: PropTypes.node
+  tertiaryStatus: PropTypes.node,
+  moreInfo: PropTypes.node
 }
 
 export default DownloadItem

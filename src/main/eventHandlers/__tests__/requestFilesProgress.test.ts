@@ -62,7 +62,7 @@ describe('requestFilesProgress', () => {
           percent: 100,
           receivedBytes: 24902726,
           remainingTime: 0,
-          state: 'COMPLETED',
+          state: downloadStates.completed,
           totalBytes: 24902726
         }],
         totalFiles: 67
@@ -79,7 +79,7 @@ describe('requestFilesProgress', () => {
         percent: 8,
         percentSum: 538,
         receivedBytesSum: 123957815,
-        state: 'COMPLETED',
+        state: downloadStates.completed,
         timeEnd: null,
         timeStart: 1692631432432,
         totalBytesSum: 159494477,
@@ -159,7 +159,7 @@ describe('requestFilesProgress', () => {
           percent: 100,
           receivedBytes: 24902726,
           remainingTime: 0,
-          state: 'COMPLETED',
+          state: downloadStates.completed,
           totalBytes: 24902726
         }],
         totalFiles: 70
@@ -180,7 +180,7 @@ describe('requestFilesProgress', () => {
         percent: 8,
         percentSum: 538,
         receivedBytesSum: 123957815,
-        state: 'COMPLETED',
+        state: downloadStates.completed,
         timeEnd: null,
         timeStart: 1692631432432,
         totalBytesSum: 159494477,

@@ -6,7 +6,6 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import { FaDownload, FaSearch } from 'react-icons/fa'
-import { isEmpty } from 'lodash'
 
 import downloadStates from '../../constants/downloadStates'
 import { REPORT_INTERVAL } from '../../constants/reportInterval'
@@ -94,10 +93,11 @@ const Downloads = ({
       return {
         download: {
           ...download,
-          hasErrors: !isEmpty(errors[downloadId])
+          numberErrors: errors[downloadId]?.numberErrors
         },
         setCurrentPage,
         setSelectedDownloadId,
+        showMoreInfoDialog,
         type: 'download'
       }
     })

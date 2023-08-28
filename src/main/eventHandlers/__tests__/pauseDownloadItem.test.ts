@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import pauseDownloadItem from '../pauseDownloadItem'
 import downloadStates from '../../../app/constants/downloadStates'
 
@@ -61,7 +63,7 @@ describe('pauseDownloadItem', () => {
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: 'PAUSED' })
+      expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: downloadStates.paused })
 
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(0)
     })

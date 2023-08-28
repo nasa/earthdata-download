@@ -56,7 +56,7 @@ const setup = (withErrors, overrideProps) => {
         {
           downloadId: 'mock-download-id',
           filename: '20230722065501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc',
-          state: 'COMPLETED',
+          state: downloadStates.completed,
           percent: 100,
           receivedBytes: 24902726,
           totalBytes: 24902726,
@@ -65,7 +65,7 @@ const setup = (withErrors, overrideProps) => {
         {
           downloadId: 'mock-download-id',
           filename: '20230722180000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc',
-          state: 'COMPLETED',
+          state: downloadStates.completed,
           percent: 100,
           receivedBytes: 21887153,
           totalBytes: 21887153,

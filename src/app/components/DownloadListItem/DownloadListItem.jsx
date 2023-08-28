@@ -19,6 +19,7 @@ import DownloadListItemPercent from './DownloadListItemPercent'
 import DownloadListItemFileProgress from './DownloadListItemFileProgress'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import useAppContext from '../../hooks/useAppContext'
+import DownloadListItemMoreInfo from './DownloadListItemMoreInfo'
 
 /**
  * @typedef {Object} DownloadListItemProps
@@ -43,7 +44,8 @@ import useAppContext from '../../hooks/useAppContext'
 const DownloadListItem = ({
   download,
   setCurrentPage,
-  setSelectedDownloadId
+  setSelectedDownloadId,
+  showMoreInfoDialog
 }) => {
   const appContext = useAppContext()
   const {
@@ -62,7 +64,7 @@ const DownloadListItem = ({
   // Create the downloadItems array from the runningDownloads reported from the main process
   const {
     downloadId,
-    hasErrors,
+    numberErrors = 0,
     loadingMoreFiles,
     progress,
     state
@@ -192,12 +194,15 @@ const DownloadListItem = ({
     ]
   ]
 
+  // TODO generate more info component here and pass in like primary/secondary
+
   return (
     <DownloadItem
       actionsList={actionsList}
       downloadId={downloadId}
       setCurrentPage={setCurrentPage}
       setSelectedDownloadId={setSelectedDownloadId}
+      showMoreInfoDialog={showMoreInfoDialog}
       shouldBeClickable={shouldBeClickable}
       state={state}
       itemName={downloadId}
@@ -214,7 +219,7 @@ const DownloadListItem = ({
           <DownloadListItemState
             state={state}
             percent={percent}
-            hasErrors={hasErrors}
+            hasErrors={numberErrors > 0}
           />
         )
       }
@@ -231,6 +236,16 @@ const DownloadListItem = ({
           />
         )
       }
+      moreInfo={
+        (
+          <DownloadListItemMoreInfo
+            downloadId={downloadId}
+            numberErrors={numberErrors}
+            state={state}
+            showMoreInfoDialog={showMoreInfoDialog}
+          />
+        )
+      }
     />
   )
 }
@@ -238,6 +253,7 @@ const DownloadListItem = ({
 DownloadListItem.propTypes = {
   download: PropTypes.shape({
     downloadId: PropTypes.string,
+    numberErrors: PropTypes.number,
     hasErrors: PropTypes.bool,
     loadingMoreFiles: PropTypes.bool,
     progress: PropTypes.shape({
@@ -249,7 +265,8 @@ DownloadListItem.propTypes = {
     state: PropTypes.string
   }).isRequired,
   setCurrentPage: PropTypes.func.isRequired,
-  setSelectedDownloadId: PropTypes.func.isRequired
+  setSelectedDownloadId: PropTypes.func.isRequired,
+  showMoreInfoDialog: PropTypes.func.isRequired
 }
 
 export default DownloadListItem

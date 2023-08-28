@@ -4,6 +4,7 @@ import { FaBan, FaRedo } from 'react-icons/fa'
 
 import Button from '../../components/Button/Button'
 
+import downloadStates from '../../constants/downloadStates'
 import { PAGES } from '../../constants/pages'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import useAppContext from '../../hooks/useAppContext'
@@ -43,6 +44,7 @@ import * as styles from './MoreErrorInfo.module.scss'
 const MoreErrorInfo = ({
   downloadId,
   numberErrors,
+  state,
   setCurrentPage,
   setSelectedDownloadId,
   onCloseMoreErrorInfoDialog
@@ -64,6 +66,15 @@ const MoreErrorInfo = ({
     retryErroredDownloadItem({ downloadId: retryDownloadId })
     onCloseMoreErrorInfoDialog(false)
     deleteAllToastsById(retryDownloadId)
+  }
+
+  if (state === downloadStates.errorFetchingLinks) {
+    return (
+      <div className={styles.message}>
+        This error failed to find download links.
+        Try creating a new download to download your files.
+      </div>
+    )
   }
 
   return (
@@ -111,12 +122,14 @@ const MoreErrorInfo = ({
 
 MoreErrorInfo.defaultProps = {
   downloadId: null,
-  numberErrors: null
+  numberErrors: null,
+  state: null
 }
 
 MoreErrorInfo.propTypes = {
   downloadId: PropTypes.string,
   numberErrors: PropTypes.number,
+  state: PropTypes.string,
   onCloseMoreErrorInfoDialog: PropTypes.func.isRequired,
   setCurrentPage: PropTypes.func.isRequired,
   setSelectedDownloadId: PropTypes.func.isRequired

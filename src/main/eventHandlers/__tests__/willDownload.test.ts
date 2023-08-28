@@ -430,7 +430,7 @@ describe('willDownload', () => {
       expect(database.updateFileById).toHaveBeenCalledTimes(1)
       expect(database.updateFileById).toHaveBeenCalledWith(123, {
         percent: 100,
-        state: 'COMPLETED',
+        state: downloadStates.completed,
         timeEnd: 1684029600000,
         timeStart: 1684029600000
       })

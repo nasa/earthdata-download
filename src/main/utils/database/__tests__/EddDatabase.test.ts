@@ -638,19 +638,19 @@ describe('EddDatabase', () => {
           'mock-download-1',
           'file1.png',
           0,
-          'PENDING',
+          downloadStates.pending,
           'http://example.com/file1.png',
           1682899200000,
           'mock-download-1',
           'file2.png',
           0,
-          'PENDING',
+          downloadStates.pending,
           'http://example.com/file2.png',
           1682899200000,
           'mock-download-1',
           'file3.png',
           0,
-          'PENDING',
+          downloadStates.pending,
           'http://example.com/file3.png'
         ])
 

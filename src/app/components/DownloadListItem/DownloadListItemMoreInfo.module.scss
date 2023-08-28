@@ -1,0 +1,14 @@
+.statusDescription {
+  overflow: hidden;
+  flex-grow: 1;
+  flex-shrink: 1;
+  cursor: pointer;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusDescriptionIcon {
+  margin-right: var(--size__100);
+  font-size: var(--text__normal);
+}

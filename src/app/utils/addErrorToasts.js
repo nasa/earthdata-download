@@ -47,7 +47,10 @@ const addErrorToasts = ({
           buttonProps: {
             Icon: FaInfoCircle,
             hideLabel: true,
-            onClick: () => showMoreInfoDialog(erroredDownloadId, numberErrors)
+            onClick: () => showMoreInfoDialog({
+              downloadId: erroredDownloadId,
+              numberErrors
+            })
           }
         }
       ]

@@ -83,10 +83,15 @@ const Layout = () => {
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
 
-  const showMoreInfoDialog = (downloadId, numberErrors) => {
+  const showMoreInfoDialog = ({
+    downloadId,
+    numberErrors,
+    state
+  }) => {
     setActiveMoreInfoDownloadInfo({
       downloadId,
-      numberErrors
+      numberErrors,
+      state
     })
 
     setMoreErrorInfoIsOpen(true)
@@ -234,7 +239,8 @@ const Layout = () => {
 
   const {
     downloadId: moreInfoDownloadId,
-    numberErrors
+    numberErrors,
+    state: moreInfoState
   } = activeMoreInfoDownloadInfo
 
   return (
@@ -433,6 +439,7 @@ const Layout = () => {
           <MoreErrorInfo
             downloadId={moreInfoDownloadId}
             numberErrors={numberErrors}
+            state={moreInfoState}
             onCloseMoreErrorInfoDialog={setMoreErrorInfoIsOpen}
             setCurrentPage={setCurrentPage}
             setSelectedDownloadId={setSelectedDownloadId}

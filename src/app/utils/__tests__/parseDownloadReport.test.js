@@ -63,7 +63,7 @@ const errorDownload = {
       id: 533,
       downloadId: 'error-download-id',
       filename: 'bad-file.png',
-      state: 'ERROR',
+      state: downloadStates.error,
       url: 'http://localhost:3001/bad-file.png',
       percent: 0,
       createdAt: 1691779355727,

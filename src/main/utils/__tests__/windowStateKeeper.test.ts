@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import windowStateKeeper from '../windowStateKeeper'
 
 describe('windowStateKeeper', () => {
@@ -40,37 +42,275 @@ describe('windowStateKeeper', () => {
     }))
   })
 
-  test.skip('saves the window state ', async () => {
-    // Skipped because I'm not sure how to test window events with my mock window object, and can't figure out how to use a real electron BrowserWindow
-    const database = {
-      getPreferences: jest.fn().mockReturnValue({
-        windowState: JSON.stringify({
-          x: 0,
-          y: 0,
-          width: 900,
-          height: 700
+  describe('when tracking the window state changes', () => {
+    describe('when resizing', () => {
+      test('saves the maximized window state ', async () => {
+        const database = {
+          getPreferences: jest.fn().mockReturnValue({
+            windowState: JSON.stringify({
+              x: 0,
+              y: 0,
+              width: 900,
+              height: 700,
+              isMaximized: true
+            })
+          }),
+          setPreferences: jest.fn()
+        }
+
+        const channels = {}
+        const window = {
+          move: jest.fn(),
+          getBounds: jest.fn().mockReturnValue({
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600
+          }),
+          isMaximized: jest.fn().mockReturnValue(true),
+          on: (channel, callback) => {
+            channels[channel] = callback
+          },
+          send: (channel, event) => {
+            channels[channel](event)
+          }
+        }
+
+        const windowState = await windowStateKeeper(database)
+
+        windowState.track(window)
+
+        window.send('resize')
+
+        expect(database.setPreferences).toHaveBeenCalledTimes(1)
+        expect(database.setPreferences).toHaveBeenCalledWith({
+          windowState: '{"x":0,"y":0,"width":900,"height":700,"isMaximized":true}'
         })
-      }),
-      setPreferences: jest.fn()
-    }
-
-    const window = {
-      move: jest.fn(),
-      getBounds: jest.fn().mockReturnValue({
-        x: 0,
-        y: 0,
-        width: 800,
-        height: 600
       })
-    }
 
-    const windowState = await windowStateKeeper(database)
+      test('saves the non-maximized window state ', async () => {
+        const database = {
+          getPreferences: jest.fn().mockReturnValue({
+            windowState: JSON.stringify({
+              x: 0,
+              y: 0,
+              width: 900,
+              height: 700,
+              isMaximized: false
+            })
+          }),
+          setPreferences: jest.fn()
+        }
 
-    // ?? how do I fire an event on my mocked window.
-    // Or how do I use a real BrowserWindow, not mocked by electronMock.js?
-    windowState.track(window)
+        const channels = {}
+        const window = {
+          move: jest.fn(),
+          getBounds: jest.fn().mockReturnValue({
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600
+          }),
+          isMaximized: jest.fn().mockReturnValue(false),
+          on: (channel, callback) => {
+            channels[channel] = callback
+          },
+          send: (channel, event) => {
+            channels[channel](event)
+          }
+        }
 
-    expect(database.setPreferences).toHaveBeenCalledTimes(1)
-    expect(database.setPreferences).toHaveBeenCalledWith(1)
+        const windowState = await windowStateKeeper(database)
+
+        windowState.track(window)
+
+        window.send('resize')
+
+        expect(database.setPreferences).toHaveBeenCalledTimes(1)
+        expect(database.setPreferences).toHaveBeenCalledWith({
+          windowState: '{"x":0,"y":0,"width":800,"height":600,"isMaximized":false}'
+        })
+      })
+    })
+
+    describe('when moving', () => {
+      test('saves the maximized window state ', async () => {
+        const database = {
+          getPreferences: jest.fn().mockReturnValue({
+            windowState: JSON.stringify({
+              x: 0,
+              y: 0,
+              width: 900,
+              height: 700,
+              isMaximized: true
+            })
+          }),
+          setPreferences: jest.fn()
+        }
+
+        const channels = {}
+        const window = {
+          move: jest.fn(),
+          getBounds: jest.fn().mockReturnValue({
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600
+          }),
+          isMaximized: jest.fn().mockReturnValue(true),
+          on: (channel, callback) => {
+            channels[channel] = callback
+          },
+          send: (channel, event) => {
+            channels[channel](event)
+          }
+        }
+
+        const windowState = await windowStateKeeper(database)
+
+        windowState.track(window)
+
+        window.send('move')
+
+        expect(database.setPreferences).toHaveBeenCalledTimes(1)
+        expect(database.setPreferences).toHaveBeenCalledWith({
+          windowState: '{"x":0,"y":0,"width":900,"height":700,"isMaximized":true}'
+        })
+      })
+
+      test('saves the non-maximized window state ', async () => {
+        const database = {
+          getPreferences: jest.fn().mockReturnValue({
+            windowState: JSON.stringify({
+              x: 0,
+              y: 0,
+              width: 900,
+              height: 700,
+              isMaximized: false
+            })
+          }),
+          setPreferences: jest.fn()
+        }
+
+        const channels = {}
+        const window = {
+          move: jest.fn(),
+          getBounds: jest.fn().mockReturnValue({
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600
+          }),
+          isMaximized: jest.fn().mockReturnValue(false),
+          on: (channel, callback) => {
+            channels[channel] = callback
+          },
+          send: (channel, event) => {
+            channels[channel](event)
+          }
+        }
+
+        const windowState = await windowStateKeeper(database)
+
+        windowState.track(window)
+
+        window.send('move')
+
+        expect(database.setPreferences).toHaveBeenCalledTimes(1)
+        expect(database.setPreferences).toHaveBeenCalledWith({
+          windowState: '{"x":0,"y":0,"width":800,"height":600,"isMaximized":false}'
+        })
+      })
+    })
+
+    describe('when closing', () => {
+      test('saves the maximized window state ', async () => {
+        const database = {
+          getPreferences: jest.fn().mockReturnValue({
+            windowState: JSON.stringify({
+              x: 0,
+              y: 0,
+              width: 900,
+              height: 700,
+              isMaximized: true
+            })
+          }),
+          setPreferences: jest.fn()
+        }
+
+        const channels = {}
+        const window = {
+          move: jest.fn(),
+          getBounds: jest.fn().mockReturnValue({
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600
+          }),
+          isMaximized: jest.fn().mockReturnValue(true),
+          on: (channel, callback) => {
+            channels[channel] = callback
+          },
+          send: (channel, event) => {
+            channels[channel](event)
+          }
+        }
+
+        const windowState = await windowStateKeeper(database)
+
+        windowState.track(window)
+
+        window.send('close')
+
+        expect(database.setPreferences).toHaveBeenCalledTimes(1)
+        expect(database.setPreferences).toHaveBeenCalledWith({
+          windowState: '{"x":0,"y":0,"width":900,"height":700,"isMaximized":true}'
+        })
+      })
+
+      test('saves the non-maximized window state ', async () => {
+        const database = {
+          getPreferences: jest.fn().mockReturnValue({
+            windowState: JSON.stringify({
+              x: 0,
+              y: 0,
+              width: 900,
+              height: 700,
+              isMaximized: false
+            })
+          }),
+          setPreferences: jest.fn()
+        }
+
+        const channels = {}
+        const window = {
+          move: jest.fn(),
+          getBounds: jest.fn().mockReturnValue({
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600
+          }),
+          isMaximized: jest.fn().mockReturnValue(false),
+          on: (channel, callback) => {
+            channels[channel] = callback
+          },
+          send: (channel, event) => {
+            channels[channel](event)
+          }
+        }
+
+        const windowState = await windowStateKeeper(database)
+
+        windowState.track(window)
+
+        window.send('close')
+
+        expect(database.setPreferences).toHaveBeenCalledTimes(1)
+        expect(database.setPreferences).toHaveBeenCalledWith({
+          windowState: '{"x":0,"y":0,"width":800,"height":600,"isMaximized":false}'
+        })
+      })
+    })
   })
 })

@@ -5,6 +5,7 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn()
 }))
 
+// Add a mock electronApi for App.test.js to correctly render context provider
 window.electronApi = {
   autoUpdateAvailable: jest.fn(),
   autoUpdateInstallLater: jest.fn(),
@@ -16,7 +17,6 @@ window.electronApi = {
   clearDefaultDownload: jest.fn(),
   closeWindow: jest.fn(),
   copyDownloadPath: jest.fn(),
-  deleteCookies: jest.fn(),
   deleteDownload: jest.fn(),
   getPreferenceFieldValue: jest.fn(),
   initializeDownload: jest.fn(),

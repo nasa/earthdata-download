@@ -48,8 +48,6 @@ const setupEventListeners = ({
   downloadsWaitingForEula,
   setUpdateAvailable
 }) => {
-  let reportInterval
-
   /**
    * Browser Window event listeners
    */
@@ -236,11 +234,6 @@ const setupEventListeners = ({
       info,
       webContents: appWindow.webContents
     })
-  })
-
-  // When the window is going to close, clear the reportProgressInterval
-  appWindow.on('close', () => {
-    if (reportInterval) clearInterval(reportInterval)
   })
 
   /**

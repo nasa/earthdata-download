@@ -4,6 +4,7 @@ const humanizedDownloadStates = {
   [downloadStates.active]: 'Downloading',
   [downloadStates.cancelled]: 'Cancelled',
   [downloadStates.completed]: 'Completed',
+  [downloadStates.errorFetchingLinks]: 'The download could not be started.',
   [downloadStates.error]: 'An error occurred',
   [downloadStates.interrupted]: 'Interrupted',
   [downloadStates.paused]: 'Paused',

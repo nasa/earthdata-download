@@ -422,6 +422,44 @@ describe('DownloadItem component', () => {
     })
   })
 
+  describe('when a download failed to start', () => {
+    test('displays the correct download information', () => {
+      const { container } = setup({
+        actionsList: [
+          [
+            {
+              label: 'test-label',
+              isActive: true,
+              isPrimary: true,
+              callback: jest.fn(),
+              icon: FaPause
+            }
+          ]
+        ],
+        percent: 0,
+        state: downloadStates.errorFetchingLinks
+      })
+
+      expect(screen.getByRole('heading', {
+        level: 3,
+        value: 'Test download'
+      })).toBeInTheDocument()
+
+      expect(screen.getByRole('listitem')).toHaveClass('wrapper isError')
+
+      expect(Progress).toHaveBeenCalledTimes(1)
+      expect(Progress).toHaveBeenCalledWith({
+        className: 'progress',
+        progress: 0,
+        state: downloadStates.errorFetchingLinks
+      }, {})
+
+      expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 0%')
+
+      expect(screen.queryByRole('button', { name: 'test-label' })).not.toBeInTheDocument()
+    })
+  })
+
   describe('when a download is waiting for authentication', () => {
     describe('when the download has not started yet', () => {
       test('displays the correct download information', () => {

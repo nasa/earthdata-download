@@ -244,7 +244,7 @@ describe('fetchLinks', () => {
       {
         errors: '{}',
         loadingMoreFiles: false,
-        state: downloadStates.error
+        state: downloadStates.errorFetchingLinks
       }
     )
 

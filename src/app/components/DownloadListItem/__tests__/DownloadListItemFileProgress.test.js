@@ -102,4 +102,14 @@ describe('DownloadListItemFileProgress component', () => {
       expect(container).toBeEmptyDOMElement()
     })
   })
+
+  describe('when the state is errorFetchingLinks', () => {
+    test('returns null', () => {
+      const { container } = setup({
+        state: downloadStates.errorFetchingLinks
+      })
+
+      expect(container).toBeEmptyDOMElement()
+    })
+  })
 })

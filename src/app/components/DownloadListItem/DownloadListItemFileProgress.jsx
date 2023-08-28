@@ -47,7 +47,11 @@ const DownloadListItemFileProgress = ({
   totalFiles,
   totalTime
 }) => {
-  if (state === downloadStates.pending || state === downloadStates.error) return null
+  if (
+    state === downloadStates.pending
+    || state === downloadStates.error
+    || state === downloadStates.errorFetchingLinks
+  ) return null
 
   return (
     <div className={styles.statusDescription}>

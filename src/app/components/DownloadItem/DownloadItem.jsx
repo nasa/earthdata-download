@@ -5,7 +5,7 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { FaSignInAlt } from 'react-icons/fa'
+import { FaInfoCircle, FaSignInAlt } from 'react-icons/fa'
 
 import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
@@ -163,6 +163,8 @@ const DownloadItem = ({
   } else if (state === downloadStates.waitingForAuth || state === downloadStates.waitingForEula) {
     // If waitingForAuth and some progress has been made, show the `interrupted` state
     stateForClassName = downloadStates.interrupted
+  } else if (state === downloadStates.errorFetchingLinks) {
+    stateForClassName = downloadStates.error
   }
 
   return (
@@ -236,13 +238,17 @@ const DownloadItem = ({
             {tertiaryStatus}
           </div>
 
-          <div className={styles.metaSecondary}>
-            {primaryActions}
-            <Dropdown
-              onOpenChange={setMoreActionsOpen}
-              actionsList={actionsList}
-            />
-          </div>
+          {
+            state !== downloadStates.errorFetchingLinks && (
+              <div className={styles.metaSecondary}>
+                {primaryActions}
+                <Dropdown
+                  onOpenChange={setMoreActionsOpen}
+                  actionsList={actionsList}
+                />
+              </div>
+            )
+          }
         </div>
 
         <div>

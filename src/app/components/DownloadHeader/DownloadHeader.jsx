@@ -189,12 +189,17 @@ const DownloadHeader = ({
   )
 }
 
+DownloadHeader.defaultProps = {
+  totalCompletedFiles: 0,
+  totalFiles: 0
+}
+
 DownloadHeader.propTypes = {
   allDownloadsCompleted: PropTypes.bool.isRequired,
   allDownloadsPaused: PropTypes.bool.isRequired,
   state: PropTypes.string.isRequired,
-  totalCompletedFiles: PropTypes.number.isRequired,
-  totalFiles: PropTypes.number.isRequired
+  totalCompletedFiles: PropTypes.number,
+  totalFiles: PropTypes.number
 }
 
 export default DownloadHeader

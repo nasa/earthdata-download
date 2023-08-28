@@ -147,7 +147,7 @@ const fetchLinks = async ({
   } catch (error) {
     await database.updateDownloadById(downloadId, {
       loadingMoreFiles: false,
-      state: downloadStates.error,
+      state: downloadStates.errorFetchingLinks,
       errors: JSON.stringify(error)
     })
   }

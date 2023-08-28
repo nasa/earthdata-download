@@ -3,6 +3,7 @@ const downloadStates = {
   cancelled: 'CANCELLED',
   completed: 'COMPLETED',
   error: 'ERROR',
+  errorFetchingLinks: 'ERROR_FETCHING_LINKS',
   interrupted: 'INTERRUPTED',
   paused: 'PAUSED',
   pending: 'PENDING',

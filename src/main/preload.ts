@@ -9,7 +9,6 @@ contextBridge.exposeInMainWorld('electronApi', {
   beginDownload: (data) => ipcRenderer.send('beginDownload', data),
   chooseDownloadLocation: () => ipcRenderer.send('chooseDownloadLocation'),
   clearDefaultDownload: () => ipcRenderer.send('clearDefaultDownload'),
-  deleteCookies: () => ipcRenderer.send('deleteCookies'),
   sendToEula: (data) => ipcRenderer.send('sendToEula', data),
   sendToLogin: (data) => ipcRenderer.send('sendToLogin', data),
   setPreferenceFieldValue: (data) => ipcRenderer.send('setPreferenceFieldValue', data),
@@ -29,6 +28,10 @@ contextBridge.exposeInMainWorld('electronApi', {
   deleteDownload: (data) => ipcRenderer.send('deleteDownload', data),
   retryErroredDownloadItem: (data) => ipcRenderer.send('retryErroredDownloadItem', data),
 
+  // Reporting
+  requestDownloadsProgress: (data) => ipcRenderer.invoke('requestDownloadsProgress', data),
+  requestFilesProgress: (data) => ipcRenderer.invoke('requestFilesProgress', data),
+
   // Messages to be received by the renderer process
   autoUpdateAvailable: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('autoUpdateAvailable', callback),
   autoUpdateProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('autoUpdateProgress', callback),
@@ -37,10 +40,6 @@ contextBridge.exposeInMainWorld('electronApi', {
   showWaitingForEulaDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForEulaDialog', callback),
   showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForLoginDialog', callback),
   windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('windowsLinuxTitleBar', callback),
-
-  // Reporting
-  requestDownloadsProgress: (data) => ipcRenderer.invoke('requestDownloadsProgress', data),
-  requestFilesProgress: (data) => ipcRenderer.invoke('requestFilesProgress', data),
 
   // System values for renderer
   isMac: process.platform === 'darwin',

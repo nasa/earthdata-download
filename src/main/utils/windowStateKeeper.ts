@@ -10,7 +10,7 @@ const windowStateKeeper = async (database) => {
   let appWindow
   let windowState
 
-  async function setBounds() {
+  const setBounds = async () => {
     // Restore from database
     const preferences = await database.getPreferences()
     const { windowState: windowStateString } = preferences
@@ -30,7 +30,7 @@ const windowStateKeeper = async (database) => {
     }
   }
 
-  function saveState() {
+  const saveState = () => {
     if (!windowState.isMaximized) {
       windowState = appWindow.getBounds()
     }
@@ -40,7 +40,7 @@ const windowStateKeeper = async (database) => {
     database.setPreferences({ windowState: JSON.stringify(windowState) })
   }
 
-  function track(trackedWindow) {
+  const track = (trackedWindow) => {
     appWindow = trackedWindow;
 
     ['resize', 'move', 'close'].forEach((event) => {

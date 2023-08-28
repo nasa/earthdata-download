@@ -10,6 +10,8 @@ import downloadStates from '../../../app/constants/downloadStates'
 import startNextDownload from '../../utils/startNextDownload'
 import verifyDownload from '../../utils/verifyDownload'
 import finishDownload from '../willDownloadEvents/finishDownload'
+import onUpdated from '../willDownloadEvents/onUpdated'
+import onDone from '../willDownloadEvents/onDone'
 
 jest.mock('../sendToEula', () => ({
   __esModule: true,
@@ -43,6 +45,9 @@ jest.mock('../willDownloadEvents/finishDownload', () => ({
   __esModule: true,
   default: jest.fn(() => { })
 }))
+
+jest.mock('../willDownloadEvents/onUpdated')
+jest.mock('../willDownloadEvents/onDone')
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
@@ -434,6 +439,129 @@ describe('willDownload', () => {
       expect(finishDownload).toHaveBeenCalledWith(expect.objectContaining({
         downloadId: 'mock-download-id'
       }))
+    })
+  })
+
+  describe('when the `updated` event is called', () => {
+    test('calls onUpdated', async () => {
+      const currentDownloadItems = {
+        addItem: jest.fn(),
+        cancelItem: jest.fn()
+      }
+      const database = {
+        updateDownloadById: jest.fn(),
+        updateFileById: jest.fn()
+      }
+      const downloadIdContext = {
+        'http://example.com/mock-filename.png': {
+          downloadId: 'mock-download-id',
+          downloadLocation: '/mock/location/mock-download-id',
+          fileId: 123
+        }
+      }
+      const channels = {}
+      const downloadsWaitingForAuth = {}
+      const item = {
+        getFilename: jest.fn().mockReturnValue('mock-filename.png'),
+        setSavePath: jest.fn(),
+        getURLChain: jest.fn().mockReturnValue(['http://example.com/mock-filename.png']),
+        on: (channel, callback) => {
+          channels[channel] = callback
+        },
+        once: (channel, callback) => {
+          channels[channel] = callback
+        },
+        send: (channel, event, state) => {
+          channels[channel](event, state)
+        },
+        getReceivedBytes: jest.fn().mockReturnValue(0),
+        getTotalBytes: jest.fn().mockReturnValue(100)
+      }
+      const webContents = {
+        send: jest.fn()
+      }
+
+      await willDownload({
+        currentDownloadItems,
+        database,
+        downloadIdContext,
+        downloadsWaitingForAuth,
+        item,
+        webContents
+      })
+
+      item.send('updated', {}, 'progressing')
+
+      expect(onUpdated).toHaveBeenCalledTimes(1)
+      expect(onUpdated).toHaveBeenCalledWith({
+        database,
+        downloadId: 'mock-download-id',
+        item,
+        state: 'progressing'
+      })
+    })
+  })
+
+  describe('when the `done` event is called', () => {
+    test('calls onDone', async () => {
+      const currentDownloadItems = {
+        addItem: jest.fn(),
+        cancelItem: jest.fn()
+      }
+      const database = {
+        updateDownloadById: jest.fn(),
+        updateFileById: jest.fn()
+      }
+      const downloadIdContext = {
+        'http://example.com/mock-filename.png': {
+          downloadId: 'mock-download-id',
+          downloadLocation: '/mock/location/mock-download-id',
+          fileId: 123
+        }
+      }
+      const channels = {}
+      const downloadsWaitingForAuth = {}
+      const item = {
+        getFilename: jest.fn().mockReturnValue('mock-filename.png'),
+        setSavePath: jest.fn(),
+        getURLChain: jest.fn().mockReturnValue(['http://example.com/mock-filename.png']),
+        on: (channel, callback) => {
+          channels[channel] = callback
+        },
+        once: (channel, callback) => {
+          channels[channel] = callback
+        },
+        send: (channel, event, state) => {
+          channels[channel](event, state)
+        },
+        getReceivedBytes: jest.fn().mockReturnValue(0),
+        getTotalBytes: jest.fn().mockReturnValue(100)
+      }
+      const webContents = {
+        send: jest.fn()
+      }
+
+      await willDownload({
+        currentDownloadItems,
+        database,
+        downloadIdContext,
+        downloadsWaitingForAuth,
+        item,
+        webContents
+      })
+
+      item.send('done', {}, 'completed')
+
+      expect(onDone).toHaveBeenCalledTimes(1)
+      expect(onDone).toHaveBeenCalledWith({
+        currentDownloadItems,
+        database,
+        downloadId: 'mock-download-id',
+        downloadIdContext,
+        item,
+        state: 'completed',
+        webContents
+      })
     })
   })
 })

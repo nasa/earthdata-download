@@ -95,7 +95,7 @@ const ListPage = ({
     }
     >
       {
-        totalItemCount > 0
+        totalItemCount > 0 || hideCompleted
           ? (
             <>
               {

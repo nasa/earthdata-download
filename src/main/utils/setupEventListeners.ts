@@ -213,7 +213,9 @@ const setupEventListeners = ({
     await resumeDownloadItem({
       currentDownloadItems,
       database,
-      info
+      downloadIdContext,
+      info,
+      webContents: appWindow.webContents
     })
   })
 

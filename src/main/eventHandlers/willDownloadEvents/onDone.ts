@@ -75,7 +75,6 @@ const onDone = async ({
   await startNextDownload({
     currentDownloadItems,
     database,
-    downloadId,
     downloadIdContext,
     webContents
   })

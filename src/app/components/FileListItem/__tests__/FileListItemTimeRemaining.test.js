@@ -8,7 +8,7 @@ import downloadStates from '../../../constants/downloadStates'
 const setup = (overrideProps = {}) => {
   const props = {
     percent: 42,
-    remainingTime: 123,
+    remainingTime: 123000,
     shouldShowTime: true,
     state: downloadStates.active,
     ...overrideProps
@@ -23,7 +23,7 @@ describe('FileListItemTimeRemaining component', () => {
   test('returns the remaining time', () => {
     setup()
 
-    expect(screen.getByText('2 minutes remaining').parentElement).toHaveClass('statusDescription')
+    expect(screen.getByText('2 minutes, 3 seconds remaining').parentElement).toHaveClass('statusDescription')
   })
 
   test('returns the state', () => {

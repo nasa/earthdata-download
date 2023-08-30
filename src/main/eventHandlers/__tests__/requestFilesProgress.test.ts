@@ -7,7 +7,7 @@ import requestFilesProgress from '../requestFilesProgress'
 import downloadStates from '../../../app/constants/downloadStates'
 
 beforeEach(() => {
-  MockDate.set('2023-05-13T22:00:00')
+  MockDate.set('2023-08-30T22:00:00')
 })
 
 describe('requestFilesProgress', () => {
@@ -28,9 +28,7 @@ describe('requestFilesProgress', () => {
           id: 'mock-download-id',
           downloadLocation: '/mock/download/location/mock-download-id',
           state: downloadStates.completed,
-          createdAt: 1692631408517,
-          timeEnd: null,
-          timeStart: 1692631432432,
+          totalTime: 123000,
           percentSum: 538,
           receivedBytesSum: 123957815,
           totalBytesSum: 159494477,
@@ -41,7 +39,9 @@ describe('requestFilesProgress', () => {
       getTotalFilesPerFilesReport: jest.fn()
         .mockResolvedValue(67),
       getErroredFiles: jest.fn()
-        .mockResolvedValue([])
+        .mockResolvedValue([]),
+      getPausesSum: jest.fn()
+        .mockResolvedValue(null)
     }
 
     const result = await requestFilesProgress({
@@ -68,11 +68,10 @@ describe('requestFilesProgress', () => {
         totalFiles: 67
       },
       headerReport: {
-        createdAt: 1692631408517,
         downloadLocation: '/mock/download/location/mock-download-id',
-        elapsedTime: -8601832,
+        elapsedTime: 123000,
         errors: {},
-        estimatedTotalTimeRemaining: -105934996.21220204,
+        estimatedTotalTimeRemaining: 1514794.1199154847,
         filesWithProgress: 7,
         finishedFiles: 4,
         id: 'mock-download-id',
@@ -80,10 +79,9 @@ describe('requestFilesProgress', () => {
         percentSum: 538,
         receivedBytesSum: 123957815,
         state: downloadStates.completed,
-        timeEnd: null,
-        timeStart: 1692631432432,
         totalBytesSum: 159494477,
-        totalFiles: 67
+        totalFiles: 67,
+        totalTime: 123000
       }
     })
 
@@ -122,9 +120,7 @@ describe('requestFilesProgress', () => {
           id: 'mock-download-id',
           downloadLocation: '/mock/download/location/mock-download-id',
           state: downloadStates.completed,
-          createdAt: 1692631408517,
-          timeEnd: null,
-          timeStart: 1692631432432,
+          totalTime: 123000,
           percentSum: 538,
           receivedBytesSum: 123957815,
           totalBytesSum: 159494477,
@@ -138,7 +134,9 @@ describe('requestFilesProgress', () => {
         .mockResolvedValue([{
           downloadId: 'mock-download-id-2',
           numberErrors: 1
-        }])
+        }]),
+      getPausesSum: jest.fn()
+        .mockResolvedValue(null)
     }
 
     const result = await requestFilesProgress({
@@ -165,15 +163,14 @@ describe('requestFilesProgress', () => {
         totalFiles: 70
       },
       headerReport: {
-        createdAt: 1692631408517,
         downloadLocation: '/mock/download/location/mock-download-id',
-        elapsedTime: -8601832,
+        elapsedTime: 123000,
         errors: {
           'mock-download-id-2': {
             numberErrors: 1
           }
         },
-        estimatedTotalTimeRemaining: -105934996.21220204,
+        estimatedTotalTimeRemaining: 1514794.1199154847,
         filesWithProgress: 7,
         finishedFiles: 4,
         id: 'mock-download-id',
@@ -181,10 +178,9 @@ describe('requestFilesProgress', () => {
         percentSum: 538,
         receivedBytesSum: 123957815,
         state: downloadStates.completed,
-        timeEnd: null,
-        timeStart: 1692631432432,
         totalBytesSum: 159494477,
-        totalFiles: 67
+        totalFiles: 67,
+        totalTime: 123000
       }
     })
 
@@ -203,6 +199,98 @@ describe('requestFilesProgress', () => {
     expect(database.getTotalFilesPerFilesReport).toHaveBeenCalledWith({
       downloadId: 'mock-download-id',
       hideCompleted: true
+    })
+  })
+
+  test('reports the file progress when files have been paused', async () => {
+    const database = {
+      getFilesReport: jest.fn()
+        .mockResolvedValue([{
+          downloadId: 'mock-download-id',
+          filename: 'file1.png',
+          state: downloadStates.completed,
+          percent: 100,
+          receivedBytes: 24902726,
+          totalBytes: 24902726,
+          remainingTime: 0
+        }]),
+      getFilesHeaderReport: jest.fn()
+        .mockResolvedValue({
+          id: 'mock-download-id',
+          downloadLocation: '/mock/download/location/mock-download-id',
+          state: downloadStates.completed,
+          totalTime: 123000,
+          percentSum: 538,
+          receivedBytesSum: 123957815,
+          totalBytesSum: 159494477,
+          totalFiles: 67,
+          filesWithProgress: 7,
+          finishedFiles: 4
+        }),
+      getTotalFilesPerFilesReport: jest.fn()
+        .mockResolvedValue(67),
+      getErroredFiles: jest.fn()
+        .mockResolvedValue([]),
+      getPausesSum: jest.fn()
+        .mockResolvedValue(10000)
+    }
+
+    const result = await requestFilesProgress({
+      database,
+      info: {
+        downloadId: 'mock-download-id',
+        limit: 1,
+        offset: 20,
+        hideCompleted: false
+      }
+    })
+
+    expect(result).toEqual({
+      filesReport: {
+        files: [{
+          downloadId: 'mock-download-id',
+          filename: 'file1.png',
+          percent: 100,
+          receivedBytes: 24902726,
+          remainingTime: 0,
+          state: downloadStates.completed,
+          totalBytes: 24902726
+        }],
+        totalFiles: 67
+      },
+      headerReport: {
+        downloadLocation: '/mock/download/location/mock-download-id',
+        elapsedTime: 113000,
+        errors: {},
+        estimatedTotalTimeRemaining: 1391640.1264264206,
+        filesWithProgress: 7,
+        finishedFiles: 4,
+        id: 'mock-download-id',
+        percent: 8,
+        percentSum: 538,
+        receivedBytesSum: 123957815,
+        state: downloadStates.completed,
+        totalBytesSum: 159494477,
+        totalFiles: 67,
+        totalTime: 123000
+      }
+    })
+
+    expect(database.getFilesReport).toHaveBeenCalledTimes(1)
+    expect(database.getFilesReport).toHaveBeenCalledWith({
+      downloadId: 'mock-download-id',
+      hideCompleted: false,
+      limit: 1,
+      offset: 20
+    })
+
+    expect(database.getFilesHeaderReport).toHaveBeenCalledTimes(1)
+    expect(database.getFilesHeaderReport).toHaveBeenCalledWith('mock-download-id')
+
+    expect(database.getTotalFilesPerFilesReport).toHaveBeenCalledTimes(1)
+    expect(database.getTotalFilesPerFilesReport).toHaveBeenCalledWith({
+      downloadId: 'mock-download-id',
+      hideCompleted: false
     })
   })
 })

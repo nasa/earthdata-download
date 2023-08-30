@@ -13,7 +13,7 @@ const setup = (overrideProps = {}) => {
     shouldShowTime: true,
     state: downloadStates.active,
     totalFiles: 10,
-    totalTime: 234,
+    totalTime: 234000,
     ...overrideProps
   }
 

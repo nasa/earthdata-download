@@ -83,7 +83,7 @@ const DownloadListItemFileProgress = ({
                 done in
                 {' '}
                 {
-                  humanizeDuration(totalTime * 1000, {
+                  humanizeDuration(totalTime, {
                     largest: 2,
                     round: 1
                   })

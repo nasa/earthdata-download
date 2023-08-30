@@ -37,6 +37,21 @@ const restartDownload = async ({
   }
 
   if (downloadId && filename) {
+    const download = await database.getDownloadById(downloadId)
+    const { timeEnd } = download
+
+    // TODO If the download was previous completed, create a new pause from the previous timeEnd to now
+    if (timeEnd !== null) {
+      // If the download was previously finished, create a new pause from the previous `timeEnd` to now
+      await database.createPauseWith({
+        downloadId,
+        timeStart: timeEnd,
+        timeEnd: new Date().getTime()
+      })
+    }
+
+    await database.deletePausesByDownloadIdAndFilename(downloadId, filename)
+
     await database.updateFilesWhere({
       downloadId,
       filename
@@ -51,6 +66,9 @@ const restartDownload = async ({
   }
 
   if (downloadId && !filename) {
+    // TODO this should delete pauses for files, but not the download
+    await database.deleteAllPausesByDownloadId(downloadId)
+
     // Set the files to pending
     await database.updateFilesWhere({
       downloadId

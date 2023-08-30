@@ -53,8 +53,8 @@ const FileListItemTimeRemaining = ({
           shouldShowTime && (
             <>
               {
-                humanizeDuration(remainingTime * 1000, {
-                  largest: 1,
+                humanizeDuration(remainingTime, {
+                  largest: 2,
                   round: 1
                 })
               }

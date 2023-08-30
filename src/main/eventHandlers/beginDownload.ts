@@ -56,12 +56,9 @@ const beginDownload = async ({
 
   // Start downloading next available active downloads
   if (shouldStart) {
-    const [firstDownloadId] = downloadIds
-
     await startNextDownload({
       currentDownloadItems,
       database,
-      downloadId: firstDownloadId,
       downloadIdContext,
       webContents
     })

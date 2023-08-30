@@ -63,7 +63,6 @@ describe('beginDownload', () => {
     expect(startNextDownload).toHaveBeenCalledTimes(1)
     expect(startNextDownload).toHaveBeenCalledWith(
       expect.objectContaining({
-        downloadId: 'mock-id',
         downloadIdContext: {}
       })
     )
@@ -112,7 +111,6 @@ describe('beginDownload', () => {
     expect(startNextDownload).toHaveBeenCalledTimes(1)
     expect(startNextDownload).toHaveBeenCalledWith(
       expect.objectContaining({
-        downloadId: 'mock-id',
         downloadIdContext: {}
       })
     )

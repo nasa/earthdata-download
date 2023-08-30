@@ -19,6 +19,8 @@ const pauseDownloadItem = async ({
   currentDownloadItems.pauseItem(downloadId, filename)
 
   if (downloadId && filename) {
+    await database.createPauseByDownloadIdAndFilename(downloadId, filename)
+
     await database.updateFilesWhere({
       downloadId,
       filename
@@ -28,12 +30,16 @@ const pauseDownloadItem = async ({
   }
 
   if (downloadId && !filename) {
+    await database.createPauseByDownloadId(downloadId)
+
     await database.updateDownloadById(downloadId, {
       state: downloadStates.paused
     })
   }
 
   if (!downloadId) {
+    await database.createPauseForAllActiveDownloads()
+
     await database.updateDownloadsWhereIn([
       'state',
       [downloadStates.active, downloadStates.pending]

@@ -230,8 +230,8 @@ describe('FileDownloadsHeader component', () => {
         headerReport: {
           ...headerReport,
           percent: 42,
-          elapsedTime: 234,
-          estimatedTotalTimeRemaining: 123,
+          elapsedTime: 234000,
+          estimatedTotalTimeRemaining: 123000,
           state: downloadStates.paused
         }
       })
@@ -239,8 +239,8 @@ describe('FileDownloadsHeader component', () => {
       expect(screen.getByText('Paused')).toHaveClass('status')
       expect(screen.getByText('42%')).toHaveClass('statusPercent')
 
-      expect(screen.getByText('0 of 1 files completed in 4 minutes')).toHaveClass('progressFiles')
-      expect(screen.getByText('2 minutes remaining')).toHaveClass('progressRemaining')
+      expect(screen.getByText('0 of 1 files completed in 3 minutes, 54 seconds')).toHaveClass('progressFiles')
+      expect(screen.getByText('2 minutes, 3 seconds remaining')).toHaveClass('progressRemaining')
 
       expect(screen.queryByRole('button', { name: 'Pause All' })).not.toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Resume All' })).toBeInTheDocument()

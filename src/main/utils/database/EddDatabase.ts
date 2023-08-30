@@ -30,7 +30,9 @@ class EddDatabase {
    * Returns the preferences.
    */
   async getPreferences() {
-    return this.db('preferences').where({ id: this.preferencesId }).first()
+    return this.db('preferences')
+      .where({ id: this.preferencesId })
+      .first()
   }
 
   /**
@@ -38,7 +40,10 @@ class EddDatabase {
    * @param {Object} field specified preferences field to be retrieved
    */
   async getPreferencesByField(field) {
-    const preferences = await this.db('preferences').where({ id: this.preferencesId }).first().select(field)
+    const preferences = await this.db('preferences')
+      .where({ id: this.preferencesId })
+      .first()
+      .select(field)
     const { [field]: fieldValue } = preferences
 
     return fieldValue
@@ -55,11 +60,16 @@ class EddDatabase {
   /* Token */
 
   async getToken() {
-    return this.db('token').where({ id: this.tokenId }).first()
+    return this.db('token')
+      .where({ id: this.tokenId })
+      .first()
   }
 
   async setToken(token) {
-    return this.db('token').update({ token }).where({ id: this.tokenId }).returning()
+    return this.db('token')
+      .update({ token })
+      .where({ id: this.tokenId })
+      .returning()
   }
 
   /* Downloads */
@@ -78,7 +88,10 @@ class EddDatabase {
    * @param {String} downloadId downloadId for download.
    */
   async getDownloadById(downloadId) {
-    return this.db('downloads').select().where({ id: downloadId }).first()
+    return this.db('downloads')
+      .select()
+      .where({ id: downloadId })
+      .first()
   }
 
   /**
@@ -86,7 +99,9 @@ class EddDatabase {
    * @param {Object} where Knex `where` object to select downloads.
    */
   async getDownloadsWhere(where) {
-    return this.db('downloads').select('id', 'getLinksToken', 'getLinksUrl').where(where)
+    return this.db('downloads')
+      .select('id', 'getLinksToken', 'getLinksUrl')
+      .where(where)
   }
 
   /**
@@ -95,10 +110,11 @@ class EddDatabase {
    * @param {Object} data The data of the download to be inserted.
    */
   async createDownload(downloadId, data) {
-    return this.db('downloads').insert({
-      id: downloadId,
-      ...data
-    })
+    return this.db('downloads')
+      .insert({
+        id: downloadId,
+        ...data
+      })
   }
 
   /**
@@ -107,7 +123,9 @@ class EddDatabase {
    * @param {Object} data The data of the download to be updated.
    */
   async updateDownloadById(downloadId, data) {
-    return this.db('downloads').update(data).where({ id: downloadId })
+    return this.db('downloads')
+      .update(data)
+      .where({ id: downloadId })
   }
 
   /**
@@ -116,7 +134,9 @@ class EddDatabase {
    * @param {Object} data The data of the download to be updated.
    */
   async updateDownloadsWhereIn(whereIn, data) {
-    return this.db('downloads').update(data).whereIn(...whereIn)
+    return this.db('downloads')
+      .update(data)
+      .whereIn(...whereIn)
   }
 
   /**
@@ -126,7 +146,10 @@ class EddDatabase {
    * @param {Object} data The data of the download to be updated.
    */
   async updateFilesWhereAndWhereNot(where, whereNot, data) {
-    return this.db('files').update(data).where(where).whereNot(whereNot)
+    return this.db('files')
+      .update(data)
+      .where(where)
+      .whereNot(whereNot)
   }
 
   /**
@@ -134,9 +157,13 @@ class EddDatabase {
    * @param {String} downloadId ID of download to delete.
    */
   async deleteDownloadById(downloadId) {
-    await this.db('files').delete().where({ downloadId })
+    await this.db('files')
+      .delete()
+      .where({ downloadId })
 
-    return this.db('downloads').delete().where({ id: downloadId })
+    return this.db('downloads')
+      .delete()
+      .where({ id: downloadId })
   }
 
   /**
@@ -144,6 +171,8 @@ class EddDatabase {
    */
   async deleteAllDownloads() {
     await this.db('files').delete()
+
+    await this.db('pauses').delete()
 
     return this.db('downloads').delete()
   }
@@ -160,18 +189,19 @@ class EddDatabase {
     const chunks = chunk(links, 100)
 
     const promises = chunks.map(async (linkChunk) => {
-      await this.db('files').insert(linkChunk.map((url) => {
-        const filename = url.split('/').pop()
+      await this.db('files')
+        .insert(linkChunk.map((url) => {
+          const filename = url.split('/').pop()
 
-        return {
-          createdAt: new Date().getTime(),
-          downloadId,
-          filename,
-          percent: 0,
-          state: downloadStates.pending,
-          url
-        }
-      }))
+          return {
+            createdAt: new Date().getTime(),
+            downloadId,
+            filename,
+            percent: 0,
+            state: downloadStates.pending,
+            url
+          }
+        }))
     })
 
     await Promise.all(promises)
@@ -182,7 +212,10 @@ class EddDatabase {
    * @param {Object} where Knex `where` object to select downloads.
    */
   async getFileWhere(where) {
-    return this.db('files').select().where(where).first()
+    return this.db('files')
+      .select()
+      .where(where)
+      .first()
   }
 
   /**
@@ -244,7 +277,9 @@ class EddDatabase {
    * @param {Object} where Knex `where` object to select downloads.
    */
   async getFileCountWhere(where) {
-    const [result] = await this.db('files').count('id').where(where)
+    const [result] = await this.db('files')
+      .count('id')
+      .where(where)
 
     const { 'count(`id`)': number } = result
 
@@ -259,7 +294,11 @@ class EddDatabase {
     const [result] = await this.db('files')
       .count('id')
       .where({ downloadId })
-      .whereNotIn('state', [downloadStates.completed, downloadStates.cancelled])
+      .whereNotIn('state', [
+        downloadStates.completed,
+        downloadStates.cancelled,
+        downloadStates.error
+      ])
 
     const { 'count(`id`)': number } = result
 
@@ -287,6 +326,195 @@ class EddDatabase {
       .update(data)
       .where(where)
   }
+
+  /** Pauses */
+
+  /**
+   * Creates a new pause row for a file based on the downloadId and filename.
+   * @param {String} downloadId Download ID of the file to create a pause.
+   * @param {String} filename Filename of the file to create a pause.
+   */
+  async createPauseByDownloadIdAndFilename(downloadId, filename) {
+    const { id: fileId } = await this.db('files')
+      .select('id')
+      .where({
+        downloadId,
+        filename
+      })
+      .first()
+
+    const data = {
+      downloadId,
+      fileID: fileId,
+      timeStart: new Date().getTime()
+    }
+
+    return this.db('pauses')
+      .insert(data)
+  }
+
+  /**
+   * Creates a new pause row for all active files of the provided downloadId.
+   * @param {String} downloadId Download ID of the file to create a pause.
+   */
+  async createPauseByDownloadId(downloadId) {
+    const files = await this.db('files')
+      .select('id')
+      .where({
+        downloadId,
+        state: downloadStates.active
+      })
+
+    const timeStart = new Date().getTime()
+    const data = files.map((file) => ({
+      downloadId,
+      fileId: file.id,
+      timeStart
+    }))
+    data.push({
+      downloadId,
+      timeStart
+    })
+
+    return this.db('pauses')
+      .insert(data)
+  }
+
+  /**
+   * Creates a new pause row for all active files and downloads.
+   */
+  async createPauseForAllActiveDownloads() {
+    const files = await this.db('files')
+      .select('id', 'downloadId')
+      .where({
+        state: downloadStates.active
+      })
+
+    const timeStart = new Date().getTime()
+    const filesData = files.map((file) => ({
+      downloadId: file.downloadId,
+      fileId: file.id,
+      timeStart
+    }))
+
+    const downloads = await this.db('downloads')
+      .select('id')
+      .where({
+        state: downloadStates.active
+      })
+    const downloadsData = downloads.map((download) => ({
+      downloadId: download.id,
+      timeStart
+    }))
+
+    const data = [
+      ...filesData,
+      ...downloadsData
+    ]
+
+    if (!data.length) return null
+
+    return this.db('pauses')
+      .insert(data)
+  }
+
+  /**
+   * Creates a new pause row with the provided data.
+   * @param {Object} data Data to be inserted into the pause table.
+   */
+  async createPauseWith(data) {
+    return this.db('pauses')
+      .insert(data)
+  }
+
+  /**
+   * Sets the timeEnd column for any pause rows without a timeEnd that matches the downloadId or filename.
+   * @param {String} downloadId Download ID of the file to end a pause.
+   * @param {String} filename Filename of the file to end a pause.
+   */
+  async endPause(downloadId, filename) {
+    const where = {
+      downloadId,
+      timeEnd: null
+    }
+
+    if (filename) {
+      where.fileID = this.db.raw(`SELECT id FROM files WHERE downloadId = ${downloadId} AND filename = ${filename};`)
+    }
+
+    return this.db('pauses')
+      .update({
+        timeEnd: new Date().getTime()
+      })
+      .where(where)
+  }
+
+  /**
+   * Returns the sum of the pause rows for the downloadId where the fileId is null.
+   * @param {String} downloadId Download ID of the file to end a pause.
+   */
+  async getPausesSum(downloadId) {
+    const where = {
+      downloadId
+    }
+
+    const result = await this.db('pauses')
+      .sum({
+        pausesSum: this.db.raw('IFNULL(`pauses`.`timeEnd`, UNIXEPOCH() * 1000.0) - `pauses`.`timeStart`')
+      })
+      .where(where)
+      .whereNull('fileId')
+      .first()
+
+    const { pausesSum } = result
+
+    return pausesSum
+  }
+
+  /**
+   * Deletes the pause rows for a file that matches the provided downloadId and filename.
+   * @param {String} downloadId Download ID of the file to delete pauses.
+   * @param {String} filename Filename of the file to delete pauses.
+   */
+  async deletePausesByDownloadIdAndFilename(downloadId, filename) {
+    const { id: fileId } = await this.db('files')
+      .select('id')
+      .where({
+        downloadId,
+        filename
+      })
+      .first()
+
+    return this.db('pauses')
+      .delete()
+      .where({
+        downloadId,
+        fileId
+      })
+  }
+
+  /**
+   * Deletes the pause rows for every pause that includes the provided downloadId.
+   * @param {String} downloadId Download ID of the file to delete pauses.
+   */
+  async deleteAllPausesByDownloadId(downloadId) {
+    return this.db('pauses')
+      .delete()
+      .where({ downloadId })
+  }
+
+  /**
+   * Deletes the pause rows for all file that match the provided downloadId.
+   * @param {String} downloadId Download ID of the file to delete pauses.
+   */
+  async deleteFilePausesByDownloadId(downloadId) {
+    return this.db('pauses')
+      .delete()
+      .where({ downloadId })
+      .whereNotNull('fileId')
+  }
+
+  /** Reports */
 
   /**
    * Returns the files progress for the given downloadId
@@ -334,12 +562,15 @@ class EddDatabase {
         'files.receivedBytes',
         'files.totalBytes',
         // Return the `remainingTime` with this formula:
-        // (Time Taken / `receivedBytes`) * remainingBytes / 1000
-        this.db.raw('((((UNIXEPOCH() * 1000.0) - timeStart) / receivedBytes) * (totalBytes - receivedBytes)) / 1000 as remainingTime')
+        // (timeTaken / `receivedBytes`) * remainingBytes / 1000
+        // `timeTaken` is (`timeEnd` (default to now) - timeStart) - the sum of the pause rows for the file
+        this.db.raw('(((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime')
       )
+      .fullOuterJoin('pauses', 'files.id', '=', 'pauses.fileId')
       .where({
-        downloadId
+        'files.downloadId': downloadId
       })
+      .groupBy('files.id')
 
     if (hideCompleted) {
       query = query.whereNot({
@@ -388,15 +619,13 @@ class EddDatabase {
    * @param {String} downloadId Download ID of the files to report
    */
   async getFilesHeaderReport(downloadId) {
-    const [result] = await this.db('files')
+    const query = this.db('files')
       .select(
         'downloads.id',
         'downloads.downloadLocation',
         'downloads.loadingMoreFiles',
         'downloads.state',
-        'downloads.createdAt',
-        'downloads.timeEnd',
-        'downloads.timeStart'
+        this.db.raw('(IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime')
       )
       .sum({
         // Return the sum of the `percent` column as `percentSum`
@@ -416,8 +645,10 @@ class EddDatabase {
       })
       .join('downloads', { 'files.downloadId': 'downloads.id' })
       .where({
-        downloadId
+        'files.downloadId': downloadId
       })
+
+    const [result] = await query
 
     return result
   }
@@ -430,12 +661,10 @@ class EddDatabase {
   async getDownloadsReport(limit, offset) {
     return this.db('downloads')
       .select(
-        'downloads.createdAt',
         'downloads.id',
         'downloads.loadingMoreFiles',
         'downloads.state',
-        'downloads.timeEnd',
-        'downloads.timeStart'
+        this.db.raw('(IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime')
       )
       .limit(limit)
       .offset(offset)

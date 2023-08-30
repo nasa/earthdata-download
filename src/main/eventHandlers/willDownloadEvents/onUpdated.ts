@@ -47,6 +47,8 @@ const onUpdated = async ({
   }
 
   if (state === 'interrupted') {
+    await database.createPauseByDownloadId(downloadId)
+
     // Update the database if the state has updated to interrupted
     await database.updateFileById(fileId, {
       state: downloadStates.interrupted,

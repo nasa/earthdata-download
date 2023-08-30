@@ -116,8 +116,8 @@ const FileDownloadsHeader = ({
     fileProgressMessage += ` of ${commafy(totalFiles)}`
   }
 
-  fileProgressMessage += ` files completed in ${humanizeDuration(elapsedTime * 1000, {
-    largest: 1,
+  fileProgressMessage += ` files completed in ${humanizeDuration(elapsedTime, {
+    largest: 2,
     round: true
   })}`
 
@@ -125,8 +125,8 @@ const FileDownloadsHeader = ({
     fileProgressMessage += ' (determining file count)'
   }
 
-  const remainingTimeMessage = `${humanizeDuration(estimatedTotalTimeRemaining * 1000, {
-    largest: 1,
+  const remainingTimeMessage = `${humanizeDuration(estimatedTotalTimeRemaining, {
+    largest: 2,
     round: true
   })} remaining`
 

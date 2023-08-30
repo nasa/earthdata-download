@@ -512,8 +512,10 @@ describe('setupEventListeners', () => {
   describe('resumeDownloadItem', () => {
     test('calls resumeDownloadItem', () => {
       const {
+        appWindow,
         currentDownloadItems,
-        database
+        database,
+        downloadIdContext
       } = setup()
 
       const event = {}
@@ -525,7 +527,9 @@ describe('setupEventListeners', () => {
       expect(resumeDownloadItem).toHaveBeenCalledWith({
         currentDownloadItems,
         database,
-        info
+        downloadIdContext,
+        info,
+        webContents: appWindow.webContents
       })
     })
   })

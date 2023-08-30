@@ -19,39 +19,43 @@ const retryErroredDownloadItem = async ({
   info,
   webContents
 }) => {
-  const { downloadId, filename } = info
+  const { downloadId } = info
 
-  if (downloadId && filename) {
-    // Set the file to pending, and call startNextDownload
-    await database.updateFilesWhere({
+  // Retry all the errored files in a download.
+  const download = await database.getDownloadById(downloadId)
+  const { timeEnd } = download
+
+  if (timeEnd !== null) {
+    // If the download was previously finished, create a new pause from the previous `timeEnd` to now
+    await database.createPauseWith({
       downloadId,
-      filename
-    }, {
-      state: downloadStates.pending,
-      percent: 0,
-      timeStart: null,
-      timeEnd: null,
-      errors: null,
-      receivedBytes: null,
-      totalBytes: null
+      timeStart: timeEnd,
+      timeEnd: new Date().getTime()
     })
   }
 
-  if (downloadId && !filename) {
-    // Retry all errored files for downloadId
-    await database.updateFilesWhere({
-      downloadId,
-      state: downloadStates.error
-    }, {
-      state: downloadStates.pending,
-      percent: 0,
-      timeStart: null,
-      timeEnd: null,
-      errors: null,
-      receivedBytes: null,
-      totalBytes: null
-    })
-  }
+  await database.deleteFilePausesByDownloadId(downloadId)
+
+  // Retry all errored files for downloadId
+  await database.updateFilesWhere({
+    downloadId,
+    state: downloadStates.error
+  }, {
+    state: downloadStates.pending,
+    percent: 0,
+    timeStart: null,
+    timeEnd: null,
+    errors: null,
+    receivedBytes: null,
+    totalBytes: null
+  })
+
+  // Set the download to active
+  await database.updateDownloadById(downloadId, {
+    state: downloadStates.active,
+    timeEnd: null,
+    errors: null
+  })
 
   await startNextDownload({
     currentDownloadItems,

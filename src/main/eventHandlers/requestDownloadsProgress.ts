@@ -29,12 +29,10 @@ const requestDownloadsProgress = async ({
 
   const promises = downloads.map(async (download) => {
     const {
-      createdAt,
       id: downloadId,
       loadingMoreFiles,
       state,
-      timeEnd,
-      timeStart
+      totalTime
     } = download
 
     const {
@@ -43,6 +41,8 @@ const requestDownloadsProgress = async ({
       finishedFiles
     } = await database.getDownloadReport(downloadId)
 
+    const pausesSum = await database.getPausesSum(downloadId)
+
     let percent = 0
 
     if (totalFiles > 0) {
@@ -50,17 +50,11 @@ const requestDownloadsProgress = async ({
       percent = Math.round((percentSum / totalFiles) * 10) / 10
     }
 
-    const now = new Date().getTime()
-
-    const lastTime = timeEnd || now
-
-    const totalTime = Math.ceil((lastTime - (timeStart || createdAt)) / 1000)
-
     const progress = {
       percent,
       finishedFiles,
       totalFiles,
-      totalTime
+      totalTime: totalTime - pausesSum
     }
 
     return {

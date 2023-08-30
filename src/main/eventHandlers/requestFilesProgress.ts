@@ -28,15 +28,15 @@ const requestFilesProgress = async ({
   const headerReport = await database.getFilesHeaderReport(downloadId)
 
   const {
-    createdAt,
     filesWithProgress,
     percentSum,
     receivedBytesSum,
-    timeEnd,
-    timeStart,
+    totalTime,
     totalBytesSum,
     totalFiles
   } = headerReport
+
+  const pausesSum = await database.getPausesSum(downloadId)
 
   let percent = 0
 
@@ -45,9 +45,7 @@ const requestFilesProgress = async ({
     percent = Math.round((percentSum / totalFiles) * 10) / 10
   }
 
-  const now = new Date().getTime()
-  const lastTime = timeEnd || now
-  const elapsedTime = Math.ceil((lastTime - (timeStart || createdAt)) / 1000)
+  const elapsedTime = totalTime - pausesSum
 
   const averageSizePerFile = totalBytesSum / filesWithProgress
   const estimatedTotalSize = averageSizePerFile * totalFiles

@@ -16,7 +16,10 @@ describe('pauseDownloadItem', () => {
       const database = {
         updateDownloadById: jest.fn(),
         updateDownloadsWhereIn: jest.fn(),
-        updateFilesWhere: jest.fn()
+        updateFilesWhere: jest.fn(),
+        createPauseByDownloadIdAndFilename: jest.fn(),
+        createPauseByDownloadId: jest.fn(),
+        createPauseForAllActiveDownloads: jest.fn()
       }
 
       await pauseDownloadItem({
@@ -35,6 +38,12 @@ describe('pauseDownloadItem', () => {
         filename: 'mock-filename.png'
       }, { state: downloadStates.paused })
 
+      expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(1)
+      expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
+
+      expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(0)
+      expect(database.createPauseForAllActiveDownloads).toHaveBeenCalledTimes(0)
+
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(0)
     })
@@ -50,7 +59,11 @@ describe('pauseDownloadItem', () => {
       }
       const database = {
         updateDownloadById: jest.fn(),
-        updateDownloadsWhereIn: jest.fn()
+        updateDownloadsWhereIn: jest.fn(),
+        updateFilesWhere: jest.fn(),
+        createPauseByDownloadIdAndFilename: jest.fn(),
+        createPauseByDownloadId: jest.fn(),
+        createPauseForAllActiveDownloads: jest.fn()
       }
 
       await pauseDownloadItem({
@@ -62,9 +75,16 @@ describe('pauseDownloadItem', () => {
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
+      expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
+      expect(database.createPauseForAllActiveDownloads).toHaveBeenCalledTimes(0)
+
+      expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(1)
+      expect(database.createPauseByDownloadId).toHaveBeenCalledWith('mock-download-id')
+
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: downloadStates.paused })
 
+      expect(database.updateFilesWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(0)
     })
   })
@@ -77,7 +97,11 @@ describe('pauseDownloadItem', () => {
       const info = {}
       const database = {
         updateDownloadById: jest.fn(),
-        updateDownloadsWhereIn: jest.fn()
+        updateDownloadsWhereIn: jest.fn(),
+        updateFilesWhere: jest.fn(),
+        createPauseByDownloadIdAndFilename: jest.fn(),
+        createPauseByDownloadId: jest.fn(),
+        createPauseForAllActiveDownloads: jest.fn()
       }
 
       await pauseDownloadItem({
@@ -89,6 +113,13 @@ describe('pauseDownloadItem', () => {
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith(undefined, undefined)
 
+      expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
+      expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(0)
+
+      expect(database.createPauseForAllActiveDownloads).toHaveBeenCalledTimes(1)
+      expect(database.createPauseForAllActiveDownloads).toHaveBeenCalledWith()
+
+      expect(database.updateFilesWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(1)

@@ -3,6 +3,7 @@
 import 'array-foreach-async'
 
 import downloadStates from '../../app/constants/downloadStates'
+import startNextDownload from '../utils/startNextDownload'
 
 /**
  * Resumes a download and updates the database
@@ -14,13 +15,17 @@ import downloadStates from '../../app/constants/downloadStates'
 const resumeDownloadItem = async ({
   currentDownloadItems,
   database,
-  info
+  downloadIdContext,
+  info,
+  webContents
 }) => {
   const { downloadId, filename } = info
 
   currentDownloadItems.resumeItem(downloadId, filename)
 
   if (downloadId && filename) {
+    await database.endPause(downloadId, filename)
+
     await database.updateFilesWhere({
       downloadId,
       filename
@@ -30,6 +35,8 @@ const resumeDownloadItem = async ({
   }
 
   if (downloadId && !filename) {
+    await database.endPause(downloadId)
+
     const numberFiles = await database.getFileCountWhere({ downloadId })
 
     // If files exist, put the item into active
@@ -49,6 +56,8 @@ const resumeDownloadItem = async ({
     await downloads.forEachAsync(async (download) => {
       const { id, state } = download
 
+      await database.endPause(id)
+
       const numberFiles = await database.getFileCountWhere({ downloadId: id })
 
       // Default to the current state value
@@ -64,6 +73,14 @@ const resumeDownloadItem = async ({
       })
     })
   }
+
+  // If no downloads were paused, call startNextDownload to start pending files
+  await startNextDownload({
+    currentDownloadItems,
+    database,
+    downloadIdContext,
+    webContents
+  })
 }
 
 export default resumeDownloadItem

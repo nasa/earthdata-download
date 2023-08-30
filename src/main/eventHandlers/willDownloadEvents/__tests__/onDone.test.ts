@@ -73,7 +73,6 @@ describe('onDone', () => {
     expect(startNextDownload).toHaveBeenCalledWith({
       currentDownloadItems,
       database,
-      downloadId: 'mock-download-id',
       downloadIdContext: {},
       webContents: {}
     })
@@ -133,7 +132,6 @@ describe('onDone', () => {
     expect(startNextDownload).toHaveBeenCalledWith({
       currentDownloadItems,
       database,
-      downloadId: 'mock-download-id',
       downloadIdContext: {},
       webContents: {}
     })
@@ -195,7 +193,6 @@ describe('onDone', () => {
     expect(startNextDownload).toHaveBeenCalledTimes(1)
     expect(startNextDownload).toHaveBeenCalledWith({
       currentDownloadItems,
-      downloadId: 'mock-download-id',
       downloadIdContext: {},
       database,
       webContents: {}

@@ -194,8 +194,6 @@ const DownloadListItem = ({
     ]
   ]
 
-  // TODO generate more info component here and pass in like primary/secondary
-
   return (
     <DownloadItem
       actionsList={actionsList}
@@ -254,7 +252,6 @@ DownloadListItem.propTypes = {
   download: PropTypes.shape({
     downloadId: PropTypes.string,
     numberErrors: PropTypes.number,
-    hasErrors: PropTypes.bool,
     loadingMoreFiles: PropTypes.bool,
     progress: PropTypes.shape({
       percent: PropTypes.number,

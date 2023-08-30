@@ -138,6 +138,24 @@ describe('FileListItem component', () => {
 
       expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
     })
+
+    describe('when the file errored', () => {
+      test('calls restartDownload and deleteAllToastsById', async () => {
+        const { deleteAllToastsById, cancelDownloadItem } = setup({
+          file: {
+            ...file,
+            state: downloadStates.error
+          }
+        })
+
+        const button = screen.getByText('Cancel File')
+        await userEvent.click(button)
+
+        expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+      })
+    })
   })
 
   describe('when clicking `Open File`', () => {

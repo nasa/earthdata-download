@@ -17,6 +17,7 @@ import * as styles from './MoreErrorInfo.module.scss'
  * @typedef {Object} MoreErrorInfoProps
  * @property {String} [downloadId] A string representing the id of a download.
  * @property {Number} [numberErrors] The number of errors associated with the Dialog.
+ * @property {String} state The state of the download.
  * @property {Function} setCurrentPage A function which sets the active page.
  * @property {Function} setSelectedDownloadId A function to set the selectedDownloadId.
  * @property {Function} onCloseMoreErrorInfoDialog A function which sets the dialog state.
@@ -71,7 +72,7 @@ const MoreErrorInfo = ({
   if (state === downloadStates.errorFetchingLinks) {
     return (
       <div className={styles.message}>
-        This error failed to find download links.
+        This download failed to find download links.
         Try creating a new download to download your files.
       </div>
     )

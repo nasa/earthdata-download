@@ -67,7 +67,7 @@ describe('MoreErrorInfo component', () => {
       })
 
       expect(screen.getByText(
-        'This error failed to find download links. Try creating a new download to download your files.'
+        'This download failed to find download links. Try creating a new download to download your files.'
       )).toBeInTheDocument()
     })
   })

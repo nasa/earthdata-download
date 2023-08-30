@@ -93,10 +93,16 @@ const FileListItem = ({
         isActive: shouldShowCancel,
         isPrimary: !isComplete,
         variant: 'danger',
-        callback: () => cancelDownloadItem({
-          downloadId,
-          filename
-        }),
+        callback: () => {
+          cancelDownloadItem({
+            downloadId,
+            filename
+          })
+
+          if (hasError) {
+            deleteAllToastsById(downloadId)
+          }
+        },
         icon: FaBan
       }
     ],

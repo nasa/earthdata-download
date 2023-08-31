@@ -179,7 +179,7 @@ const DownloadItem = ({
       }
       data-testid="download-item"
     >
-      {/* TODO EDD-39 Move these layouts to dialog */}
+      {/* TODO Refactor: Move these dialogs to Layout */}
       {
         !isFile && (
           <>

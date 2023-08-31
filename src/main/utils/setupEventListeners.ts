@@ -7,17 +7,20 @@ import {
   shell
 } from 'electron'
 
+import beforeQuit from '../eventHandlers/beforeQuit'
 import beginDownload from '../eventHandlers/beginDownload'
 import cancelDownloadItem from '../eventHandlers/cancelDownloadItem'
 import cancelErroredDownloadItem from '../eventHandlers/cancelErroredDownloadItem'
 import chooseDownloadLocation from '../eventHandlers/chooseDownloadLocation'
 import copyDownloadPath from '../eventHandlers/copyDownloadPath'
+import deleteDownload from '../eventHandlers/deleteDownload'
 import getPreferenceFieldValue from '../eventHandlers/getPreferenceFieldValue'
 import openDownloadFolder from '../eventHandlers/openDownloadFolder'
 import pauseDownloadItem from '../eventHandlers/pauseDownloadItem'
+import requestDownloadsProgress from '../eventHandlers/requestDownloadsProgress'
+import requestFilesProgress from '../eventHandlers/requestFilesProgress'
 import restartDownload from '../eventHandlers/restartDownload'
 import resumeDownloadItem from '../eventHandlers/resumeDownloadItem'
-import deleteDownload from '../eventHandlers/deleteDownload'
 import retryErroredDownloadItem from '../eventHandlers/retryErroredDownloadItem'
 import sendToEula from '../eventHandlers/sendToEula'
 import sendToLogin from '../eventHandlers/sendToLogin'
@@ -26,8 +29,7 @@ import willDownload from '../eventHandlers/willDownload'
 
 import startPendingDownloads from '../utils/startPendingDownloads'
 
-import requestFilesProgress from '../eventHandlers/requestFilesProgress'
-import requestDownloadsProgress from '../eventHandlers/requestDownloadsProgress'
+import didFinishLoad from '../eventHandlers/didFinishLoad'
 
 /**
  * Sets up event listeners for the main process
@@ -353,23 +355,26 @@ const setupEventListeners = ({
 
   // When the application finished loading, show the appWindow
   appWindow.webContents.once('did-finish-load', async () => {
-    // Show the electron appWindow
-    appWindow.show()
+    await didFinishLoad({
+      appWindow,
+      autoUpdater,
+      database,
+      setUpdateAvailable
+    })
+  })
 
-    // Open the DevTools if running in development.
-    if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })
+  // When the application is about to quit
+  app.on('before-quit', async (event) => {
+    // If we are in dev mode, don't worry about quitting with running downloads
+    if (!app.isPackaged) return
 
-    await autoUpdater.checkForUpdates()
+    const keepOpen = await beforeQuit({
+      currentDownloadItems
+    })
 
-    // Locally, start pending downloads unless `forceDevUpdateConfig` is enabled
-    if (!app.isPackaged && !autoUpdater.forceDevUpdateConfig) {
-      setUpdateAvailable(false)
-
-      // Start any pending downloads
-      await startPendingDownloads({
-        appWindow,
-        database
-      })
+    if (keepOpen) {
+      // Don't quit the application
+      event.preventDefault()
     }
   })
 

@@ -7,11 +7,14 @@ import {
 } from 'electron'
 
 import setupEventListeners from '../setupEventListeners'
+
+import beforeQuit from '../../eventHandlers/beforeQuit'
 import beginDownload from '../../eventHandlers/beginDownload'
 import cancelDownloadItem from '../../eventHandlers/cancelDownloadItem'
 import cancelErroredDownloadItem from '../../eventHandlers/cancelErroredDownloadItem'
 import chooseDownloadLocation from '../../eventHandlers/chooseDownloadLocation'
 import copyDownloadPath from '../../eventHandlers/copyDownloadPath'
+import didFinishLoad from '../../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../../eventHandlers/getPreferenceFieldValue'
 import openDownloadFolder from '../../eventHandlers/openDownloadFolder'
 import pauseDownloadItem from '../../eventHandlers/pauseDownloadItem'
@@ -27,11 +30,21 @@ import startPendingDownloads from '../../utils/startPendingDownloads'
 import requestFilesProgress from '../../eventHandlers/requestFilesProgress'
 import requestDownloadsProgress from '../../eventHandlers/requestDownloadsProgress'
 
+jest.mock('../../eventHandlers/beforeQuit', () => ({
+  __esModule: true,
+  default: jest.fn()
+    // `when beforeQuit returns true`
+    .mockResolvedValueOnce(true)
+    // `when beforeQuit returns false`
+    .mockResolvedValueOnce(false)
+}))
+
 jest.mock('../../eventHandlers/beginDownload')
 jest.mock('../../eventHandlers/cancelDownloadItem')
 jest.mock('../../eventHandlers/cancelErroredDownloadItem')
 jest.mock('../../eventHandlers/chooseDownloadLocation')
 jest.mock('../../eventHandlers/copyDownloadPath')
+jest.mock('../../eventHandlers/didFinishLoad')
 jest.mock('../../eventHandlers/getPreferenceFieldValue', () => ({
   __esModule: true,
   default: jest.fn().mockResolvedValue('mock getPreferenceFieldValue')
@@ -79,6 +92,12 @@ jest.mock(
       showMessageBoxSync: jest.fn()
     }
     const mockApp = {
+      on: (channel, callback) => {
+        channels[channel] = callback
+      },
+      send: (channel, data) => {
+        channels[channel](data)
+      },
       isPackaged: false
     }
     const mockShell = {
@@ -140,7 +159,10 @@ const setup = (overrideAppWindow) => {
     forceDevUpdateConfig: false
   }
   const currentDownloadItems = {}
-  const database = {}
+  const database = {
+    updateFilesWhere: jest.fn(),
+    updateDownloadsWhereIn: jest.fn()
+  }
   const downloadIdContext = {}
   const downloadsWaitingForAuth = {}
   const downloadsWaitingForEula = {}
@@ -795,51 +817,74 @@ describe('setupEventListeners', () => {
   })
 
   describe('did-finish-load', () => {
+    test('calls didFinishLoad', async () => {
+      const {
+        appWindow,
+        autoUpdater,
+        database,
+        setUpdateAvailable
+      } = setup()
+
+      await appWindow.webContents.send('did-finish-load')
+
+      expect(didFinishLoad).toHaveBeenCalledTimes(1)
+      expect(didFinishLoad).toHaveBeenCalledWith({
+        appWindow,
+        autoUpdater,
+        database,
+        setUpdateAvailable
+      })
+    })
+  })
+
+  describe('before-quit', () => {
     describe('when the app is not packaged', () => {
-      test('opens the app window', async () => {
-        const {
-          appWindow,
-          autoUpdater,
-          database,
-          setUpdateAvailable
-        } = setup()
+      test('does not call beforeQuit', async () => {
+        app.isPackaged = false
+        setup()
 
-        await appWindow.webContents.send('did-finish-load')
+        await app.send('before-quit')
 
-        expect(appWindow.show).toHaveBeenCalledTimes(1)
-        expect(autoUpdater.checkForUpdates).toHaveBeenCalledTimes(1)
-
-        expect(appWindow.webContents.openDevTools).toHaveBeenCalledTimes(1)
-        expect(appWindow.webContents.openDevTools).toHaveBeenCalledWith({ mode: 'detach' })
-
-        expect(setUpdateAvailable).toHaveBeenCalledTimes(1)
-        expect(setUpdateAvailable).toHaveBeenCalledWith(false)
-
-        expect(startPendingDownloads).toHaveBeenCalledTimes(1)
-        expect(startPendingDownloads).toHaveBeenCalledWith({
-          appWindow,
-          database
-        })
+        expect(beforeQuit).toHaveBeenCalledTimes(0)
       })
     })
 
     describe('when the app is packaged', () => {
-      test('opens the app window', async () => {
-        app.isPackaged = true
-        const {
-          appWindow,
-          autoUpdater,
-          setUpdateAvailable
-        } = setup()
+      describe('when beforeQuit returns true', () => {
+        test('calls event.preventDefault', async () => {
+          app.isPackaged = true
+          beforeQuit.mockResolvedValue(true)
+          const {
+            currentDownloadItems
+          } = setup()
 
-        await appWindow.webContents.send('did-finish-load')
+          const preventDefault = jest.fn()
 
-        expect(appWindow.show).toHaveBeenCalledTimes(1)
-        expect(autoUpdater.checkForUpdates).toHaveBeenCalledTimes(1)
+          await app.send('before-quit', { preventDefault })
 
-        expect(appWindow.webContents.openDevTools).toHaveBeenCalledTimes(0)
-        expect(setUpdateAvailable).toHaveBeenCalledTimes(0)
-        expect(startPendingDownloads).toHaveBeenCalledTimes(0)
+          expect(beforeQuit).toHaveBeenCalledTimes(1)
+          expect(beforeQuit).toHaveBeenCalledWith({ currentDownloadItems })
+
+          expect(preventDefault).toHaveBeenCalledTimes(1)
+        })
+      })
+
+      describe('when beforeQuit returns false', () => {
+        test('does not call event.preventDefault', async () => {
+          app.isPackaged = true
+          const {
+            currentDownloadItems
+          } = setup()
+
+          const preventDefault = jest.fn()
+
+          await app.send('before-quit', { preventDefault })
+
+          expect(beforeQuit).toHaveBeenCalledTimes(1)
+          expect(beforeQuit).toHaveBeenCalledWith({ currentDownloadItems })
+
+          expect(preventDefault).toHaveBeenCalledTimes(0)
+        })
       })
     })
   })

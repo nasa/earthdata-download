@@ -562,8 +562,8 @@ class EddDatabase {
         'files.receivedBytes',
         'files.totalBytes',
         // Return the `remainingTime` with this formula:
-        // (timeTaken / `receivedBytes`) * remainingBytes / 1000
-        // `timeTaken` is (`timeEnd` (default to now) - timeStart) - the sum of the pause rows for the file
+        // `remainingTime` = (`timeTaken` / `receivedBytes`) * remainingBytes
+        // `timeTaken` = (`timeEnd` (defaulting to now) - `timeStart`) - the sum of the pause rows for the file
         this.db.raw('(((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime')
       )
       .fullOuterJoin('pauses', 'files.id', '=', 'pauses.fileId')

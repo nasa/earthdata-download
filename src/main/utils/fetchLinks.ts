@@ -59,8 +59,7 @@ const fetchLinks = async ({
     // https://eslint.org/docs/latest/rules/no-await-in-loop#when-not-to-use-it
     /* eslint-disable no-await-in-loop */
     while (!finished) {
-      // `node-fetch` doesn't play nice with `localhost`, replace it with 127.0.0.1 for local dev
-      let updatedUrl = getLinksUrl.replace('localhost', '127.0.0.1')
+      let updatedUrl = getLinksUrl
 
       // If a cursor exists, add it to the URL
       if (cursor) {

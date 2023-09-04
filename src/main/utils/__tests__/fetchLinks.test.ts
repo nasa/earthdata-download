@@ -73,7 +73,7 @@ describe('fetchLinks', () => {
 
     expect(fetch).toHaveBeenCalledTimes(3)
     expect(fetch).toHaveBeenCalledWith(
-      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
+      'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
       {
         headers: {
           Authorization: 'Bearer mock-token'
@@ -83,7 +83,7 @@ describe('fetchLinks', () => {
     )
 
     expect(fetch).toHaveBeenCalledWith(
-      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&cursor=mock-cursor',
+      'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&cursor=mock-cursor',
       {
         headers: {
           Authorization: 'Bearer mock-token'
@@ -158,7 +158,7 @@ describe('fetchLinks', () => {
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(fetch).toHaveBeenCalledWith(
-      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
+      'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
       {
         headers: {
           Authorization: 'Bearer mock-token'
@@ -221,7 +221,7 @@ describe('fetchLinks', () => {
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(fetch).toHaveBeenCalledWith(
-      'http://127.0.0.1:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
+      'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
       {
         headers: {
           Authorization: 'Bearer mock-token'

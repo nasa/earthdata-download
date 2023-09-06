@@ -79,9 +79,10 @@ const setupEventListeners = ({
   })
 
   // Show the choose download dialog
-  ipcMain.on('chooseDownloadLocation', () => {
-    chooseDownloadLocation({
-      appWindow
+  ipcMain.on('chooseDownloadLocation', async () => {
+    await chooseDownloadLocation({
+      appWindow,
+      database
     })
   })
 

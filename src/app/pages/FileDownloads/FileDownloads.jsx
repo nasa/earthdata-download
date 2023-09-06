@@ -60,23 +60,10 @@ const FileDownloads = ({
 
   const listRef = useRef(null)
 
-  const onInitializeDownload = () => {
-    // If there is a new download return to the downloads page
-    setCurrentPage(PAGES.downloads)
-  }
-
   const onSetHideCompleted = (value) => {
     setHideCompleted(value)
     listRef.current.scrollToItem(0)
   }
-
-  useEffect(() => {
-    initializeDownload(true, onInitializeDownload)
-
-    return () => {
-      initializeDownload(false, onInitializeDownload)
-    }
-  }, [])
 
   const buildItems = (report) => {
     const {

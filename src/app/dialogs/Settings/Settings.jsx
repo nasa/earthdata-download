@@ -42,6 +42,8 @@ import * as styles from './Settings.module.scss'
  */
 const Settings = ({
   hasActiveDownloads,
+  defaultDownloadLocation,
+  setDefaultDownloadLocation,
   settingsDialogIsOpen
 }) => {
   const {
@@ -51,7 +53,6 @@ const Settings = ({
     getPreferenceFieldValue
   } = useContext(ElectronApiContext)
   const [concurrentDownloads, setConcurrentDownloads] = useState('')
-  const [defaultDownloadLocation, setDefaultDownloadLocation] = useState()
 
   const onClearDefaultDownload = () => {
     setPreferenceFieldValue({
@@ -104,15 +105,6 @@ const Settings = ({
     }
   }
 
-  const onSetDownloadLocation = (event, info) => {
-    const { downloadLocation: newDownloadLocation } = info
-    setDefaultDownloadLocation(newDownloadLocation)
-    setPreferenceFieldValue({
-      field: 'defaultDownloadLocation',
-      value: newDownloadLocation
-    })
-  }
-
   useEffect(() => {
     const fetchDefaultDownloadLocation = async () => {
       setDefaultDownloadLocation(await getPreferenceFieldValue('defaultDownloadLocation'))
@@ -128,15 +120,6 @@ const Settings = ({
     }
 
     fetchConcurrentDownloads()
-  }, [])
-
-  // Handle the response from the setDownloadLocation
-  useEffect(() => {
-    setDownloadLocation(true, onSetDownloadLocation)
-
-    return () => {
-      setDownloadLocation(false, onSetDownloadLocation)
-    }
   }, [])
 
   useEffect(() => {
@@ -244,9 +227,13 @@ const Settings = ({
     </div>
   )
 }
-
+Settings.defaultProps = {
+  defaultDownloadLocation: '',
+}
 Settings.propTypes = {
   hasActiveDownloads: PropTypes.bool.isRequired,
+  defaultDownloadLocation: PropTypes.string,
+  setDefaultDownloadLocation: PropTypes.func.isRequired,
   settingsDialogIsOpen: PropTypes.bool.isRequired
 }
 

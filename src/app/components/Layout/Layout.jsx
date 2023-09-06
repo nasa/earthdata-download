@@ -168,6 +168,22 @@ const Layout = () => {
         downloadLocation: newDownloadLocation,
         makeDefaultDownloadLocation: true
       })
+      // Display a toast notification if a download is initialized
+      // while current page is not Downloads
+      if (currentPage !== PAGES.downloads) {
+        downloadIds.forEach((downloadId) => {
+          addToast({
+            id: downloadId,
+            title: 'New Download',
+            message: downloadId,
+            numberErrors: 0
+          })
+        })
+      }
+    }
+    else {
+      // Return to Downloads so that the set default location dialog can be displayed
+      setCurrentPage(PAGES.downloads)
     }
   }
 
@@ -226,16 +242,22 @@ const Layout = () => {
     autoUpdateAvailable(true, onAutoUpdateAvailable)
     autoUpdateProgress(true, onAutoUpdateProgress)
     setDownloadLocation(true, onSetDownloadLocation)
-    initializeDownload(true, onInitializeDownload)
 
     return () => {
       windowsLinuxTitleBar(false, onWindowMaximized)
       autoUpdateAvailable(false, onAutoUpdateAvailable)
       autoUpdateProgress(false, onAutoUpdateProgress)
       setDownloadLocation(false, onSetDownloadLocation)
-      initializeDownload(false, onInitializeDownload)
     }
   }, [])
+
+  useEffect(() => {
+    initializeDownload(true, onInitializeDownload)
+
+    return () => {
+      initializeDownload(false, onInitializeDownload)
+    }
+  }, [currentPage])
 
   const {
     downloadId: moreInfoDownloadId,
@@ -396,7 +418,6 @@ const Layout = () => {
           dismissToast={onDismissToast}
           toasts={Object.values(activeToasts).filter(Boolean)}
         />
-
         <Dialog
           open={settingsDialogIsOpen}
           setOpen={setSettingsDialogIsOpen}
@@ -407,6 +428,8 @@ const Layout = () => {
         >
           <Settings
             hasActiveDownloads={hasActiveDownload}
+            defaultDownloadLocation={selectedDownloadLocation}
+            setDefaultDownloadLocation={setSelectedDownloadLocation}
             settingsDialogIsOpen={settingsDialogIsOpen}
           />
         </Dialog>

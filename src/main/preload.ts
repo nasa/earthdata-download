@@ -33,13 +33,13 @@ contextBridge.exposeInMainWorld('electronApi', {
   requestFilesProgress: (data) => ipcRenderer.invoke('requestFilesProgress', data),
 
   // Messages to be received by the renderer process
-  autoUpdateAvailable: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('autoUpdateAvailable', callback),
-  autoUpdateProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('autoUpdateProgress', callback),
-  initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('initializeDownload', callback),
-  setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('setDownloadLocation', callback),
-  showWaitingForEulaDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForEulaDialog', callback),
-  showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('showWaitingForLoginDialog', callback),
-  windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'removeListener']('windowsLinuxTitleBar', callback),
+  autoUpdateAvailable: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('autoUpdateAvailable', callback),
+  autoUpdateProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('autoUpdateProgress', callback),
+  initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('initializeDownload', callback),
+  setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('setDownloadLocation', callback),
+  showWaitingForEulaDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('showWaitingForEulaDialog', callback),
+  showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('showWaitingForLoginDialog', callback),
+  windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('windowsLinuxTitleBar', callback),
 
   // System values for renderer
   isMac: process.platform === 'darwin',

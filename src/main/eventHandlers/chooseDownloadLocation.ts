@@ -4,11 +4,12 @@ import { dialog } from 'electron'
 
 /**
  * Opens the electron open dialog to choose a download location
- * @param {Object} params
+ * @param {Object} psarams
  * @param {Object} params.appWindow Electron window instance
  */
-const chooseDownloadLocation = ({
-  appWindow
+const chooseDownloadLocation = async ({
+  appWindow,
+  database
 }) => {
   const result = dialog.showOpenDialogSync(null, {
     message: 'Where would you like to download your files?',
@@ -23,6 +24,10 @@ const chooseDownloadLocation = ({
   if (!result) return
 
   const [downloadLocation] = result
+
+  await database.setPreferences({
+    defaultDownloadLocation: downloadLocation
+  })
 
   // Send a message back to the renderer with the downloadLocation
   appWindow.webContents.send('setDownloadLocation', { downloadLocation })

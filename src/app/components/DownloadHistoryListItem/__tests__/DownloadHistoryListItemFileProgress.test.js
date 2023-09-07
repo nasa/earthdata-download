@@ -8,11 +8,7 @@ import downloadStates from '../../../constants/downloadStates'
 const setup = (overrideProps = {}) => {
   const props = {
     finishedFiles: 5,
-    loadingMoreFiles: false,
-    shouldShowProgress: true,
-    shouldShowTime: true,
     state: downloadStates.active,
-    totalFiles: 10,
     totalTime: 234000,
     ...overrideProps
   }
@@ -26,7 +22,7 @@ describe('DownloadHistoryListItemFileProgress component', () => {
   test('returns the progress', () => {
     setup()
 
-    expect(screen.getByText('10 files in 3 minutes, 54 seconds')).toHaveClass('statusInformation')
+    expect(screen.getByText('5 files in 3 minutes, 54 seconds')).toHaveClass('statusInformation')
   })
 
   describe('when the state is cancelled', () => {

@@ -81,8 +81,8 @@ const willDownload = async ({
   item.setSavePath(path.join(downloadLocation, filename))
 
   // If the download has been cancelled, cancel this file
-  const { state } = await database.getDownloadById(downloadId)
-  if (state === downloadStates.cancelled) {
+  const { state: downloadState } = await database.getDownloadById(downloadId)
+  if (downloadState === downloadStates.cancelled) {
     currentDownloadItems.cancelItem(downloadId, filename)
 
     return
@@ -124,14 +124,18 @@ const willDownload = async ({
     webContents
   })
 
-  if (!downloadCheck) {
+  console.log('🚀 ~ file: willDownload.ts:130 ~ downloadId, filename:', downloadId, filename)
+  console.log('🚀 ~ file: willDownload.ts:128 ~ downloadCheck:', downloadCheck)
+  console.log('🚀 ~ file: willDownload.ts:136 ~ totalBytes:', totalBytes)
+  console.log('🚀 ~ file: willDownload.ts:137 ~ downloadState:', downloadState)
+  if (!downloadCheck && downloadState === downloadStates.active) {
     currentDownloadItems.cancelItem(downloadId, filename)
 
     return
   }
 
   // If the file has no totalBytes, report an error
-  if (totalBytes === 0) {
+  if (totalBytes === 0 && downloadState === downloadStates.active) {
     await database.updateFileById(fileId, {
       state: downloadStates.error,
       errors: 'This file could not be downloaded'

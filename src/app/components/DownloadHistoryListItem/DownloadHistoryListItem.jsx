@@ -49,7 +49,6 @@ const DownloadHistoryListItem = ({
   const {
     downloadId,
     numberErrors = 0,
-    loadingMoreFiles,
     progress,
     state,
     timeStart
@@ -58,7 +57,6 @@ const DownloadHistoryListItem = ({
   const {
     percent = 0,
     finishedFiles,
-    totalFiles,
     totalTime
   } = progress
 
@@ -115,11 +113,7 @@ const DownloadHistoryListItem = ({
         (
           <DownloadHistoryListItemFileProgress
             finishedFiles={finishedFiles}
-            loadingMoreFiles={loadingMoreFiles}
-            shouldShowProgress
-            shouldShowTime
             state={state}
-            totalFiles={totalFiles}
             totalTime={totalTime}
           />
         )

@@ -46,10 +46,12 @@ const onDone = async ({
   currentDownloadItems.removeItem(downloadId, filename)
   let errors
 
+  const { state: downloadState } = await database.getDownloadById(downloadId)
   let updatedState = previousState
   switch (state) {
     case 'cancelled':
-      if (previousState === downloadStates.active) {
+      // If the download is `appQuitting`, don't change the state of the file
+      if (downloadState !== downloadStates.appQuitting) {
         updatedState = downloadStates.cancelled
       }
 

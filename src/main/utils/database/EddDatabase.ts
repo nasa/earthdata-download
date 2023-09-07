@@ -173,10 +173,11 @@ class EddDatabase {
    * @param {Object} whereIn Knex `whereIn` object to select downloads to be updated.
    * @param {Object} data The data of the download to be updated.
    */
-  async updateDownloadsWhereNotIn(whereIn, data) {
+  async updateDownloadsWhereAndWhereNotIn(where, whereIn, data) {
     return this.db('downloads')
       .returning(['id'])
       .update(data)
+      .where(where)
       .whereNotIn(...whereIn)
   }
 

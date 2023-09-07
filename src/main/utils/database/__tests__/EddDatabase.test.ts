@@ -1112,13 +1112,14 @@ describe('EddDatabase', () => {
     })
   })
 
-  describe('updateDownloadsWhereNotIn', () => {
+  describe('updateDownloadsWhereAndWhereNotIn', () => {
     test('updates the requested file where and where not condition', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('update `downloads` set `state` = ?, `timeEnd` = ? where `state` not in (?, ?) returning `id`')
+        expect(query.sql).toEqual('update `downloads` set `state` = ?, `timeEnd` = ? where `active` = ? and `state` not in (?, ?) returning `id`')
         expect(query.bindings).toEqual([
           downloadStates.cancelled,
           1682899200000,
+          true,
           downloadStates.completed,
           downloadStates.cancelled
         ])
@@ -1128,13 +1129,17 @@ describe('EddDatabase', () => {
 
       const database = new EddDatabase('./')
 
-      const result = await database.updateDownloadsWhereNotIn([
-        'state',
-        [downloadStates.completed, downloadStates.cancelled]
-      ], {
-        state: downloadStates.cancelled,
-        timeEnd: new Date().getTime()
-      })
+      const result = await database.updateDownloadsWhereAndWhereNotIn(
+        { active: true },
+        [
+          'state',
+          [downloadStates.completed, downloadStates.cancelled]
+        ],
+        {
+          state: downloadStates.cancelled,
+          timeEnd: new Date().getTime()
+        }
+      )
 
       expect(result).toEqual([{ id: 42 }])
     })

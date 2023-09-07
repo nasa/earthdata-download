@@ -31,14 +31,12 @@ const beforeQuit = async ({
 
   // `Quit` was selected
   if (result === 0) {
-    currentDownloadItems.pauseItem()
-
-    // Set any active downloads to paused, so they can resumed when the app re-opens
+    // Set any active downloads to appQuitting, so they can resumed when the app re-opens
     const updatedDownloads = await database.updateDownloadsWhereIn([
       'state',
       [downloadStates.active]
     ], {
-      state: downloadStates.paused
+      state: downloadStates.appQuitting
     })
 
     // Create a new pause for those downloads that were updated

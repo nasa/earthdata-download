@@ -26,23 +26,19 @@ import useAppContext from '../../hooks/useAppContext'
 import ListPage from '../../components/ListPage/ListPage'
 
 /**
- * @typedef {Object} DownloadsProps
+ * @typedef {Object} DownloadsHistoryProps
  * @property {Function} setCurrentPage A function which sets the active page.
- * @property {Function} setHasActiveDownload A function to set whether a download is active.
- * @property {Function} setSelectedDownloadId A function to set the selectedDownloadId.
  * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout.
 
 /**
- * Renders a `Downloads` page.
- * @param {DownloadsProps} props
+ * Renders a `DownloadHistory` page.
+ * @param {DownloadsHistoryProps} props
  *
- * @example <caption>Render a Downloads page.</caption>
+ * @example <caption>Render a DownloadHistory page.</caption>
  *
  * return (
- *   <Downloads
+ *   <DownloadHistory
  *     setCurrentPage={setCurrentPage}
- *     setHasActiveDownload={setHasActiveDownload}
- *     setSelectedDownloadId={setSelectedDownloadId}
  *     showMoreInfoDialog={showMoreInfoDialog}
  *   />
  * )

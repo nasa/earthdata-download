@@ -208,7 +208,7 @@ describe('onDone', () => {
     })
   })
 
-  test('updates the database and calls startNextDownload for a cancelled download that was not active', async () => {
+  test('does not set a cancelled file to cancelled when the download state is appQuitting', async () => {
     const currentDownloadItems = {
       removeItem: jest.fn()
     }
@@ -221,12 +221,13 @@ describe('onDone', () => {
     const state = 'cancelled'
     const database = {
       getDownloadById: jest.fn().mockResolvedValue({
-        errors: []
+        errors: [],
+        state: downloadStates.appQuitting
       }),
       updateDownloadById: jest.fn(),
       getFileWhere: jest.fn().mockResolvedValue({
         id: 123,
-        state: downloadStates.paused
+        state: downloadStates.active
       }),
       updateFileById: jest.fn()
     }
@@ -254,7 +255,7 @@ describe('onDone', () => {
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
       errors: undefined,
       percent: 0,
-      state: downloadStates.paused,
+      state: downloadStates.active,
       timeEnd: 1684029600000
     })
 

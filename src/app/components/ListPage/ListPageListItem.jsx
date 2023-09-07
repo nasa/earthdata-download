@@ -102,7 +102,6 @@ ListPageListItem.propTypes = {
     PropTypes.shape({
       download: PropTypes.shape({}),
       file: PropTypes.shape({}),
-      isHistorical: PropTypes.bool,
       setCurrentPage: PropTypes.func,
       setSelectedDownloadId: PropTypes.func,
       showMoreInfoDialog: PropTypes.func,

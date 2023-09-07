@@ -9,8 +9,8 @@ import * as styles from './DownloadHistoryListItemFileProgress.module.scss'
 
 /**
  * @typedef {Object} DownloadHistoryListItemFileProgressProps
+ * @property {Number} finishedFiles Total number of files in the download.
  * @property {String} state The state of the DownloadItem.
- * @property {Number} totalFiles Total number of files in the download.
  * @property {Number} totalTime Total time the download has taken.
  */
 
@@ -21,15 +21,15 @@ import * as styles from './DownloadHistoryListItemFileProgress.module.scss'
  * @example <caption>Renders a `DownloadHistoryListItemFileProgress` component</caption>
  * return (
  *   <DownloadHistoryListItemFileProgress
+ *     finishedFiles={finishedFiles}
  *     state={state}
- *     totalFiles={totalFiles}
  *     totalTime={totalTime}
  *   />
  * )
  */
 const DownloadHistoryListItemFileProgress = ({
+  finishedFiles,
   state,
-  totalFiles,
   totalTime
 }) => {
   if (
@@ -41,7 +41,7 @@ const DownloadHistoryListItemFileProgress = ({
   return (
     <div className={styles.statusDescription}>
       <p className={styles.statusInformation}>
-        {commafy(totalFiles)}
+        {commafy(finishedFiles)}
         {' '}
         files in
         {' '}
@@ -58,7 +58,7 @@ const DownloadHistoryListItemFileProgress = ({
 
 DownloadHistoryListItemFileProgress.propTypes = {
   state: PropTypes.string.isRequired,
-  totalFiles: PropTypes.number.isRequired,
+  finishedFiles: PropTypes.number.isRequired,
   totalTime: PropTypes.number.isRequired
 }
 

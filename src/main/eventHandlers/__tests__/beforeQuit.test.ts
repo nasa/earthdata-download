@@ -66,7 +66,7 @@ describe('beforeQuit', () => {
         [downloadStates.active]
       ],
       {
-        state: downloadStates.paused
+        state: downloadStates.appQuitting
       }
     )
 

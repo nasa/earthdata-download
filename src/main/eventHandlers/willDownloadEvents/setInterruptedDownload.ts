@@ -3,7 +3,7 @@
 import downloadStates from '../../../app/constants/downloadStates'
 
 /**
- * If no more files are not completed, mark the download as completed
+ * If no more files are active, mark the download as interrupted
  * @param {Object} params
  * @param {Object} params.database `EddDatabase` instance
  * @param {Object} params.downloadId downloadId of the DownloadItem being downloaded

@@ -53,7 +53,9 @@ const cancelDownloadItem = async ({
 
   if (!downloadId) {
     // Cancel all active downloads
-    const updatedDownloads = await database.updateDownloadsWhereNotIn([
+    const updatedDownloads = await database.updateDownloadsWhereAndWhereNotIn({
+      active: true
+    }, [
       'state',
       [downloadStates.completed, downloadStates.cancelled]
     ], {

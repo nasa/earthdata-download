@@ -20,17 +20,12 @@ const parseDownloadReport = (report) => {
     )
   ))
 
-  // TODO ensure this didn't break anything
   const allDownloadsCompleted = !!(report.length && report.every(
     ({ state }) => (
       state === downloadStates.completed
       || state === downloadStates.cancelled
       || state === downloadStates.error
     )
-  ))
-
-  const allDownloadsCancelled = !!(report.length && report.every(
-    ({ state }) => state === downloadStates.cancelled
   ))
 
   const hasActiveDownload = !!(report.length && report.some(
@@ -51,9 +46,6 @@ const parseDownloadReport = (report) => {
     derivedStateFromDownloads = downloadStates.paused
   } else if (allDownloadsPausedOrCompleted) {
     derivedStateFromDownloads = downloadStates.paused
-  } else if (allDownloadsCancelled) {
-    // TODO this is never happening, might have broken something
-    derivedStateFromDownloads = downloadStates.cancelled
   } else if (hasActiveDownload) {
     derivedStateFromDownloads = downloadStates.active
   } else if (hasPausedDownload) {

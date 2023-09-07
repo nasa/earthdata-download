@@ -22,7 +22,7 @@ describe('cancelDownloadItem', () => {
       }
       const database = {
         endPause: jest.fn(),
-        updateDownloadsWhereNotIn: jest.fn(),
+        updateDownloadsWhereAndWhereNotIn: jest.fn(),
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
         getNotCompletedFilesCountByDownloadId: jest.fn()
@@ -49,7 +49,7 @@ describe('cancelDownloadItem', () => {
 
       expect(database.endPause).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
-      expect(database.updateDownloadsWhereNotIn).toHaveBeenCalledTimes(0)
+      expect(database.updateDownloadsWhereAndWhereNotIn).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -63,7 +63,7 @@ describe('cancelDownloadItem', () => {
       }
       const database = {
         endPause: jest.fn(),
-        updateDownloadsWhereNotIn: jest.fn(),
+        updateDownloadsWhereAndWhereNotIn: jest.fn(),
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
         updateFilesWhereAndWhereNot: jest.fn()
@@ -95,7 +95,7 @@ describe('cancelDownloadItem', () => {
       expect(database.endPause).toHaveBeenCalledWith('mock-download-id')
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(0)
-      expect(database.updateDownloadsWhereNotIn).toHaveBeenCalledTimes(0)
+      expect(database.updateDownloadsWhereAndWhereNotIn).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -108,7 +108,7 @@ describe('cancelDownloadItem', () => {
       const database = {
         endPause: jest.fn(),
         deleteDownloadById: jest.fn(),
-        updateDownloadsWhereNotIn: jest.fn().mockResolvedValue([
+        updateDownloadsWhereAndWhereNotIn: jest.fn().mockResolvedValue([
           { id: 123 },
           { id: 456 }
         ]),
@@ -128,8 +128,10 @@ describe('cancelDownloadItem', () => {
 
       expect(database.deleteDownloadById).toHaveBeenCalledTimes(0)
 
-      expect(database.updateDownloadsWhereNotIn).toHaveBeenCalledTimes(1)
-      expect(database.updateDownloadsWhereNotIn).toHaveBeenCalledWith([
+      expect(database.updateDownloadsWhereAndWhereNotIn).toHaveBeenCalledTimes(1)
+      expect(database.updateDownloadsWhereAndWhereNotIn).toHaveBeenCalledWith({
+        active: true
+      }, [
         'state', ['COMPLETED', 'CANCELLED']
       ], {
         state: 'CANCELLED',

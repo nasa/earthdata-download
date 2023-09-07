@@ -50,6 +50,7 @@ describe('did-finish-load', () => {
       }
       const database = {
         updateFilesWhere: jest.fn().mockResolvedValue([]),
+        updateDownloadsWhereIn: jest.fn().mockResolvedValue([]),
         deletePausesByDownloadIdAndFilename: jest.fn()
       }
       const setUpdateAvailable = jest.fn()
@@ -66,7 +67,7 @@ describe('did-finish-load', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        state: downloadStates.paused
+        state: downloadStates.active
       }, {
         errors: null,
         percent: 0,
@@ -75,6 +76,14 @@ describe('did-finish-load', () => {
         timeEnd: null,
         timeStart: null,
         totalBytes: null
+      })
+
+      expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(1)
+      expect(database.updateDownloadsWhereIn).toHaveBeenCalledWith([
+        'state',
+        [downloadStates.appQuitting]
+      ], {
+        state: downloadStates.paused
       })
 
       expect(database.deletePausesByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
@@ -116,6 +125,7 @@ describe('did-finish-load', () => {
           downloadId: 123,
           filename: 'mock-filename'
         }]),
+        updateDownloadsWhereIn: jest.fn().mockResolvedValue([]),
         deletePausesByDownloadIdAndFilename: jest.fn()
       }
       const setUpdateAvailable = jest.fn()
@@ -132,7 +142,7 @@ describe('did-finish-load', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        state: downloadStates.paused
+        state: downloadStates.active
       }, {
         errors: null,
         percent: 0,
@@ -141,6 +151,14 @@ describe('did-finish-load', () => {
         timeEnd: null,
         timeStart: null,
         totalBytes: null
+      })
+
+      expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(1)
+      expect(database.updateDownloadsWhereIn).toHaveBeenCalledWith([
+        'state',
+        [downloadStates.appQuitting]
+      ], {
+        state: downloadStates.paused
       })
 
       expect(database.deletePausesByDownloadIdAndFilename).toHaveBeenCalledTimes(1)

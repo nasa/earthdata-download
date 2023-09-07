@@ -49,8 +49,8 @@ describe('did-finish-load', () => {
         forceDevUpdateConfig: false
       }
       const database = {
-        updateFilesWhere: jest.fn(),
-        updateDownloadsWhereIn: jest.fn()
+        updateFilesWhere: jest.fn().mockResolvedValue([]),
+        deletePausesByDownloadIdAndFilename: jest.fn()
       }
       const setUpdateAvailable = jest.fn()
 
@@ -66,7 +66,7 @@ describe('did-finish-load', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        state: downloadStates.active
+        state: downloadStates.paused
       }, {
         errors: null,
         percent: 0,
@@ -77,13 +77,7 @@ describe('did-finish-load', () => {
         totalBytes: null
       })
 
-      expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(1)
-      expect(database.updateDownloadsWhereIn).toHaveBeenCalledWith([
-        'state',
-        [downloadStates.active]
-      ], {
-        state: downloadStates.paused
-      })
+      expect(database.deletePausesByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
 
       expect(appWindow.webContents.openDevTools).toHaveBeenCalledTimes(1)
       expect(appWindow.webContents.openDevTools).toHaveBeenCalledWith({ mode: 'detach' })
@@ -118,8 +112,11 @@ describe('did-finish-load', () => {
         forceDevUpdateConfig: false
       }
       const database = {
-        updateFilesWhere: jest.fn(),
-        updateDownloadsWhereIn: jest.fn()
+        updateFilesWhere: jest.fn().mockResolvedValue([{
+          downloadId: 123,
+          filename: 'mock-filename'
+        }]),
+        deletePausesByDownloadIdAndFilename: jest.fn()
       }
       const setUpdateAvailable = jest.fn()
 
@@ -135,7 +132,7 @@ describe('did-finish-load', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        state: downloadStates.active
+        state: downloadStates.paused
       }, {
         errors: null,
         percent: 0,
@@ -146,13 +143,8 @@ describe('did-finish-load', () => {
         totalBytes: null
       })
 
-      expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(1)
-      expect(database.updateDownloadsWhereIn).toHaveBeenCalledWith([
-        'state',
-        [downloadStates.active]
-      ], {
-        state: downloadStates.paused
-      })
+      expect(database.deletePausesByDownloadIdAndFilename).toHaveBeenCalledTimes(1)
+      expect(database.deletePausesByDownloadIdAndFilename).toHaveBeenCalledWith(123, 'mock-filename')
 
       expect(appWindow.webContents.openDevTools).toHaveBeenCalledTimes(0)
       expect(setUpdateAvailable).toHaveBeenCalledTimes(0)

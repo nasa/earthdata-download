@@ -29,6 +29,7 @@ const setup = (overrideProps = {}) => {
   const addToast = jest.fn()
   const deleteAllToastsById = jest.fn()
   const cancelDownloadItem = jest.fn()
+  const clearDownload = jest.fn()
   const copyDownloadPath = jest.fn()
   const openDownloadFolder = jest.fn()
   const pauseDownloadItem = jest.fn()
@@ -56,6 +57,7 @@ const setup = (overrideProps = {}) => {
       value={
         {
           cancelDownloadItem,
+          clearDownload,
           copyDownloadPath,
           openDownloadFolder,
           pauseDownloadItem,
@@ -86,6 +88,7 @@ const setup = (overrideProps = {}) => {
     addToast,
     deleteAllToastsById,
     cancelDownloadItem,
+    clearDownload,
     copyDownloadPath,
     openDownloadFolder,
     pauseDownloadItem,
@@ -306,6 +309,29 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(restartDownload).toHaveBeenCalledTimes(1)
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+    })
+  })
+
+  describe('when clicking `Clear Download`', () => {
+    test('calls clearDownload', async () => {
+      const { clearDownload, deleteAllToastsById } = setup({
+        download: {
+          ...download,
+          state: downloadStates.completed
+        }
+      })
+
+      const moreActions = screen.getByText('More Actions')
+      await userEvent.click(moreActions)
+
+      const button = screen.getByText('Clear Download')
+      await userEvent.click(button)
+
+      expect(clearDownload).toHaveBeenCalledTimes(1)
+      expect(clearDownload).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
 
       expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
       expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')

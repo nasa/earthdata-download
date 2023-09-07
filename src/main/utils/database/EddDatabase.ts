@@ -84,6 +84,16 @@ class EddDatabase {
   }
 
   /**
+   * Returns all downloads that match the where object.
+   */
+  async getAllDownloadsWhere(where) {
+    return this.db('downloads')
+      .select()
+      .where(where)
+      .orderBy('createdAt', 'desc')
+  }
+
+  /**
    * Returns a download given the downloadId.
    * @param {String} downloadId downloadId for download.
    */
@@ -105,6 +115,23 @@ class EddDatabase {
   }
 
   /**
+   * Sets the active column of a download to false.
+   * @param {String} downloadId ID of download to update.
+   */
+  async clearDownload(downloadId) {
+    let query = this.db('downloads')
+      .update({
+        active: false
+      })
+
+    if (downloadId) {
+      query = query.where({ id: downloadId })
+    }
+
+    return query
+  }
+
+  /**
    * Creates a new download.
    * @param {String} downloadId ID of download to create.
    * @param {Object} data The data of the download to be inserted.
@@ -113,6 +140,7 @@ class EddDatabase {
     return this.db('downloads')
       .insert({
         id: downloadId,
+        active: true,
         ...data
       })
   }
@@ -135,8 +163,21 @@ class EddDatabase {
    */
   async updateDownloadsWhereIn(whereIn, data) {
     return this.db('downloads')
+      .returning(['id'])
       .update(data)
       .whereIn(...whereIn)
+  }
+
+  /**
+   * Updates downloads that match the whereIn criteria.
+   * @param {Object} whereIn Knex `whereIn` object to select downloads to be updated.
+   * @param {Object} data The data of the download to be updated.
+   */
+  async updateDownloadsWhereNotIn(whereIn, data) {
+    return this.db('downloads')
+      .returning(['id'])
+      .update(data)
+      .whereNotIn(...whereIn)
   }
 
   /**
@@ -147,6 +188,7 @@ class EddDatabase {
    */
   async updateFilesWhereAndWhereNot(where, whereNot, data) {
     return this.db('files')
+      .returning(['id', 'downloadId'])
       .update(data)
       .where(where)
       .whereNot(whereNot)
@@ -288,7 +330,7 @@ class EddDatabase {
 
   /**
    * Returns count of files that are not in the `completed` state for the given downloadId
-   * @param {String} downloadId Id of the download to add files.
+   * @param {String} downloadId Id of the download to count files.
    */
   async getNotCompletedFilesCountByDownloadId(downloadId) {
     const [result] = await this.db('files')
@@ -299,6 +341,23 @@ class EddDatabase {
         downloadStates.cancelled,
         downloadStates.error
       ])
+
+    const { 'count(`id`)': number } = result
+
+    return number
+  }
+
+  /**
+   * Returns count of files that are active for the given downloadId
+   * @param {String} downloadId Id of the download to count files.
+   */
+  async getActiveFilesCountByDownloadId(downloadId) {
+    const [result] = await this.db('files')
+      .count('id')
+      .where({
+        downloadId,
+        state: downloadStates.active
+      })
 
     const { 'count(`id`)': number } = result
 
@@ -323,6 +382,7 @@ class EddDatabase {
    */
   async updateFilesWhere(where, data) {
     return this.db('files')
+      .returning(['id', 'downloadId', 'filename'])
       .update(data)
       .where(where)
   }
@@ -356,28 +416,47 @@ class EddDatabase {
   /**
    * Creates a new pause row for all active files of the provided downloadId.
    * @param {String} downloadId Download ID of the file to create a pause.
+   * @param {Boolean} pauseFiles Should files also have pauses created.
    */
-  async createPauseByDownloadId(downloadId) {
-    const files = await this.db('files')
-      .select('id')
-      .where({
-        downloadId,
-        state: downloadStates.active
-      })
-
+  async createPauseByDownloadId(downloadId, pauseFiles) {
     const timeStart = new Date().getTime()
-    const data = files.map((file) => ({
-      downloadId,
-      fileId: file.id,
-      timeStart
-    }))
-    data.push({
-      downloadId,
-      timeStart
-    })
+    let data = []
 
-    return this.db('pauses')
-      .insert(data)
+    if (pauseFiles) {
+      const files = await this.db('files')
+        .select('id')
+        .where({
+          downloadId,
+          state: downloadStates.active
+        })
+
+      data = files.map((file) => ({
+        downloadId,
+        fileId: file.id,
+        timeStart
+      }))
+    }
+
+    const query = this.db('pauses')
+      .select('id')
+      .where({ downloadId })
+      .whereNull('fileId')
+      .whereNull('timeEnd')
+    const downloadAlreadyPaused = await query
+
+    if (downloadAlreadyPaused.length === 0) {
+      data.push({
+        downloadId,
+        timeStart
+      })
+    }
+
+    if (data.length > 0) {
+      return this.db('pauses')
+        .insert(data)
+    }
+
+    return null
   }
 
   /**
@@ -530,7 +609,7 @@ class EddDatabase {
         // Return the count of the `id` column as `totalFiles`
         totalFiles: 'id',
         // Return the count of the `state` column when the value is "COMPLETED" as `finishedFiles`
-        finishedFiles: this.db.raw('CASE `state` WHEN "COMPLETED" THEN 1 ELSE NULL END')
+        finishedFiles: this.db.raw('CASE `state` WHEN \'COMPLETED\' THEN 1 ELSE NULL END')
       })
       .where({
         downloadId
@@ -641,7 +720,7 @@ class EddDatabase {
         // Return the count of the `percent` field when the percent is greater than 0 as `filesWithProgress`
         filesWithProgress: this.db.raw('CASE WHEN `percent` > 0 THEN 1 ELSE NULL END'),
         // Return the count of the `state` column when the value is "COMPLETED" as `finishedFiles`
-        finishedFiles: this.db.raw('CASE `files`.`state` WHEN "COMPLETED" THEN 1 ELSE NULL END')
+        finishedFiles: this.db.raw('CASE `files`.`state` WHEN \'COMPLETED\' THEN 1 ELSE NULL END')
       })
       .join('downloads', { 'files.downloadId': 'downloads.id' })
       .where({
@@ -658,14 +737,16 @@ class EddDatabase {
    * @param {Number} limit Limit of the files returned
    * @param {Number} offset Offset of the files returned
    */
-  async getDownloadsReport(limit, offset) {
+  async getDownloadsReport(active, limit, offset) {
     return this.db('downloads')
       .select(
         'downloads.id',
         'downloads.loadingMoreFiles',
         'downloads.state',
+        'downloads.timeStart',
         this.db.raw('(IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime')
       )
+      .where({ active })
       .limit(limit)
       .offset(offset)
       .orderBy('createdAt', 'desc')
@@ -674,9 +755,10 @@ class EddDatabase {
   /**
    * Returns the total number of downloads to be reported
    */
-  async getAllDownloadsCount() {
+  async getAllDownloadsCount(active) {
     const [result] = await this.db('downloads')
       .count('id')
+      .where({ active })
 
     const { 'count(`id`)': number } = result
 
@@ -692,7 +774,7 @@ class EddDatabase {
         // Return the count of the `id` column as `totalFiles`
         totalFiles: 'files.id',
         // Return the count of the `state` column when the value is "COMPLETED" as `finishedFiles`
-        totalCompletedFiles: this.db.raw('CASE `files`.`state` WHEN "COMPLETED" THEN 1 ELSE NULL END')
+        totalCompletedFiles: this.db.raw('CASE `files`.`state` WHEN \'COMPLETED\' THEN 1 ELSE NULL END')
       })
 
     return result

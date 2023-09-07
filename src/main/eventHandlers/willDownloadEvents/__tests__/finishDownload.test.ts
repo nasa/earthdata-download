@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import MockDate from 'mockdate'
 
 import finishDownload from '../finishDownload'

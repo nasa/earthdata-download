@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   autoUpdateInstallLater: () => ipcRenderer.send('autoUpdateInstallLater'),
   cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
   cancelErroredDownloadItem: (data) => ipcRenderer.send('cancelErroredDownloadItem', data),
+  clearDownload: (data) => ipcRenderer.send('clearDownload', data),
+  clearDownloadHistory: () => ipcRenderer.send('clearDownloadHistory'),
   closeWindow: () => ipcRenderer.send('closeWindow'),
   copyDownloadPath: (data) => ipcRenderer.send('copyDownloadPath', data),
   maximizeWindow: () => ipcRenderer.send('maximizeWindow'),

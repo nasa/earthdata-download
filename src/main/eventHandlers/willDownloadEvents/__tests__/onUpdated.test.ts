@@ -5,6 +5,12 @@ import MockDate from 'mockdate'
 import onUpdated from '../onUpdated'
 
 import downloadStates from '../../../../app/constants/downloadStates'
+import setInterruptedDownload from '../setInterruptedDownload'
+
+jest.mock('../setInterruptedDownload', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
@@ -24,8 +30,7 @@ describe('onUpdated', () => {
         id: 123
       }),
       updateFileById: jest.fn(),
-      updateDownloadById: jest.fn(),
-      createPauseByDownloadId: jest.fn()
+      createPauseByDownloadIdAndFilename: jest.fn()
     }
 
     await onUpdated({
@@ -47,13 +52,14 @@ describe('onUpdated', () => {
       state: downloadStates.interrupted
     })
 
-    expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
-    expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', {
-      state: downloadStates.interrupted
-    })
+    expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(1)
+    expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
-    expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(1)
-    expect(database.createPauseByDownloadId).toHaveBeenCalledWith('mock-download-id')
+    expect(setInterruptedDownload).toHaveBeenCalledTimes(1)
+    expect(setInterruptedDownload).toHaveBeenCalledWith({
+      database,
+      downloadId
+    })
   })
 
   test('updates the database for progressing downloads', async () => {
@@ -70,8 +76,7 @@ describe('onUpdated', () => {
         id: 123
       }),
       updateFileById: jest.fn(),
-      updateDownloadById: jest.fn(),
-      createPauseByDownloadId: jest.fn()
+      createPauseByDownloadIdAndFilename: jest.fn()
     }
 
     await onUpdated({
@@ -95,8 +100,7 @@ describe('onUpdated', () => {
       totalBytes: 100
     })
 
-    expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
-    expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(0)
+    expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
   })
 
   test('updates the database for paused downloads', async () => {
@@ -113,8 +117,7 @@ describe('onUpdated', () => {
         id: 123
       }),
       updateFileById: jest.fn(),
-      updateDownloadById: jest.fn(),
-      createPauseByDownloadId: jest.fn()
+      createPauseByDownloadIdAndFilename: jest.fn()
     }
 
     await onUpdated({
@@ -138,8 +141,7 @@ describe('onUpdated', () => {
       totalBytes: 100
     })
 
-    expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
-    expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(0)
+    expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
   })
 
   test('reports percent as 0 before total bytes are known', async () => {
@@ -156,8 +158,7 @@ describe('onUpdated', () => {
         id: 123
       }),
       updateFileById: jest.fn(),
-      updateDownloadById: jest.fn(),
-      createPauseByDownloadId: jest.fn()
+      createPauseByDownloadIdAndFilename: jest.fn()
     }
 
     await onUpdated({
@@ -181,8 +182,7 @@ describe('onUpdated', () => {
       totalBytes: 0
     })
 
-    expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
-    expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(0)
+    expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
   })
 
   test('cancels the item if the file is not in the database', async () => {
@@ -197,8 +197,7 @@ describe('onUpdated', () => {
     const database = {
       getFileWhere: jest.fn().mockResolvedValue(undefined),
       updateFileById: jest.fn(),
-      updateDownloadById: jest.fn(),
-      createPauseByDownloadId: jest.fn()
+      createPauseByDownloadIdAndFilename: jest.fn()
     }
 
     await onUpdated({
@@ -217,7 +216,6 @@ describe('onUpdated', () => {
     expect(item.cancel).toHaveBeenCalledTimes(1)
 
     expect(database.updateFileById).toHaveBeenCalledTimes(0)
-    expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
-    expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(0)
+    expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
   })
 })

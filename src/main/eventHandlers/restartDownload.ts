@@ -75,6 +75,7 @@ const restartDownload = async ({
     // Set the download to active
     await database.updateDownloadById(downloadId, {
       state: downloadStates.active,
+      active: true,
       timeStart: new Date().getTime(),
       timeEnd: null,
       errors: null

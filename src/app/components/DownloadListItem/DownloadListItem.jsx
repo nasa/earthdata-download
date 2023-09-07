@@ -53,6 +53,7 @@ const DownloadListItem = ({
   } = appContext
   const {
     cancelDownloadItem,
+    clearDownload,
     copyDownloadPath,
     openDownloadFolder,
     pauseDownloadItem,
@@ -61,7 +62,7 @@ const DownloadListItem = ({
     sendToEula,
     sendToLogin
   } = useContext(ElectronApiContext)
-  // Create the downloadItems array from the runningDownloads reported from the main process
+
   const {
     downloadId,
     numberErrors = 0,
@@ -94,6 +95,10 @@ const DownloadListItem = ({
     downloadStates.error,
     downloadStates.interrupted,
     downloadStates.waitingForAuth
+  ].includes(state)
+  const shouldShowClear = [
+    downloadStates.completed,
+    downloadStates.cancelled
   ].includes(state)
   const shouldDisableOpenFolder = finishedFiles === 0
   const isComplete = state === downloadStates.completed
@@ -190,6 +195,16 @@ const DownloadListItem = ({
           restartDownload({ downloadId })
         },
         icon: FaInfoCircle
+      },
+      {
+        label: 'Clear Download',
+        isActive: shouldShowClear,
+        isPrimary: false,
+        callback: () => {
+          deleteAllToastsById(downloadId)
+          clearDownload({ downloadId })
+        },
+        icon: FaInfoCircle
       }
     ]
   ]
@@ -248,6 +263,11 @@ const DownloadListItem = ({
   )
 }
 
+DownloadListItem.defaultProps = {
+  setCurrentPage: null,
+  setSelectedDownloadId: null
+}
+
 DownloadListItem.propTypes = {
   download: PropTypes.shape({
     downloadId: PropTypes.string,
@@ -261,8 +281,8 @@ DownloadListItem.propTypes = {
     }),
     state: PropTypes.string
   }).isRequired,
-  setCurrentPage: PropTypes.func.isRequired,
-  setSelectedDownloadId: PropTypes.func.isRequired,
+  setCurrentPage: PropTypes.func,
+  setSelectedDownloadId: PropTypes.func,
   showMoreInfoDialog: PropTypes.func.isRequired
 }
 

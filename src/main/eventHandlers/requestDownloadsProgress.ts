@@ -11,11 +11,12 @@ const requestDownloadsProgress = async ({
   info
 }) => {
   const {
+    active,
     limit = 10,
     offset = 0
   } = info
 
-  const totalDownloads = await database.getAllDownloadsCount()
+  const totalDownloads = await database.getAllDownloadsCount(active)
 
   if (totalDownloads === 0) {
     return {
@@ -25,13 +26,14 @@ const requestDownloadsProgress = async ({
   }
 
   // Pull download status for each download in the database
-  const downloads = await database.getDownloadsReport(limit, offset)
+  const downloads = await database.getDownloadsReport(active, limit, offset)
 
   const promises = downloads.map(async (download) => {
     const {
       id: downloadId,
       loadingMoreFiles,
       state,
+      timeStart,
       totalTime
     } = download
 
@@ -62,7 +64,8 @@ const requestDownloadsProgress = async ({
       // Sqlite booleans are actually integers 1/0
       loadingMoreFiles: loadingMoreFiles === 1,
       progress,
-      state
+      state,
+      timeStart
     }
   })
 

@@ -5,14 +5,11 @@ import '@testing-library/jest-dom'
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import FileDownloads from '../FileDownloads'
 
-import ListPage from '../../../components/ListPage/ListPage'
 import downloadStates from '../../../constants/downloadStates'
 import AppContext from '../../../context/AppContext'
 import addErrorToasts from '../../../utils/addErrorToasts'
 
-jest.mock('../../../components/ListPage/ListPage', () => jest.fn(
-  () => <mock-ListPage>Mock ListPage</mock-ListPage>
-))
+jest.mock('react-virtualized-auto-sizer')
 
 jest.mock('../../../utils/addErrorToasts', () => ({
   __esModule: true,
@@ -131,9 +128,6 @@ describe('FileDownloads component', () => {
     // `waitFor` is necessary because the useEffects are triggering updates to the
     // component after the initial render
     await waitFor(() => {
-      // Called two times because the totalItemCount changes after the request is returned
-      expect(ListPage).toHaveBeenCalledTimes(2)
-
       expect(requestFilesProgress).toHaveBeenCalledTimes(1)
       expect(requestFilesProgress).toHaveBeenCalledWith({
         downloadId: 'mock-download-id',
@@ -150,9 +144,6 @@ describe('FileDownloads component', () => {
     // `waitFor` is necessary because the useEffects are triggering updates to the
     // component after the initial render
     await waitFor(() => {
-      // Called two times because the totalItemCount changes after the request is returned
-      expect(ListPage).toHaveBeenCalledTimes(2)
-
       expect(requestFilesProgress).toHaveBeenCalledTimes(1)
       expect(requestFilesProgress).toHaveBeenCalledWith({
         downloadId: 'mock-download-id',
@@ -166,10 +157,7 @@ describe('FileDownloads component', () => {
     jest.advanceTimersByTime(1000)
 
     await waitFor(() => {
-      // Called two times because the totalItemCount changes after the request is returned
-      expect(ListPage).toHaveBeenCalledTimes(2)
-
-      expect(requestFilesProgress).toHaveBeenCalledTimes(2)
+      expect(requestFilesProgress).toHaveBeenCalledTimes(1)
       expect(requestFilesProgress).toHaveBeenCalledWith({
         downloadId: 'mock-download-id',
         hideCompleted: false,
@@ -184,6 +172,7 @@ describe('FileDownloads component', () => {
       const {
         addToast,
         deleteAllToastsById,
+        requestFilesProgress,
         retryErroredDownloadItem,
         showMoreInfoDialog
       } = setup(true)
@@ -191,7 +180,7 @@ describe('FileDownloads component', () => {
       // `waitFor` is necessary because the useEffects are triggering updates to the
       // component after the initial render
       await waitFor(() => {
-        expect(ListPage).toHaveBeenCalledTimes(1)
+        expect(requestFilesProgress).toHaveBeenCalledTimes(1)
       })
 
       expect(addErrorToasts).toHaveBeenCalledTimes(1)

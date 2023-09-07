@@ -1,10 +1,27 @@
 // @ts-nocheck
 
+import { session } from 'electron'
 import MockDate from 'mockdate'
 
 import downloadFile from '../downloadFile'
 
 import downloadStates from '../../../app/constants/downloadStates'
+
+jest.mock(
+  'electron',
+  () => {
+    const mockSession = {
+      defaultSession: {
+        clearStorageData: jest.fn()
+      }
+    }
+
+    return {
+      session: mockSession
+    }
+  },
+  { virtual: true }
+)
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
@@ -41,14 +58,12 @@ describe('downloadFile', () => {
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, { state: downloadStates.starting })
 
+    expect(session.defaultSession.clearStorageData).toHaveBeenCalledTimes(1)
+
     expect(webContents.downloadURL).toHaveBeenCalledTimes(1)
     expect(webContents.downloadURL).toHaveBeenCalledWith(
       'http://example.com/mock-file.png',
-      {
-        headers: {
-          Authorization: undefined
-        }
-      }
+      { headers: {} }
     )
   })
 
@@ -81,6 +96,8 @@ describe('downloadFile', () => {
 
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, { state: downloadStates.starting })
+
+    expect(session.defaultSession.clearStorageData).toHaveBeenCalledTimes(1)
 
     expect(webContents.downloadURL).toHaveBeenCalledTimes(1)
     expect(webContents.downloadURL).toHaveBeenCalledWith(

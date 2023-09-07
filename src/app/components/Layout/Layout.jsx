@@ -210,7 +210,10 @@ const Layout = () => {
       case PAGES.downloadHistory:
         setSelectedDownloadId(null)
         setPageComponent(
-          <DownloadHistory setCurrentPage={setCurrentPage} />
+          <DownloadHistory
+            setCurrentPage={setCurrentPage}
+            showMoreInfoDialog={showMoreInfoDialog}
+          />
         )
 
         break
@@ -279,8 +282,7 @@ const Layout = () => {
           )
         }
       >
-        {/* Hiding nav buttons until EDD-18 */}
-        {/* <nav className={styles.nav}>
+        <nav className={styles.nav}>
           <Button
             className={
               classNames(
@@ -316,7 +318,8 @@ const Layout = () => {
           >
             Download History
           </Button>
-        </nav> */}
+        </nav>
+
         <section
           className={
             classNames(
@@ -337,6 +340,7 @@ const Layout = () => {
             Settings
           </Button>
         </section>
+
         {
           (isWin || isLinux) && (
             <div

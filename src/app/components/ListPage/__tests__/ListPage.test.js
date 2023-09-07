@@ -12,14 +12,17 @@ jest.mock('react-virtualized-auto-sizer')
 
 const setup = (overrideProps = {}) => {
   const setWindowState = jest.fn()
+  const fetchReport = jest.fn()
 
   const props = {
     actions: [],
     emptyMessage: 'Mock Empty Message',
+    fetchReport,
     header: null,
     hideCompleted: false,
     Icon: null,
     items: [],
+    itemSize: 97,
     totalItemCount: 0,
     setWindowState,
     ...overrideProps
@@ -30,11 +33,39 @@ const setup = (overrideProps = {}) => {
   )
 
   return {
+    fetchReport,
     setWindowState
   }
 }
 
+beforeEach(() => {
+  jest.useFakeTimers()
+})
+
 describe('ListPage', () => {
+  test('calls fetchReport to get items', () => {
+    const { fetchReport } = setup()
+
+    expect(fetchReport).toHaveBeenCalledTimes(1)
+    // Empty windowState because we are mocking AutoSizer
+    expect(fetchReport).toHaveBeenCalledWith({})
+  })
+
+  test('calls fetchReport every REPORT_INTERVAL', () => {
+    const { fetchReport } = setup()
+
+    expect(fetchReport).toHaveBeenCalledTimes(1)
+    // Empty windowState because we are mocking AutoSizer
+    expect(fetchReport).toHaveBeenCalledWith({})
+
+    jest.clearAllMocks()
+    jest.advanceTimersByTime(1000)
+
+    expect(fetchReport).toHaveBeenCalledTimes(1)
+    // Empty windowState because we are mocking AutoSizer
+    expect(fetchReport).toHaveBeenCalledWith({})
+  })
+
   describe('when no items are provided', () => {
     test('renders the empty message', () => {
       setup()

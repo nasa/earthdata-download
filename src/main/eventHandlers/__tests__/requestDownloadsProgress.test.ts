@@ -25,6 +25,7 @@ describe('requestDownloadsProgress', () => {
     const result = await requestDownloadsProgress({
       database,
       info: {
+        active: true,
         limit: 10,
         offset: 0
       }
@@ -89,6 +90,7 @@ describe('requestDownloadsProgress', () => {
     const result = await requestDownloadsProgress({
       database,
       info: {
+        active: true,
         limit: 10,
         offset: 0
       }
@@ -125,7 +127,7 @@ describe('requestDownloadsProgress', () => {
     expect(database.getAllDownloadsCount).toHaveBeenCalledTimes(1)
 
     expect(database.getDownloadsReport).toHaveBeenCalledTimes(1)
-    expect(database.getDownloadsReport).toHaveBeenCalledWith(10, 0)
+    expect(database.getDownloadsReport).toHaveBeenCalledWith(true, 10, 0)
 
     expect(database.getDownloadReport).toHaveBeenCalledTimes(2)
     expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id-1')
@@ -184,6 +186,7 @@ describe('requestDownloadsProgress', () => {
     const result = await requestDownloadsProgress({
       database,
       info: {
+        active: true,
         limit: 10,
         offset: 0
       }
@@ -220,7 +223,7 @@ describe('requestDownloadsProgress', () => {
     expect(database.getAllDownloadsCount).toHaveBeenCalledTimes(1)
 
     expect(database.getDownloadsReport).toHaveBeenCalledTimes(1)
-    expect(database.getDownloadsReport).toHaveBeenCalledWith(10, 0)
+    expect(database.getDownloadsReport).toHaveBeenCalledWith(true, 10, 0)
 
     expect(database.getDownloadReport).toHaveBeenCalledTimes(2)
     expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id-1')
@@ -282,6 +285,7 @@ describe('requestDownloadsProgress', () => {
     const result = await requestDownloadsProgress({
       database,
       info: {
+        active: true,
         limit: 10,
         offset: 0
       }
@@ -322,7 +326,7 @@ describe('requestDownloadsProgress', () => {
     expect(database.getAllDownloadsCount).toHaveBeenCalledTimes(1)
 
     expect(database.getDownloadsReport).toHaveBeenCalledTimes(1)
-    expect(database.getDownloadsReport).toHaveBeenCalledWith(10, 0)
+    expect(database.getDownloadsReport).toHaveBeenCalledWith(true, 10, 0)
 
     expect(database.getDownloadReport).toHaveBeenCalledTimes(2)
     expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id-1')

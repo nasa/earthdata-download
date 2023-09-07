@@ -17,6 +17,8 @@ const cancelDownloadItem = async ({
 }) => {
   const { downloadId, filename } = info
 
+  currentDownloadItems.cancelItem(downloadId, filename)
+
   if (downloadId && filename) {
     await database.updateFilesWhere({
       downloadId,
@@ -35,7 +37,8 @@ const cancelDownloadItem = async ({
 
   if (downloadId && !filename) {
     await database.updateDownloadById(downloadId, {
-      state: downloadStates.cancelled
+      state: downloadStates.cancelled,
+      timeEnd: new Date().getTime()
     })
 
     // Update files with downloadId which are completed and not cancelled
@@ -44,14 +47,25 @@ const cancelDownloadItem = async ({
       { state: downloadStates.completed },
       { state: downloadStates.cancelled }
     )
+
+    await database.endPause(downloadId)
   }
 
-  // TODO EDD-18 put the downloads into a cancelled state, clear button will move them
   if (!downloadId) {
-    await database.deleteAllDownloads()
-  }
+    // Cancel all active downloads
+    const updatedDownloads = await database.updateDownloadsWhereNotIn([
+      'state',
+      [downloadStates.completed, downloadStates.cancelled]
+    ], {
+      state: downloadStates.cancelled,
+      timeEnd: new Date().getTime()
+    })
 
-  currentDownloadItems.cancelItem(downloadId, filename)
+    await Promise.all(updatedDownloads.map(async (updatedDownload) => {
+      const { id } = updatedDownload
+      await database.endPause(id)
+    }))
+  }
 }
 
 export default cancelDownloadItem

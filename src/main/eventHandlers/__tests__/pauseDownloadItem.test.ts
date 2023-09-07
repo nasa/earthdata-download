@@ -79,7 +79,7 @@ describe('pauseDownloadItem', () => {
       expect(database.createPauseForAllActiveDownloads).toHaveBeenCalledTimes(0)
 
       expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(1)
-      expect(database.createPauseByDownloadId).toHaveBeenCalledWith('mock-download-id')
+      expect(database.createPauseByDownloadId).toHaveBeenCalledWith('mock-download-id', true)
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: downloadStates.paused })

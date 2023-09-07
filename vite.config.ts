@@ -24,7 +24,7 @@ export default defineConfig(({ command }) => {
             build: {
               rollupOptions: {
                 external: [
-                  'sqlite3',
+                  'better-sqlite3',
                   'knex'
                 ]
               },

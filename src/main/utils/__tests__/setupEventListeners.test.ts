@@ -12,6 +12,7 @@ import beforeQuit from '../../eventHandlers/beforeQuit'
 import beginDownload from '../../eventHandlers/beginDownload'
 import cancelDownloadItem from '../../eventHandlers/cancelDownloadItem'
 import cancelErroredDownloadItem from '../../eventHandlers/cancelErroredDownloadItem'
+import clearDownload from '../../eventHandlers/clearDownload'
 import chooseDownloadLocation from '../../eventHandlers/chooseDownloadLocation'
 import copyDownloadPath from '../../eventHandlers/copyDownloadPath'
 import didFinishLoad from '../../eventHandlers/didFinishLoad'
@@ -42,6 +43,7 @@ jest.mock('../../eventHandlers/beforeQuit', () => ({
 jest.mock('../../eventHandlers/beginDownload')
 jest.mock('../../eventHandlers/cancelDownloadItem')
 jest.mock('../../eventHandlers/cancelErroredDownloadItem')
+jest.mock('../../eventHandlers/clearDownload')
 jest.mock('../../eventHandlers/chooseDownloadLocation')
 jest.mock('../../eventHandlers/copyDownloadPath')
 jest.mock('../../eventHandlers/didFinishLoad')
@@ -98,6 +100,7 @@ jest.mock(
       send: (channel, data) => {
         channels[channel](data)
       },
+      quit: jest.fn(),
       isPackaged: false
     }
     const mockShell = {
@@ -488,6 +491,25 @@ describe('setupEventListeners', () => {
     })
   })
 
+  describe('clearDownload', () => {
+    test('calls clearDownload', () => {
+      const {
+        database
+      } = setup()
+
+      const event = {}
+      const info = { mock: 'info' }
+
+      ipcRenderer.send('clearDownload', event, info)
+
+      expect(clearDownload).toHaveBeenCalledTimes(1)
+      expect(clearDownload).toHaveBeenCalledWith({
+        database,
+        info
+      })
+    })
+  })
+
   describe('pauseDownloadItem', () => {
     test('calls pauseDownloadItem', () => {
       const {
@@ -844,51 +866,35 @@ describe('setupEventListeners', () => {
     describe('when the app is not packaged', () => {
       test('does not call beforeQuit', async () => {
         app.isPackaged = false
-        setup()
+        const { appWindow } = setup()
 
-        await app.send('before-quit')
+        await appWindow.send('close')
 
         expect(beforeQuit).toHaveBeenCalledTimes(0)
       })
     })
 
     describe('when the app is packaged', () => {
-      describe('when beforeQuit returns true', () => {
-        test('calls event.preventDefault', async () => {
-          app.isPackaged = true
-          beforeQuit.mockResolvedValue(true)
-          const {
-            currentDownloadItems
-          } = setup()
+      test('does not call beforeQuit', async () => {
+        app.isPackaged = true
+        const { appWindow } = setup()
 
-          const preventDefault = jest.fn()
+        await appWindow.send('close')
 
-          await app.send('before-quit', { preventDefault })
-
-          expect(beforeQuit).toHaveBeenCalledTimes(1)
-          expect(beforeQuit).toHaveBeenCalledWith({ currentDownloadItems })
-
-          expect(preventDefault).toHaveBeenCalledTimes(1)
-        })
+        expect(beforeQuit).toHaveBeenCalledTimes(1)
       })
+    })
+  })
 
-      describe('when beforeQuit returns false', () => {
-        test('does not call event.preventDefault', async () => {
-          app.isPackaged = true
-          const {
-            currentDownloadItems
-          } = setup()
+  describe('closed', () => {
+    test('calls app.quit', async () => {
+      const {
+        appWindow
+      } = setup()
 
-          const preventDefault = jest.fn()
+      await appWindow.webContents.send('closed')
 
-          await app.send('before-quit', { preventDefault })
-
-          expect(beforeQuit).toHaveBeenCalledTimes(1)
-          expect(beforeQuit).toHaveBeenCalledWith({ currentDownloadItems })
-
-          expect(preventDefault).toHaveBeenCalledTimes(0)
-        })
-      })
+      expect(app.quit).toHaveBeenCalledTimes(1)
     })
   })
 })

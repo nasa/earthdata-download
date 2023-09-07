@@ -1,19 +1,21 @@
 import React, {
   useContext,
-  useEffect,
   useRef,
   useState
 } from 'react'
 import PropTypes from 'prop-types'
-import { FaDownload, FaSearch } from 'react-icons/fa'
+import {
+  FaDownload,
+  FaHistory,
+  FaSearch
+} from 'react-icons/fa'
 
 import downloadStates from '../../constants/downloadStates'
-import { REPORT_INTERVAL } from '../../constants/reportInterval'
+import { PAGES } from '../../constants/pages'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import Button from '../../components/Button/Button'
-import ListPage from '../../components/ListPage/ListPage'
 import DownloadHeader from '../../components/DownloadHeader/DownloadHeader'
 
 import parseDownloadReport from '../../utils/parseDownloadReport'
@@ -21,6 +23,7 @@ import parseDownloadReport from '../../utils/parseDownloadReport'
 import * as styles from './Downloads.module.scss'
 import addErrorToasts from '../../utils/addErrorToasts'
 import useAppContext from '../../hooks/useAppContext'
+import ListPage from '../../components/ListPage/ListPage'
 
 /**
  * @typedef {Object} DownloadsProps
@@ -60,10 +63,7 @@ const Downloads = ({
     retryErroredDownloadItem
   } = useContext(ElectronApiContext)
 
-  const listRef = useRef()
-
   const [items, setItems] = useState([])
-  const [windowState, setWindowState] = useState({})
   const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
   const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
   const [totalFiles, setTotalFiles] = useState(0)
@@ -74,7 +74,9 @@ const Downloads = ({
     setDerivedStateFromDownloads
   ] = useState(downloadStates.completed)
 
-  const buildItems = (report) => {
+  const listRef = useRef()
+
+  const buildItems = (windowState, report) => {
     const {
       overscanStartIndex,
       overscanStopIndex
@@ -107,77 +109,67 @@ const Downloads = ({
     const preArray = preArrayLength > 0 ? Array.from({ length: preArrayLength }) : []
     const postArray = postArrayLength > 0 ? Array.from({ length: postArrayLength }) : []
 
-    setItems([
+    return [
       ...preArray,
       ...realItems,
       ...postArray
-    ])
-
-    setTotalDownloads(reportTotalDownloads)
+    ]
   }
 
-  useEffect(() => {
-    const loadItems = async () => {
-      const {
-        overscanStartIndex = 0,
-        // Default to 10 items
-        overscanStopIndex = 10
-      } = windowState
+  const fetchReport = async (windowState) => {
+    const {
+      overscanStartIndex = 0,
+      // Default to 10 items
+      overscanStopIndex = 10
+    } = windowState
 
-      // React window doesn't handle lists smaller than the window very well, and sets the overscanStopIndex lower than the list of items. Never set the limit to less than 10
-      const stopIndex = Math.max(10, overscanStopIndex + 1)
-      const limit = stopIndex - overscanStartIndex
-      const offset = overscanStartIndex
+    // React window doesn't handle lists smaller than the window very well, and sets the overscanStopIndex lower than the list of items. Never set the limit to less than 10
+    const stopIndex = Math.max(10, overscanStopIndex + 1)
+    const limit = stopIndex - overscanStartIndex
+    const offset = overscanStartIndex
 
-      const report = await requestDownloadsProgress({
-        limit,
-        offset
-      })
+    const report = await requestDownloadsProgress({
+      active: true,
+      limit,
+      offset
+    })
 
-      const {
-        downloadsReport,
-        totalFiles: reportTotalFiles,
-        totalCompletedFiles: reportTotalCompletedFiles,
-        errors
-      } = report
+    const {
+      downloadsReport,
+      totalDownloads: reportTotalDownloads,
+      totalFiles: reportTotalFiles,
+      totalCompletedFiles: reportTotalCompletedFiles,
+      errors
+    } = report
 
-      const parsedReport = parseDownloadReport(downloadsReport)
+    const parsedReport = parseDownloadReport(downloadsReport)
 
-      const {
-        allDownloadsCompleted: reportAllDownloadsCompleted,
-        allDownloadsPaused: reportAllDownloadsPaused,
-        derivedStateFromDownloads: reportDerivedStateFromDownloads,
-        hasActiveDownload: reportHasActiveDownload
-      } = parsedReport
+    const {
+      allDownloadsCompleted: reportAllDownloadsCompleted,
+      allDownloadsPaused: reportAllDownloadsPaused,
+      derivedStateFromDownloads: reportDerivedStateFromDownloads,
+      hasActiveDownload: reportHasActiveDownload
+    } = parsedReport
 
-      setAllDownloadsPaused(reportAllDownloadsPaused)
-      setAllDownloadsCompleted(reportAllDownloadsCompleted)
-      setHasActiveDownload(reportHasActiveDownload)
-      setTotalFiles(reportTotalFiles)
-      setTotalCompletedFiles(reportTotalCompletedFiles)
-      setDerivedStateFromDownloads(reportDerivedStateFromDownloads)
+    setAllDownloadsPaused(reportAllDownloadsPaused)
+    setAllDownloadsCompleted(reportAllDownloadsCompleted)
+    setHasActiveDownload(reportHasActiveDownload)
+    setTotalFiles(reportTotalFiles)
+    setTotalCompletedFiles(reportTotalCompletedFiles)
+    setDerivedStateFromDownloads(reportDerivedStateFromDownloads)
 
-      buildItems(report)
+    setItems(buildItems(windowState, report))
 
-      addErrorToasts({
-        errors,
-        addToast,
-        deleteAllToastsById,
-        retryErroredDownloadItem,
-        showMoreInfoDialog
-      })
-    }
+    setTotalDownloads(reportTotalDownloads)
 
-    loadItems()
-
-    const interval = setInterval(() => {
-      loadItems()
-    }, REPORT_INTERVAL)
-
-    return () => {
-      clearInterval(interval)
-    }
-  }, [windowState])
+    addErrorToasts({
+      errors,
+      addToast,
+      deleteAllToastsById,
+      retryErroredDownloadItem,
+      showMoreInfoDialog
+    })
+  }
 
   return (
     <ListPage
@@ -194,19 +186,20 @@ const Downloads = ({
             >
               Find data in Earthdata Search
             </Button>
-            {/* Hiding nav buttons until EDD-18 */}
-            {/* <Button
+
+            <Button
               className={styles.button}
               size="lg"
               Icon={FaHistory}
               onClick={() => setCurrentPage(PAGES.downloadHistory)}
             >
               View Download History
-            </Button> */}
+            </Button>
           </>
         )
       }
       emptyMessage="No downloads in progress"
+      fetchReport={fetchReport}
       header={
         !!items.length && (
           <DownloadHeader
@@ -221,9 +214,9 @@ const Downloads = ({
       }
       Icon={FaDownload}
       items={items}
+      itemSize={97}
       listRef={listRef}
       totalItemCount={totalDownloads}
-      setWindowState={setWindowState}
     />
   )
 }

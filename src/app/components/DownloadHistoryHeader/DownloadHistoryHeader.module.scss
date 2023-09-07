@@ -1,0 +1,15 @@
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  padding: var(--size__500) var(--size__200);
+  padding-left: var(--size__300);
+}
+
+.headerButton {
+  margin-right: var(--size__100);
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

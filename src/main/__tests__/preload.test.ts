@@ -122,6 +122,24 @@ describe('preload', () => {
     expect(ipcRenderer.send).toHaveBeenCalledWith('cancelErroredDownloadItem', { mock: 'data' })
   })
 
+  test('clearDownload sends the clearDownload message', async () => {
+    await setup()
+
+    electronApi.clearDownload({ mock: 'data' })
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('clearDownload', { mock: 'data' })
+  })
+
+  test('clearDownloadHistory sends the clearDownloadHistory message', async () => {
+    await setup()
+
+    electronApi.clearDownloadHistory()
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('clearDownloadHistory')
+  })
+
   test('closeWindow sends the closeWindow message', async () => {
     await setup()
 

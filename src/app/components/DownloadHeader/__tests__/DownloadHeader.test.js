@@ -12,6 +12,7 @@ import AppContext from '../../../context/AppContext'
 const setup = (overrideProps) => {
   // ElectronApiContext functions
   const cancelDownloadItem = jest.fn()
+  const clearDownload = jest.fn()
   const pauseDownloadItem = jest.fn()
   const resumeDownloadItem = jest.fn()
 
@@ -33,6 +34,7 @@ const setup = (overrideProps) => {
     <ElectronApiContext.Provider value={
       {
         cancelDownloadItem,
+        clearDownload,
         pauseDownloadItem,
         resumeDownloadItem
       }
@@ -54,6 +56,7 @@ const setup = (overrideProps) => {
 
   return {
     cancelDownloadItem,
+    clearDownload,
     deleteAllToastsById,
     pauseDownloadItem,
     resumeDownloadItem,
@@ -94,6 +97,25 @@ describe('DownloadHeader component', () => {
       await userEvent.click(button)
 
       expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith()
+    })
+  })
+
+  describe('when clicking the Clear Downloads button', () => {
+    test('calls cancelDownloadItem and deleteAllToastsById', async () => {
+      const { clearDownload, deleteAllToastsById } = setup({
+        allDownloadsCompleted: true,
+        state: downloadStates.completed,
+        totalCompletedFiles: 10,
+        totalFiles: 10
+      })
+
+      const button = screen.getByRole('button', { name: 'Clear Downloads' })
+      await userEvent.click(button)
+
+      expect(clearDownload).toHaveBeenCalledTimes(1)
+      expect(clearDownload).toHaveBeenCalledWith({})
       expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
       expect(deleteAllToastsById).toHaveBeenCalledWith()
     })

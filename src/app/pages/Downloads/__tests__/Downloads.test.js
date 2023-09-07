@@ -4,21 +4,18 @@ import '@testing-library/jest-dom'
 
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import Downloads from '../Downloads'
-import ListPage from '../../../components/ListPage/ListPage'
 import downloadStates from '../../../constants/downloadStates'
 import AppContext from '../../../context/AppContext'
 import addErrorToasts from '../../../utils/addErrorToasts'
 
-jest.mock('../../../components/ListPage/ListPage', () => jest.fn(
-  () => <mock-ListPage>Mock ListPage</mock-ListPage>
-))
+jest.mock('react-virtualized-auto-sizer')
 
 jest.mock('../../../utils/addErrorToasts', () => ({
   __esModule: true,
   default: jest.fn()
 }))
 
-const setup = (withErrors, overrideProps) => {
+const setup = (withErrors, overrideReport) => {
   const addToast = jest.fn()
   const deleteAllToastsById = jest.fn()
   const retryErroredDownloadItem = jest.fn()
@@ -61,7 +58,8 @@ const setup = (withErrors, overrideProps) => {
     errors: withErrors ? errors : {},
     totalCompletedFiles: 14,
     totalDownloads: 2,
-    totalFiles: 14
+    totalFiles: 14,
+    ...overrideReport
   })
 
   // Props
@@ -69,8 +67,7 @@ const setup = (withErrors, overrideProps) => {
     setCurrentPage,
     setHasActiveDownload,
     setSelectedDownloadId,
-    showMoreInfoDialog,
-    ...overrideProps
+    showMoreInfoDialog
   }
 
   render(
@@ -100,6 +97,7 @@ const setup = (withErrors, overrideProps) => {
     deleteAllToastsById,
     requestDownloadsProgress,
     retryErroredDownloadItem,
+    setCurrentPage,
     showMoreInfoDialog
   }
 }
@@ -116,16 +114,17 @@ afterEach(() => {
 
 describe('Downloads component', () => {
   test('renders the ListPage', async () => {
-    const { requestDownloadsProgress } = setup()
+    const { requestDownloadsProgress } = setup({
+      overscanStartIndex: 0,
+      overscanStopIndex: 10
+    })
 
     // `waitFor` is necessary because the useEffects are triggering updates to the
     // component after the initial render
     await waitFor(() => {
-      // Called two times because the totalItemCount changes after the request is returned
-      expect(ListPage).toHaveBeenCalledTimes(2)
-
       expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
       expect(requestDownloadsProgress).toHaveBeenCalledWith({
+        active: true,
         limit: 11,
         offset: 0
       })
@@ -138,11 +137,9 @@ describe('Downloads component', () => {
     // `waitFor` is necessary because the useEffects are triggering updates to the
     // component after the initial render
     await waitFor(() => {
-      // Called two times because the totalItemCount changes after the request is returned
-      expect(ListPage).toHaveBeenCalledTimes(2)
-
       expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
       expect(requestDownloadsProgress).toHaveBeenCalledWith({
+        active: true,
         limit: 11,
         offset: 0
       })
@@ -152,11 +149,9 @@ describe('Downloads component', () => {
     jest.advanceTimersByTime(1000)
 
     await waitFor(() => {
-      // Called two times because the totalItemCount changes after the request is returned
-      expect(ListPage).toHaveBeenCalledTimes(2)
-
-      expect(requestDownloadsProgress).toHaveBeenCalledTimes(2)
+      expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
       expect(requestDownloadsProgress).toHaveBeenCalledWith({
+        active: true,
         limit: 11,
         offset: 0
       })
@@ -168,6 +163,7 @@ describe('Downloads component', () => {
       const {
         addToast,
         deleteAllToastsById,
+        requestDownloadsProgress,
         retryErroredDownloadItem,
         showMoreInfoDialog
       } = setup(true)
@@ -175,7 +171,7 @@ describe('Downloads component', () => {
       // `waitFor` is necessary because the useEffects are triggering updates to the
       // component after the initial render
       await waitFor(() => {
-        expect(ListPage).toHaveBeenCalledTimes(1)
+        expect(requestDownloadsProgress).toHaveBeenCalledTimes(1)
       })
 
       expect(addErrorToasts).toHaveBeenCalledTimes(1)

@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../../app/constants/downloadStates'
+import setInterruptedDownload from './setInterruptedDownload'
 
 /**
  * Handles the DownloadItem 'updated' event
@@ -47,7 +48,7 @@ const onUpdated = async ({
   }
 
   if (state === 'interrupted') {
-    await database.createPauseByDownloadId(downloadId)
+    await database.createPauseByDownloadIdAndFilename(downloadId, filename)
 
     // Update the database if the state has updated to interrupted
     await database.updateFileById(fileId, {
@@ -55,9 +56,10 @@ const onUpdated = async ({
       percent: percentDone
     })
 
-    // Set the download state to interrupted
-    await database.updateDownloadById(downloadId, {
-      state: downloadStates.interrupted
+    // Set the download to interrupted if necessary
+    await setInterruptedDownload({
+      database,
+      downloadId
     })
   } else if (state === 'progressing') {
     // Update the database with the percent and state

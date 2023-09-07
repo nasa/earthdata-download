@@ -12,8 +12,10 @@ import beginDownload from '../eventHandlers/beginDownload'
 import cancelDownloadItem from '../eventHandlers/cancelDownloadItem'
 import cancelErroredDownloadItem from '../eventHandlers/cancelErroredDownloadItem'
 import chooseDownloadLocation from '../eventHandlers/chooseDownloadLocation'
+import clearDownload from '../eventHandlers/clearDownload'
 import copyDownloadPath from '../eventHandlers/copyDownloadPath'
 import deleteDownload from '../eventHandlers/deleteDownload'
+import didFinishLoad from '../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../eventHandlers/getPreferenceFieldValue'
 import openDownloadFolder from '../eventHandlers/openDownloadFolder'
 import pauseDownloadItem from '../eventHandlers/pauseDownloadItem'
@@ -28,8 +30,6 @@ import setPreferenceFieldValue from '../eventHandlers/setPreferenceFieldValue'
 import willDownload from '../eventHandlers/willDownload'
 
 import startPendingDownloads from '../utils/startPendingDownloads'
-
-import didFinishLoad from '../eventHandlers/didFinishLoad'
 
 /**
  * Sets up event listeners for the main process
@@ -173,7 +173,7 @@ const setupEventListeners = ({
     })
   })
 
-  // Cancel and downloadItem
+  // Cancel a downloadItem
   ipcMain.on('cancelDownloadItem', async (event, info) => {
     await cancelDownloadItem({
       currentDownloadItems,
@@ -186,6 +186,14 @@ const setupEventListeners = ({
   ipcMain.on('cancelErroredDownloadItem', async (event, info) => {
     await cancelErroredDownloadItem({
       currentDownloadItems,
+      database,
+      info
+    })
+  })
+
+  // Clear a download
+  ipcMain.on('clearDownload', async (event, info) => {
+    await clearDownload({
       database,
       info
     })
@@ -364,19 +372,21 @@ const setupEventListeners = ({
     })
   })
 
-  // When the application is about to quit
-  app.on('before-quit', async (event) => {
+  // When the window is about to close
+  appWindow.on('close', async (event) => {
     // If we are in dev mode, don't worry about quitting with running downloads
     if (!app.isPackaged) return
 
-    const keepOpen = await beforeQuit({
-      currentDownloadItems
+    await beforeQuit({
+      currentDownloadItems,
+      database,
+      event
     })
+  })
 
-    if (keepOpen) {
-      // Don't quit the application
-      event.preventDefault()
-    }
+  // If the appWindow was closed, quit the application
+  appWindow.on('closed', () => {
+    app.quit()
   })
 
   // When a `target=_blank` link is clicked, open in an external browser

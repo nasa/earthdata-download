@@ -46,10 +46,10 @@ const onDone = async ({
   currentDownloadItems.removeItem(downloadId, filename)
   let errors
 
-  let updatedState
+  let updatedState = previousState
   switch (state) {
     case 'cancelled':
-      if (previousState !== downloadStates.pending) {
+      if (previousState === downloadStates.active) {
         updatedState = downloadStates.cancelled
       }
 

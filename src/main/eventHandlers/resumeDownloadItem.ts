@@ -51,7 +51,7 @@ const resumeDownloadItem = async ({
   }
 
   if (!downloadId) {
-    const downloads = await database.getAllDownloads()
+    const downloads = await database.getAllDownloadsWhere({ active: true })
 
     await downloads.forEachAsync(async (download) => {
       const { id, state } = download
@@ -61,10 +61,8 @@ const resumeDownloadItem = async ({
       const numberFiles = await database.getFileCountWhere({ downloadId: id })
 
       // Default to the current state value
-      let newState = state
+      let newState = downloadStates.active
 
-      // If the state is paused and there are files, set to active
-      if (state === downloadStates.paused && numberFiles > 0) newState = downloadStates.active
       // If the state is paused and there are no files, set to pending
       if (state === downloadStates.paused && numberFiles === 0) newState = downloadStates.pending
 

@@ -1,10 +1,6 @@
 // @ts-nocheck
 
-import {
-  app,
-  BrowserWindow,
-  session
-} from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import electronLog from 'electron-log'
@@ -81,28 +77,6 @@ const createWindow = async () => {
     // Load your file
     appWindow.loadFile('dist/index.html')
   }
-
-  // TODO Remove this after electron supports adding headers to downloadURL()
-  // https://github.com/electron/electron/pull/38785 has been merged, waiting for a release
-  appWindow.webContents.session.webRequest.onBeforeSendHeaders(async (details, callback) => {
-    const { token } = await database.getToken()
-
-    await session.defaultSession.clearStorageData()
-
-    let bearerToken
-    if (token) {
-      bearerToken = `Bearer ${token}`
-    } else {
-      // If we have no token in the database, clear the cookie data that is saved by providers downloads
-    }
-
-    callback({
-      requestHeaders: {
-        ...details.requestHeaders,
-        Authorization: bearerToken
-      }
-    })
-  })
 
   const setUpdateAvailable = (available) => {
     updateAvailable = available

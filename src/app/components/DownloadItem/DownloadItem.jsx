@@ -40,6 +40,7 @@ import * as styles from './DownloadItem.module.scss'
  * @property {Object} primaryStatus Component for the primary status of the DownloadItem.
  * @property {Object} secondaryStatus Component for the secondary status of the DownloadItem.
  * @property {Object} tertiaryStatus Component for the tertiary status of the DownloadItem.
+ * @property {Object} subStatus Component for the sub status of the DownloadItem.
  * @property {Object} moreInfo Component for a 'More Info' link on the DownloadItem.
  */
 
@@ -76,6 +77,7 @@ const DownloadItem = ({
   primaryStatus,
   secondaryStatus,
   tertiaryStatus,
+  subStatus,
   moreInfo
 }) => {
   const {
@@ -254,6 +256,16 @@ const DownloadItem = ({
           }
         </div>
 
+        {
+          subStatus && (
+            <div className={styles.subMeta}>
+              <div className={styles.metaPrimary}>
+                {subStatus}
+              </div>
+            </div>
+          )
+        }
+
         <div>
           <Progress
             className={styles.progress}
@@ -280,6 +292,7 @@ DownloadItem.defaultProps = {
   primaryStatus: null,
   secondaryStatus: null,
   tertiaryStatus: null,
+  subStatus: null,
   moreInfo: null
 }
 
@@ -308,6 +321,7 @@ DownloadItem.propTypes = {
   primaryStatus: PropTypes.node,
   secondaryStatus: PropTypes.node,
   tertiaryStatus: PropTypes.node,
+  subStatus: PropTypes.node,
   moreInfo: PropTypes.node
 }
 

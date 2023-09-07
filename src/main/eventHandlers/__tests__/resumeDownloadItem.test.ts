@@ -20,7 +20,7 @@ describe('resumeDownloadItem', () => {
         filename: 'mock-filename.png'
       }
       const database = {
-        getAllDownloads: jest.fn(),
+        getAllDownloadsWhere: jest.fn(),
         getFileCountWhere: jest.fn(),
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
@@ -45,7 +45,7 @@ describe('resumeDownloadItem', () => {
         filename: 'mock-filename.png'
       }, { state: downloadStates.active })
 
-      expect(database.getAllDownloads).toHaveBeenCalledTimes(0)
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
       expect(database.getFileCountWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 
@@ -72,7 +72,7 @@ describe('resumeDownloadItem', () => {
           downloadId: 'mock-download-id'
         }
         const database = {
-          getAllDownloads: jest.fn(),
+          getAllDownloadsWhere: jest.fn(),
           getFileCountWhere: jest.fn().mockResolvedValue(0),
           updateDownloadById: jest.fn(),
           endPause: jest.fn()
@@ -89,7 +89,7 @@ describe('resumeDownloadItem', () => {
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
-        expect(database.getAllDownloads).toHaveBeenCalledTimes(0)
+        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
 
         expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
         expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
@@ -120,7 +120,7 @@ describe('resumeDownloadItem', () => {
           downloadId: 'mock-download-id'
         }
         const database = {
-          getAllDownloads: jest.fn(),
+          getAllDownloadsWhere: jest.fn(),
           getFileCountWhere: jest.fn().mockResolvedValue(1),
           updateDownloadById: jest.fn(),
           endPause: jest.fn()
@@ -137,7 +137,7 @@ describe('resumeDownloadItem', () => {
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
-        expect(database.getAllDownloads).toHaveBeenCalledTimes(0)
+        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
 
         expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
         expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
@@ -166,9 +166,9 @@ describe('resumeDownloadItem', () => {
       }
       const info = {}
       const database = {
-        getAllDownloads: jest.fn().mockResolvedValue([{
+        getAllDownloadsWhere: jest.fn().mockResolvedValue([{
           id: 'download1',
-          state: downloadStates.complete
+          state: downloadStates.completed
         }, {
           id: 'download2',
           state: downloadStates.paused
@@ -196,7 +196,8 @@ describe('resumeDownloadItem', () => {
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith(undefined, undefined)
 
-      expect(database.getAllDownloads).toHaveBeenCalledTimes(1)
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledWith({ active: true })
 
       expect(database.getFileCountWhere).toHaveBeenCalledTimes(3)
       expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'download1' })
@@ -204,7 +205,7 @@ describe('resumeDownloadItem', () => {
       expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'download3' })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(3)
-      expect(database.updateDownloadById).toHaveBeenCalledWith('download1', { state: downloadStates.complete })
+      expect(database.updateDownloadById).toHaveBeenCalledWith('download1', { state: downloadStates.active })
       expect(database.updateDownloadById).toHaveBeenCalledWith('download2', { state: downloadStates.active })
       expect(database.updateDownloadById).toHaveBeenCalledWith('download3', { state: downloadStates.pending })
 

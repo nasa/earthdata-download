@@ -1,6 +1,6 @@
 module.exports = {
   development: {
-    client: 'sqlite3',
+    client: 'better-sqlite3',
     connection: {
       // This is only necessary to run `npx knex migrate:make`
       // Starting the application will then run the migrations on the real database

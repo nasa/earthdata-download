@@ -30,7 +30,7 @@ const pauseDownloadItem = async ({
   }
 
   if (downloadId && !filename) {
-    await database.createPauseByDownloadId(downloadId)
+    await database.createPauseByDownloadId(downloadId, true)
 
     await database.updateDownloadById(downloadId, {
       state: downloadStates.paused

@@ -57,12 +57,18 @@ const DownloadHeader = ({
   } = appContext
   const {
     cancelDownloadItem,
+    clearDownload,
     pauseDownloadItem,
     resumeDownloadItem
   } = useContext(ElectronApiContext)
 
   const onCancelDownloadItem = () => {
     cancelDownloadItem({})
+    deleteAllToastsById()
+  }
+
+  const onClearDownloads = () => {
+    clearDownload({})
     deleteAllToastsById()
   }
 
@@ -178,7 +184,7 @@ const DownloadHeader = ({
                 size="sm"
                 Icon={FaBan}
                 variant="danger"
-                onClick={onCancelDownloadItem}
+                onClick={onClearDownloads}
               >
                 Clear Downloads
               </Button>

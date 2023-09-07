@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import FileListItem from '../FileListItem/FileListItem'
+import DownloadHistoryListItem from '../DownloadHistoryListItem/DownloadHistoryListItem'
 import DownloadListItem from '../DownloadListItem/DownloadListItem'
 import Skeleton from '../Skeleton/Skeleton'
 
@@ -72,6 +73,17 @@ const ListPageListItem = ({
     )
   }
 
+  if (type === 'downloadHistory') {
+    return (
+      <div style={style}>
+        <DownloadHistoryListItem
+          download={download}
+          showMoreInfoDialog={showMoreInfoDialog}
+        />
+      </div>
+    )
+  }
+
   // If type is `download`
   return (
     <div style={style}>
@@ -90,6 +102,7 @@ ListPageListItem.propTypes = {
     PropTypes.shape({
       download: PropTypes.shape({}),
       file: PropTypes.shape({}),
+      isHistorical: PropTypes.bool,
       setCurrentPage: PropTypes.func,
       setSelectedDownloadId: PropTypes.func,
       showMoreInfoDialog: PropTypes.func,

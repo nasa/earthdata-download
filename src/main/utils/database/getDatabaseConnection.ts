@@ -10,7 +10,7 @@ export const getDatabaseConnection = (dbPath) => {
   const seedsDirectory = app.isPackaged ? path.join(process.resourcesPath, 'seeds') : 'seeds'
 
   const config = {
-    client: 'sqlite3',
+    client: 'better-sqlite3',
     connection: {
       filename: path.join(dbPath, 'edd-database.sqlite3')
     },

@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { session } from 'electron'
+
 import downloadStates from '../../app/constants/downloadStates'
 
 /**
@@ -39,14 +41,18 @@ const downloadFile = async ({
     fileId
   }
 
-  let bearerToken
-  if (token) bearerToken = `Bearer ${token}`
+  // Thin Egress App sets a cookie, but we want to ensure a token is validated for each request, so clear cookies
+  // before downloading
+  await session.defaultSession.clearStorageData()
 
-  webContents.downloadURL(url, {
-    headers: {
-      Authorization: bearerToken
+  let headers = {}
+  if (token) {
+    headers = {
+      Authorization: `Bearer ${token}`
     }
-  })
+  }
+
+  webContents.downloadURL(url, { headers })
 }
 
 export default downloadFile

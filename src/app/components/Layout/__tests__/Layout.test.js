@@ -92,8 +92,7 @@ describe('Layout component', () => {
     expect(Downloads).toHaveBeenCalledTimes(1)
   })
 
-  test.skip('renders the downloads page when clicking the nav button', async () => {
-    // Skipping because the nav buttons are hidden until EDD-18
+  test('renders the downloads page when clicking the nav button', async () => {
     const user = userEvent.setup()
 
     setup()
@@ -109,8 +108,7 @@ describe('Layout component', () => {
     expect(Downloads).toHaveBeenCalledTimes(2)
   })
 
-  test.skip('renders the download history page when clicking the nav button', async () => {
-    // Skipping because the nav buttons are hidden until EDD-18
+  test('renders the download history page when clicking the nav button', async () => {
     const user = userEvent.setup()
 
     setup()

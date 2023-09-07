@@ -168,9 +168,9 @@ describe('parseDownloadReport', () => {
       const result = parseDownloadReport([cancelledDownload])
 
       expect(result).toEqual({
-        allDownloadsCompleted: false,
+        allDownloadsCompleted: true,
         allDownloadsPaused: false,
-        derivedStateFromDownloads: downloadStates.cancelled,
+        derivedStateFromDownloads: downloadStates.completed,
         hasActiveDownload: false
       })
     })

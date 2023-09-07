@@ -152,6 +152,15 @@
   font-size: var(--text__small);
 }
 
+.subMeta {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  height: 1.75rem; // Height of action buttons
+  margin-top: var(--size__050);
+  font-size: var(--text__small);
+}
+
 .metaPrimary {
   display: flex;
   overflow: hidden;

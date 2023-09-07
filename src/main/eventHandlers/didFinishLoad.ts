@@ -23,9 +23,10 @@ const didFinishLoad = async ({
   // Show the electron appWindow
   appWindow.show()
 
-  // Update any active files to pending, so they can be restarted
-  await database.updateFilesWhere({
-    state: downloadStates.active
+  // Update any paused files to pending, so they can be restarted. The files are paused when
+  // the app quits and they are still running
+  const updatedFiles = await database.updateFilesWhere({
+    state: downloadStates.paused
   }, {
     state: downloadStates.pending,
     percent: 0,
@@ -36,13 +37,11 @@ const didFinishLoad = async ({
     totalBytes: null
   })
 
-  // Update any active downloads to paused, so they can be resumed
-  await database.updateDownloadsWhereIn([
-    'state',
-    [downloadStates.active]
-  ], {
-    state: downloadStates.paused
-  })
+  // Delete any pauses associated with update files (files in pending state)
+  await Promise.all(updatedFiles.map(async (updatedFile) => {
+    const { downloadId, filename } = updatedFile
+    await database.deletePausesByDownloadIdAndFilename(downloadId, filename)
+  }))
 
   // Open the DevTools if running in development.
   if (!app.isPackaged) appWindow.webContents.openDevTools({ mode: 'detach' })

@@ -80,6 +80,14 @@ const willDownload = async ({
   // Set the save path for the DownloadItem
   item.setSavePath(path.join(downloadLocation, filename))
 
+  // If the download has been cancelled, cancel this file
+  const { state } = await database.getDownloadById(downloadId)
+  if (state === downloadStates.cancelled) {
+    currentDownloadItems.cancelItem(downloadId, filename)
+
+    return
+  }
+
   // eslint-disable-next-line no-param-reassign
   delete downloadIdContext[originalUrl]
 

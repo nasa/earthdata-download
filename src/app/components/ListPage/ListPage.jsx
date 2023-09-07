@@ -13,6 +13,7 @@ import AutoSizer from 'react-virtualized-auto-sizer'
 import ListPageListItem from './ListPageListItem'
 
 import * as styles from './ListPage.module.scss'
+import { REPORT_INTERVAL } from '../../constants/reportInterval'
 
 /**
  * @typedef {Object} ListPageProps
@@ -43,17 +44,19 @@ import * as styles from './ListPage.module.scss'
 const ListPage = ({
   actions,
   emptyMessage,
+  fetchReport,
   header,
   hideCompleted,
   Icon,
-  totalItemCount,
   items,
+  itemSize,
   listRef,
-  setWindowState
+  totalItemCount
 }) => {
   const scrollableNodeRef = useRef(null)
   const infiniteLoaderRef = useRef(null)
   const [hasScrolledList, setHasScrolledList] = useState(false)
+  const [windowState, setWindowState] = useState({})
 
   const onScrollList = useCallback(({ target }) => {
     const { scrollTop } = target
@@ -77,8 +80,24 @@ const ListPage = ({
     }
   }, [scrollableNodeRef.current])
 
-  const onItemsRendered = (windowState) => {
-    setWindowState(windowState)
+  useEffect(() => {
+    const loadItems = async () => {
+      await fetchReport(windowState)
+    }
+
+    loadItems()
+
+    const interval = setInterval(() => {
+      loadItems()
+    }, REPORT_INTERVAL)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [windowState, hideCompleted])
+
+  const onItemsRendered = (newWindowState) => {
+    setWindowState(newWindowState)
   }
 
   // TODO Trevor simplebar-mouse-entered is getting added to the simplebar element and causing a tiny dot to appear and top and left of y & x scrollbars
@@ -130,7 +149,7 @@ const ListPage = ({
                                 innerRef={contentNodeRef}
                                 itemCount={totalItemCount}
                                 itemData={items}
-                                itemSize={97}
+                                itemSize={itemSize}
                                 onItemsRendered={onItemsRendered}
                                 outerRef={scrollableNodeRef}
                                 ref={listRef}
@@ -178,21 +197,21 @@ ListPage.defaultProps = {
   hideCompleted: false,
   Icon: null,
   listRef: {},
-  totalItemCount: 0,
-  setWindowState: () => {}
+  totalItemCount: 0
 }
 
 ListPage.propTypes = {
   actions: PropTypes.node,
   emptyMessage: PropTypes.string,
+  fetchReport: PropTypes.func.isRequired,
   header: PropTypes.node,
   Icon: PropTypes.func,
   items: PropTypes.arrayOf(
     PropTypes.shape({})
   ).isRequired,
+  itemSize: PropTypes.number.isRequired,
   listRef: PropTypes.shape({}),
   totalItemCount: PropTypes.number,
-  setWindowState: PropTypes.func,
   hideCompleted: PropTypes.bool
 }
 

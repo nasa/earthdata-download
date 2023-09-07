@@ -1,13 +1,10 @@
 import React, {
   useContext,
-  useEffect,
   useRef,
   useState
 } from 'react'
 import PropTypes from 'prop-types'
 import { FaDownload } from 'react-icons/fa'
-
-import { REPORT_INTERVAL } from '../../constants/reportInterval'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
@@ -52,7 +49,6 @@ const FileDownloads = ({
 
   const [hideCompleted, setHideCompleted] = useState(false)
   const [items, setItems] = useState([])
-  const [windowState, setWindowState] = useState({})
   const [headerReport, setHeaderReport] = useState({})
   const [totalFiles, setTotalFiles] = useState(0)
 
@@ -63,7 +59,7 @@ const FileDownloads = ({
     listRef.current.scrollToItem(0)
   }
 
-  const buildItems = (report) => {
+  const buildItems = (windowState, report) => {
     const {
       overscanStartIndex,
       overscanStopIndex
@@ -95,60 +91,59 @@ const FileDownloads = ({
       ...postArray
     ])
 
-    setTotalFiles(reportTotalFiles)
+    return [
+      ...preArray,
+      ...realItems,
+      ...postArray
+    ]
   }
 
-  useEffect(() => {
-    const loadItems = async () => {
-      const {
-        overscanStartIndex = 0,
-        // Default to 10 items
-        overscanStopIndex = 10
-      } = windowState
+  const fetchReport = async (windowState) => {
+    const {
+      overscanStartIndex = 0,
+      // Default to 10 items
+      overscanStopIndex = 10
+    } = windowState
 
-      const stopIndex = Math.max(10, overscanStopIndex + 1)
-      const limit = stopIndex - overscanStartIndex
-      const offset = overscanStartIndex
+    const stopIndex = Math.max(10, overscanStopIndex + 1)
+    const limit = stopIndex - overscanStartIndex
+    const offset = overscanStartIndex
 
-      const report = await requestFilesProgress({
-        downloadId,
-        limit,
-        offset,
-        hideCompleted
-      })
+    const report = await requestFilesProgress({
+      downloadId,
+      limit,
+      offset,
+      hideCompleted
+    })
 
-      const {
-        headerReport: newHeaderReport
-      } = report || {}
+    const {
+      headerReport: newHeaderReport,
+      filesReport: newFilesReport
+    } = report || {}
 
-      const { errors } = newHeaderReport
+    const {
+      totalFiles: reportTotalFiles
+    } = newFilesReport
 
-      buildItems(report)
-      setHeaderReport(newHeaderReport)
+    const { errors } = newHeaderReport
 
-      addErrorToasts({
-        errors,
-        addToast,
-        deleteAllToastsById,
-        retryErroredDownloadItem,
-        showMoreInfoDialog
-      })
-    }
+    setItems(buildItems(windowState, report))
+    setTotalFiles(reportTotalFiles)
+    setHeaderReport(newHeaderReport)
 
-    loadItems()
-
-    const interval = setInterval(() => {
-      loadItems()
-    }, REPORT_INTERVAL)
-
-    return () => {
-      clearInterval(interval)
-    }
-  }, [windowState, hideCompleted])
+    addErrorToasts({
+      errors,
+      addToast,
+      deleteAllToastsById,
+      retryErroredDownloadItem,
+      showMoreInfoDialog
+    })
+  }
 
   return (
     <ListPage
       emptyMessage="No file downloads in progress"
+      fetchReport={fetchReport}
       header={
         (
           <FileDownloadsHeader
@@ -163,9 +158,9 @@ const FileDownloads = ({
       hideCompleted={hideCompleted}
       Icon={FaDownload}
       items={items}
+      itemSize={97}
       listRef={listRef}
       totalItemCount={totalFiles}
-      setWindowState={setWindowState}
     />
   )
 }

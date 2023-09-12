@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { dialog } from 'electron'
 
 import chooseDownloadLocation from '../chooseDownloadLocation'

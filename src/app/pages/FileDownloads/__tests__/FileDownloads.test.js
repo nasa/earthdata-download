@@ -22,7 +22,6 @@ jest.mock('../../../utils/addErrorToasts', () => ({
 const setup = (withErrors, overrideProps) => {
   const addToast = jest.fn()
   const deleteAllToastsById = jest.fn()
-  const initializeDownload = jest.fn()
   const setCurrentPage = jest.fn()
   const showMoreInfoDialog = jest.fn()
 
@@ -87,7 +86,6 @@ const setup = (withErrors, overrideProps) => {
   render(
     <ElectronApiContext.Provider value={
       {
-        initializeDownload,
         requestFilesProgress
       }
     }
@@ -109,7 +107,6 @@ const setup = (withErrors, overrideProps) => {
   return {
     addToast,
     deleteAllToastsById,
-    initializeDownload,
     requestFilesProgress,
     setCurrentPage,
     showMoreInfoDialog

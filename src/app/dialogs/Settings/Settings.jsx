@@ -23,7 +23,7 @@ import * as styles from './Settings.module.scss'
  * @typedef {Object} InitializeDownloadProps
  * @property {Boolean} hasActiveDownloads A boolean representing flag if user has downloads in active state
  * @property {String} defaultDownloadLocation A string representing the default download file path
- * @property {String} setDefaultDownloadLocation A function which sets default download location.
+ * @property {String} setDefaultDownloadLocation A function which sets default download location
  * @property {Boolean} settingsDialogIsOpen A boolean representing flag if the settings modal is open or closed
  */
 

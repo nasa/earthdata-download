@@ -10,10 +10,7 @@ const clearDownloadHistory = async ({
   database,
   info
 }) => {
-  // TODO we should be able to clear individual items from the download history with a button to the actions bar
-  console.log('🚀 ~ file: clearDownloadHistory.ts:14 ~ info:', info)
   const { downloadId = '' } = info
-  console.log('🚀 ~ file: clearDownloadHistory.ts:14 ~ downloadId:', downloadId)
 
   if (downloadId.length > 0) {
     database.clearDownloadHistoryDownloads(downloadId)

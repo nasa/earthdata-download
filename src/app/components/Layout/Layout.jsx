@@ -173,7 +173,7 @@ const Layout = () => {
       if (currentPage !== PAGES.downloads) {
         newDownloadIds.forEach((downloadId) => {
           addToast({
-            id: downloadId,
+            id: `new-download-${downloadId}`,
             title: 'New Download',
             message: downloadId,
             numberErrors: 0

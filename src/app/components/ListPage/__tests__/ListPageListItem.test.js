@@ -3,8 +3,10 @@ import React from 'react'
 import ListPageListItem from '../ListPageListItem'
 import FileListItem from '../../FileListItem/FileListItem'
 import DownloadListItem from '../../DownloadListItem/DownloadListItem'
+import DownloadHistoryListItem from '../../DownloadHistoryListItem/DownloadHistoryListItem'
 
 jest.mock('../../DownloadListItem/DownloadListItem')
+jest.mock('../../DownloadHistoryListItem/DownloadHistoryListItem')
 jest.mock('../../FileListItem/FileListItem')
 
 const setup = (overrideProps = {}) => {
@@ -42,6 +44,30 @@ describe('ListPageListItem', () => {
         },
         setCurrentPage,
         setSelectedDownloadId
+      }, {})
+
+      expect(FileListItem).toHaveBeenCalledTimes(0)
+    })
+  })
+
+  describe('when the ListItem is an inactive download', () => {
+    test('renders a DownloadHistoryListItem', () => {
+      const showMoreInfoDialog = jest.fn()
+
+      setup({
+        data: [{
+          type: 'downloadHistory',
+          download: { mock: 'download' },
+          showMoreInfoDialog
+        }]
+      })
+
+      expect(DownloadHistoryListItem).toHaveBeenCalledTimes(1)
+      expect(DownloadHistoryListItem).toHaveBeenCalledWith({
+        download: {
+          mock: 'download'
+        },
+        showMoreInfoDialog
       }, {})
 
       expect(FileListItem).toHaveBeenCalledTimes(0)

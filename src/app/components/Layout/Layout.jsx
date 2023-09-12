@@ -170,7 +170,6 @@ const Layout = () => {
 
       // Display a toast notification if a download is initialized
       // while current page is not Downloads
-
       if (currentPage !== PAGES.downloads) {
         newDownloadIds.forEach((downloadId) => {
           addToast({

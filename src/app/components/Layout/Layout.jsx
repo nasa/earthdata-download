@@ -160,7 +160,6 @@ const Layout = () => {
     setDownloadIds(newDownloadIds)
     setSelectedDownloadLocation(newDownloadLocation)
     setUseDefaultLocation(shouldUseDefaultLocation)
-
     // If shouldUseDefaultLocation is true, start the download(s)
     if (shouldUseDefaultLocation) {
       beginDownload({
@@ -171,8 +170,9 @@ const Layout = () => {
 
       // Display a toast notification if a download is initialized
       // while current page is not Downloads
+
       if (currentPage !== PAGES.downloads) {
-        downloadIds.forEach((downloadId) => {
+        newDownloadIds.forEach((downloadId) => {
           addToast({
             id: downloadId,
             title: 'New Download',

@@ -270,6 +270,7 @@ describe('requestDownloadsProgress', () => {
         }),
       getErroredFiles: jest.fn()
         .mockResolvedValue([{
+          active: 1,
           downloadId: 'mock-download-id-2',
           numberErrors: 1
         }]),
@@ -315,6 +316,7 @@ describe('requestDownloadsProgress', () => {
       }],
       errors: {
         'mock-download-id-2': {
+          active: 1,
           numberErrors: 1
         }
       },

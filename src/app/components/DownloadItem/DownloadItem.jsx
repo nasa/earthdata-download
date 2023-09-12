@@ -244,7 +244,7 @@ const DownloadItem = ({
           </div>
 
           {
-            state !== downloadStates.errorFetchingLinks && (
+            actionsList && (
               <div className={styles.metaSecondary}>
                 {primaryActions}
                 <Dropdown

@@ -59,7 +59,13 @@ describe('restartDownload', () => {
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledTimes(1)
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledWith('mock-download-id')
 
-      expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
+      expect(database.updateFilesWhere).toHaveBeenCalledTimes(2)
+      expect(database.updateFilesWhere).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id'
+      }, {
+        state: downloadStates.cancelling
+      })
+
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
         downloadId: 'mock-download-id'
       }, {
@@ -130,7 +136,14 @@ describe('restartDownload', () => {
 
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledTimes(0)
 
-      expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
+      expect(database.updateFilesWhere).toHaveBeenCalledTimes(2)
+      expect(database.updateFilesWhere).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id',
+        filename: 'mock-filename'
+      }, {
+        state: downloadStates.cancelling
+      })
+
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
         downloadId: 'mock-download-id',
         filename: 'mock-filename'
@@ -202,7 +215,14 @@ describe('restartDownload', () => {
 
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledTimes(0)
 
-      expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
+      expect(database.updateFilesWhere).toHaveBeenCalledTimes(2)
+      expect(database.updateFilesWhere).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id',
+        filename: 'mock-filename'
+      }, {
+        state: downloadStates.cancelling
+      })
+
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
         downloadId: 'mock-download-id',
         filename: 'mock-filename'

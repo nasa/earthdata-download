@@ -518,7 +518,7 @@ describe('EddDatabase', () => {
   describe('getErroredFiles', () => {
     test('returns requested files', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select `downloadId`, count(`id`) as `numberErrors` from `files` where `state` = ? group by `downloadId`')
+        expect(query.sql).toEqual('select `downloads`.`active`, `files`.`downloadId`, count(`files`.`id`) as `numberErrors` from `files` inner join `downloads` on `files`.`downloadId` = `downloads`.`id` where `files`.`state` = ? group by `files`.`downloadId`')
         expect(query.bindings).toEqual([
           downloadStates.error
         ])

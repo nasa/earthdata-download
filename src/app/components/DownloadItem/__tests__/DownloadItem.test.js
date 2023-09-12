@@ -455,7 +455,7 @@ describe('DownloadItem component', () => {
 
       expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 0%')
 
-      expect(screen.queryByRole('button', { name: 'test-label' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'test-label' })).toBeInTheDocument()
     })
   })
 

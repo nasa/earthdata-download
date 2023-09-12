@@ -60,7 +60,7 @@ const resumeDownloadItem = async ({
 
       const numberFiles = await database.getFileCountWhere({ downloadId: id })
 
-      // Default to the current state value
+      // Default state to active
       let newState = downloadStates.active
 
       // If the state is paused and there are no files, set to pending

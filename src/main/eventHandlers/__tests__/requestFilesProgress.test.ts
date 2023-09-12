@@ -132,6 +132,7 @@ describe('requestFilesProgress', () => {
         .mockResolvedValue(70),
       getErroredFiles: jest.fn()
         .mockResolvedValue([{
+          active: 1,
           downloadId: 'mock-download-id-2',
           numberErrors: 1
         }]),
@@ -167,6 +168,7 @@ describe('requestFilesProgress', () => {
         elapsedTime: 123000,
         errors: {
           'mock-download-id-2': {
+            active: 1,
             numberErrors: 1
           }
         },

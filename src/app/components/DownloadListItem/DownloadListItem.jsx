@@ -98,8 +98,11 @@ const DownloadListItem = ({
   ].includes(state)
   const shouldShowClear = [
     downloadStates.completed,
-    downloadStates.cancelled
+    downloadStates.cancelled,
+    downloadStates.error,
+    downloadStates.errorFetchingLinks
   ].includes(state)
+  const shouldShowActions = state !== downloadStates.errorFetchingLinks
   const shouldDisableOpenFolder = finishedFiles === 0
   const isComplete = state === downloadStates.completed
   const shouldShowLogin = state === downloadStates.waitingForAuth
@@ -171,7 +174,7 @@ const DownloadListItem = ({
     [
       {
         label: 'Open Folder',
-        isActive: !shouldDisableOpenFolder,
+        isActive: shouldShowActions && !shouldDisableOpenFolder,
         isPrimary: isComplete,
         callback: () => openDownloadFolder({ downloadId }),
         icon: FaFolderOpen,
@@ -179,7 +182,7 @@ const DownloadListItem = ({
       },
       {
         label: 'Copy Folder Path',
-        isActive: true,
+        isActive: shouldShowActions,
         isPrimary: isComplete,
         callback: () => copyDownloadPath({ downloadId }),
         icon: FaClipboard
@@ -188,7 +191,7 @@ const DownloadListItem = ({
     [
       {
         label: 'Restart Download',
-        isActive: true,
+        isActive: shouldShowActions,
         isPrimary: false,
         callback: () => {
           deleteAllToastsById(downloadId)

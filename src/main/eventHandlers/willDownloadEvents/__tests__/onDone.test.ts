@@ -38,7 +38,8 @@ describe('onDone', () => {
       getDownloadById: jest.fn().mockResolvedValue({ errors: [] }),
       updateDownloadById: jest.fn(),
       getFileWhere: jest.fn().mockResolvedValue({
-        id: 123
+        id: 123,
+        state: downloadStates.active
       }),
       updateFileById: jest.fn()
     }
@@ -99,7 +100,8 @@ describe('onDone', () => {
       getDownloadById: jest.fn().mockResolvedValue({ errors: [] }),
       updateDownloadById: jest.fn(),
       getFileWhere: jest.fn().mockResolvedValue({
-        id: 123
+        id: 123,
+        state: downloadStates.active
       }),
       updateFileById: jest.fn()
     }
@@ -258,6 +260,66 @@ describe('onDone', () => {
       state: downloadStates.active,
       timeEnd: 1684029600000
     })
+
+    expect(startNextDownload).toHaveBeenCalledTimes(1)
+    expect(startNextDownload).toHaveBeenCalledWith({
+      currentDownloadItems,
+      downloadIdContext: {},
+      database,
+      webContents: {}
+    })
+
+    expect(finishDownload).toHaveBeenCalledTimes(1)
+    expect(finishDownload).toHaveBeenCalledWith({
+      database,
+      downloadId: 'mock-download-id'
+    })
+  })
+
+  test('does not set a cancelled file to cancelled when the file state is not active', async () => {
+    const currentDownloadItems = {
+      removeItem: jest.fn()
+    }
+    const downloadId = 'mock-download-id'
+    const item = {
+      getFilename: jest.fn().mockReturnValue('mock-filename.png'),
+      getReceivedBytes: jest.fn().mockReturnValue(42),
+      getTotalBytes: jest.fn().mockReturnValue(100)
+    }
+    const state = 'cancelled'
+    const database = {
+      getDownloadById: jest.fn().mockResolvedValue({
+        errors: [],
+        state: downloadStates.active
+      }),
+      updateDownloadById: jest.fn(),
+      getFileWhere: jest.fn().mockResolvedValue({
+        id: 123,
+        state: downloadStates.error
+      }),
+      updateFileById: jest.fn()
+    }
+
+    await onDone({
+      currentDownloadItems,
+      database,
+      downloadId,
+      downloadIdContext: {},
+      item,
+      state,
+      webContents: {}
+    })
+
+    expect(currentDownloadItems.removeItem).toHaveBeenCalledTimes(1)
+    expect(currentDownloadItems.removeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
+
+    expect(database.getFileWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileWhere).toHaveBeenCalledWith({
+      downloadId: 'mock-download-id',
+      filename: 'mock-filename.png'
+    })
+
+    expect(database.updateFileById).toHaveBeenCalledTimes(0)
 
     expect(startNextDownload).toHaveBeenCalledTimes(1)
     expect(startNextDownload).toHaveBeenCalledWith({

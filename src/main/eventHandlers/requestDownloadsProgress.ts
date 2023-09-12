@@ -75,10 +75,15 @@ const requestDownloadsProgress = async ({
   const errors = {}
   errorResults.forEach((error) => {
     const {
+      active: erroredDownloadActive,
       downloadId: erroredDownloadId,
       numberErrors
     } = error
-    errors[erroredDownloadId] = { numberErrors }
+
+    errors[erroredDownloadId] = {
+      active: erroredDownloadActive,
+      numberErrors
+    }
   })
 
   const filesTotals = await database.getFilesTotals()

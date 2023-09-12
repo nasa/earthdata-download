@@ -24,6 +24,16 @@ const restartDownload = async ({
     filename
   } = info
 
+  // Set the files to cancelling
+  const updateWhere = { downloadId }
+  if (filename) {
+    updateWhere.filename = filename
+  }
+
+  await database.updateFilesWhere(updateWhere, {
+    state: downloadStates.cancelling
+  })
+
   currentDownloadItems.cancelItem(downloadId, filename)
 
   const resetFileValues = {

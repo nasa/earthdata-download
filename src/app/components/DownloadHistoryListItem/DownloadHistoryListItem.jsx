@@ -13,20 +13,21 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
 import useAppContext from '../../hooks/useAppContext'
 import DownloadHistoryListItemState from './DownloadHistoryListItemState'
 import DownloadHistoryListItemTimestamp from './DownloadHistoryListItemTimestamp'
+import downloadStates from '../../constants/downloadStates'
 
 /**
- * @typedef {Object} DownloadListItemProps
+ * @typedef {Object} DownloadHistoryListItemProps
  * @property {Object} download State of the download item.
  * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout.
  */
 
 /**
- * Renders a `DownloadListItem` component
- * @param {DownloadListItemProps} props
+ * Renders a `DownloadHistoryListItem` component
+ * @param {DownloadHistoryListItemProps} props
  *
- * @example <caption>Renders a `DownloadListItem` component</caption>
+ * @example <caption>Renders a `DownloadHistoryListItem` component</caption>
  * return (
- *   <DownloadListItem
+ *   <DownloadHistoryListItem
  *     download={download}
  *     showMoreInfoDialog={showMoreInfoDialog}
  *   />
@@ -59,6 +60,8 @@ const DownloadHistoryListItem = ({
     finishedFiles,
     totalTime
   } = progress
+
+  const shouldShowActions = state !== downloadStates.errorFetchingLinks
 
   const actionsList = [
     [
@@ -93,7 +96,7 @@ const DownloadHistoryListItem = ({
 
   return (
     <DownloadItem
-      actionsList={actionsList}
+      actionsList={shouldShowActions ? actionsList : null}
       downloadId={downloadId}
       showMoreInfoDialog={showMoreInfoDialog}
       shouldBeClickable={false}

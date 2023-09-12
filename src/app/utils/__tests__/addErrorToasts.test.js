@@ -22,9 +22,11 @@ describe('addErrorToasts', () => {
   test('calls addToast for each error', () => {
     const errors = {
       'mock-download-id-1': {
+        active: 1,
         numberErrors: 3
       },
       'mock-download-id-2': {
+        active: 1,
         numberErrors: 5
       }
     }
@@ -61,5 +63,32 @@ describe('addErrorToasts', () => {
         variant: 'danger'
       })
     )
+  })
+
+  test('does not call addToast when the download is not active', () => {
+    const errors = {
+      'mock-download-id-1': {
+        active: 0,
+        numberErrors: 3
+      },
+      'mock-download-id-2': {
+        active: 0,
+        numberErrors: 5
+      }
+    }
+    const addToast = jest.fn()
+    const deleteAllToastsById = jest.fn()
+    const retryErroredDownloadItem = jest.fn()
+    const showMoreInfoDialog = jest.fn()
+
+    addErrorToasts({
+      errors,
+      addToast,
+      deleteAllToastsById,
+      retryErroredDownloadItem,
+      showMoreInfoDialog
+    })
+
+    expect(addToast).toHaveBeenCalledTimes(0)
   })
 })

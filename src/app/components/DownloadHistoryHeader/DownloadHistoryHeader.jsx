@@ -7,11 +7,11 @@ import Button from '../Button/Button'
 import * as styles from './DownloadHistoryHeader.module.scss'
 
 /**
- * Renders a `DownloadHeader` component
+ * Renders a `DownloadHistoryHeader` component
  *
- * @example <caption>Renders a `DownloadHeader` component</caption>
+ * @example <caption>Renders a `DownloadHistoryHeader` component</caption>
  * return (
- *   <DownloadHeader />
+ *   <DownloadHistoryHeader />
  * )
  */
 const DownloadHistoryHeader = () => {

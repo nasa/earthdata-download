@@ -60,7 +60,8 @@ describe('willDownload', () => {
       cancelItem: jest.fn()
     }
     const database = {
-      getDownloadById: jest.fn().mockReturnValue({ state: downloadStates.active }),
+      getDownloadById: jest.fn().mockResolvedValue({ state: downloadStates.active }),
+      getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
       updateDownloadById: jest.fn(),
       updateFileById: jest.fn()
     }
@@ -121,6 +122,7 @@ describe('willDownload', () => {
         authUrl: '',
         state: downloadStates.active
       }),
+      getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
       updateDownloadById: jest.fn(),
       updateFileById: jest.fn(),
       willDownload: jest.fn().mockResolvedValue(100)
@@ -172,6 +174,7 @@ describe('willDownload', () => {
           errors: [],
           state: downloadStates.active
         }),
+        getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         updateFileById: jest.fn()
       }
       const downloadIdContext = {
@@ -243,6 +246,7 @@ describe('willDownload', () => {
           authUrl: 'http://example.com/login',
           state: downloadStates.active
         }),
+        getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         updateDownloadById: jest.fn(),
         updateFileById: jest.fn()
       }
@@ -322,6 +326,7 @@ describe('willDownload', () => {
           authUrl: 'http://example.com/login',
           state: downloadStates.active
         }),
+        getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         updateDownloadById: jest.fn(),
         updateFileById: jest.fn()
       }
@@ -394,6 +399,7 @@ describe('willDownload', () => {
           authUrl: 'http://example.com/login',
           state: downloadStates.active
         }),
+        getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         updateDownloadById: jest.fn(),
         updateFileById: jest.fn()
       }
@@ -477,6 +483,7 @@ describe('willDownload', () => {
           authUrl: 'http://example.com/login',
           state: downloadStates.cancelled
         }),
+        getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         updateDownloadById: jest.fn(),
         updateFileById: jest.fn()
       }
@@ -533,6 +540,77 @@ describe('willDownload', () => {
     })
   })
 
+  describe('when the download has been paused', () => {
+    test('pauses the file', async () => {
+      const currentDownloadItems = {
+        addItem: jest.fn(),
+        cancelItem: jest.fn(),
+        pauseItem: jest.fn()
+      }
+      const database = {
+        getDownloadById: jest.fn().mockResolvedValue({
+          authUrl: 'http://example.com/login',
+          state: downloadStates.paused
+        }),
+        getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
+        updateDownloadById: jest.fn(),
+        updateFileById: jest.fn()
+      }
+      const downloadIdContext = {
+        'http://example.com/mock-filename.png': {
+          downloadId: 'mock-download-id',
+          downloadLocation: '/mock/location/mock-download-id',
+          fileId: 123
+        }
+      }
+      const downloadsWaitingForAuth = {}
+      const downloadsWaitingForEula = {}
+      const item = {
+        getFilename: jest.fn().mockReturnValue('mock-filename.png'),
+        setSavePath: jest.fn(),
+        getURLChain: jest.fn().mockReturnValue([
+          'http://example.com/mock-filename.png'
+        ]),
+        on: jest.fn(),
+        once: jest.fn(),
+        cancel: jest.fn(),
+        getReceivedBytes: jest.fn().mockReturnValue(100),
+        getTotalBytes: jest.fn().mockReturnValue(100)
+      }
+      const webContents = {
+        send: jest.fn()
+      }
+
+      await willDownload({
+        currentDownloadItems,
+        database,
+        downloadIdContext,
+        downloadsWaitingForAuth,
+        downloadsWaitingForEula,
+        item,
+        webContents
+      })
+
+      expect(item.setSavePath).toHaveBeenCalledTimes(1)
+      expect(item.setSavePath).toHaveBeenCalledWith('/mock/location/mock-download-id/mock-filename.png')
+
+      expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+      expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
+
+      expect(currentDownloadItems.addItem).toHaveBeenCalledTimes(1)
+
+      expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(0)
+
+      expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
+      expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
+
+      expect(verifyDownload).toHaveBeenCalledTimes(0)
+      expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
+      expect(database.updateFileById).toHaveBeenCalledTimes(0)
+      expect(finishDownload).toHaveBeenCalledTimes(0)
+    })
+  })
+
   describe('when the `updated` event is called', () => {
     test('calls onUpdated', async () => {
       const currentDownloadItems = {
@@ -541,6 +619,7 @@ describe('willDownload', () => {
       }
       const database = {
         getDownloadById: jest.fn().mockReturnValue({ state: downloadStates.active }),
+        getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         updateDownloadById: jest.fn(),
         updateFileById: jest.fn()
       }
@@ -602,6 +681,7 @@ describe('willDownload', () => {
       }
       const database = {
         getDownloadById: jest.fn().mockReturnValue({ state: downloadStates.active }),
+        getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         updateDownloadById: jest.fn(),
         updateFileById: jest.fn()
       }

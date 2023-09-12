@@ -25,7 +25,6 @@ const onDone = async ({
   webContents
 }) => {
   const filename = item.getFilename()
-
   // Get the download item from the database
   const file = await database.getFileWhere({
     filename,
@@ -41,7 +40,6 @@ const onDone = async ({
     id: fileId,
     state: previousState
   } = file
-
   // Remove the item from the currentDownloadItems
   currentDownloadItems.removeItem(downloadId, filename)
   let errors
@@ -65,13 +63,16 @@ const onDone = async ({
       break
   }
 
-  // Update the state in the database
-  await database.updateFileById(fileId, {
-    errors,
-    percent: updatedState === downloadStates.completed ? 100 : 0,
-    state: updatedState,
-    timeEnd: new Date().getTime()
-  })
+  // If the `previousState` is not active, don't worry about updating the file
+  if (previousState === downloadStates.active) {
+    // Update the state in the database
+    await database.updateFileById(fileId, {
+      errors,
+      percent: updatedState === downloadStates.completed ? 100 : 0,
+      state: updatedState,
+      timeEnd: new Date().getTime()
+    })
+  }
 
   // Start the next download
   await startNextDownload({

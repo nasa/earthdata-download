@@ -274,19 +274,20 @@ class EddDatabase {
 
   /**
    * Returns the errored files.
-   * @param {String} downloadId Id of the download to retrieve errored files.
    */
   async getErroredFiles() {
     return this.db('files')
       // Add additional fields to this select if we need to display any error info
       .select(
-        'downloadId'
+        'downloads.active',
+        'files.downloadId'
       )
-      .count('id as numberErrors')
+      .count('files.id as numberErrors')
+      .join('downloads', { 'files.downloadId': 'downloads.id' })
       .where({
-        state: downloadStates.error
+        'files.state': downloadStates.error
       })
-      .groupBy('downloadId')
+      .groupBy('files.downloadId')
   }
 
   /**

@@ -1,5 +1,6 @@
 const downloadStates = {
   active: 'ACTIVE',
+  cancelling: 'CANCELLING',
   cancelled: 'CANCELLED',
   completed: 'COMPLETED',
   error: 'ERROR',

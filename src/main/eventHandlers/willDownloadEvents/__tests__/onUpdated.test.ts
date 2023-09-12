@@ -5,12 +5,6 @@ import MockDate from 'mockdate'
 import onUpdated from '../onUpdated'
 
 import downloadStates from '../../../../app/constants/downloadStates'
-import setInterruptedDownload from '../setInterruptedDownload'
-
-jest.mock('../setInterruptedDownload', () => ({
-  __esModule: true,
-  default: jest.fn(() => {})
-}))
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
@@ -30,7 +24,9 @@ describe('onUpdated', () => {
         id: 123
       }),
       updateFileById: jest.fn(),
-      createPauseByDownloadIdAndFilename: jest.fn()
+      createPauseByDownloadIdAndFilename: jest.fn(),
+      createPauseByDownloadId: jest.fn(),
+      updateDownloadById: jest.fn()
     }
 
     await onUpdated({
@@ -55,11 +51,11 @@ describe('onUpdated', () => {
     expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(1)
     expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
-    expect(setInterruptedDownload).toHaveBeenCalledTimes(1)
-    expect(setInterruptedDownload).toHaveBeenCalledWith({
-      database,
-      downloadId
-    })
+    expect(database.createPauseByDownloadId).toHaveBeenCalledTimes(1)
+    expect(database.createPauseByDownloadId).toHaveBeenCalledWith('mock-download-id', false)
+
+    expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: downloadStates.interrupted })
   })
 
   test('updates the database for progressing downloads', async () => {

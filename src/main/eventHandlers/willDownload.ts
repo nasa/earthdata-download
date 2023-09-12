@@ -88,6 +88,13 @@ const willDownload = async ({
     return
   }
 
+  // If the download has been paused, pause this file
+  if (downloadState === downloadStates.paused) {
+    currentDownloadItems.pauseItem(downloadId, filename)
+
+    return
+  }
+
   // eslint-disable-next-line no-param-reassign
   delete downloadIdContext[originalUrl]
 
@@ -124,18 +131,21 @@ const willDownload = async ({
     webContents
   })
 
-  console.log('🚀 ~ file: willDownload.ts:130 ~ downloadId, filename:', downloadId, filename)
-  console.log('🚀 ~ file: willDownload.ts:128 ~ downloadCheck:', downloadCheck)
-  console.log('🚀 ~ file: willDownload.ts:136 ~ totalBytes:', totalBytes)
-  console.log('🚀 ~ file: willDownload.ts:137 ~ downloadState:', downloadState)
-  if (!downloadCheck && downloadState === downloadStates.active) {
+  const { state: fileState } = await database.getFileWhere({
+    downloadId,
+    filename
+  })
+  const isFileActive = fileState === downloadStates.active
+  const isDownloadActive = downloadState === downloadStates.active
+
+  if (isFileActive && isDownloadActive && !downloadCheck) {
     currentDownloadItems.cancelItem(downloadId, filename)
 
     return
   }
 
   // If the file has no totalBytes, report an error
-  if (totalBytes === 0 && downloadState === downloadStates.active) {
+  if (isFileActive && isDownloadActive && totalBytes === 0) {
     await database.updateFileById(fileId, {
       state: downloadStates.error,
       errors: 'This file could not be downloaded'
@@ -155,7 +165,7 @@ const willDownload = async ({
     return
   }
 
-  if (receivedBytes === totalBytes) {
+  if (totalBytes > 0 && receivedBytes === totalBytes) {
     // The file is already done, mark it as completed
     await database.updateFileById(fileId, {
       percent: 100,

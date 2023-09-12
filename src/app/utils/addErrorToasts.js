@@ -21,7 +21,13 @@ const addErrorToasts = ({
   // Add errors
   Object.keys(errors).forEach((erroredDownloadId) => {
     const error = errors[erroredDownloadId]
-    const { numberErrors } = error
+    const {
+      active,
+      numberErrors
+    } = error
+
+    // If the download is not active, don't display the toast
+    if (!active) return
 
     addToast({
       id: erroredDownloadId,

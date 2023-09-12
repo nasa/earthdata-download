@@ -4,7 +4,7 @@ import { dialog } from 'electron'
 
 /**
  * Opens the electron open dialog to choose a download location
- * @param {Object} psarams
+ * @param {Object} params
  * @param {Object} params.appWindow Electron window instance
  */
 const chooseDownloadLocation = async ({

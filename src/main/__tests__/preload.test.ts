@@ -11,7 +11,7 @@ jest.mock(
       send: jest.fn(),
       invoke: jest.fn(),
       on: jest.fn(),
-      removeListener: jest.fn()
+      removeAllListeners: jest.fn()
     }
     const mockContextBridge = {
       exposeInMainWorld: (name, events) => {
@@ -240,10 +240,10 @@ describe('preload', () => {
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(1)
       expect(ipcRenderer.on).toHaveBeenCalledWith('autoUpdateAvailable', mockCallback)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(0)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(0)
     })
 
-    test('calls ipcRenderer.removeListener', async () => {
+    test('calls ipcRenderer.removeAllListeners', async () => {
       await setup()
 
       const mockCallback = jest.fn()
@@ -251,8 +251,8 @@ describe('preload', () => {
       electronApi.autoUpdateAvailable(false, mockCallback)
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(0)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(1)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledWith('autoUpdateAvailable', mockCallback)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(1)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledWith('autoUpdateAvailable', mockCallback)
     })
   })
 
@@ -266,10 +266,10 @@ describe('preload', () => {
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(1)
       expect(ipcRenderer.on).toHaveBeenCalledWith('autoUpdateProgress', mockCallback)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(0)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(0)
     })
 
-    test('calls ipcRenderer.removeListener', async () => {
+    test('calls ipcRenderer.removeAllListeners', async () => {
       await setup()
 
       const mockCallback = jest.fn()
@@ -277,8 +277,8 @@ describe('preload', () => {
       electronApi.autoUpdateProgress(false, mockCallback)
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(0)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(1)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledWith('autoUpdateProgress', mockCallback)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(1)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledWith('autoUpdateProgress', mockCallback)
     })
   })
 
@@ -292,10 +292,10 @@ describe('preload', () => {
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(1)
       expect(ipcRenderer.on).toHaveBeenCalledWith('initializeDownload', mockCallback)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(0)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(0)
     })
 
-    test('calls ipcRenderer.removeListener', async () => {
+    test('calls ipcRenderer.removeAllListeners', async () => {
       await setup()
 
       const mockCallback = jest.fn()
@@ -303,8 +303,8 @@ describe('preload', () => {
       electronApi.initializeDownload(false, mockCallback)
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(0)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(1)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledWith('initializeDownload', mockCallback)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(1)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledWith('initializeDownload', mockCallback)
     })
   })
 
@@ -318,10 +318,10 @@ describe('preload', () => {
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(1)
       expect(ipcRenderer.on).toHaveBeenCalledWith('setDownloadLocation', mockCallback)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(0)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(0)
     })
 
-    test('calls ipcRenderer.removeListener', async () => {
+    test('calls ipcRenderer.removeAllListeners', async () => {
       await setup()
 
       const mockCallback = jest.fn()
@@ -329,8 +329,8 @@ describe('preload', () => {
       electronApi.setDownloadLocation(false, mockCallback)
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(0)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(1)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledWith('setDownloadLocation', mockCallback)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(1)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledWith('setDownloadLocation', mockCallback)
     })
   })
 
@@ -344,10 +344,10 @@ describe('preload', () => {
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(1)
       expect(ipcRenderer.on).toHaveBeenCalledWith('showWaitingForEulaDialog', mockCallback)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(0)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(0)
     })
 
-    test('calls ipcRenderer.removeListener', async () => {
+    test('calls ipcRenderer.removeAllListeners', async () => {
       await setup()
 
       const mockCallback = jest.fn()
@@ -355,8 +355,8 @@ describe('preload', () => {
       electronApi.showWaitingForEulaDialog(false, mockCallback)
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(0)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(1)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledWith('showWaitingForEulaDialog', mockCallback)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(1)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledWith('showWaitingForEulaDialog', mockCallback)
     })
   })
 
@@ -370,10 +370,10 @@ describe('preload', () => {
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(1)
       expect(ipcRenderer.on).toHaveBeenCalledWith('showWaitingForLoginDialog', mockCallback)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(0)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(0)
     })
 
-    test('calls ipcRenderer.removeListener', async () => {
+    test('calls ipcRenderer.removeAllListeners', async () => {
       await setup()
 
       const mockCallback = jest.fn()
@@ -381,8 +381,8 @@ describe('preload', () => {
       electronApi.showWaitingForLoginDialog(false, mockCallback)
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(0)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(1)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledWith('showWaitingForLoginDialog', mockCallback)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(1)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledWith('showWaitingForLoginDialog', mockCallback)
     })
   })
 
@@ -396,10 +396,10 @@ describe('preload', () => {
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(1)
       expect(ipcRenderer.on).toHaveBeenCalledWith('windowsLinuxTitleBar', mockCallback)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(0)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(0)
     })
 
-    test('calls ipcRenderer.removeListener', async () => {
+    test('calls ipcRenderer.removeAllListeners', async () => {
       await setup()
 
       const mockCallback = jest.fn()
@@ -407,8 +407,8 @@ describe('preload', () => {
       electronApi.windowsLinuxTitleBar(false, mockCallback)
 
       expect(ipcRenderer.on).toHaveBeenCalledTimes(0)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledTimes(1)
-      expect(ipcRenderer.removeListener).toHaveBeenCalledWith('windowsLinuxTitleBar', mockCallback)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(1)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledWith('windowsLinuxTitleBar', mockCallback)
     })
   })
 })

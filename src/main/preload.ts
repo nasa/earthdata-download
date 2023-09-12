@@ -40,7 +40,6 @@ contextBridge.exposeInMainWorld('electronApi', {
   showWaitingForEulaDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('showWaitingForEulaDialog', callback),
   showWaitingForLoginDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('showWaitingForLoginDialog', callback),
   windowsLinuxTitleBar: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('windowsLinuxTitleBar', callback),
-
   // System values for renderer
   isMac: process.platform === 'darwin',
   isWin: process.platform === 'win32',

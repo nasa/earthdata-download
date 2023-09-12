@@ -7,7 +7,6 @@ import React, {
 import PropTypes from 'prop-types'
 import { FaDownload } from 'react-icons/fa'
 
-import { PAGES } from '../../constants/pages'
 import { REPORT_INTERVAL } from '../../constants/reportInterval'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
@@ -47,7 +46,6 @@ const FileDownloads = ({
     deleteAllToastsById
   } = appContext
   const {
-    initializeDownload,
     requestFilesProgress,
     retryErroredDownloadItem
   } = useContext(ElectronApiContext)

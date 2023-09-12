@@ -262,12 +262,15 @@ describe('setupEventListeners', () => {
 
   describe('chooseDownloadLocation', () => {
     test('calls chooseDownloadLocation', () => {
-      const { appWindow } = setup()
+      const { appWindow, database } = setup()
 
       ipcRenderer.send('chooseDownloadLocation')
 
       expect(chooseDownloadLocation).toHaveBeenCalledTimes(1)
-      expect(chooseDownloadLocation).toHaveBeenCalledWith({ appWindow })
+      expect(chooseDownloadLocation).toHaveBeenCalledWith({
+        appWindow,
+        database
+      })
     })
   })
 

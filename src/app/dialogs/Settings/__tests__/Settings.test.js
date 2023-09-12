@@ -17,11 +17,13 @@ const currentlyDownloadingText = 'Files currently downloading will not be affect
 const setup = (
   hasActiveDownloads,
   settingsDialogIsOpen,
-  getPreferenceFieldValue
+  getPreferenceFieldValue,
+  defaultDownloadLocation = ''
 ) => {
   // We need to mock hasActiveDownloads to render warning
   const mockHasActiveDownloads = hasActiveDownloads
   const mockSettingsDialogIsOpen = settingsDialogIsOpen
+  const mockDefaultDownloadLocation = defaultDownloadLocation
   const chooseDownloadLocation = jest.fn()
   const setDownloadLocation = jest.fn()
   const setPreferenceFieldValue = jest.fn()
@@ -45,6 +47,8 @@ const setup = (
     >
       <Settings
         hasActiveDownloads={mockHasActiveDownloads}
+        defaultDownloadLocation={mockDefaultDownloadLocation}
+        setDefaultDownloadLocation={jest.fn()}
         settingsDialogIsOpen={mockSettingsDialogIsOpen}
       />
     </ElectronApiContext.Provider>
@@ -78,7 +82,7 @@ describe('Settings dialog', () => {
     setup(hasActiveDownloads, settingsDialogIsOpen)
 
     await waitFor(() => {
-    // Can't use getByTestId, that returns an error instead of null
+      // Can't use getByTestId, that returns an error instead of null
       expect(screen.queryByText(currentlyDownloadingText)).not.toBeInTheDocument()
     })
   })
@@ -110,23 +114,26 @@ describe('Settings dialog', () => {
       return null
     })
 
-    const { setPreferenceFieldValue } = setup(
+    setup(
       hasActiveDownloads,
       settingsDialogIsOpen,
-      getPreferenceFieldValueMock
+      getPreferenceFieldValueMock,
+      '/test/location/'
     )
 
     const clearDownloadLocationButton = await screen.findByText('Clear download location')
 
     await user.click(clearDownloadLocationButton)
 
+    setup(
+      hasActiveDownloads,
+      settingsDialogIsOpen,
+      getPreferenceFieldValueMock,
+      ''
+    )
+
     await waitFor(() => {
       screen.getByText('Choose download location')
-      expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
-      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
-        field: 'defaultDownloadLocation',
-        value: null
-      })
     })
   })
 
@@ -202,6 +209,7 @@ describe('Settings dialog', () => {
       >
         <Settings
           hasActiveDownloads={false}
+          setDefaultDownloadLocation={jest.fn()}
           settingsDialogIsOpen
         />
       </ElectronApiContext.Provider>
@@ -222,6 +230,7 @@ describe('Settings dialog', () => {
       >
         <Settings
           hasActiveDownloads={false}
+          setDefaultDownloadLocation={jest.fn()}
           settingsDialogIsOpen={false}
         />
       </ElectronApiContext.Provider>

@@ -168,6 +168,7 @@ const Layout = () => {
         downloadLocation: newDownloadLocation,
         makeDefaultDownloadLocation: true
       })
+
       // Display a toast notification if a download is initialized
       // while current page is not Downloads
       if (currentPage !== PAGES.downloads) {
@@ -180,8 +181,7 @@ const Layout = () => {
           })
         })
       }
-    }
-    else {
+    } else {
       // Return to Downloads so that the set default location dialog can be displayed
       setCurrentPage(PAGES.downloads)
     }

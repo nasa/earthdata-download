@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
+  FaBan,
   FaClipboard,
   FaFolderOpen,
   FaInfoCircle
@@ -42,6 +43,7 @@ const DownloadHistoryListItem = ({
     deleteAllToastsById
   } = appContext
   const {
+    clearDownloadHistory,
     copyDownloadPath,
     openDownloadFolder,
     restartDownload
@@ -90,6 +92,16 @@ const DownloadHistoryListItem = ({
           restartDownload({ downloadId })
         },
         icon: FaInfoCircle
+      },
+      {
+        label: 'Clear Download',
+        isActive: true,
+        isPrimary: false,
+        callback: () => {
+          deleteAllToastsById(downloadId)
+          clearDownloadHistory({ downloadId })
+        },
+        icon: FaBan
       }
     ]
   ]

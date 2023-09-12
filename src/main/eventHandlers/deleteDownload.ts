@@ -11,7 +11,6 @@ const deleteDownload = async ({
   info
 }) => {
   const { downloadId } = info
-
   if (downloadId) {
     await database.deleteDownloadById(downloadId)
   }

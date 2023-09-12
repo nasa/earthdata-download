@@ -28,6 +28,7 @@ const download = {
 
 const setup = (overrideProps = {}) => {
   const deleteAllToastsById = jest.fn()
+  const clearDownloadHistory = jest.fn()
   const copyDownloadPath = jest.fn()
   const openDownloadFolder = jest.fn()
   const restartDownload = jest.fn()
@@ -45,6 +46,7 @@ const setup = (overrideProps = {}) => {
     <ElectronApiContext.Provider
       value={
         {
+          clearDownloadHistory,
           copyDownloadPath,
           openDownloadFolder,
           restartDownload,
@@ -67,6 +69,7 @@ const setup = (overrideProps = {}) => {
 
   return {
     deleteAllToastsById,
+    clearDownloadHistory,
     copyDownloadPath,
     openDownloadFolder,
     restartDownload
@@ -153,6 +156,24 @@ describe('DownloadHistoryListItem component', () => {
       await userEvent.click(button)
 
       expect(restartDownload).toHaveBeenCalledTimes(1)
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+    })
+  })
+
+  describe('when clicking `Clear Download`', () => {
+    test('calls clearDownloadHistory', async () => {
+      const { clearDownloadHistory, deleteAllToastsById } = setup()
+
+      const moreActions = screen.getByText('More Actions')
+      await userEvent.click(moreActions)
+
+      const button = screen.getByText('Clear Download')
+      await userEvent.click(button)
+
+      expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
+      expect(clearDownloadHistory).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
 
       expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
       expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')

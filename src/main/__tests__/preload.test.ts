@@ -133,6 +133,7 @@ describe('preload', () => {
 
   test('clearDownloadHistory sends the clearDownloadHistory message', async () => {
     await setup()
+
     electronApi.clearDownloadHistory({ mock: 'data' })
 
     expect(ipcRenderer.send).toHaveBeenCalledTimes(1)

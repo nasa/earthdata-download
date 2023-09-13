@@ -391,7 +391,6 @@ describe('EddDatabase', () => {
               }
             ])
           }
-          // TODO Do I need to pass the query response on each step?
 
           if (step === 2) {
             expect(query.sql).toEqual('delete from `downloads` where `id` in (?, ?)')

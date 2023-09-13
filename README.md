@@ -13,7 +13,7 @@ Environment variables are used to define the download location and download size
 
 ## Icons
 
-In order to keep the page as lean as possible, SVG icons have been imported from Font Awesome. The icon SVG XML was pulled directly from the [Font Awesome](https://fontawesome.com/icons/l) website and placed in the `/public/images/icon/` directory.
+In order to keep the page as lean as possible, SVG icons have been imported from Font Awesome. The icon SVG XML was pulled directly from the [Font Awesome](https://fontawesome.com/icons/l) website, with the addition of `class` and `fill` attributes.
 
 ## Deployment
 

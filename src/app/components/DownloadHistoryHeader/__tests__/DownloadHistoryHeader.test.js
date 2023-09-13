@@ -48,7 +48,8 @@ describe('DownloadHistoryHeader component', () => {
       const button = screen.getByRole('button', { name: 'Clear Download History' })
       await userEvent.click(button)
 
-      expect(clearDownloadHistory).toHaveBeenCalledTimes(0)
+      expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
+      expect(clearDownloadHistory).toHaveBeenCalledWith({})
       expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
     })
   })

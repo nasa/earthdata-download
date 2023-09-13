@@ -26,8 +26,23 @@ const download = {
   timeStart: 123000
 }
 
+const erroredFetchLinksdownload = {
+  errors: null,
+  loadingMoreFiles: false,
+  progress: {
+    percent: 100,
+    finishedFiles: 10,
+    totalFiles: 10,
+    totalTime: 567000
+  },
+  downloadId: 'mock-download-id',
+  state: downloadStates.errorFetchingLinks,
+  timeStart: 123000
+}
+
 const setup = (overrideProps = {}) => {
   const deleteAllToastsById = jest.fn()
+  const clearDownloadHistory = jest.fn()
   const copyDownloadPath = jest.fn()
   const openDownloadFolder = jest.fn()
   const restartDownload = jest.fn()
@@ -45,6 +60,7 @@ const setup = (overrideProps = {}) => {
     <ElectronApiContext.Provider
       value={
         {
+          clearDownloadHistory,
           copyDownloadPath,
           openDownloadFolder,
           restartDownload,
@@ -67,6 +83,7 @@ const setup = (overrideProps = {}) => {
 
   return {
     deleteAllToastsById,
+    clearDownloadHistory,
     copyDownloadPath,
     openDownloadFolder,
     restartDownload
@@ -153,6 +170,49 @@ describe('DownloadHistoryListItem component', () => {
       await userEvent.click(button)
 
       expect(restartDownload).toHaveBeenCalledTimes(1)
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+    })
+  })
+
+  describe('when clicking `Clear Download`', () => {
+    test('calls clearDownloadHistory', async () => {
+      const { clearDownloadHistory, deleteAllToastsById } = setup()
+
+      const moreActions = screen.getByText('More Actions')
+      await userEvent.click(moreActions)
+
+      const button = screen.getByText('Clear Download')
+      await userEvent.click(button)
+
+      expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
+      expect(clearDownloadHistory).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+    })
+  })
+
+  describe('when a `downloadHistoryListItem` is in `errorFetchingLinks` state', () => {
+    test(' clicking `Clear Download` clearDownloadHistory', async () => {
+      const { clearDownloadHistory, deleteAllToastsById } = setup(
+        { download: erroredFetchLinksdownload }
+      )
+      const moreActions = screen.getByText('More Actions')
+      await userEvent.click(moreActions)
+
+      // Ensure the other buttons are not rendering
+      expect(screen.queryAllByText('Open Folder').length).toEqual(0)
+      expect(screen.queryAllByText('Copy Folder Path').length).toEqual(0)
+      expect(screen.queryAllByText('Copy Folder Path').length).toEqual(0)
+      expect(screen.queryAllByText('Restart Download').length).toEqual(0)
+
+      const Clearbutton = screen.getByText('Clear Download')
+      await userEvent.click(Clearbutton)
+
+      expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
+      expect(clearDownloadHistory).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
 
       expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
       expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')

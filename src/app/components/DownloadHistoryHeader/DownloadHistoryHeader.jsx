@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { FaBan } from 'react-icons/fa'
 import useAppContext from '../../hooks/useAppContext'
+import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import Button from '../Button/Button'
 
@@ -19,14 +20,13 @@ const DownloadHistoryHeader = () => {
   const {
     deleteAllToastsById
   } = appContext
-  // TODO EDD-19
-  // const {
-  //   clearDownloadHistory
-  // } = useContext(ElectronApiContext)
+
+  const {
+    clearDownloadHistory
+  } = useContext(ElectronApiContext)
 
   const onClearDownloadHistory = () => {
-    // TODO EDD-19
-    // clearDownloadHistory()
+    clearDownloadHistory({})
     deleteAllToastsById()
   }
 

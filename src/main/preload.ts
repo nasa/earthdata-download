@@ -18,7 +18,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
   cancelErroredDownloadItem: (data) => ipcRenderer.send('cancelErroredDownloadItem', data),
   clearDownload: (data) => ipcRenderer.send('clearDownload', data),
-  clearDownloadHistory: () => ipcRenderer.send('clearDownloadHistory'),
+  clearDownloadHistory: (data) => ipcRenderer.send('clearDownloadHistory', data),
   closeWindow: () => ipcRenderer.send('closeWindow'),
   copyDownloadPath: (data) => ipcRenderer.send('copyDownloadPath', data),
   maximizeWindow: () => ipcRenderer.send('maximizeWindow'),

@@ -132,6 +132,50 @@ class EddDatabase {
   }
 
   /**
+   * Deletes downloads which are on the `downloadHistory` page
+   * @param {String} downloadId ID of download to create.
+   */
+  async clearDownloadHistoryDownloads(downloadId) {
+    if (downloadId) {
+      await this.db('downloads')
+        .delete()
+        .where({ id: downloadId })
+
+      await this.db('files')
+        .delete()
+        .where({ downloadId })
+
+      await this.db('pauses')
+        .delete()
+        .where({ id: downloadId })
+
+      return
+    }
+
+    await this.db('pauses')
+      .delete()
+      .whereIn('downloadId', function select() {
+        this
+          .select('id')
+          .from('downloads')
+          .where({ active: false })
+      })
+
+    await this.db('files')
+      .delete()
+      .whereIn('downloadId', function select() {
+        this
+          .select('id')
+          .from('downloads')
+          .where({ active: false })
+      })
+
+    await this.db('downloads')
+      .delete()
+      .where({ 'downloads.active': false })
+  }
+
+  /**
    * Creates a new download.
    * @param {String} downloadId ID of download to create.
    * @param {Object} data The data of the download to be inserted.

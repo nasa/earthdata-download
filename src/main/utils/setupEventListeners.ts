@@ -13,6 +13,7 @@ import cancelDownloadItem from '../eventHandlers/cancelDownloadItem'
 import cancelErroredDownloadItem from '../eventHandlers/cancelErroredDownloadItem'
 import chooseDownloadLocation from '../eventHandlers/chooseDownloadLocation'
 import clearDownload from '../eventHandlers/clearDownload'
+import clearDownloadHistory from '../eventHandlers/clearDownloadHistory'
 import copyDownloadPath from '../eventHandlers/copyDownloadPath'
 import deleteDownload from '../eventHandlers/deleteDownload'
 import didFinishLoad from '../eventHandlers/didFinishLoad'
@@ -194,6 +195,14 @@ const setupEventListeners = ({
   // Clear a download
   ipcMain.on('clearDownload', async (event, info) => {
     await clearDownload({
+      database,
+      info
+    })
+  })
+
+  // Clear a download form the download history by deleting it
+  ipcMain.on('clearDownloadHistory', async (event, info) => {
+    await clearDownloadHistory({
       database,
       info
     })

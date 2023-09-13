@@ -344,6 +344,73 @@ describe('EddDatabase', () => {
     })
   })
 
+  describe('clearDownloadHistoryDownloads', () => {
+    describe('when a downloadId is provided', () => {
+      test('deletes the download, files and pauses', async () => {
+        dbTracker.on('query', (query, step) => {
+          if (step === 1) {
+            expect(query.sql).toEqual('delete from `downloads` where `id` = ?')
+            expect(query.bindings).toEqual(['mock-download-id'])
+          }
+
+          if (step === 2) {
+            expect(query.sql).toEqual('delete from `files` where `downloadId` = ?')
+            expect(query.bindings).toEqual(['mock-download-id'])
+          }
+
+          if (step === 3) {
+            expect(query.sql).toEqual('delete from `pauses` where `id` = ?')
+            expect(query.bindings).toEqual(['mock-download-id'])
+          }
+
+          // We aren't returning anything from this method, the above assertions are the important part of the test
+          query.response([1])
+        })
+
+        const database = new EddDatabase('./')
+
+        await database.clearDownloadHistoryDownloads('mock-download-id')
+      })
+    })
+
+    describe('when a downloadId is not provided', () => {
+      test('deletes all of the downloads, pauses, and files for inactive downloads', async () => {
+        dbTracker.on('query', (query, step) => {
+          if (step === 1) {
+            expect(query.sql).toEqual('delete from `pauses` where `downloadId` in (select `id` from `downloads` where `active` = ?)')
+            expect(query.bindings).toEqual([
+              false
+            ])
+
+            query.response([1])
+          }
+
+          if (step === 2) {
+            expect(query.sql).toEqual('delete from `files` where `downloadId` in (select `id` from `downloads` where `active` = ?)')
+            expect(query.bindings).toEqual([
+              false
+            ])
+
+            query.response([1])
+          }
+
+          if (step === 3) {
+            expect(query.sql).toEqual('delete from `downloads` where `downloads`.`active` = ?')
+            expect(query.bindings).toEqual([
+              false
+            ])
+
+            query.response([1])
+          }
+        })
+
+        const database = new EddDatabase('./')
+
+        await database.clearDownloadHistoryDownloads()
+      })
+    })
+  })
+
   describe('createDownload', () => {
     test('creates a new download', async () => {
       dbTracker.on('query', (query) => {

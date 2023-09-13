@@ -1,0 +1,371 @@
+$breakpoint-additional-downloads: 50rem;
+$breakpoint-features: 50rem;
+
+:root {
+  background-color: var(--color__white);
+  color: var(--color__black);
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  font-weight: 400;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  text-size-adjust: 100%;
+
+  --color__white: #FFF;
+  --color__gray-light: #dbdcde;
+  --color__gray-mid: #b9bcc0;
+  --color__gray-dark: #7D7D7D;
+  --color__black: #212529;
+  --color__green: #27ae60;
+  --color__green-dark: #208f4f;
+  --color__blue: #186697;
+  --color__blue-dark: #186697;
+}
+
+* > * {
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background-color: #F3F3F3;
+}
+
+#app {
+  padding: 1rem 1rem 0;
+}
+
+a {
+  color: var(--color__blue);
+
+  &:hover,
+  &:focus {
+    color: var(--color__blue-dark);
+    text-decoration: none;
+  }
+}
+
+// Recommended styles from FontAwesome
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.container {
+  max-width: 65rem;
+  margin: 0 auto;
+}
+
+.primary-download {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &--macos {
+    .is-macos & {
+      display: flex;
+    }
+  }
+
+  &--windows {
+    .is-windows & {
+      display: flex;
+    }
+  }
+
+  &--linux {
+    .is-linux & {
+      display: flex;
+    }
+  }
+
+  &__link {
+    margin-bottom: 0.75rem;
+  }
+
+  &__meta {
+    color: var(--color__gray-dark);
+    text-align: center;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8rem;
+  margin-top: 8rem;
+  background-image: url('/images/edd-icon.png');
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: 8rem;
+
+  &__primary-heading {
+    padding-top: 0;
+    margin: 0;
+    font-size: 1.75rem;
+    text-align: center;
+  }
+
+  &__secondary-heading {
+    margin-bottom: 3rem;
+    color: var(--color__gray-dark);
+    font-size: 1.5rem;
+    font-weight: 300;
+    text-align: center;
+  }
+}
+
+.button {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.75rem;
+  border: 0;
+  border-radius: 0.125rem;
+  background-color: var(--color__gray-light);
+  color: inherit;
+  font-weight: 500;
+  line-height: 1.5;
+  outline: 0;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    background-color: var(--color__gray-mid);
+    color: var(--color__black);
+  }
+
+  &--primary {
+    padding: 0.5rem 1rem;
+    background-color: var(--color__green);
+    color: var(--color__white);
+    font-size: 1.125rem;
+
+    &:hover,
+    &:focus {
+      background-color: var(--color__green-dark);
+      color: var(--color__white);
+    }
+  }
+
+  &__icon {
+    margin-right: 0.25rem;
+
+    .button--primary & {
+      color: var(--color__white)
+    }
+  }
+}
+
+.additional-downloads {
+  &__list {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    list-style-type: none;
+
+    @media (min-width: $breakpoint-additional-downloads) {
+      flex-direction: row;
+    }
+  }
+
+  &__list-item {
+    width: auto;
+    text-align: center;
+
+    @media (min-width: $breakpoint-additional-downloads) {
+      width: 33.33%;
+    }
+
+    &--macos {
+      .is-macos & {
+        display: none;
+      }
+    }
+
+    &--mac-silicon {
+      display: none;
+
+      .is-macos & {
+        display: block;
+      }
+    }
+
+    &--linux {
+      .is-linux & {
+        display: none;
+      }
+    }
+
+    &--linux-extra {
+      display: none;
+
+      .is-linux & {
+        display: block;
+      }
+    }
+  }
+
+  &__more-info {
+    color: var(--color__gray-dark);
+  }
+
+  &__more-info-link {
+    position: relative;
+    padding: 0;
+    margin-right: 1rem;
+  }
+
+  &__more-info-external {
+    position: absolute;
+    right: -0.625em;
+    text-decoration: none;
+
+    .icon {
+      display: inline;
+      width: 0.625em;
+      height: 0.625em;
+      color: var(--color__gray-dark);
+    }
+  }
+
+  &__download-links-list {
+    padding: 0;
+    margin: 0;
+    margin-bottom: 1rem;
+    list-style: none;
+  }
+
+  &__download-links-item {
+    display: block;
+    text-align: center;
+  }
+
+  &__download-icon {
+    display: block;
+    margin-bottom: 0.5rem;
+
+    .icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: var(--color__gray-dark)
+    }
+  }
+
+  &__download-title {
+    margin: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  @media (min-width: $breakpoint-features) {
+    flex-direction: row;
+  }
+
+  &__list-item {
+    font-size: 1.125rem;
+
+    &::marker {
+      margin-right: 0.25rem;
+      color: var(--color__blue);
+      content: "\2713";
+      font-size: 1.25rem;
+    }
+  }
+
+  &__list-item-text {
+    position: relative;
+    left: 0.5rem;
+  }
+}
+
+.extras {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-basis: auto;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #2980ba;
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+
+  &__info {
+    display: flex;
+    width: 100%;
+    flex-grow: 1;
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  &__info-bit {
+    margin-left: 0.55rem;
+    vertical-align: middle;
+
+    &--emph {
+      color: #fff;
+    }
+  }
+
+  &__info-link {
+    background-color: transparent;
+    color: #92bfec;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus {
+      color: #92bfec;
+      text-decoration: underline;
+    }
+
+    &::before {
+      display: inline-block;
+      color: #fff;
+      content: '\2022';
+      font-size: 5px;
+      transform: translate(-0.375rem, -0.165rem) scale(2);
+
+      .footer__info-bit:first-child & {
+        display: none;
+      }
+    }
+  }
+}

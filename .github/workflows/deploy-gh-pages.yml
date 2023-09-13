@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy-gh-pages:
-    if: success() && github.ref == 'refs/heads/gh-pages'
+    # if: success() && github.ref == 'refs/heads/gh-pages'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -19,8 +19,9 @@ jobs:
     - name: Run build
       run: npm run build
     - name: Deploy to Github Pages
-      uses: JamesIves/github-pages-deploy-action@3.7.1
+      uses: JamesIves/github-pages-deploy-action@4.4.3
       with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: dist
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages
+        folder: dist
+        target_folder: dist

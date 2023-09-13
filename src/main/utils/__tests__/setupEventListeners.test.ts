@@ -13,6 +13,7 @@ import beginDownload from '../../eventHandlers/beginDownload'
 import cancelDownloadItem from '../../eventHandlers/cancelDownloadItem'
 import cancelErroredDownloadItem from '../../eventHandlers/cancelErroredDownloadItem'
 import clearDownload from '../../eventHandlers/clearDownload'
+import clearDownloadHistory from '../../eventHandlers/clearDownloadHistory'
 import chooseDownloadLocation from '../../eventHandlers/chooseDownloadLocation'
 import copyDownloadPath from '../../eventHandlers/copyDownloadPath'
 import didFinishLoad from '../../eventHandlers/didFinishLoad'
@@ -44,6 +45,7 @@ jest.mock('../../eventHandlers/beginDownload')
 jest.mock('../../eventHandlers/cancelDownloadItem')
 jest.mock('../../eventHandlers/cancelErroredDownloadItem')
 jest.mock('../../eventHandlers/clearDownload')
+jest.mock('../../eventHandlers/clearDownloadHistory')
 jest.mock('../../eventHandlers/chooseDownloadLocation')
 jest.mock('../../eventHandlers/copyDownloadPath')
 jest.mock('../../eventHandlers/didFinishLoad')
@@ -504,6 +506,25 @@ describe('setupEventListeners', () => {
 
       expect(clearDownload).toHaveBeenCalledTimes(1)
       expect(clearDownload).toHaveBeenCalledWith({
+        database,
+        info
+      })
+    })
+  })
+
+  describe('clearDownloadHistory', () => {
+    test('calls clearDownloadHistory', () => {
+      const {
+        database
+      } = setup()
+
+      const event = {}
+      const info = { mock: 'info' }
+
+      ipcRenderer.send('clearDownloadHistory', event, info)
+
+      expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
+      expect(clearDownloadHistory).toHaveBeenCalledWith({
         database,
         info
       })

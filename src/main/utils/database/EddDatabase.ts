@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { chunk, map } from 'lodash'
+import { chunk } from 'lodash'
 
 import downloadStates from '../../../app/constants/downloadStates'
 
@@ -152,15 +152,27 @@ class EddDatabase {
       return
     }
 
-    const result = await this.db('downloads')
-      .select('id')
-      .where({ active: false })
+    await this.db('pauses')
+      .delete()
+      .whereIn('downloadId', function select() {
+        this
+          .select('id')
+          .from('downloads')
+          .where({ active: false })
+      })
 
-    const inactiveDownloadIds = map(result, 'id')
+    await this.db('files')
+      .delete()
+      .whereIn('downloadId', function select() {
+        this
+          .select('id')
+          .from('downloads')
+          .where({ active: false })
+      })
 
-    await this.db('downloads').delete().whereIn('id', inactiveDownloadIds)
-    await this.db('files').delete().whereIn('downloadId', inactiveDownloadIds)
-    await this.db('pauses').delete().whereIn('downloadId', inactiveDownloadIds)
+    await this.db('downloads')
+      .delete()
+      .where({ 'downloads.active': false })
   }
 
   /**

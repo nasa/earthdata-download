@@ -377,36 +377,29 @@ describe('EddDatabase', () => {
       test('deletes all of the downloads, pauses, and files for inactive downloads', async () => {
         dbTracker.on('query', (query, step) => {
           if (step === 1) {
-            expect(query.sql).toEqual('select `id` from `downloads` where `active` = ?')
+            expect(query.sql).toEqual('delete from `pauses` where `downloadId` in (select `id` from `downloads` where `active` = ?)')
             expect(query.bindings).toEqual([
               false
             ])
 
-            query.response([
-              {
-                id: 'mock-download-id1'
-              },
-              {
-                id: 'mock-download-id2'
-              }
-            ])
+            query.response([1])
           }
 
           if (step === 2) {
-            expect(query.sql).toEqual('delete from `downloads` where `id` in (?, ?)')
-            expect(query.bindings).toEqual(['mock-download-id1', 'mock-download-id2'])
+            expect(query.sql).toEqual('delete from `files` where `downloadId` in (select `id` from `downloads` where `active` = ?)')
+            expect(query.bindings).toEqual([
+              false
+            ])
+
             query.response([1])
           }
 
           if (step === 3) {
-            expect(query.sql).toEqual('delete from `files` where `downloadId` in (?, ?)')
-            expect(query.bindings).toEqual(['mock-download-id1', 'mock-download-id2'])
-            query.response([1])
-          }
+            expect(query.sql).toEqual('delete from `downloads` where `downloads`.`active` = ?')
+            expect(query.bindings).toEqual([
+              false
+            ])
 
-          if (step === 4) {
-            expect(query.sql).toEqual('delete from `pauses` where `downloadId` in (?, ?)')
-            expect(query.bindings).toEqual(['mock-download-id1', 'mock-download-id2'])
             query.response([1])
           }
         })

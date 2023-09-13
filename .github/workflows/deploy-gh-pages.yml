@@ -1,0 +1,26 @@
+name: deploy-gh-pages
+
+on:
+  push:
+    branches: [gh-pages]
+  pull_request: {}
+
+jobs:
+  deploy-gh-pages:
+    if: success() && github.ref == 'refs/heads/gh-pages'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: gh-pages
+    - name: Install dependencies
+      run: npm ci
+    - name: Run build
+      run: npm run build
+    - name: Deploy to Github Pages
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: dist

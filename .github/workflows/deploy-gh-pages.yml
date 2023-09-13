@@ -21,4 +21,4 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: gh-pages
         folder: dist
-        target-folder: dist
+        target-folder: docs

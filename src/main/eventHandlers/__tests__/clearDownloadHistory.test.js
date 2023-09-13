@@ -14,8 +14,8 @@ describe('clearDownloadHistory', () => {
       })
 
       expect(database.clearDownloadHistoryDownloads).toHaveBeenCalledTimes(1)
-      // `clearDownloadHistoryDownloads` is called with no arguments
-      expect(database.clearDownloadHistoryDownloads).toHaveBeenCalledWith()
+
+      expect(database.clearDownloadHistoryDownloads).toHaveBeenCalledWith(undefined)
     })
   })
 

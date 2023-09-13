@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { chunk } from 'lodash'
+import { chunk, map } from 'lodash'
 
 import downloadStates from '../../../app/constants/downloadStates'
 
@@ -137,20 +137,30 @@ class EddDatabase {
    */
   async clearDownloadHistoryDownloads(downloadId) {
     if (downloadId) {
-      await this.db('downloads').delete().where({ id: downloadId })
-      await this.db('files').delete().where({ downloadId })
-      await this.db('pauses').delete().where({ id: downloadId })
+      await this.db('downloads')
+        .delete()
+        .where({ id: downloadId })
+
+      await this.db('files')
+        .delete()
+        .where({ downloadId })
+
+      await this.db('pauses')
+        .delete()
+        .where({ id: downloadId })
 
       return
     }
 
-    // Pluck documentation: https://knexjs.org/guide/query-builder.html#pluck
-    const inactiveDownloads = await this.db('downloads')
-      .pluck('id')
+    const result = await this.db('downloads')
+      .select('id')
       .where({ active: false })
-    await this.db('downloads').delete().whereIn('id', inactiveDownloads)
-    await this.db('files').delete().whereIn('downloadId', inactiveDownloads)
-    await this.db('pauses').delete().whereIn('downloadId', inactiveDownloads)
+
+    const inactiveDownloadIds = map(result, 'id')
+
+    await this.db('downloads').delete().whereIn('id', inactiveDownloadIds)
+    await this.db('files').delete().whereIn('downloadId', inactiveDownloadIds)
+    await this.db('pauses').delete().whereIn('downloadId', inactiveDownloadIds)
   }
 
   /**

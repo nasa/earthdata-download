@@ -49,6 +49,7 @@ describe('DownloadHistoryHeader component', () => {
       await userEvent.click(button)
 
       expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
+      expect(clearDownloadHistory).toHaveBeenCalledWith({})
       expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
     })
   })

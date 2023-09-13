@@ -26,6 +26,20 @@ const download = {
   timeStart: 123000
 }
 
+const erroredFetchLinksdownload = {
+  errors: null,
+  loadingMoreFiles: false,
+  progress: {
+    percent: 100,
+    finishedFiles: 10,
+    totalFiles: 10,
+    totalTime: 567000
+  },
+  downloadId: 'mock-download-id',
+  state: downloadStates.errorFetchingLinks,
+  timeStart: 123000
+}
+
 const setup = (overrideProps = {}) => {
   const deleteAllToastsById = jest.fn()
   const clearDownloadHistory = jest.fn()
@@ -171,6 +185,31 @@ describe('DownloadHistoryListItem component', () => {
 
       const button = screen.getByText('Clear Download')
       await userEvent.click(button)
+
+      expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
+      expect(clearDownloadHistory).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+    })
+  })
+
+  describe('when a `downloadHistoryListItem` is in `errorFetchingLinks` state', () => {
+    test(' clicking `Clear Download` clearDownloadHistory', async () => {
+      const { clearDownloadHistory, deleteAllToastsById } = setup(
+        { download: erroredFetchLinksdownload }
+      )
+      const moreActions = screen.getByText('More Actions')
+      await userEvent.click(moreActions)
+
+      // Ensure the other buttons are not rendering
+      expect(screen.queryAllByText('Open Folder').length).toEqual(0)
+      expect(screen.queryAllByText('Copy Folder Path').length).toEqual(0)
+      expect(screen.queryAllByText('Copy Folder Path').length).toEqual(0)
+      expect(screen.queryAllByText('Restart Download').length).toEqual(0)
+
+      const Clearbutton = screen.getByText('Clear Download')
+      await userEvent.click(Clearbutton)
 
       expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
       expect(clearDownloadHistory).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })

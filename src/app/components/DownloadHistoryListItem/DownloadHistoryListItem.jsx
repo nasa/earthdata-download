@@ -106,9 +106,23 @@ const DownloadHistoryListItem = ({
     ]
   ]
 
+  const fetchLinksErroredActionsList = [
+    [
+      {
+        label: 'Clear Download',
+        isActive: true,
+        isPrimary: false,
+        callback: () => {
+          deleteAllToastsById(downloadId)
+          clearDownloadHistory({ downloadId })
+        },
+        icon: FaBan
+      }
+    ], []]
+
   return (
     <DownloadItem
-      actionsList={shouldShowActions ? actionsList : null}
+      actionsList={shouldShowActions ? actionsList : fetchLinksErroredActionsList}
       downloadId={downloadId}
       showMoreInfoDialog={showMoreInfoDialog}
       shouldBeClickable={false}

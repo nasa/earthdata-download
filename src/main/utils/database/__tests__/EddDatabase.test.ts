@@ -346,7 +346,7 @@ describe('EddDatabase', () => {
 
   describe('clearDownloadHistoryDownloads', () => {
     describe('when a downloadId is provided', () => {
-      test('sets the download to inactive', async () => {
+      test('deletes the download, files and pauses', async () => {
         dbTracker.on('query', (query, step) => {
           if (step === 1) {
             expect(query.sql).toEqual('delete from `downloads` where `id` = ?')

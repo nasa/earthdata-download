@@ -10,16 +10,10 @@ const clearDownloadHistory = async ({
   database,
   info
 }) => {
-  const { downloadId = '' } = info
+  const { downloadId } = info
 
-  if (downloadId.length > 0) {
-    database.clearDownloadHistoryDownloads(downloadId)
-
-    return
-  }
-
-  // Clear all the downloads in the history
-  await database.clearDownloadHistoryDownloads()
+  // Clear the download(s) in the history
+  await database.clearDownloadHistoryDownloads(downloadId)
 }
 
 export default clearDownloadHistory

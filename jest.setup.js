@@ -40,6 +40,7 @@ window.electronApi = {
   setPreferenceFieldValue: jest.fn(),
   showWaitingForEulaDialog: jest.fn(),
   showWaitingForLoginDialog: jest.fn(),
+  undoClearDownload: jest.fn(),
   windowsLinuxTitleBar: jest.fn(),
   isMac: true,
   isWin: false,

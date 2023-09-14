@@ -21,14 +21,15 @@ contextBridge.exposeInMainWorld('electronApi', {
   clearDownloadHistory: (data) => ipcRenderer.send('clearDownloadHistory', data),
   closeWindow: () => ipcRenderer.send('closeWindow'),
   copyDownloadPath: (data) => ipcRenderer.send('copyDownloadPath', data),
+  deleteDownload: (data) => ipcRenderer.send('deleteDownload', data),
   maximizeWindow: () => ipcRenderer.send('maximizeWindow'),
   minimizeWindow: () => ipcRenderer.send('minimizeWindow'),
   openDownloadFolder: (data) => ipcRenderer.send('openDownloadFolder', data),
   pauseDownloadItem: (data) => ipcRenderer.send('pauseDownloadItem', data),
   restartDownload: (data) => ipcRenderer.send('restartDownload', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),
-  deleteDownload: (data) => ipcRenderer.send('deleteDownload', data),
   retryErroredDownloadItem: (data) => ipcRenderer.send('retryErroredDownloadItem', data),
+  undoClearDownload: (data) => ipcRenderer.send('undoClearDownload', data),
 
   // Reporting
   requestDownloadsProgress: (data) => ipcRenderer.invoke('requestDownloadsProgress', data),

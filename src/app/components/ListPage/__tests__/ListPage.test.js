@@ -5,6 +5,7 @@ import '@testing-library/jest-dom'
 
 import ListPage from '../ListPage'
 import downloadStates from '../../../constants/downloadStates'
+import AppContext from '../../../context/AppContext'
 
 // AutoSizer has problems in jest, so we'll just test that the AutoSize component
 // is rendered when it is supposed to be https://github.com/bvaughn/react-virtualized-auto-sizer/issues/69
@@ -29,7 +30,15 @@ const setup = (overrideProps = {}) => {
   }
 
   render(
-    <ListPage {...props} />
+    <AppContext.Provider
+      value={
+        {
+          toasts: {}
+        }
+      }
+    >
+      <ListPage {...props} />
+    </AppContext.Provider>
   )
 
   return {

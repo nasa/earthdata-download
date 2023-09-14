@@ -7,10 +7,12 @@ import {
   FaInfoCircle,
   FaPause,
   FaPlay,
-  FaSignInAlt
+  FaSignInAlt,
+  FaUndo
 } from 'react-icons/fa'
 
 import downloadStates from '../../constants/downloadStates'
+import { UNDO_TIMEOUT } from '../../constants/undoTimeout'
 
 import DownloadItem from '../DownloadItem/DownloadItem'
 
@@ -49,6 +51,7 @@ const DownloadListItem = ({
 }) => {
   const appContext = useAppContext()
   const {
+    addToast,
     deleteAllToastsById
   } = appContext
   const {
@@ -60,7 +63,8 @@ const DownloadListItem = ({
     restartDownload,
     resumeDownloadItem,
     sendToEula,
-    sendToLogin
+    sendToLogin,
+    undoClearDownload
   } = useContext(ElectronApiContext)
 
   const {
@@ -122,6 +126,48 @@ const DownloadListItem = ({
   const shouldBeClickable = state !== downloadStates.starting
     && state !== downloadStates.pending
     && totalFiles > 0
+
+  const handleClearDownload = () => {
+    // Clear the download
+    deleteAllToastsById(downloadId)
+    clearDownload({ downloadId })
+
+    const toastId = `undo-clear-${downloadId}`
+
+    let timeoutId
+
+    // Setup an undo callback to provide to the toast that flips the active flag back to true
+    const undoCallback = () => {
+      // Undo was clicked, dismiss the setTimeout used to remove the undo toast
+      clearTimeout(timeoutId)
+
+      // TODO need to be able to put the error toasts back?
+      undoClearDownload({ downloadId })
+      deleteAllToastsById(toastId)
+    }
+
+    // Show an `undo` toast
+    addToast({
+      id: toastId,
+      message: 'Download Cleared',
+      variant: 'spinner',
+      actions: [
+        {
+          altText: 'Undo',
+          buttonText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: undoCallback
+          }
+        }
+      ]
+    })
+
+    // After the UNDO_TIMEOUT time has passed, remove the undo toast
+    timeoutId = setTimeout(() => {
+      deleteAllToastsById(toastId)
+    }, UNDO_TIMEOUT)
+  }
 
   const actionsList = [
     [
@@ -203,10 +249,7 @@ const DownloadListItem = ({
         label: 'Clear Download',
         isActive: shouldShowClear,
         isPrimary: false,
-        callback: () => {
-          deleteAllToastsById(downloadId)
-          clearDownload({ downloadId })
-        },
+        callback: handleClearDownload,
         icon: FaInfoCircle
       }
     ]

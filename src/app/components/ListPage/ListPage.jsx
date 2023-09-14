@@ -12,8 +12,10 @@ import AutoSizer from 'react-virtualized-auto-sizer'
 
 import ListPageListItem from './ListPageListItem'
 
-import * as styles from './ListPage.module.scss'
 import { REPORT_INTERVAL } from '../../constants/reportInterval'
+import useAppContext from '../../hooks/useAppContext'
+
+import * as styles from './ListPage.module.scss'
 
 /**
  * @typedef {Object} ListPageProps
@@ -53,6 +55,9 @@ const ListPage = ({
   listRef,
   totalItemCount
 }) => {
+  const { toasts } = useAppContext()
+  const { activeToasts } = toasts
+
   const scrollableNodeRef = useRef(null)
   const infiniteLoaderRef = useRef(null)
   const [hasScrolledList, setHasScrolledList] = useState(false)
@@ -94,7 +99,7 @@ const ListPage = ({
     return () => {
       clearInterval(interval)
     }
-  }, [windowState, hideCompleted])
+  }, [windowState, hideCompleted, activeToasts])
 
   const onItemsRendered = (newWindowState) => {
     setWindowState(newWindowState)

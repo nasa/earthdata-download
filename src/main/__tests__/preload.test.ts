@@ -230,6 +230,15 @@ describe('preload', () => {
     expect(ipcRenderer.send).toHaveBeenCalledWith('retryErroredDownloadItem', { mock: 'data' })
   })
 
+  test('undoClearDownload sends the undoClearDownload message', async () => {
+    await setup()
+
+    electronApi.undoClearDownload({ mock: 'data' })
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('undoClearDownload', { mock: 'data' })
+  })
+
   test('requestDownloadsProgress sends the requestDownloadsProgress message', async () => {
     await setup()
 

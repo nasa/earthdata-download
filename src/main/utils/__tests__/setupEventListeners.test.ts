@@ -12,25 +12,26 @@ import beforeQuit from '../../eventHandlers/beforeQuit'
 import beginDownload from '../../eventHandlers/beginDownload'
 import cancelDownloadItem from '../../eventHandlers/cancelDownloadItem'
 import cancelErroredDownloadItem from '../../eventHandlers/cancelErroredDownloadItem'
+import chooseDownloadLocation from '../../eventHandlers/chooseDownloadLocation'
 import clearDownload from '../../eventHandlers/clearDownload'
 import clearDownloadHistory from '../../eventHandlers/clearDownloadHistory'
-import chooseDownloadLocation from '../../eventHandlers/chooseDownloadLocation'
 import copyDownloadPath from '../../eventHandlers/copyDownloadPath'
+import deleteDownload from '../../eventHandlers/deleteDownload'
 import didFinishLoad from '../../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../../eventHandlers/getPreferenceFieldValue'
 import openDownloadFolder from '../../eventHandlers/openDownloadFolder'
 import pauseDownloadItem from '../../eventHandlers/pauseDownloadItem'
+import requestDownloadsProgress from '../../eventHandlers/requestDownloadsProgress'
+import requestFilesProgress from '../../eventHandlers/requestFilesProgress'
 import restartDownload from '../../eventHandlers/restartDownload'
 import resumeDownloadItem from '../../eventHandlers/resumeDownloadItem'
-import deleteDownload from '../../eventHandlers/deleteDownload'
 import retryErroredDownloadItem from '../../eventHandlers/retryErroredDownloadItem'
 import sendToEula from '../../eventHandlers/sendToEula'
 import sendToLogin from '../../eventHandlers/sendToLogin'
 import setPreferenceFieldValue from '../../eventHandlers/setPreferenceFieldValue'
-import willDownload from '../../eventHandlers/willDownload'
 import startPendingDownloads from '../../utils/startPendingDownloads'
-import requestFilesProgress from '../../eventHandlers/requestFilesProgress'
-import requestDownloadsProgress from '../../eventHandlers/requestDownloadsProgress'
+import undoClearDownload from '../../eventHandlers/undoClearDownload'
+import willDownload from '../../eventHandlers/willDownload'
 
 jest.mock('../../eventHandlers/beforeQuit', () => ({
   __esModule: true,
@@ -44,10 +45,11 @@ jest.mock('../../eventHandlers/beforeQuit', () => ({
 jest.mock('../../eventHandlers/beginDownload')
 jest.mock('../../eventHandlers/cancelDownloadItem')
 jest.mock('../../eventHandlers/cancelErroredDownloadItem')
+jest.mock('../../eventHandlers/chooseDownloadLocation')
 jest.mock('../../eventHandlers/clearDownload')
 jest.mock('../../eventHandlers/clearDownloadHistory')
-jest.mock('../../eventHandlers/chooseDownloadLocation')
 jest.mock('../../eventHandlers/copyDownloadPath')
+jest.mock('../../eventHandlers/deleteDownload')
 jest.mock('../../eventHandlers/didFinishLoad')
 jest.mock('../../eventHandlers/getPreferenceFieldValue', () => ({
   __esModule: true,
@@ -56,17 +58,17 @@ jest.mock('../../eventHandlers/getPreferenceFieldValue', () => ({
 
 jest.mock('../../eventHandlers/openDownloadFolder')
 jest.mock('../../eventHandlers/pauseDownloadItem')
+jest.mock('../../eventHandlers/requestDownloadsProgress')
+jest.mock('../../eventHandlers/requestFilesProgress')
 jest.mock('../../eventHandlers/restartDownload')
 jest.mock('../../eventHandlers/resumeDownloadItem')
-jest.mock('../../eventHandlers/deleteDownload')
 jest.mock('../../eventHandlers/retryErroredDownloadItem')
 jest.mock('../../eventHandlers/sendToEula')
 jest.mock('../../eventHandlers/sendToLogin')
 jest.mock('../../eventHandlers/setPreferenceFieldValue')
+jest.mock('../../eventHandlers/undoClearDownload')
 jest.mock('../../eventHandlers/willDownload')
 jest.mock('../../utils/startPendingDownloads')
-jest.mock('../../eventHandlers/requestFilesProgress')
-jest.mock('../../eventHandlers/requestDownloadsProgress')
 
 jest.mock('node-fetch', () => ({
   __esModule: true,
@@ -640,6 +642,25 @@ describe('setupEventListeners', () => {
         downloadIdContext,
         info,
         webContents: appWindow.webContents
+      })
+    })
+  })
+
+  describe('undoClearDownload', () => {
+    test('calls undoClearDownload', () => {
+      const {
+        database
+      } = setup()
+
+      const event = {}
+      const info = { mock: 'info' }
+
+      ipcRenderer.send('undoClearDownload', event, info)
+
+      expect(undoClearDownload).toHaveBeenCalledTimes(1)
+      expect(undoClearDownload).toHaveBeenCalledWith({
+        database,
+        info
       })
     })
   })

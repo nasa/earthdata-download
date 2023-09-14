@@ -81,7 +81,8 @@ const setup = (withErrors, overrideReport) => {
       <AppContext.Provider value={
         {
           addToast,
-          deleteAllToastsById
+          deleteAllToastsById,
+          toasts: {}
         }
       }
       >

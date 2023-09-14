@@ -1,12 +1,19 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
+import { FaUndo } from 'react-icons/fa'
 
 import DownloadListItem from '../DownloadListItem'
 import DownloadItem from '../../DownloadItem/DownloadItem'
 
 import downloadStates from '../../../constants/downloadStates'
+import { UNDO_TIMEOUT } from '../../../constants/undoTimeout'
+
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import AppContext from '../../../context/AppContext'
 
@@ -26,7 +33,20 @@ const download = {
 }
 
 const setup = (overrideProps = {}) => {
-  const addToast = jest.fn()
+  const toasts = []
+  const addToast = jest.fn((toast) => {
+    toasts.push(toast)
+
+    const { timeout } = toast
+
+    if (timeout) {
+      const { callback, duration } = timeout
+
+      setTimeout(() => {
+        callback()
+      }, duration)
+    }
+  })
   const deleteAllToastsById = jest.fn()
   const cancelDownloadItem = jest.fn()
   const clearDownload = jest.fn()
@@ -43,6 +63,7 @@ const setup = (overrideProps = {}) => {
   const showMoreInfoDialog = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
+  const undoClearDownload = jest.fn()
 
   const props = {
     setCurrentPage,
@@ -67,7 +88,8 @@ const setup = (overrideProps = {}) => {
           sendToEula,
           sendToLogin,
           showWaitingForEulaDialog,
-          showWaitingForLoginDialog
+          showWaitingForLoginDialog,
+          undoClearDownload
         }
       }
     >
@@ -99,12 +121,18 @@ const setup = (overrideProps = {}) => {
     sendToLogin,
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
-    setSelectedDownloadId
+    setSelectedDownloadId,
+    toasts,
+    undoClearDownload
   }
 }
 
 beforeEach(() => {
   DownloadItem.mockImplementation(jest.requireActual('../../DownloadItem/DownloadItem').default)
+})
+
+afterEach(() => {
+  jest.useRealTimers()
 })
 
 describe('DownloadListItem component', () => {
@@ -316,8 +344,12 @@ describe('DownloadListItem component', () => {
   })
 
   describe('when clicking `Clear Download`', () => {
-    test('calls clearDownload', async () => {
-      const { clearDownload, deleteAllToastsById } = setup({
+    test('calls clearDownload and displays a toast', async () => {
+      const {
+        addToast,
+        clearDownload,
+        deleteAllToastsById
+      } = setup({
         download: {
           ...download,
           state: downloadStates.completed
@@ -335,6 +367,98 @@ describe('DownloadListItem component', () => {
 
       expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
       expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+
+      expect(addToast).toHaveBeenCalledTimes(1)
+      expect(addToast).toHaveBeenCalledWith({
+        actions: [{
+          altText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: expect.any(Function)
+          },
+          buttonText: 'Undo'
+        }],
+        id: 'undo-clear-mock-download-id',
+        message: 'Download Cleared',
+        variant: 'spinner'
+      })
+    })
+
+    describe('when calling the undo callback', () => {
+      test('calls undoClearDownload', async () => {
+        const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+
+        const {
+          deleteAllToastsById,
+          toasts,
+          undoClearDownload
+        } = setup({
+          download: {
+            ...download,
+            state: downloadStates.completed
+          }
+        })
+
+        const moreActions = screen.getByText('More Actions')
+        await userEvent.click(moreActions)
+
+        const button = screen.getByText('Clear Download')
+        await userEvent.click(button)
+
+        expect(toasts).toHaveLength(1)
+
+        const [toast] = toasts
+        const { actions } = toast
+        const [undoAction] = actions
+        const { buttonProps } = undoAction
+        const { onClick } = buttonProps
+
+        jest.clearAllMocks()
+
+        // Click the undo button
+        onClick()
+
+        expect(clearTimeoutSpy).toHaveBeenCalledTimes(1)
+        expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
+
+        expect(undoClearDownload).toHaveBeenCalledTimes(1)
+        expect(undoClearDownload).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-clear-mock-download-id')
+      })
+    })
+
+    describe('when the undo timeout runs out', () => {
+      test('removes the toast', async () => {
+        const {
+          deleteAllToastsById,
+          undoClearDownload
+        } = setup({
+          download: {
+            ...download,
+            state: downloadStates.completed
+          }
+        })
+
+        const moreActions = screen.getByText('More Actions')
+        await userEvent.click(moreActions)
+
+        jest.useFakeTimers()
+
+        await waitFor(async () => {
+          const button = screen.getByText('Clear Download')
+          await userEvent.click(button)
+        })
+
+        jest.clearAllMocks()
+        jest.advanceTimersByTime(UNDO_TIMEOUT)
+
+        expect(undoClearDownload).toHaveBeenCalledTimes(0)
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-clear-mock-download-id')
+      })
     })
   })
 })

@@ -31,6 +31,7 @@ import setPreferenceFieldValue from '../eventHandlers/setPreferenceFieldValue'
 import willDownload from '../eventHandlers/willDownload'
 
 import startPendingDownloads from '../utils/startPendingDownloads'
+import undoClearDownload from '../eventHandlers/undoClearDownload'
 
 /**
  * Sets up event listeners for the main process
@@ -255,6 +256,14 @@ const setupEventListeners = ({
       downloadIdContext,
       info,
       webContents: appWindow.webContents
+    })
+  })
+
+  // Undo a clearDownload action
+  ipcMain.on('undoClearDownload', async (event, info) => {
+    await undoClearDownload({
+      database,
+      info
     })
   })
 

@@ -18,7 +18,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
   cancelErroredDownloadItem: (data) => ipcRenderer.send('cancelErroredDownloadItem', data),
   clearDownload: (data) => ipcRenderer.send('clearDownload', data),
-  clearDownloadHistory: (data) => ipcRenderer.send('clearDownloadHistory', data),
+  deleteDownloadHistory: (data) => ipcRenderer.send('deleteDownloadHistory', data),
   closeWindow: () => ipcRenderer.send('closeWindow'),
   copyDownloadPath: (data) => ipcRenderer.send('copyDownloadPath', data),
   deleteDownload: (data) => ipcRenderer.send('deleteDownload', data),
@@ -29,7 +29,9 @@ contextBridge.exposeInMainWorld('electronApi', {
   restartDownload: (data) => ipcRenderer.send('restartDownload', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),
   retryErroredDownloadItem: (data) => ipcRenderer.send('retryErroredDownloadItem', data),
+  setPendingDeleteDownloadHistory: (data) => ipcRenderer.send('setPendingDeleteDownloadHistory', data),
   undoClearDownload: (data) => ipcRenderer.send('undoClearDownload', data),
+  undoDeleteDownloadHistory: (data) => ipcRenderer.send('undoDeleteDownloadHistory', data),
 
   // Reporting
   requestDownloadsProgress: (data) => ipcRenderer.invoke('requestDownloadsProgress', data),

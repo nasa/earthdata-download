@@ -13,7 +13,7 @@ import cancelDownloadItem from '../eventHandlers/cancelDownloadItem'
 import cancelErroredDownloadItem from '../eventHandlers/cancelErroredDownloadItem'
 import chooseDownloadLocation from '../eventHandlers/chooseDownloadLocation'
 import clearDownload from '../eventHandlers/clearDownload'
-import clearDownloadHistory from '../eventHandlers/clearDownloadHistory'
+import deleteDownloadHistory from '../eventHandlers/deleteDownloadHistory'
 import copyDownloadPath from '../eventHandlers/copyDownloadPath'
 import deleteDownload from '../eventHandlers/deleteDownload'
 import didFinishLoad from '../eventHandlers/didFinishLoad'
@@ -32,6 +32,8 @@ import willDownload from '../eventHandlers/willDownload'
 
 import startPendingDownloads from '../utils/startPendingDownloads'
 import undoClearDownload from '../eventHandlers/undoClearDownload'
+import undoDeleteDownloadHistory from '../eventHandlers/undoDeleteDownloadHistory'
+import setPendingDeleteDownloadHistory from '../eventHandlers/setPendingDeleteDownloadHistory'
 
 /**
  * Sets up event listeners for the main process
@@ -202,8 +204,8 @@ const setupEventListeners = ({
   })
 
   // Clear a download form the download history by deleting it
-  ipcMain.on('clearDownloadHistory', async (event, info) => {
-    await clearDownloadHistory({
+  ipcMain.on('deleteDownloadHistory', async (event, info) => {
+    await deleteDownloadHistory({
       database,
       info
     })
@@ -260,8 +262,24 @@ const setupEventListeners = ({
   })
 
   // Undo a clearDownload action
+  ipcMain.on('setPendingDeleteDownloadHistory', async (event, info) => {
+    await setPendingDeleteDownloadHistory({
+      database,
+      info
+    })
+  })
+
+  // Undo a clearDownload action
   ipcMain.on('undoClearDownload', async (event, info) => {
     await undoClearDownload({
+      database,
+      info
+    })
+  })
+
+  // Undo a deleteDownloadHistory action
+  ipcMain.on('undoDeleteDownloadHistory', async (event, info) => {
+    await undoDeleteDownloadHistory({
       database,
       info
     })

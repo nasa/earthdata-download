@@ -1,12 +1,20 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
+import { FaUndo } from 'react-icons/fa'
+import MockDate from 'mockdate'
 
 import DownloadHistoryListItem from '../DownloadHistoryListItem'
 import DownloadItem from '../../DownloadItem/DownloadItem'
 
 import downloadStates from '../../../constants/downloadStates'
+import { UNDO_TIMEOUT } from '../../../constants/undoTimeout'
+
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import AppContext from '../../../context/AppContext'
 
@@ -26,29 +34,19 @@ const download = {
   timeStart: 123000
 }
 
-const erroredFetchLinksdownload = {
-  errors: null,
-  loadingMoreFiles: false,
-  progress: {
-    percent: 100,
-    finishedFiles: 10,
-    totalFiles: 10,
-    totalTime: 567000
-  },
-  downloadId: 'mock-download-id',
-  state: downloadStates.errorFetchingLinks,
-  timeStart: 123000
-}
-
 const setup = (overrideProps = {}) => {
-  const deleteAllToastsById = jest.fn()
-  const clearDownloadHistory = jest.fn()
+  const toasts = []
+  const addToast = jest.fn((toast) => toasts.push(toast))
+  const deleteDownloadHistory = jest.fn()
   const copyDownloadPath = jest.fn()
+  const deleteAllToastsById = jest.fn()
   const openDownloadFolder = jest.fn()
   const restartDownload = jest.fn()
+  const setPendingDeleteDownloadHistory = jest.fn()
   const showMoreInfoDialog = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
+  const undoDeleteDownloadHistory = jest.fn()
 
   const props = {
     showMoreInfoDialog,
@@ -60,18 +58,21 @@ const setup = (overrideProps = {}) => {
     <ElectronApiContext.Provider
       value={
         {
-          clearDownloadHistory,
+          deleteDownloadHistory,
           copyDownloadPath,
           openDownloadFolder,
           restartDownload,
+          setPendingDeleteDownloadHistory,
           showWaitingForEulaDialog,
-          showWaitingForLoginDialog
+          showWaitingForLoginDialog,
+          undoDeleteDownloadHistory
         }
       }
     >
       <AppContext.Provider
         value={
           {
+            addToast,
             deleteAllToastsById
           }
         }
@@ -82,16 +83,26 @@ const setup = (overrideProps = {}) => {
   )
 
   return {
+    addToast,
     deleteAllToastsById,
-    clearDownloadHistory,
+    deleteDownloadHistory,
     copyDownloadPath,
     openDownloadFolder,
-    restartDownload
+    restartDownload,
+    setPendingDeleteDownloadHistory,
+    toasts,
+    undoDeleteDownloadHistory
   }
 }
 
 beforeEach(() => {
+  MockDate.set('2023-05-13T22:00:00')
+
   DownloadItem.mockImplementation(jest.requireActual('../../DownloadItem/DownloadItem').default)
+})
+
+afterEach(() => {
+  jest.useRealTimers()
 })
 
 describe('DownloadHistoryListItem component', () => {
@@ -176,29 +187,15 @@ describe('DownloadHistoryListItem component', () => {
     })
   })
 
-  describe('when clicking `Clear Download`', () => {
-    test('calls clearDownloadHistory', async () => {
-      const { clearDownloadHistory, deleteAllToastsById } = setup()
+  describe('when the state is `errorFetchingLinks`', () => {
+    test('does not render unsupported actions', async () => {
+      setup({
+        download: {
+          ...download,
+          state: downloadStates.errorFetchingLinks
+        }
+      })
 
-      const moreActions = screen.getByText('More Actions')
-      await userEvent.click(moreActions)
-
-      const button = screen.getByText('Clear Download')
-      await userEvent.click(button)
-
-      expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
-      expect(clearDownloadHistory).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
-
-      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
-      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
-    })
-  })
-
-  describe('when a `downloadHistoryListItem` is in `errorFetchingLinks` state', () => {
-    test(' clicking `Clear Download` clearDownloadHistory', async () => {
-      const { clearDownloadHistory, deleteAllToastsById } = setup(
-        { download: erroredFetchLinksdownload }
-      )
       const moreActions = screen.getByText('More Actions')
       await userEvent.click(moreActions)
 
@@ -207,15 +204,128 @@ describe('DownloadHistoryListItem component', () => {
       expect(screen.queryAllByText('Copy Folder Path').length).toEqual(0)
       expect(screen.queryAllByText('Copy Folder Path').length).toEqual(0)
       expect(screen.queryAllByText('Restart Download').length).toEqual(0)
+    })
+  })
 
-      const Clearbutton = screen.getByText('Clear Download')
-      await userEvent.click(Clearbutton)
+  describe('when clicking `Delete Download`', () => {
+    test('calls setPendingDeleteDownloadHistory and displays a toast', async () => {
+      const {
+        addToast,
+        setPendingDeleteDownloadHistory,
+        deleteAllToastsById
+      } = setup({
+        download: {
+          ...download,
+          state: downloadStates.completed
+        }
+      })
 
-      expect(clearDownloadHistory).toHaveBeenCalledTimes(1)
-      expect(clearDownloadHistory).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
+      const moreActions = screen.getByText('More Actions')
+      await userEvent.click(moreActions)
+
+      const button = screen.getByText('Delete Download')
+      await userEvent.click(button)
+
+      expect(setPendingDeleteDownloadHistory).toHaveBeenCalledTimes(1)
+      expect(setPendingDeleteDownloadHistory).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id',
+        deleteId: 'mock-download-id-1684029600000'
+      })
 
       expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
       expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+
+      expect(addToast).toHaveBeenCalledTimes(1)
+      expect(addToast).toHaveBeenCalledWith({
+        actions: [{
+          altText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: expect.any(Function)
+          },
+          buttonText: 'Undo'
+        }],
+        id: 'undo-clear-history-mock-download-id',
+        message: 'Download Deleted',
+        variant: 'spinner'
+      })
+    })
+
+    describe('when calling the undo callback', () => {
+      test('calls undoDeleteDownloadHistory', async () => {
+        const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+
+        const {
+          deleteAllToastsById,
+          toasts,
+          undoDeleteDownloadHistory
+        } = setup({
+          download: {
+            ...download,
+            state: downloadStates.completed
+          }
+        })
+
+        const moreActions = screen.getByText('More Actions')
+        await userEvent.click(moreActions)
+
+        const button = screen.getByText('Delete Download')
+        await userEvent.click(button)
+
+        expect(toasts).toHaveLength(1)
+
+        const [toast] = toasts
+        const { actions } = toast
+        const [undoAction] = actions
+        const { buttonProps } = undoAction
+        const { onClick } = buttonProps
+
+        jest.clearAllMocks()
+
+        // Click the undo button
+        onClick()
+
+        expect(clearTimeoutSpy).toHaveBeenCalledTimes(1)
+        expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
+
+        expect(undoDeleteDownloadHistory).toHaveBeenCalledTimes(1)
+        expect(undoDeleteDownloadHistory).toHaveBeenCalledWith({ deleteId: 'mock-download-id-1684029600000' })
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-clear-history-mock-download-id')
+      })
+    })
+
+    describe('when the undo timeout runs out', () => {
+      test('removes the toast', async () => {
+        const {
+          deleteAllToastsById,
+          undoDeleteDownloadHistory
+        } = setup({
+          download: {
+            ...download,
+            state: downloadStates.completed
+          }
+        })
+
+        const moreActions = screen.getByText('More Actions')
+        await userEvent.click(moreActions)
+
+        jest.useFakeTimers()
+
+        await waitFor(async () => {
+          const button = screen.getByText('Delete Download')
+          await userEvent.click(button)
+        })
+
+        jest.clearAllMocks()
+        jest.advanceTimersByTime(UNDO_TIMEOUT)
+
+        expect(undoDeleteDownloadHistory).toHaveBeenCalledTimes(0)
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-clear-history-mock-download-id')
+      })
     })
   })
 })

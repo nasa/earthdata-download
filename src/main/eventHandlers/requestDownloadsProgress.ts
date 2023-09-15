@@ -86,7 +86,12 @@ const requestDownloadsProgress = async ({
     }
   })
 
-  const filesTotals = await database.getFilesTotals()
+  // If active is false, we don't need files totals
+  let filesTotals = {}
+  if (active) {
+    filesTotals = await database.getFilesTotals()
+  }
+
   const {
     totalFiles,
     totalCompletedFiles

@@ -34,19 +34,7 @@ const download = {
 
 const setup = (overrideProps = {}) => {
   const toasts = []
-  const addToast = jest.fn((toast) => {
-    toasts.push(toast)
-
-    const { timeout } = toast
-
-    if (timeout) {
-      const { callback, duration } = timeout
-
-      setTimeout(() => {
-        callback()
-      }, duration)
-    }
-  })
+  const addToast = jest.fn((toast) => toasts.push(toast))
   const deleteAllToastsById = jest.fn()
   const cancelDownloadItem = jest.fn()
   const clearDownload = jest.fn()

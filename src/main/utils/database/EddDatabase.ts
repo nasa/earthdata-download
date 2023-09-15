@@ -132,50 +132,6 @@ class EddDatabase {
   }
 
   /**
-   * Deletes downloads which are on the `downloadHistory` page
-   * @param {String} downloadId ID of download to create.
-   */
-  async clearDownloadHistoryDownloads(downloadId) {
-    if (downloadId) {
-      await this.db('downloads')
-        .delete()
-        .where({ id: downloadId })
-
-      await this.db('files')
-        .delete()
-        .where({ downloadId })
-
-      await this.db('pauses')
-        .delete()
-        .where({ id: downloadId })
-
-      return
-    }
-
-    await this.db('pauses')
-      .delete()
-      .whereIn('downloadId', function select() {
-        this
-          .select('id')
-          .from('downloads')
-          .where({ active: false })
-      })
-
-    await this.db('files')
-      .delete()
-      .whereIn('downloadId', function select() {
-        this
-          .select('id')
-          .from('downloads')
-          .where({ active: false })
-      })
-
-    await this.db('downloads')
-      .delete()
-      .where({ 'downloads.active': false })
-  }
-
-  /**
    * Creates a new download.
    * @param {String} downloadId ID of download to create.
    * @param {Object} data The data of the download to be inserted.
@@ -331,6 +287,7 @@ class EddDatabase {
       .where({
         'files.state': downloadStates.error
       })
+      .whereNull('files.deleteId')
       .groupBy('files.downloadId')
   }
 
@@ -588,7 +545,7 @@ class EddDatabase {
         pausesSum: this.db.raw('IFNULL(`pauses`.`timeEnd`, UNIXEPOCH() * 1000.0) - `pauses`.`timeStart`')
       })
       .where(where)
-      .whereNull('fileId')
+      .whereNull('fileId', 'deleteId')
       .first()
 
     const { pausesSum } = result
@@ -660,6 +617,7 @@ class EddDatabase {
       .where({
         downloadId
       })
+      .whereNull('deleteId')
 
     return result
   }
@@ -793,6 +751,7 @@ class EddDatabase {
         this.db.raw('(IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime')
       )
       .where({ active })
+      .whereNull('deleteId')
       .limit(limit)
       .offset(offset)
       .orderBy('createdAt', 'desc')
@@ -805,6 +764,7 @@ class EddDatabase {
     const [result] = await this.db('downloads')
       .count('id')
       .where({ active })
+      .whereNull('deleteId')
 
     const { 'count(`id`)': number } = result
 
@@ -824,6 +784,97 @@ class EddDatabase {
       })
 
     return result
+  }
+
+  /**
+   * Adds a given deleteId to downloads, files and pauses.
+   * @param downloadId Download Id to add the deleteId.
+   * @param deleteId Delete ID to add to the database.
+   */
+  async addDeleteId(downloadId, deleteId) {
+    // Add the deleteId to the specific downloadId
+    if (downloadId) {
+      await this.db('downloads')
+        .update({ deleteId })
+        .where({ id: downloadId })
+
+      await this.db('files')
+        .update({ deleteId })
+        .where({ downloadId })
+
+      await this.db('pauses')
+        .update({ deleteId })
+        .where({ id: downloadId })
+
+      return
+    }
+
+    // Add the deleteId to all pauses where the download is inactive
+    await this.db('pauses')
+      .update({ deleteId })
+      .whereIn('downloadId', function select() {
+        this
+          .select('id')
+          .from('downloads')
+          .where({ active: false })
+      })
+
+    // Add the deleteId to all files where the download is inactive
+    await this.db('files')
+      .update({ deleteId })
+      .whereIn('downloadId', function select() {
+        this
+          .select('id')
+          .from('downloads')
+          .where({ active: false })
+      })
+
+    // Add the deleteId to all inactive downloads
+    await this.db('downloads')
+      .update({ deleteId })
+      .where({ 'downloads.active': false })
+  }
+
+  /**
+   * Removes the given deleteId from downloads, files and pauses.
+   * @param deleteId Delete ID to remove from the database.
+   */
+  async clearDeleteId(deleteId) {
+    // Remove all instances of deleteId from pauses
+    await this.db('pauses')
+      .update({ deleteId: null })
+      .where({ deleteId })
+
+    // Remove all instances of deleteId from files
+    await this.db('files')
+      .update({ deleteId: null })
+      .where({ deleteId })
+
+    // Remove all instances of deleteId from downloads
+    await this.db('downloads')
+      .update({ deleteId: null })
+      .where({ deleteId })
+  }
+
+  /**
+   * Deletes rows that match the given deleteId from downloads, files and pauses.
+   * @param deleteId Delete ID to add to the database.
+   */
+  async deleteByDeleteId(deleteId) {
+    // Delete all rows with the deleteId from pauses
+    await this.db('pauses')
+      .delete()
+      .where({ deleteId })
+
+    // Delete all rows with the deleteId from files
+    await this.db('files')
+      .delete()
+      .where({ deleteId })
+
+    // Delete all rows with the deleteId from downloads
+    await this.db('downloads')
+      .delete()
+      .where({ deleteId })
   }
 }
 

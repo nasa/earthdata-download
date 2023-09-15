@@ -14,7 +14,7 @@ window.electronApi = {
   cancelDownloadItem: jest.fn(),
   cancelErroredDownloadItem: jest.fn(),
   clearDownload: jest.fn(),
-  clearDownloadHistory: jest.fn(),
+  deleteDownloadHistory: jest.fn(),
   chooseDownloadLocation: jest.fn(),
   clearDefaultDownload: jest.fn(),
   closeWindow: jest.fn(),

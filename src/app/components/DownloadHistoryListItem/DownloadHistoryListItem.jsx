@@ -4,7 +4,8 @@ import {
   FaBan,
   FaClipboard,
   FaFolderOpen,
-  FaInfoCircle
+  FaInfoCircle,
+  FaUndo
 } from 'react-icons/fa'
 
 import DownloadItem from '../DownloadItem/DownloadItem'
@@ -14,7 +15,9 @@ import { ElectronApiContext } from '../../context/ElectronApiContext'
 import useAppContext from '../../hooks/useAppContext'
 import DownloadHistoryListItemState from './DownloadHistoryListItemState'
 import DownloadHistoryListItemTimestamp from './DownloadHistoryListItemTimestamp'
+
 import downloadStates from '../../constants/downloadStates'
+import { UNDO_TIMEOUT } from '../../constants/undoTimeout'
 
 /**
  * @typedef {Object} DownloadHistoryListItemProps
@@ -40,13 +43,16 @@ const DownloadHistoryListItem = ({
 }) => {
   const appContext = useAppContext()
   const {
+    addToast,
     deleteAllToastsById
   } = appContext
   const {
-    clearDownloadHistory,
+    deleteDownloadHistory,
     copyDownloadPath,
     openDownloadFolder,
-    restartDownload
+    restartDownload,
+    setPendingDeleteDownloadHistory,
+    undoDeleteDownloadHistory
   } = useContext(ElectronApiContext)
 
   const {
@@ -65,18 +71,72 @@ const DownloadHistoryListItem = ({
 
   const shouldShowActions = state !== downloadStates.errorFetchingLinks
 
+  const handleDeleteDownload = () => {
+    const now = new Date().getTime()
+    const deleteId = `${downloadId}-${now}`
+
+    // Clear the download
+    deleteAllToastsById(downloadId)
+    setPendingDeleteDownloadHistory({
+      downloadId,
+      deleteId
+    })
+
+    const toastId = `undo-clear-history-${downloadId}`
+
+    let timeoutId
+
+    // Setup an undo callback to provide to the toast that flips the active flag back to true
+    const undoCallback = () => {
+      // Undo was clicked, dismiss the setTimeout used to remove the undo toast
+      clearTimeout(timeoutId)
+
+      deleteAllToastsById(toastId)
+      undoDeleteDownloadHistory({
+        deleteId
+      })
+    }
+
+    // Show an `undo` toast
+    addToast({
+      id: toastId,
+      message: 'Download Deleted',
+      variant: 'spinner',
+      actions: [
+        {
+          altText: 'Undo',
+          buttonText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: undoCallback
+          }
+        }
+      ]
+    })
+
+    // After the UNDO_TIMEOUT time has passed, remove the undo toast
+    timeoutId = setTimeout(() => {
+      deleteAllToastsById(toastId)
+
+      // Actually clear the history
+      deleteDownloadHistory({
+        deleteId
+      })
+    }, UNDO_TIMEOUT)
+  }
+
   const actionsList = [
     [
       {
         label: 'Open Folder',
-        isActive: true,
+        isActive: shouldShowActions,
         isPrimary: true,
         callback: () => openDownloadFolder({ downloadId }),
         icon: FaFolderOpen
       },
       {
         label: 'Copy Folder Path',
-        isActive: true,
+        isActive: shouldShowActions,
         isPrimary: true,
         callback: () => copyDownloadPath({ downloadId }),
         icon: FaClipboard
@@ -85,7 +145,7 @@ const DownloadHistoryListItem = ({
     [
       {
         label: 'Restart Download',
-        isActive: true,
+        isActive: shouldShowActions,
         isPrimary: false,
         callback: () => {
           deleteAllToastsById(downloadId)
@@ -94,35 +154,18 @@ const DownloadHistoryListItem = ({
         icon: FaInfoCircle
       },
       {
-        label: 'Clear Download',
+        label: 'Delete Download',
         isActive: true,
         isPrimary: false,
-        callback: () => {
-          deleteAllToastsById(downloadId)
-          clearDownloadHistory({ downloadId })
-        },
+        callback: handleDeleteDownload,
         icon: FaBan
       }
     ]
   ]
 
-  const fetchLinksErroredActionsList = [
-    [
-      {
-        label: 'Clear Download',
-        isActive: true,
-        isPrimary: false,
-        callback: () => {
-          deleteAllToastsById(downloadId)
-          clearDownloadHistory({ downloadId })
-        },
-        icon: FaBan
-      }
-    ], []]
-
   return (
     <DownloadItem
-      actionsList={shouldShowActions ? actionsList : fetchLinksErroredActionsList}
+      actionsList={actionsList}
       downloadId={downloadId}
       showMoreInfoDialog={showMoreInfoDialog}
       shouldBeClickable={false}

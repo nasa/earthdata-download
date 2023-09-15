@@ -37,7 +37,8 @@ describe('restartDownload', () => {
       const downloadIdContext = {}
       const webContents = {}
       const info = {
-        downloadId: 'mock-download-id'
+        downloadId: 'mock-download-id',
+        restartId: 'mock-restart-id'
       }
 
       await restartDownload({
@@ -61,13 +62,13 @@ describe('restartDownload', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(2)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        downloadId: 'mock-download-id'
+        restartId: 'mock-restart-id'
       }, {
         state: downloadStates.cancelling
       })
 
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        downloadId: 'mock-download-id'
+        restartId: 'mock-restart-id'
       }, {
         state: downloadStates.pending,
         percent: 0,
@@ -75,7 +76,8 @@ describe('restartDownload', () => {
         timeEnd: null,
         errors: null,
         receivedBytes: null,
-        totalBytes: null
+        totalBytes: null,
+        restartId: null
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
@@ -86,7 +88,8 @@ describe('restartDownload', () => {
           state: downloadStates.active,
           timeStart: 1682899200000,
           timeEnd: null,
-          errors: null
+          errors: null,
+          restartId: null
         }
       )
 
@@ -112,7 +115,8 @@ describe('restartDownload', () => {
       const webContents = {}
       const info = {
         downloadId: 'mock-download-id',
-        filename: 'mock-filename'
+        filename: 'mock-filename',
+        restartId: 'mock-restart-id'
       }
 
       await restartDownload({
@@ -138,15 +142,13 @@ describe('restartDownload', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(2)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        downloadId: 'mock-download-id',
-        filename: 'mock-filename'
+        restartId: 'mock-restart-id'
       }, {
         state: downloadStates.cancelling
       })
 
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        downloadId: 'mock-download-id',
-        filename: 'mock-filename'
+        restartId: 'mock-restart-id'
       }, {
         state: downloadStates.pending,
         percent: 0,
@@ -154,14 +156,16 @@ describe('restartDownload', () => {
         timeEnd: null,
         errors: null,
         receivedBytes: null,
-        totalBytes: null
+        totalBytes: null,
+        restartId: null
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', {
         errors: null,
         state: downloadStates.active,
-        timeEnd: null
+        timeEnd: null,
+        restartId: null
       })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)
@@ -186,7 +190,8 @@ describe('restartDownload', () => {
       const webContents = {}
       const info = {
         downloadId: 'mock-download-id',
-        filename: 'mock-filename'
+        filename: 'mock-filename',
+        restartId: 'mock-restart-id'
       }
 
       await restartDownload({
@@ -217,15 +222,13 @@ describe('restartDownload', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(2)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        downloadId: 'mock-download-id',
-        filename: 'mock-filename'
+        restartId: 'mock-restart-id'
       }, {
         state: downloadStates.cancelling
       })
 
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
-        downloadId: 'mock-download-id',
-        filename: 'mock-filename'
+        restartId: 'mock-restart-id'
       }, {
         state: downloadStates.pending,
         percent: 0,
@@ -233,7 +236,8 @@ describe('restartDownload', () => {
         timeEnd: null,
         errors: null,
         receivedBytes: null,
-        totalBytes: null
+        totalBytes: null,
+        restartId: null
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
@@ -242,7 +246,8 @@ describe('restartDownload', () => {
         {
           state: downloadStates.active,
           timeEnd: null,
-          errors: null
+          errors: null,
+          restartId: null
         }
       )
 

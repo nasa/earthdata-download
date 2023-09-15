@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import downloadStates from '../../app/constants/downloadStates'
+
 /**
  * Reports current progress on individual files
  * @param {Object} params
@@ -73,6 +75,25 @@ const requestFilesProgress = async ({
     }
   })
 
+  const files = filesReport.map((file) => {
+    const { restartId } = file
+
+    // Restarting files aren't actually restarted until the setTimeout expires, so while a restartId exists
+    // we need to fake a 'pending' file.
+    if (restartId) {
+      return {
+        ...file,
+        percent: 0,
+        receivedBytes: 0,
+        remainingTime: 0,
+        state: downloadStates.pending,
+        totalBytes: 0
+      }
+    }
+
+    return file
+  })
+
   return {
     headerReport: {
       ...headerReport,
@@ -82,7 +103,7 @@ const requestFilesProgress = async ({
       estimatedTotalTimeRemaining
     },
     filesReport: {
-      files: filesReport,
+      files,
       totalFiles: totalFilesCount
     }
   }

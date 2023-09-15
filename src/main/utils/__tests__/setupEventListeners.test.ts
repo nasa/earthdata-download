@@ -30,9 +30,11 @@ import sendToEula from '../../eventHandlers/sendToEula'
 import sendToLogin from '../../eventHandlers/sendToLogin'
 import setPendingDeleteDownloadHistory from '../../eventHandlers/setPendingDeleteDownloadHistory'
 import setPreferenceFieldValue from '../../eventHandlers/setPreferenceFieldValue'
+import setRestartingDownload from '../../eventHandlers/setRestartingDownload'
 import startPendingDownloads from '../../utils/startPendingDownloads'
 import undoClearDownload from '../../eventHandlers/undoClearDownload'
 import undoDeleteDownloadHistory from '../../eventHandlers/undoDeleteDownloadHistory'
+import undoRestartingDownload from '../../eventHandlers/undoRestartingDownload'
 import willDownload from '../../eventHandlers/willDownload'
 
 jest.mock('../../eventHandlers/beforeQuit', () => ({
@@ -69,8 +71,10 @@ jest.mock('../../eventHandlers/sendToEula')
 jest.mock('../../eventHandlers/sendToLogin')
 jest.mock('../../eventHandlers/setPendingDeleteDownloadHistory')
 jest.mock('../../eventHandlers/setPreferenceFieldValue')
+jest.mock('../../eventHandlers/setRestartingDownload')
 jest.mock('../../eventHandlers/undoClearDownload')
 jest.mock('../../eventHandlers/undoDeleteDownloadHistory')
+jest.mock('../../eventHandlers/undoRestartingDownload')
 jest.mock('../../eventHandlers/willDownload')
 jest.mock('../../utils/startPendingDownloads')
 
@@ -669,6 +673,25 @@ describe('setupEventListeners', () => {
     })
   })
 
+  describe('setRestartingDownload', () => {
+    test('calls setRestartingDownload', () => {
+      const {
+        database
+      } = setup()
+
+      const event = {}
+      const info = { mock: 'info' }
+
+      ipcRenderer.send('setRestartingDownload', event, info)
+
+      expect(setRestartingDownload).toHaveBeenCalledTimes(1)
+      expect(setRestartingDownload).toHaveBeenCalledWith({
+        database,
+        info
+      })
+    })
+  })
+
   describe('undoClearDownload', () => {
     test('calls undoClearDownload', () => {
       const {
@@ -701,6 +724,25 @@ describe('setupEventListeners', () => {
 
       expect(undoDeleteDownloadHistory).toHaveBeenCalledTimes(1)
       expect(undoDeleteDownloadHistory).toHaveBeenCalledWith({
+        database,
+        info
+      })
+    })
+  })
+
+  describe('undoRestartingDownload', () => {
+    test('calls undoRestartingDownload', () => {
+      const {
+        database
+      } = setup()
+
+      const event = {}
+      const info = { mock: 'info' }
+
+      ipcRenderer.send('undoRestartingDownload', event, info)
+
+      expect(undoRestartingDownload).toHaveBeenCalledTimes(1)
+      expect(undoRestartingDownload).toHaveBeenCalledWith({
         database,
         info
       })

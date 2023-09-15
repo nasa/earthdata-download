@@ -4,10 +4,13 @@ import {
   FaBan,
   FaClipboard,
   FaFolderOpen,
-  FaInfoCircle
+  FaInfoCircle,
+  FaUndo
 } from 'react-icons/fa'
 
 import downloadStates from '../../constants/downloadStates'
+import { UNDO_TIMEOUT } from '../../constants/undoTimeout'
+
 import useAppContext from '../../hooks/useAppContext'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
@@ -37,13 +40,16 @@ const FileListItem = ({
 }) => {
   const appContext = useAppContext()
   const {
+    addToast,
     deleteAllToastsById
   } = appContext
   const {
     cancelDownloadItem,
     copyDownloadPath,
     openDownloadFolder,
-    restartDownload
+    restartDownload,
+    setRestartingDownload,
+    undoRestartingDownload
   } = useContext(ElectronApiContext)
 
   const {
@@ -85,6 +91,61 @@ const FileListItem = ({
     && state !== downloadStates.cancelled
 
   const hasError = state === downloadStates.error
+
+  const handleRestartFile = () => {
+    const now = new Date().getTime()
+    const restartId = `${filename}-${now}`
+
+    // Set the download to be restarting by adding the restartId
+    deleteAllToastsById(downloadId)
+    setRestartingDownload({
+      downloadId,
+      filename,
+      restartId
+    })
+
+    const toastId = `undo-restart-file-${filename}`
+
+    let timeoutId
+
+    // Setup an undo callback to provide to the toast that removes the restartId
+    const undoCallback = () => {
+      // Undo was clicked, dismiss the setTimeout used to remove the undo toast
+      clearTimeout(timeoutId)
+
+      deleteAllToastsById(toastId)
+      undoRestartingDownload({ restartId })
+    }
+
+    // Show an `undo` toast
+    addToast({
+      id: toastId,
+      message: 'File Restarted',
+      variant: 'spinner',
+      actions: [
+        {
+          altText: 'Undo',
+          buttonText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: undoCallback
+          }
+        }
+      ]
+    })
+
+    // After the UNDO_TIMEOUT time has passed, remove the undo toast
+    timeoutId = setTimeout(() => {
+      deleteAllToastsById(toastId)
+
+      // Actually restart the download
+      restartDownload({
+        downloadId,
+        filename,
+        restartId
+      })
+    }, UNDO_TIMEOUT)
+  }
 
   const actionsList = [
     [
@@ -131,16 +192,7 @@ const FileListItem = ({
         label: 'Restart File',
         isActive: !shouldDisableFileRestart,
         isPrimary: false,
-        callback: () => {
-          restartDownload({
-            downloadId,
-            filename
-          })
-
-          if (hasError) {
-            deleteAllToastsById(downloadId)
-          }
-        },
+        callback: handleRestartFile,
         icon: FaInfoCircle
       }
     ]

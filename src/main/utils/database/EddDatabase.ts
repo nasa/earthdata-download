@@ -157,6 +157,18 @@ class EddDatabase {
   }
 
   /**
+   * Updates downloads that match the where criteria.
+   * @param {Object} where Knex `where` object to select downloads.
+   * @param {Object} data The data of the download to be updated.
+   */
+  async updateDownloadsWhere(where, data) {
+    return this.db('downloads')
+      .returning(['id'])
+      .update(data)
+      .where(where)
+  }
+
+  /**
    * Updates downloads that match the whereIn criteria.
    * @param {Object} whereIn Knex `whereIn` object to select downloads to be updated.
    * @param {Object} data The data of the download to be updated.
@@ -640,9 +652,10 @@ class EddDatabase {
       .select(
         'files.downloadId',
         'files.filename',
-        'files.state',
         'files.percent',
         'files.receivedBytes',
+        'files.restartId',
+        'files.state',
         'files.totalBytes',
         // Return the `remainingTime` with this formula:
         // `remainingTime` = (`timeTaken` / `receivedBytes`) * remainingBytes
@@ -742,29 +755,47 @@ class EddDatabase {
    * @param {Number} offset Offset of the files returned
    */
   async getDownloadsReport(active, limit, offset) {
-    return this.db('downloads')
+    let query = this.db('downloads')
       .select(
         'downloads.id',
         'downloads.loadingMoreFiles',
+        'downloads.restartId',
         'downloads.state',
         'downloads.timeStart',
         this.db.raw('(IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime')
       )
       .where({ active })
       .whereNull('deleteId')
-      .limit(limit)
+
+    if (active) {
+      query = query.orWhereNotNull('restartId')
+    } else {
+      query = query.whereNull('restartId')
+    }
+
+    query = query.limit(limit)
       .offset(offset)
       .orderBy('createdAt', 'desc')
+
+    return query
   }
 
   /**
    * Returns the total number of downloads to be reported
    */
   async getAllDownloadsCount(active) {
-    const [result] = await this.db('downloads')
+    let query = this.db('downloads')
       .count('id')
       .where({ active })
       .whereNull('deleteId')
+
+    if (active) {
+      query = query.orWhereNotNull('restartId')
+    } else {
+      query = query.whereNull('restartId')
+    }
+
+    const [result] = await query
 
     const { 'count(`id`)': number } = result
 
@@ -782,6 +813,9 @@ class EddDatabase {
         // Return the count of the `state` column when the value is "COMPLETED" as `finishedFiles`
         totalCompletedFiles: this.db.raw('CASE `files`.`state` WHEN \'COMPLETED\' THEN 1 ELSE NULL END')
       })
+      .join('downloads', { 'files.downloadId': 'downloads.id' })
+      .where({ 'downloads.active': true })
+      .whereNull('files.deleteId', 'files.restartId')
 
     return result
   }

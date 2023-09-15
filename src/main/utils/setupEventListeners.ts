@@ -34,6 +34,8 @@ import startPendingDownloads from '../utils/startPendingDownloads'
 import undoClearDownload from '../eventHandlers/undoClearDownload'
 import undoDeleteDownloadHistory from '../eventHandlers/undoDeleteDownloadHistory'
 import setPendingDeleteDownloadHistory from '../eventHandlers/setPendingDeleteDownloadHistory'
+import setRestartingDownload from '../eventHandlers/setRestartingDownload'
+import undoRestartingDownload from '../eventHandlers/undoRestartingDownload'
 
 /**
  * Sets up event listeners for the main process
@@ -261,9 +263,17 @@ const setupEventListeners = ({
     })
   })
 
-  // Undo a clearDownload action
+  // Set a download to be pending deletion
   ipcMain.on('setPendingDeleteDownloadHistory', async (event, info) => {
     await setPendingDeleteDownloadHistory({
+      database,
+      info
+    })
+  })
+
+  // Set a download to be restarted
+  ipcMain.on('setRestartingDownload', async (event, info) => {
+    await setRestartingDownload({
       database,
       info
     })
@@ -280,6 +290,14 @@ const setupEventListeners = ({
   // Undo a deleteDownloadHistory action
   ipcMain.on('undoDeleteDownloadHistory', async (event, info) => {
     await undoDeleteDownloadHistory({
+      database,
+      info
+    })
+  })
+
+  // Undo a setRestartingDownload action
+  ipcMain.on('undoRestartingDownload', async (event, info) => {
+    await undoRestartingDownload({
       database,
       info
     })

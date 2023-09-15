@@ -81,6 +81,10 @@ describe('EddDatabase', () => {
             name: '20230915000521_add_delete_id_to_files.js'
           }, {
             name: '20230915000535_add_delete_id_to_pauses.js'
+          }, {
+            name: '20230915190921_add_restart_id_to_downloads.js'
+          }, {
+            name: '20230915190942_add_restart_id_to_files.js'
           }])
         } else if (step === 5) {
           // Query: select `name` from `knex_migrations` order by `id` asc'
@@ -1249,7 +1253,7 @@ describe('EddDatabase', () => {
   describe('getFilesReport', () => {
     test('returns the report', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select `files`.`downloadId`, `files`.`filename`, `files`.`state`, `files`.`percent`, `files`.`receivedBytes`, `files`.`totalBytes`, (((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime from `files` full outer join `pauses` on `files`.`id` = `pauses`.`fileId` where `files`.`downloadId` = ? group by `files`.`id` order by `createdAt` asc limit ?')
+        expect(query.sql).toEqual('select `files`.`downloadId`, `files`.`filename`, `files`.`percent`, `files`.`receivedBytes`, `files`.`restartId`, `files`.`state`, `files`.`totalBytes`, (((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime from `files` full outer join `pauses` on `files`.`id` = `pauses`.`fileId` where `files`.`downloadId` = ? group by `files`.`id` order by `createdAt` asc limit ?')
         expect(query.bindings).toEqual([
           'mock-download-1',
           2
@@ -1304,7 +1308,7 @@ describe('EddDatabase', () => {
 
     test('returns the report when hiding completed files', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select `files`.`downloadId`, `files`.`filename`, `files`.`state`, `files`.`percent`, `files`.`receivedBytes`, `files`.`totalBytes`, (((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime from `files` full outer join `pauses` on `files`.`id` = `pauses`.`fileId` where `files`.`downloadId` = ? and not `state` = ? group by `files`.`id` order by `createdAt` asc limit ?')
+        expect(query.sql).toEqual('select `files`.`downloadId`, `files`.`filename`, `files`.`percent`, `files`.`receivedBytes`, `files`.`restartId`, `files`.`state`, `files`.`totalBytes`, (((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime from `files` full outer join `pauses` on `files`.`id` = `pauses`.`fileId` where `files`.`downloadId` = ? and not `state` = ? group by `files`.`id` order by `createdAt` asc limit ?')
         expect(query.bindings).toEqual([
           'mock-download-1',
           downloadStates.completed,
@@ -1442,7 +1446,7 @@ describe('EddDatabase', () => {
   describe('getDownloadsReport', () => {
     test('returns the report', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select `downloads`.`id`, `downloads`.`loadingMoreFiles`, `downloads`.`state`, `downloads`.`timeStart`, (IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime from `downloads` where `active` = ? and `deleteId` is null order by `createdAt` desc limit ?')
+        expect(query.sql).toEqual('select `downloads`.`id`, `downloads`.`loadingMoreFiles`, `downloads`.`restartId`, `downloads`.`state`, `downloads`.`timeStart`, (IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime from `downloads` where `active` = ? and `deleteId` is null or `restartId` is not null order by `createdAt` desc limit ?')
         expect(query.bindings).toEqual([
           10,
           10
@@ -1492,7 +1496,7 @@ describe('EddDatabase', () => {
   describe('getAllDownloadsCount', () => {
     test('returns the report', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select count(`id`) from `downloads` where `active` = ? and `deleteId` is null')
+        expect(query.sql).toEqual('select count(`id`) from `downloads` where `active` = ? and `deleteId` is null or `restartId` is not null')
         expect(query.bindings).toEqual([true])
 
         query.response([{
@@ -1511,8 +1515,8 @@ describe('EddDatabase', () => {
   describe('getFilesTotals', () => {
     test('returns the report', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select count(`files`.`id`) as `totalFiles`, count(CASE `files`.`state` WHEN \'COMPLETED\' THEN 1 ELSE NULL END) as `totalCompletedFiles` from `files`')
-        expect(query.bindings).toEqual([])
+        expect(query.sql).toEqual('select count(`files`.`id`) as `totalFiles`, count(CASE `files`.`state` WHEN \'COMPLETED\' THEN 1 ELSE NULL END) as `totalCompletedFiles` from `files` inner join `downloads` on `files`.`downloadId` = `downloads`.`id` where `downloads`.`active` = ? and `files`.`deleteId` is null')
+        expect(query.bindings).toEqual([true])
 
         query.response([{
           totalCompletedFiles: 5,

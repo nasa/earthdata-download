@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import downloadStates from '../../app/constants/downloadStates'
+
 /**
  * Reports current progress on downloads
  * @param {Object} params
@@ -32,6 +34,7 @@ const requestDownloadsProgress = async ({
     const {
       id: downloadId,
       loadingMoreFiles,
+      restartId,
       state,
       timeStart,
       totalTime
@@ -57,6 +60,23 @@ const requestDownloadsProgress = async ({
       finishedFiles,
       totalFiles,
       totalTime: totalTime - pausesSum
+    }
+
+    // Restarting downloads aren't actually restarted until the setTimeout expires, so while a restartId exists
+    // we need to fake a 'pending' download.
+    if (restartId) {
+      return {
+        downloadId,
+        loadingMoreFiles: false,
+        progress: {
+          percent: 0,
+          finishedFiles: 0,
+          totalFiles,
+          totalTime: 0
+        },
+        state: downloadStates.pending,
+        timeStart: null
+      }
     }
 
     return {

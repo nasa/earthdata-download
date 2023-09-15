@@ -64,7 +64,9 @@ const DownloadListItem = ({
     resumeDownloadItem,
     sendToEula,
     sendToLogin,
-    undoClearDownload
+    setRestartingDownload,
+    undoClearDownload,
+    undoRestartingDownload
   } = useContext(ElectronApiContext)
 
   const {
@@ -169,6 +171,59 @@ const DownloadListItem = ({
     }, UNDO_TIMEOUT)
   }
 
+  const handleRestartDownload = () => {
+    const now = new Date().getTime()
+    const restartId = `${downloadId}-${now}`
+
+    // Set the download to be restarting by adding the restartId
+    deleteAllToastsById(downloadId)
+    setRestartingDownload({
+      downloadId,
+      restartId
+    })
+
+    const toastId = `undo-restart-download-${downloadId}`
+
+    let timeoutId
+
+    // Setup an undo callback to provide to the toast that removes the restartId
+    const undoCallback = () => {
+      // Undo was clicked, dismiss the setTimeout used to remove the undo toast
+      clearTimeout(timeoutId)
+
+      deleteAllToastsById(toastId)
+      undoRestartingDownload({ restartId })
+    }
+
+    // Show an `undo` toast
+    addToast({
+      id: toastId,
+      message: 'Download Restarted',
+      variant: 'spinner',
+      actions: [
+        {
+          altText: 'Undo',
+          buttonText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: undoCallback
+          }
+        }
+      ]
+    })
+
+    // After the UNDO_TIMEOUT time has passed, remove the undo toast
+    timeoutId = setTimeout(() => {
+      deleteAllToastsById(toastId)
+
+      // Actually restart the download
+      restartDownload({
+        downloadId,
+        restartId
+      })
+    }, UNDO_TIMEOUT)
+  }
+
   const actionsList = [
     [
       {
@@ -239,10 +294,7 @@ const DownloadListItem = ({
         label: 'Restart Download',
         isActive: shouldShowActions,
         isPrimary: false,
-        callback: () => {
-          deleteAllToastsById(downloadId)
-          restartDownload({ downloadId })
-        },
+        callback: handleRestartDownload,
         icon: FaInfoCircle
       },
       {

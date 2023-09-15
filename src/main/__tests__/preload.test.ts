@@ -77,6 +77,15 @@ describe('preload', () => {
     expect(ipcRenderer.send).toHaveBeenCalledWith('sendToLogin', { mock: 'data' })
   })
 
+  test('setPendingDeleteDownloadHistory sends the setPendingDeleteDownloadHistory message', async () => {
+    await setup()
+
+    electronApi.setPendingDeleteDownloadHistory({ mock: 'data' })
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('setPendingDeleteDownloadHistory', { mock: 'data' })
+  })
+
   test('setPreferenceFieldValue sends the setPreferenceFieldValue message', async () => {
     await setup()
 
@@ -84,6 +93,15 @@ describe('preload', () => {
 
     expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
     expect(ipcRenderer.send).toHaveBeenCalledWith('setPreferenceFieldValue', { mock: 'data' })
+  })
+
+  test('setRestartingDownload sends the setRestartingDownload message', async () => {
+    await setup()
+
+    electronApi.setRestartingDownload({ mock: 'data' })
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('setRestartingDownload', { mock: 'data' })
   })
 
   test('getPreferenceFieldValue sends the getPreferenceFieldValue message', async () => {
@@ -237,6 +255,24 @@ describe('preload', () => {
 
     expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
     expect(ipcRenderer.send).toHaveBeenCalledWith('undoClearDownload', { mock: 'data' })
+  })
+
+  test('undoDeleteDownloadHistory sends the undoDeleteDownloadHistory message', async () => {
+    await setup()
+
+    electronApi.undoDeleteDownloadHistory({ mock: 'data' })
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('undoDeleteDownloadHistory', { mock: 'data' })
+  })
+
+  test('undoRestartingDownload sends the undoRestartingDownload message', async () => {
+    await setup()
+
+    electronApi.undoRestartingDownload({ mock: 'data' })
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('undoRestartingDownload', { mock: 'data' })
   })
 
   test('requestDownloadsProgress sends the requestDownloadsProgress message', async () => {

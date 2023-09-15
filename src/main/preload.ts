@@ -6,22 +6,18 @@ import { contextBridge, ipcRenderer } from 'electron'
 // https://www.electronjs.org/docs/latest/tutorial/ipc
 contextBridge.exposeInMainWorld('electronApi', {
   // Messages to send to the main process
-  beginDownload: (data) => ipcRenderer.send('beginDownload', data),
-  chooseDownloadLocation: () => ipcRenderer.send('chooseDownloadLocation'),
-  clearDefaultDownload: () => ipcRenderer.send('clearDefaultDownload'),
-  sendToEula: (data) => ipcRenderer.send('sendToEula', data),
-  sendToLogin: (data) => ipcRenderer.send('sendToLogin', data),
-  setPreferenceFieldValue: (data) => ipcRenderer.send('setPreferenceFieldValue', data),
-  getPreferenceFieldValue: (data) => ipcRenderer.invoke('getPreferenceFieldValue', data),
-
   autoUpdateInstallLater: () => ipcRenderer.send('autoUpdateInstallLater'),
+  beginDownload: (data) => ipcRenderer.send('beginDownload', data),
   cancelDownloadItem: (data) => ipcRenderer.send('cancelDownloadItem', data),
   cancelErroredDownloadItem: (data) => ipcRenderer.send('cancelErroredDownloadItem', data),
+  chooseDownloadLocation: () => ipcRenderer.send('chooseDownloadLocation'),
+  clearDefaultDownload: () => ipcRenderer.send('clearDefaultDownload'),
   clearDownload: (data) => ipcRenderer.send('clearDownload', data),
-  deleteDownloadHistory: (data) => ipcRenderer.send('deleteDownloadHistory', data),
   closeWindow: () => ipcRenderer.send('closeWindow'),
   copyDownloadPath: (data) => ipcRenderer.send('copyDownloadPath', data),
   deleteDownload: (data) => ipcRenderer.send('deleteDownload', data),
+  deleteDownloadHistory: (data) => ipcRenderer.send('deleteDownloadHistory', data),
+  getPreferenceFieldValue: (data) => ipcRenderer.invoke('getPreferenceFieldValue', data),
   maximizeWindow: () => ipcRenderer.send('maximizeWindow'),
   minimizeWindow: () => ipcRenderer.send('minimizeWindow'),
   openDownloadFolder: (data) => ipcRenderer.send('openDownloadFolder', data),
@@ -29,9 +25,14 @@ contextBridge.exposeInMainWorld('electronApi', {
   restartDownload: (data) => ipcRenderer.send('restartDownload', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),
   retryErroredDownloadItem: (data) => ipcRenderer.send('retryErroredDownloadItem', data),
+  sendToEula: (data) => ipcRenderer.send('sendToEula', data),
+  sendToLogin: (data) => ipcRenderer.send('sendToLogin', data),
   setPendingDeleteDownloadHistory: (data) => ipcRenderer.send('setPendingDeleteDownloadHistory', data),
+  setPreferenceFieldValue: (data) => ipcRenderer.send('setPreferenceFieldValue', data),
+  setRestartingDownload: (data) => ipcRenderer.send('setRestartingDownload', data),
   undoClearDownload: (data) => ipcRenderer.send('undoClearDownload', data),
   undoDeleteDownloadHistory: (data) => ipcRenderer.send('undoDeleteDownloadHistory', data),
+  undoRestartingDownload: (data) => ipcRenderer.send('undoRestartingDownload', data),
 
   // Reporting
   requestDownloadsProgress: (data) => ipcRenderer.invoke('requestDownloadsProgress', data),

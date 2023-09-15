@@ -1,12 +1,20 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
+import { FaUndo } from 'react-icons/fa'
+import MockDate from 'mockdate'
 
 import FileListItem from '../FileListItem'
 import DownloadItem from '../../DownloadItem/DownloadItem'
 
 import downloadStates from '../../../constants/downloadStates'
+import { UNDO_TIMEOUT } from '../../../constants/undoTimeout'
+
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import AppContext from '../../../context/AppContext'
 
@@ -27,13 +35,17 @@ const file = {
 }
 
 const setup = (overrideProps = {}) => {
+  const toasts = []
+  const addToast = jest.fn((toast) => toasts.push(toast))
   const cancelDownloadItem = jest.fn()
   const copyDownloadPath = jest.fn()
+  const deleteAllToastsById = jest.fn()
   const openDownloadFolder = jest.fn()
   const restartDownload = jest.fn()
+  const setRestartingDownload = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
-  const deleteAllToastsById = jest.fn()
+  const undoRestartingDownload = jest.fn()
 
   const props = {
     file,
@@ -49,12 +61,15 @@ const setup = (overrideProps = {}) => {
           openDownloadFolder,
           restartDownload,
           showWaitingForEulaDialog,
-          showWaitingForLoginDialog
+          showWaitingForLoginDialog,
+          setRestartingDownload,
+          undoRestartingDownload
         }
       }
     >
       <AppContext.Provider value={
         {
+          addToast,
           deleteAllToastsById
         }
       }
@@ -65,15 +80,21 @@ const setup = (overrideProps = {}) => {
   )
 
   return {
+    addToast,
     cancelDownloadItem,
     copyDownloadPath,
     deleteAllToastsById,
     openDownloadFolder,
-    restartDownload
+    restartDownload,
+    setRestartingDownload,
+    toasts,
+    undoRestartingDownload
   }
 }
 
 beforeEach(() => {
+  MockDate.set('2023-05-13T22:00:00')
+
   DownloadItem.mockImplementation(jest.requireActual('../../DownloadItem/DownloadItem').default)
 })
 
@@ -191,8 +212,12 @@ describe('FileListItem component', () => {
   })
 
   describe('when clicking `Restart File`', () => {
-    test('calls restartDownload', async () => {
-      const { restartDownload } = setup({
+    test('calls setRestartingDownload and displays a toast', async () => {
+      const {
+        addToast,
+        setRestartingDownload,
+        deleteAllToastsById
+      } = setup({
         file: {
           ...file,
           state: downloadStates.completed
@@ -205,15 +230,44 @@ describe('FileListItem component', () => {
       const button = screen.getByText('Restart File')
       await userEvent.click(button)
 
-      expect(restartDownload).toHaveBeenCalledTimes(1)
+      expect(setRestartingDownload).toHaveBeenCalledTimes(1)
+      expect(setRestartingDownload).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id',
+        filename: 'mock-file.png',
+        restartId: 'mock-file.png-1684029600000'
+      })
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+
+      expect(addToast).toHaveBeenCalledTimes(1)
+      expect(addToast).toHaveBeenCalledWith({
+        actions: [{
+          altText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: expect.any(Function)
+          },
+          buttonText: 'Undo'
+        }],
+        id: 'undo-restart-file-mock-file.png',
+        message: 'File Restarted',
+        variant: 'spinner'
+      })
     })
 
-    describe('when the file errored', () => {
-      test('calls restartDownload and deleteAllToastsById', async () => {
-        const { deleteAllToastsById, restartDownload } = setup({
+    describe('when calling the undo callback', () => {
+      test('calls undoRestartingDownload', async () => {
+        const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+
+        const {
+          deleteAllToastsById,
+          toasts,
+          undoRestartingDownload
+        } = setup({
           file: {
             ...file,
-            state: downloadStates.error
+            state: downloadStates.completed
           }
         })
 
@@ -223,9 +277,66 @@ describe('FileListItem component', () => {
         const button = screen.getByText('Restart File')
         await userEvent.click(button)
 
-        expect(restartDownload).toHaveBeenCalledTimes(1)
+        expect(toasts).toHaveLength(1)
+
+        const [toast] = toasts
+        const { actions } = toast
+        const [undoAction] = actions
+        const { buttonProps } = undoAction
+        const { onClick } = buttonProps
+
+        jest.clearAllMocks()
+
+        // Click the undo button
+        onClick()
+
+        expect(clearTimeoutSpy).toHaveBeenCalledTimes(1)
+        expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
+
+        expect(undoRestartingDownload).toHaveBeenCalledTimes(1)
+        expect(undoRestartingDownload).toHaveBeenCalledWith({ restartId: 'mock-file.png-1684029600000' })
+
         expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
-        expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-restart-file-mock-file.png')
+      })
+    })
+
+    describe('when the undo timeout runs out', () => {
+      test('removes the toast', async () => {
+        const {
+          deleteAllToastsById,
+          restartDownload
+        } = setup({
+          file: {
+            ...file,
+            state: downloadStates.completed
+          }
+        })
+
+        const moreActions = screen.getByText('More Actions')
+        await userEvent.click(moreActions)
+
+        jest.useFakeTimers({
+          now: 1684029600000
+        })
+
+        await waitFor(async () => {
+          const button = screen.getByText('Restart File')
+          await userEvent.click(button)
+        })
+
+        jest.clearAllMocks()
+        jest.advanceTimersByTime(UNDO_TIMEOUT)
+
+        expect(restartDownload).toHaveBeenCalledTimes(1)
+        expect(restartDownload).toHaveBeenCalledWith({
+          downloadId: 'mock-download-id',
+          filename: 'mock-file.png',
+          restartId: 'mock-file.png-1684029600100'
+        })
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-restart-file-mock-file.png')
       })
     })
   })

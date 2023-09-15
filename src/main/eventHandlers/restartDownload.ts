@@ -21,16 +21,19 @@ const restartDownload = async ({
 }) => {
   const {
     downloadId,
-    filename
+    filename,
+    restartId
   } = info
 
   // Set the files to cancelling
-  const updateWhere = { downloadId }
-  if (filename) {
-    updateWhere.filename = filename
-  }
+  // const updateWhere = { downloadId }
+  // if (filename) {
+  //   updateWhere.filename = filename
+  // }
 
-  await database.updateFilesWhere(updateWhere, {
+  await database.updateFilesWhere({
+    restartId
+  }, {
     state: downloadStates.cancelling
   })
 
@@ -43,7 +46,8 @@ const restartDownload = async ({
     timeEnd: null,
     errors: null,
     receivedBytes: null,
-    totalBytes: null
+    totalBytes: null,
+    restartId: null
   }
 
   if (downloadId && filename) {
@@ -62,15 +66,15 @@ const restartDownload = async ({
     await database.deletePausesByDownloadIdAndFilename(downloadId, filename)
 
     await database.updateFilesWhere({
-      downloadId,
-      filename
+      restartId
     }, resetFileValues)
 
     // Set the download to active
     await database.updateDownloadById(downloadId, {
       state: downloadStates.active,
       timeEnd: null,
-      errors: null
+      errors: null,
+      restartId: null
     })
   }
 
@@ -79,7 +83,7 @@ const restartDownload = async ({
 
     // Set the files to pending
     await database.updateFilesWhere({
-      downloadId
+      restartId
     }, resetFileValues)
 
     // Set the download to active
@@ -88,7 +92,8 @@ const restartDownload = async ({
       active: true,
       timeStart: new Date().getTime(),
       timeEnd: null,
-      errors: null
+      errors: null,
+      restartId: null
     })
   }
 

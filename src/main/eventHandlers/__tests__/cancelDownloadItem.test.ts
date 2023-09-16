@@ -42,6 +42,7 @@ describe('cancelDownloadItem', () => {
         downloadId: 'mock-download-id',
         filename: 'mock-filename.png'
       }, {
+        cancelId: null,
         state: downloadStates.cancelled
       })
 
@@ -88,7 +89,10 @@ describe('cancelDownloadItem', () => {
       expect(database.updateFilesWhereAndWhereNot).toHaveBeenCalledWith(
         { downloadId: 'mock-download-id' },
         { state: downloadStates.completed },
-        { state: downloadStates.cancelled }
+        {
+          cancelId: null,
+          state: downloadStates.cancelled
+        }
       )
 
       expect(database.endPause).toHaveBeenCalledTimes(1)
@@ -132,9 +136,10 @@ describe('cancelDownloadItem', () => {
       expect(database.updateDownloadsWhereAndWhereNotIn).toHaveBeenCalledWith({
         active: true
       }, [
-        'state', ['COMPLETED', 'CANCELLED']
+        'state', [downloadStates.completed, downloadStates.cancelled]
       ], {
-        state: 'CANCELLED',
+        cancelId: null,
+        state: downloadStates.cancelled,
         timeEnd: 1682899200000
       })
 

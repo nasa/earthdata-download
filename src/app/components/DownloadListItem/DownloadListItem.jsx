@@ -64,7 +64,9 @@ const DownloadListItem = ({
     resumeDownloadItem,
     sendToEula,
     sendToLogin,
+    setCancellingDownload,
     setRestartingDownload,
+    undoCancellingDownload,
     undoClearDownload,
     undoRestartingDownload
   } = useContext(ElectronApiContext)
@@ -224,6 +226,59 @@ const DownloadListItem = ({
     }, UNDO_TIMEOUT)
   }
 
+  const handleCancelDownload = () => {
+    const now = new Date().getTime()
+    const cancelId = `${downloadId}-${now}`
+
+    // Set the download to be canceling by adding the cancelId
+    deleteAllToastsById(downloadId)
+    setCancellingDownload({
+      downloadId,
+      cancelId
+    })
+
+    const toastId = `undo-cancel-download-${downloadId}`
+
+    let timeoutId
+
+    // Setup an undo callback to provide to the toast that removes the cancelId
+    const undoCallback = () => {
+      // Undo was clicked, dismiss the setTimeout used to remove the undo toast
+      clearTimeout(timeoutId)
+
+      deleteAllToastsById(toastId)
+      undoCancellingDownload({ cancelId })
+    }
+
+    // Show an `undo` toast
+    addToast({
+      id: toastId,
+      message: 'Download Cancelled',
+      variant: 'spinner',
+      actions: [
+        {
+          altText: 'Undo',
+          buttonText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: undoCallback
+          }
+        }
+      ]
+    })
+
+    // After the UNDO_TIMEOUT time has passed, remove the undo toast
+    timeoutId = setTimeout(() => {
+      deleteAllToastsById(toastId)
+
+      // Actually cancel the download
+      cancelDownloadItem({
+        downloadId,
+        cancelId
+      })
+    }, UNDO_TIMEOUT)
+  }
+
   const actionsList = [
     [
       {
@@ -265,10 +320,7 @@ const DownloadListItem = ({
         isActive: shouldShowCancel,
         isPrimary: !isComplete,
         variant: 'danger',
-        callback: () => {
-          deleteAllToastsById(downloadId)
-          cancelDownloadItem({ downloadId })
-        },
+        callback: handleCancelDownload,
         icon: FaBan
       }
     ],

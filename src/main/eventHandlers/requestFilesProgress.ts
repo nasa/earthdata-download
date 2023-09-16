@@ -76,17 +76,20 @@ const requestFilesProgress = async ({
   })
 
   const files = filesReport.map((file) => {
-    const { restartId } = file
+    const {
+      cancelId,
+      restartId
+    } = file
 
-    // Restarting files aren't actually restarted until the setTimeout expires, so while a restartId exists
-    // we need to fake a 'pending' file.
-    if (restartId) {
+    // Restarting/cancelling files aren't actually restarted/cancelled until the setTimeout expires, so while a
+    // restartId/cancelId exists we need to fake a 'pending'/'cancelled' file.
+    if (restartId || cancelId) {
       return {
         ...file,
         percent: 0,
         receivedBytes: 0,
         remainingTime: 0,
-        state: downloadStates.pending,
+        state: restartId ? downloadStates.pending : downloadStates.cancelled,
         totalBytes: 0
       }
     }

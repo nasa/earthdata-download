@@ -70,14 +70,15 @@ describe('restartDownload', () => {
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
         restartId: 'mock-restart-id'
       }, {
-        state: downloadStates.pending,
-        percent: 0,
-        timeStart: null,
-        timeEnd: null,
+        cancelId: null,
         errors: null,
+        percent: 0,
         receivedBytes: null,
-        totalBytes: null,
-        restartId: null
+        restartId: null,
+        state: downloadStates.pending,
+        timeEnd: null,
+        timeStart: null,
+        totalBytes: null
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
@@ -85,11 +86,12 @@ describe('restartDownload', () => {
         'mock-download-id',
         {
           active: true,
-          state: downloadStates.active,
-          timeStart: 1682899200000,
-          timeEnd: null,
+          cancelId: null,
           errors: null,
-          restartId: null
+          restartId: null,
+          state: downloadStates.active,
+          timeEnd: null,
+          timeStart: 1682899200000
         }
       )
 
@@ -150,22 +152,24 @@ describe('restartDownload', () => {
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
         restartId: 'mock-restart-id'
       }, {
-        state: downloadStates.pending,
-        percent: 0,
-        timeStart: null,
-        timeEnd: null,
+        cancelId: null,
         errors: null,
+        percent: 0,
         receivedBytes: null,
-        totalBytes: null,
-        restartId: null
+        restartId: null,
+        state: downloadStates.pending,
+        timeEnd: null,
+        timeStart: null,
+        totalBytes: null
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', {
+        cancelId: null,
         errors: null,
+        restartId: null,
         state: downloadStates.active,
-        timeEnd: null,
-        restartId: null
+        timeEnd: null
       })
 
       expect(startNextDownload).toHaveBeenCalledTimes(1)
@@ -230,24 +234,26 @@ describe('restartDownload', () => {
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
         restartId: 'mock-restart-id'
       }, {
-        state: downloadStates.pending,
-        percent: 0,
-        timeStart: null,
-        timeEnd: null,
+        cancelId: null,
         errors: null,
+        percent: 0,
         receivedBytes: null,
-        totalBytes: null,
-        restartId: null
+        restartId: null,
+        state: downloadStates.pending,
+        timeEnd: null,
+        timeStart: null,
+        totalBytes: null
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith(
         'mock-download-id',
         {
-          state: downloadStates.active,
-          timeEnd: null,
+          cancelId: null,
           errors: null,
-          restartId: null
+          restartId: null,
+          state: downloadStates.active,
+          timeEnd: null
         }
       )
 

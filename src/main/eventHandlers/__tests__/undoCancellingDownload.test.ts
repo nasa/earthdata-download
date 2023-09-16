@@ -1,32 +1,32 @@
-import undoRestartingDownload from '../undoRestartingDownload'
+import undoCancellingDownload from '../undoCancellingDownload'
 
-describe('undoRestartingDownload', () => {
+describe('undoCancellingDownload', () => {
   test('updates the database', async () => {
     const info = {
-      restartId: 'mock-delete-id'
+      cancelId: 'mock-delete-id'
     }
     const database = {
       updateDownloadsWhere: jest.fn(),
       updateFilesWhere: jest.fn()
     }
 
-    await undoRestartingDownload({
+    await undoCancellingDownload({
       database,
       info
     })
 
     expect(database.updateDownloadsWhere).toHaveBeenCalledTimes(1)
     expect(database.updateDownloadsWhere).toHaveBeenCalledWith({
-      restartId: 'mock-delete-id'
+      cancelId: 'mock-delete-id'
     }, {
-      restartId: null
+      cancelId: null
     })
 
     expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
     expect(database.updateFilesWhere).toHaveBeenCalledWith({
-      restartId: 'mock-delete-id'
+      cancelId: 'mock-delete-id'
     }, {
-      restartId: null
+      cancelId: null
     })
   })
 })

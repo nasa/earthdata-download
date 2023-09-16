@@ -1,7 +1,7 @@
 import setPendingDeleteDownloadHistory from '../setPendingDeleteDownloadHistory'
 
 describe('setPendingDeleteDownloadHistory', () => {
-  test('calls database.addDeleteId', async () => {
+  test('updates the database', async () => {
     const info = {
       downloadId: 'mock-download-id',
       deleteId: 'mock-delete-id'

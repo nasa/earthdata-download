@@ -1,32 +1,32 @@
-import setRestartingDownload from '../setRestartingDownload'
+import setCancellingDownload from '../setCancellingDownload'
 
-describe('setRestartingDownload', () => {
+describe('setCancellingDownload', () => {
   describe('when no filename is provided', () => {
     test('updates the database', async () => {
       const info = {
         downloadId: 'mock-download-id',
-        restartId: 'mock-restart-id'
+        cancelId: 'mock-cancel-id'
       }
       const database = {
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn()
       }
 
-      await setRestartingDownload({
+      await setCancellingDownload({
         database,
         info
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', {
-        restartId: 'mock-restart-id'
+        cancelId: 'mock-cancel-id'
       })
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
         downloadId: 'mock-download-id'
       }, {
-        restartId: 'mock-restart-id'
+        cancelId: 'mock-cancel-id'
       })
     })
   })
@@ -36,21 +36,21 @@ describe('setRestartingDownload', () => {
       const info = {
         downloadId: 'mock-download-id',
         filename: 'mock-filename',
-        restartId: 'mock-restart-id'
+        cancelId: 'mock-cancel-id'
       }
       const database = {
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn()
       }
 
-      await setRestartingDownload({
+      await setCancellingDownload({
         database,
         info
       })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', {
-        restartId: 'mock-restart-id'
+        cancelId: 'mock-cancel-id'
       })
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(1)
@@ -58,7 +58,7 @@ describe('setRestartingDownload', () => {
         downloadId: 'mock-download-id',
         filename: 'mock-filename'
       }, {
-        restartId: 'mock-restart-id'
+        cancelId: 'mock-cancel-id'
       })
     })
   })

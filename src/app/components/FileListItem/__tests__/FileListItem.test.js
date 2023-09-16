@@ -42,9 +42,11 @@ const setup = (overrideProps = {}) => {
   const deleteAllToastsById = jest.fn()
   const openDownloadFolder = jest.fn()
   const restartDownload = jest.fn()
+  const setCancellingDownload = jest.fn()
   const setRestartingDownload = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
+  const undoCancellingDownload = jest.fn()
   const undoRestartingDownload = jest.fn()
 
   const props = {
@@ -60,9 +62,11 @@ const setup = (overrideProps = {}) => {
           copyDownloadPath,
           openDownloadFolder,
           restartDownload,
+          setCancellingDownload,
+          setRestartingDownload,
           showWaitingForEulaDialog,
           showWaitingForLoginDialog,
-          setRestartingDownload,
+          undoCancellingDownload,
           undoRestartingDownload
         }
       }
@@ -86,8 +90,10 @@ const setup = (overrideProps = {}) => {
     deleteAllToastsById,
     openDownloadFolder,
     restartDownload,
+    setCancellingDownload,
     setRestartingDownload,
     toasts,
+    undoCancellingDownload,
     undoRestartingDownload
   }
 }
@@ -96,6 +102,10 @@ beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
 
   DownloadItem.mockImplementation(jest.requireActual('../../DownloadItem/DownloadItem').default)
+})
+
+afterEach(() => {
+  jest.useRealTimers()
 })
 
 describe('FileListItem component', () => {
@@ -143,40 +153,6 @@ describe('FileListItem component', () => {
       //   // tertiary: <FileListItemSizeProgress receivedBytes={61587289} shouldShowBytes totalBytes={61587289} />
       // })
     }), {})
-  })
-
-  describe('when clicking `Cancel File`', () => {
-    test('calls cancelDownloadItem', async () => {
-      const { cancelDownloadItem } = setup({
-        file: {
-          ...file,
-          state: downloadStates.active
-        }
-      })
-
-      const button = screen.getByText('Cancel File')
-      await userEvent.click(button)
-
-      expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
-    })
-
-    describe('when the file errored', () => {
-      test('calls restartDownload and deleteAllToastsById', async () => {
-        const { deleteAllToastsById, cancelDownloadItem } = setup({
-          file: {
-            ...file,
-            state: downloadStates.error
-          }
-        })
-
-        const button = screen.getByText('Cancel File')
-        await userEvent.click(button)
-
-        expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
-        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
-        expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
-      })
-    })
   })
 
   describe('when clicking `Open File`', () => {
@@ -337,6 +313,127 @@ describe('FileListItem component', () => {
 
         expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
         expect(deleteAllToastsById).toHaveBeenCalledWith('undo-restart-file-mock-file.png')
+      })
+    })
+  })
+
+  describe('when clicking `Cancel File`', () => {
+    test('calls setCancellingDownload and displays a toast', async () => {
+      const {
+        addToast,
+        setCancellingDownload,
+        deleteAllToastsById
+      } = setup({
+        file: {
+          ...file,
+          state: downloadStates.active
+        }
+      })
+
+      const button = screen.getByText('Cancel File')
+      await userEvent.click(button)
+
+      expect(setCancellingDownload).toHaveBeenCalledTimes(1)
+      expect(setCancellingDownload).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id',
+        filename: 'mock-file.png',
+        cancelId: 'mock-file.png-1684029600000'
+      })
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
+
+      expect(addToast).toHaveBeenCalledTimes(1)
+      expect(addToast).toHaveBeenCalledWith({
+        actions: [{
+          altText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: expect.any(Function)
+          },
+          buttonText: 'Undo'
+        }],
+        id: 'undo-cancel-file-mock-file.png',
+        message: 'File Cancelled',
+        variant: 'spinner'
+      })
+    })
+
+    describe('when calling the undo callback', () => {
+      test('calls undoCancellingDownload', async () => {
+        const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+
+        const {
+          deleteAllToastsById,
+          toasts,
+          undoCancellingDownload
+        } = setup({
+          file: {
+            ...file,
+            state: downloadStates.active
+          }
+        })
+
+        const button = screen.getByText('Cancel File')
+        await userEvent.click(button)
+
+        expect(toasts).toHaveLength(1)
+
+        const [toast] = toasts
+        const { actions } = toast
+        const [undoAction] = actions
+        const { buttonProps } = undoAction
+        const { onClick } = buttonProps
+
+        jest.clearAllMocks()
+
+        // Click the undo button
+        onClick()
+
+        expect(clearTimeoutSpy).toHaveBeenCalledTimes(1)
+        expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
+
+        expect(undoCancellingDownload).toHaveBeenCalledTimes(1)
+        expect(undoCancellingDownload).toHaveBeenCalledWith({ cancelId: 'mock-file.png-1684029600000' })
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-cancel-file-mock-file.png')
+      })
+    })
+
+    describe('when the undo timeout runs out', () => {
+      test('removes the toast', async () => {
+        const {
+          deleteAllToastsById,
+          cancelDownloadItem
+        } = setup({
+          file: {
+            ...file,
+            state: downloadStates.active
+          }
+        })
+
+        jest.useFakeTimers({
+          now: 1684029600000
+        })
+
+        await waitFor(async () => {
+          const button = screen.getByText('Cancel File')
+          await userEvent.click(button)
+        })
+
+        jest.clearAllMocks()
+        jest.advanceTimersByTime(UNDO_TIMEOUT)
+
+        expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
+        expect(cancelDownloadItem).toHaveBeenCalledWith({
+          downloadId: 'mock-download-id',
+          filename: 'mock-file.png',
+          cancelId: 'mock-file.png-1684029600100'
+        })
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-cancel-file-mock-file.png')
       })
     })
   })

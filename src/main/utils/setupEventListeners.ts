@@ -13,9 +13,9 @@ import cancelDownloadItem from '../eventHandlers/cancelDownloadItem'
 import cancelErroredDownloadItem from '../eventHandlers/cancelErroredDownloadItem'
 import chooseDownloadLocation from '../eventHandlers/chooseDownloadLocation'
 import clearDownload from '../eventHandlers/clearDownload'
-import deleteDownloadHistory from '../eventHandlers/deleteDownloadHistory'
 import copyDownloadPath from '../eventHandlers/copyDownloadPath'
 import deleteDownload from '../eventHandlers/deleteDownload'
+import deleteDownloadHistory from '../eventHandlers/deleteDownloadHistory'
 import didFinishLoad from '../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../eventHandlers/getPreferenceFieldValue'
 import openDownloadFolder from '../eventHandlers/openDownloadFolder'
@@ -27,15 +27,16 @@ import resumeDownloadItem from '../eventHandlers/resumeDownloadItem'
 import retryErroredDownloadItem from '../eventHandlers/retryErroredDownloadItem'
 import sendToEula from '../eventHandlers/sendToEula'
 import sendToLogin from '../eventHandlers/sendToLogin'
+import setCancellingDownload from '../eventHandlers/setCancellingDownload'
+import setPendingDeleteDownloadHistory from '../eventHandlers/setPendingDeleteDownloadHistory'
 import setPreferenceFieldValue from '../eventHandlers/setPreferenceFieldValue'
-import willDownload from '../eventHandlers/willDownload'
-
+import setRestartingDownload from '../eventHandlers/setRestartingDownload'
 import startPendingDownloads from '../utils/startPendingDownloads'
+import undoCancellingDownload from '../eventHandlers/undoCancellingDownload'
 import undoClearDownload from '../eventHandlers/undoClearDownload'
 import undoDeleteDownloadHistory from '../eventHandlers/undoDeleteDownloadHistory'
-import setPendingDeleteDownloadHistory from '../eventHandlers/setPendingDeleteDownloadHistory'
-import setRestartingDownload from '../eventHandlers/setRestartingDownload'
 import undoRestartingDownload from '../eventHandlers/undoRestartingDownload'
+import willDownload from '../eventHandlers/willDownload'
 
 /**
  * Sets up event listeners for the main process
@@ -263,6 +264,14 @@ const setupEventListeners = ({
     })
   })
 
+  // Set a download to be pending cancellation
+  ipcMain.on('setCancellingDownload', async (event, info) => {
+    await setCancellingDownload({
+      database,
+      info
+    })
+  })
+
   // Set a download to be pending deletion
   ipcMain.on('setPendingDeleteDownloadHistory', async (event, info) => {
     await setPendingDeleteDownloadHistory({
@@ -274,6 +283,14 @@ const setupEventListeners = ({
   // Set a download to be restarted
   ipcMain.on('setRestartingDownload', async (event, info) => {
     await setRestartingDownload({
+      database,
+      info
+    })
+  })
+
+  // Undo a setCancellingDownload action
+  ipcMain.on('undoCancellingDownload', async (event, info) => {
+    await undoCancellingDownload({
       database,
       info
     })

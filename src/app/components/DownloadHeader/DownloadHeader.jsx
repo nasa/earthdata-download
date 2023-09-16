@@ -5,7 +5,8 @@ import {
   FaCheckCircle,
   FaPause,
   FaPlay,
-  FaSpinner
+  FaSpinner,
+  FaUndo
 } from 'react-icons/fa'
 import classNames from 'classnames'
 
@@ -19,6 +20,7 @@ import Button from '../Button/Button'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import * as styles from './DownloadHeader.module.scss'
+import { UNDO_TIMEOUT } from '../../constants/undoTimeout'
 
 /**
  * @typedef {Object} DownloadHeaderProps
@@ -53,18 +55,67 @@ const DownloadHeader = ({
 }) => {
   const appContext = useAppContext()
   const {
+    addToast,
     deleteAllToastsById
   } = appContext
   const {
     cancelDownloadItem,
     clearDownload,
     pauseDownloadItem,
-    resumeDownloadItem
+    resumeDownloadItem,
+    setCancellingDownload,
+    undoCancellingDownload
   } = useContext(ElectronApiContext)
 
   const onCancelDownloadItem = () => {
-    cancelDownloadItem({})
+    const now = new Date().getTime()
+    const cancelId = `cancel-downloads-${now}`
+
+    // Set the download to be canceling by adding the cancelId
     deleteAllToastsById()
+    setCancellingDownload({
+      cancelId
+    })
+
+    const toastId = 'undo-cancel-downloads'
+
+    let timeoutId
+
+    // Setup an undo callback to provide to the toast that removes the cancelId
+    const undoCallback = () => {
+      // Undo was clicked, dismiss the setTimeout used to remove the undo toast
+      clearTimeout(timeoutId)
+
+      deleteAllToastsById(toastId)
+      undoCancellingDownload({ cancelId })
+    }
+
+    // Show an `undo` toast
+    addToast({
+      id: toastId,
+      message: 'Download Cancelled',
+      variant: 'spinner',
+      actions: [
+        {
+          altText: 'Undo',
+          buttonText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: undoCallback
+          }
+        }
+      ]
+    })
+
+    // After the UNDO_TIMEOUT time has passed, remove the undo toast
+    timeoutId = setTimeout(() => {
+      deleteAllToastsById(toastId)
+
+      // Actually cancel the download
+      cancelDownloadItem({
+        cancelId
+      })
+    }, UNDO_TIMEOUT)
   }
 
   const onClearDownloads = () => {

@@ -85,6 +85,10 @@ describe('EddDatabase', () => {
             name: '20230915190921_add_restart_id_to_downloads.js'
           }, {
             name: '20230915190942_add_restart_id_to_files.js'
+          }, {
+            name: '20230916000143_add_cancel_id_to_downloads.js'
+          }, {
+            name: '20230916000205_add_cancel_id_to_files.js'
           }])
         } else if (step === 5) {
           // Query: select `name` from `knex_migrations` order by `id` asc'
@@ -391,6 +395,31 @@ describe('EddDatabase', () => {
       const database = new EddDatabase('./')
 
       await database.updateDownloadById('mock-download-1', {
+        loadingMoreFiles: false,
+        state: downloadStates.active
+      })
+    })
+  })
+
+  describe('updateDownloadsWhere', () => {
+    test('updates the requested downloads', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('update `downloads` set `loadingMoreFiles` = ?, `state` = ? where `active` = ?')
+        expect(query.bindings).toEqual([
+          false,
+          downloadStates.active,
+          true
+        ])
+
+        // We aren't returning anything from this method, the above assertions are the important part of the test
+        query.response([1])
+      })
+
+      const database = new EddDatabase('./')
+
+      await database.updateDownloadsWhere({
+        active: true
+      }, {
         loadingMoreFiles: false,
         state: downloadStates.active
       })
@@ -1253,7 +1282,7 @@ describe('EddDatabase', () => {
   describe('getFilesReport', () => {
     test('returns the report', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select `files`.`downloadId`, `files`.`filename`, `files`.`percent`, `files`.`receivedBytes`, `files`.`restartId`, `files`.`state`, `files`.`totalBytes`, (((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime from `files` full outer join `pauses` on `files`.`id` = `pauses`.`fileId` where `files`.`downloadId` = ? group by `files`.`id` order by `createdAt` asc limit ?')
+        expect(query.sql).toEqual('select `files`.`cancelId`, `files`.`downloadId`, `files`.`filename`, `files`.`percent`, `files`.`receivedBytes`, `files`.`restartId`, `files`.`state`, `files`.`totalBytes`, (((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime from `files` full outer join `pauses` on `files`.`id` = `pauses`.`fileId` where `files`.`downloadId` = ? group by `files`.`id` order by `createdAt` asc limit ?')
         expect(query.bindings).toEqual([
           'mock-download-1',
           2
@@ -1308,7 +1337,7 @@ describe('EddDatabase', () => {
 
     test('returns the report when hiding completed files', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select `files`.`downloadId`, `files`.`filename`, `files`.`percent`, `files`.`receivedBytes`, `files`.`restartId`, `files`.`state`, `files`.`totalBytes`, (((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime from `files` full outer join `pauses` on `files`.`id` = `pauses`.`fileId` where `files`.`downloadId` = ? and not `state` = ? group by `files`.`id` order by `createdAt` asc limit ?')
+        expect(query.sql).toEqual('select `files`.`cancelId`, `files`.`downloadId`, `files`.`filename`, `files`.`percent`, `files`.`receivedBytes`, `files`.`restartId`, `files`.`state`, `files`.`totalBytes`, (((IFNULL(`files`.`timeEnd`, UNIXEPOCH () * 1000.0) - `files`.`timeStart`) - IFNULL(sum(IFNULL(`pauses`.`timeEnd`, UNIXEPOCH () * 1000.0) - `pauses`.`timeStart`), 0)) / receivedBytes * (totalBytes - receivedBytes)) AS remainingTime from `files` full outer join `pauses` on `files`.`id` = `pauses`.`fileId` where `files`.`downloadId` = ? and not `state` = ? group by `files`.`id` order by `createdAt` asc limit ?')
         expect(query.bindings).toEqual([
           'mock-download-1',
           downloadStates.completed,
@@ -1444,15 +1473,39 @@ describe('EddDatabase', () => {
   })
 
   describe('getDownloadsReport', () => {
-    test('returns the report', async () => {
-      dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select `downloads`.`id`, `downloads`.`loadingMoreFiles`, `downloads`.`restartId`, `downloads`.`state`, `downloads`.`timeStart`, (IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime from `downloads` where `active` = ? and `deleteId` is null or `restartId` is not null order by `createdAt` desc limit ?')
-        expect(query.bindings).toEqual([
-          10,
-          10
-        ])
+    describe('when active is true', () => {
+      test('returns the report', async () => {
+        dbTracker.on('query', (query) => {
+          expect(query.sql).toEqual('select `downloads`.`cancelId`, `downloads`.`id`, `downloads`.`loadingMoreFiles`, `downloads`.`restartId`, `downloads`.`state`, `downloads`.`timeStart`, (IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime from `downloads` where `active` = ? and `deleteId` is null or `restartId` is not null order by `createdAt` desc limit ? offset ?')
+          expect(query.bindings).toEqual([
+            true,
+            10,
+            10
+          ])
 
-        query.response([
+          query.response([
+            {
+              id: 'mock-download-id-1',
+              loadingMoreFiles: 1,
+              state: downloadStates.active,
+              timeStart: 1234567,
+              totalTime: 123
+            },
+            {
+              id: 'mock-download-id-2',
+              loadingMoreFiles: 0,
+              state: downloadStates.active,
+              timeStart: 1234567,
+              totalTime: 456
+            }
+          ])
+        })
+
+        const database = new EddDatabase('./')
+
+        const result = await database.getDownloadsReport(true, 10, 10)
+
+        expect(result).toEqual([
           {
             id: 'mock-download-id-1',
             loadingMoreFiles: 1,
@@ -1469,46 +1522,97 @@ describe('EddDatabase', () => {
           }
         ])
       })
+    })
 
-      const database = new EddDatabase('./')
+    describe('when active is false', () => {
+      test('returns the report', async () => {
+        dbTracker.on('query', (query) => {
+          expect(query.sql).toEqual('select `downloads`.`cancelId`, `downloads`.`id`, `downloads`.`loadingMoreFiles`, `downloads`.`restartId`, `downloads`.`state`, `downloads`.`timeStart`, (IFNULL(`downloads`.`timeEnd`, UNIXEPOCH() * 1000.0) - `downloads`.`timeStart`) as totalTime from `downloads` where `active` = ? and `deleteId` is null and `restartId` is null order by `createdAt` desc limit ? offset ?')
+          expect(query.bindings).toEqual([
+            false,
+            10,
+            10
+          ])
 
-      const result = await database.getDownloadsReport(10, 10)
+          query.response([
+            {
+              id: 'mock-download-id-1',
+              loadingMoreFiles: 1,
+              state: downloadStates.active,
+              timeStart: 1234567,
+              totalTime: 123
+            },
+            {
+              id: 'mock-download-id-2',
+              loadingMoreFiles: 0,
+              state: downloadStates.active,
+              timeStart: 1234567,
+              totalTime: 456
+            }
+          ])
+        })
 
-      expect(result).toEqual([
-        {
-          id: 'mock-download-id-1',
-          loadingMoreFiles: 1,
-          state: downloadStates.active,
-          timeStart: 1234567,
-          totalTime: 123
-        },
-        {
-          id: 'mock-download-id-2',
-          loadingMoreFiles: 0,
-          state: downloadStates.active,
-          timeStart: 1234567,
-          totalTime: 456
-        }
-      ])
+        const database = new EddDatabase('./')
+
+        const result = await database.getDownloadsReport(false, 10, 10)
+
+        expect(result).toEqual([
+          {
+            id: 'mock-download-id-1',
+            loadingMoreFiles: 1,
+            state: downloadStates.active,
+            timeStart: 1234567,
+            totalTime: 123
+          },
+          {
+            id: 'mock-download-id-2',
+            loadingMoreFiles: 0,
+            state: downloadStates.active,
+            timeStart: 1234567,
+            totalTime: 456
+          }
+        ])
+      })
     })
   })
 
   describe('getAllDownloadsCount', () => {
-    test('returns the report', async () => {
-      dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select count(`id`) from `downloads` where `active` = ? and `deleteId` is null or `restartId` is not null')
-        expect(query.bindings).toEqual([true])
+    describe('when active is true', () => {
+      test('returns the report', async () => {
+        dbTracker.on('query', (query) => {
+          expect(query.sql).toEqual('select count(`id`) from `downloads` where `active` = ? and `deleteId` is null or `restartId` is not null')
+          expect(query.bindings).toEqual([true])
 
-        query.response([{
-          'count(`id`)': 5
-        }])
+          query.response([{
+            'count(`id`)': 5
+          }])
+        })
+
+        const database = new EddDatabase('./')
+
+        const result = await database.getAllDownloadsCount(true)
+
+        expect(result).toEqual(5)
       })
+    })
 
-      const database = new EddDatabase('./')
+    describe('when active is false', () => {
+      test('returns the report', async () => {
+        dbTracker.on('query', (query) => {
+          expect(query.sql).toEqual('select count(`id`) from `downloads` where `active` = ? and `deleteId` is null and `restartId` is null')
+          expect(query.bindings).toEqual([false])
 
-      const result = await database.getAllDownloadsCount(true)
+          query.response([{
+            'count(`id`)': 5
+          }])
+        })
 
-      expect(result).toEqual(5)
+        const database = new EddDatabase('./')
+
+        const result = await database.getAllDownloadsCount(false)
+
+        expect(result).toEqual(5)
+      })
     })
   })
 

@@ -40,14 +40,15 @@ const restartDownload = async ({
   currentDownloadItems.cancelItem(downloadId, filename)
 
   const resetFileValues = {
-    state: downloadStates.pending,
-    percent: 0,
-    timeStart: null,
-    timeEnd: null,
+    cancelId: null,
     errors: null,
+    percent: 0,
     receivedBytes: null,
-    totalBytes: null,
-    restartId: null
+    restartId: null,
+    state: downloadStates.pending,
+    timeEnd: null,
+    timeStart: null,
+    totalBytes: null
   }
 
   if (downloadId && filename) {
@@ -74,6 +75,7 @@ const restartDownload = async ({
       state: downloadStates.active,
       timeEnd: null,
       errors: null,
+      cancelId: null,
       restartId: null
     })
   }
@@ -93,6 +95,7 @@ const restartDownload = async ({
       timeStart: new Date().getTime(),
       timeEnd: null,
       errors: null,
+      cancelId: null,
       restartId: null
     })
   }

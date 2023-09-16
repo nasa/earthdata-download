@@ -67,6 +67,7 @@ const onDone = async ({
   if (previousState === downloadStates.active) {
     // Update the state in the database
     await database.updateFileById(fileId, {
+      cancelId: null,
       errors,
       percent: updatedState === downloadStates.completed ? 100 : 0,
       state: updatedState,

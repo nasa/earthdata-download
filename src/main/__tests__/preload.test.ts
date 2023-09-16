@@ -77,6 +77,15 @@ describe('preload', () => {
     expect(ipcRenderer.send).toHaveBeenCalledWith('sendToLogin', { mock: 'data' })
   })
 
+  test('setCancellingDownload sends the setCancellingDownload message', async () => {
+    await setup()
+
+    electronApi.setCancellingDownload({ mock: 'data' })
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('setCancellingDownload', { mock: 'data' })
+  })
+
   test('setPendingDeleteDownloadHistory sends the setPendingDeleteDownloadHistory message', async () => {
     await setup()
 
@@ -246,6 +255,15 @@ describe('preload', () => {
 
     expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
     expect(ipcRenderer.send).toHaveBeenCalledWith('retryErroredDownloadItem', { mock: 'data' })
+  })
+
+  test('undoCancellingDownload sends the undoCancellingDownload message', async () => {
+    await setup()
+
+    electronApi.undoCancellingDownload({ mock: 'data' })
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('undoCancellingDownload', { mock: 'data' })
   })
 
   test('undoClearDownload sends the undoClearDownload message', async () => {

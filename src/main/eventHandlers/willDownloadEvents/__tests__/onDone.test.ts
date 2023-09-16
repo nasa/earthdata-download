@@ -65,6 +65,7 @@ describe('onDone', () => {
 
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
+      cancelId: null,
       percent: 100,
       state: downloadStates.completed,
       timeEnd: 1684029600000
@@ -124,6 +125,7 @@ describe('onDone', () => {
 
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
+      cancelId: null,
       errors: 'This file could not be downloaded',
       percent: 0,
       state: downloadStates.error,
@@ -189,6 +191,7 @@ describe('onDone', () => {
 
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
+      cancelId: null,
       errors: undefined,
       percent: 0,
       state: downloadStates.cancelled,
@@ -255,6 +258,7 @@ describe('onDone', () => {
 
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
+      cancelId: null,
       errors: undefined,
       percent: 0,
       state: downloadStates.active,

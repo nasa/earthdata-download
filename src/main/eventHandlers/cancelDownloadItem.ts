@@ -15,7 +15,10 @@ const cancelDownloadItem = async ({
   database,
   info
 }) => {
-  const { downloadId, filename } = info
+  const {
+    downloadId,
+    filename
+  } = info
 
   currentDownloadItems.cancelItem(downloadId, filename)
 
@@ -24,6 +27,7 @@ const cancelDownloadItem = async ({
       downloadId,
       filename
     }, {
+      cancelId: null,
       state: downloadStates.cancelled
     })
 
@@ -45,7 +49,10 @@ const cancelDownloadItem = async ({
     await database.updateFilesWhereAndWhereNot(
       { downloadId },
       { state: downloadStates.completed },
-      { state: downloadStates.cancelled }
+      {
+        cancelId: null,
+        state: downloadStates.cancelled
+      }
     )
 
     await database.endPause(downloadId)
@@ -59,6 +66,7 @@ const cancelDownloadItem = async ({
       'state',
       [downloadStates.completed, downloadStates.cancelled]
     ], {
+      cancelId: null,
       state: downloadStates.cancelled,
       timeEnd: new Date().getTime()
     })

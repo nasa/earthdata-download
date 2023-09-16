@@ -56,6 +56,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 1,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: null
           },
           {
@@ -63,6 +64,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 0,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: null
           }
         ]),
@@ -158,6 +160,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 1,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: null
           },
           {
@@ -165,6 +168,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 0,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: null
           }
         ]),
@@ -260,6 +264,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 1,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: null
           },
           {
@@ -267,6 +272,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 0,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: null
           }
         ]),
@@ -371,6 +377,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 1,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: null
           },
           {
@@ -378,6 +385,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 0,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: null
           }
         ]),
@@ -476,6 +484,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 1,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: null
           },
           {
@@ -483,6 +492,7 @@ describe('requestDownloadsProgress', () => {
             loadingMoreFiles: 0,
             state: downloadStates.active,
             totalTime: 123000,
+            cancelId: null,
             restartId: 'mock-restart-id'
           }
         ]),
@@ -540,6 +550,111 @@ describe('requestDownloadsProgress', () => {
           totalTime: 0
         },
         state: downloadStates.pending,
+        timeStart: null
+      }],
+      errors: {},
+      totalCompletedFiles: 5,
+      totalDownloads: 2,
+      totalFiles: 14
+    })
+
+    expect(database.getAllDownloadsCount).toHaveBeenCalledTimes(1)
+
+    expect(database.getDownloadsReport).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadsReport).toHaveBeenCalledWith(true, 10, 0)
+
+    expect(database.getDownloadReport).toHaveBeenCalledTimes(2)
+    expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id-1')
+    expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id-2')
+
+    expect(database.getErroredFiles).toHaveBeenCalledTimes(1)
+    expect(database.getErroredFiles).toHaveBeenCalledWith()
+
+    expect(database.getPausesSum).toHaveBeenCalledTimes(2)
+    expect(database.getPausesSum).toHaveBeenCalledWith('mock-download-id-1')
+    expect(database.getPausesSum).toHaveBeenCalledWith('mock-download-id-2')
+
+    expect(database.getFilesTotals).toHaveBeenCalledTimes(1)
+    expect(database.getFilesTotals).toHaveBeenCalledWith()
+  })
+
+  test('returns the downloads report when downloads have been cancelled', async () => {
+    const database = {
+      getAllDownloadsCount: jest.fn()
+        .mockResolvedValue(2),
+      getDownloadsReport: jest.fn()
+        .mockResolvedValue([
+          {
+            id: 'mock-download-id-1',
+            loadingMoreFiles: 1,
+            state: downloadStates.active,
+            totalTime: 123000,
+            cancelId: null,
+            restartId: null
+          },
+          {
+            id: 'mock-download-id-2',
+            loadingMoreFiles: 0,
+            state: downloadStates.active,
+            totalTime: 123000,
+            cancelId: 'mock-cancel-id',
+            restartId: null
+          }
+        ]),
+      getDownloadReport: jest.fn()
+        .mockResolvedValueOnce({
+          percentSum: 0,
+          erroredFiles: 0,
+          totalFiles: 7,
+          finishedFiles: 0
+        })
+        .mockResolvedValueOnce({
+          percentSum: 546,
+          erroredFiles: 0,
+          totalFiles: 7,
+          finishedFiles: 5
+        }),
+      getErroredFiles: jest.fn()
+        .mockResolvedValue([]),
+      getFilesTotals: jest.fn()
+        .mockResolvedValue({
+          totalCompletedFiles: 5,
+          totalFiles: 14
+        }),
+      getPausesSum: jest.fn()
+        .mockResolvedValue(null)
+    }
+
+    const result = await requestDownloadsProgress({
+      database,
+      info: {
+        active: true,
+        limit: 10,
+        offset: 0
+      }
+    })
+
+    expect(result).toEqual({
+      downloadsReport: [{
+        downloadId: 'mock-download-id-1',
+        loadingMoreFiles: true,
+        progress: {
+          finishedFiles: 0,
+          percent: 0,
+          totalFiles: 7,
+          totalTime: 123000
+        },
+        state: downloadStates.active
+      }, {
+        downloadId: 'mock-download-id-2',
+        loadingMoreFiles: false,
+        progress: {
+          finishedFiles: 0,
+          percent: 0,
+          totalFiles: 7,
+          totalTime: 0
+        },
+        state: downloadStates.cancelled,
         timeStart: null
       }],
       errors: {},

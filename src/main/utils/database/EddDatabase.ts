@@ -163,7 +163,6 @@ class EddDatabase {
    */
   async updateDownloadsWhere(where, data) {
     return this.db('downloads')
-      .returning(['id'])
       .update(data)
       .where(where)
   }
@@ -650,6 +649,7 @@ class EddDatabase {
   }) {
     let query = this.db('files')
       .select(
+        'files.cancelId',
         'files.downloadId',
         'files.filename',
         'files.percent',
@@ -757,6 +757,7 @@ class EddDatabase {
   async getDownloadsReport(active, limit, offset) {
     let query = this.db('downloads')
       .select(
+        'downloads.cancelId',
         'downloads.id',
         'downloads.loadingMoreFiles',
         'downloads.restartId',

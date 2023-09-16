@@ -48,7 +48,9 @@ const FileListItem = ({
     copyDownloadPath,
     openDownloadFolder,
     restartDownload,
+    setCancellingDownload,
     setRestartingDownload,
+    undoCancellingDownload,
     undoRestartingDownload
   } = useContext(ElectronApiContext)
 
@@ -89,8 +91,6 @@ const FileListItem = ({
     && state !== downloadStates.pending
     && state !== downloadStates.starting
     && state !== downloadStates.cancelled
-
-  const hasError = state === downloadStates.error
 
   const handleRestartFile = () => {
     const now = new Date().getTime()
@@ -147,6 +147,61 @@ const FileListItem = ({
     }, UNDO_TIMEOUT)
   }
 
+  const handleCancelFile = () => {
+    const now = new Date().getTime()
+    const cancelId = `${filename}-${now}`
+
+    // Set the download to be restarting by adding the cancelId
+    deleteAllToastsById(downloadId)
+    setCancellingDownload({
+      downloadId,
+      filename,
+      cancelId
+    })
+
+    const toastId = `undo-cancel-file-${filename}`
+
+    let timeoutId
+
+    // Setup an undo callback to provide to the toast that removes the cancelId
+    const undoCallback = () => {
+      // Undo was clicked, dismiss the setTimeout used to remove the undo toast
+      clearTimeout(timeoutId)
+
+      deleteAllToastsById(toastId)
+      undoCancellingDownload({ cancelId })
+    }
+
+    // Show an `undo` toast
+    addToast({
+      id: toastId,
+      message: 'File Cancelled',
+      variant: 'spinner',
+      actions: [
+        {
+          altText: 'Undo',
+          buttonText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: undoCallback
+          }
+        }
+      ]
+    })
+
+    // After the UNDO_TIMEOUT time has passed, remove the undo toast
+    timeoutId = setTimeout(() => {
+      deleteAllToastsById(toastId)
+
+      // Actually restart the download
+      cancelDownloadItem({
+        downloadId,
+        filename,
+        cancelId
+      })
+    }, UNDO_TIMEOUT)
+  }
+
   const actionsList = [
     [
       {
@@ -154,16 +209,7 @@ const FileListItem = ({
         isActive: shouldShowCancel,
         isPrimary: !isComplete,
         variant: 'danger',
-        callback: () => {
-          cancelDownloadItem({
-            downloadId,
-            filename
-          })
-
-          if (hasError) {
-            deleteAllToastsById(downloadId)
-          }
-        },
+        callback: handleCancelFile,
         icon: FaBan
       }
     ],

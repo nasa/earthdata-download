@@ -3,7 +3,7 @@
 import undoClearDownload from '../undoClearDownload'
 
 describe('undoClearDownload', () => {
-  test('calls database.updateDownloadById', async () => {
+  test('updates the database', async () => {
     const info = {
       downloadId: 'mock-download-id'
     }

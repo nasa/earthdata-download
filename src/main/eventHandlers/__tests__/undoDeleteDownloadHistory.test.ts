@@ -1,7 +1,7 @@
 import undoDeleteDownloadHistory from '../undoDeleteDownloadHistory'
 
 describe('undoDeleteDownloadHistory', () => {
-  test('calls database.clearDeleteId', async () => {
+  test('updates the database', async () => {
     const info = {
       deleteId: 'mock-delete-id'
     }

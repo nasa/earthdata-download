@@ -32,6 +32,7 @@ const requestDownloadsProgress = async ({
 
   const promises = downloads.map(async (download) => {
     const {
+      cancelId,
       id: downloadId,
       loadingMoreFiles,
       restartId,
@@ -62,9 +63,9 @@ const requestDownloadsProgress = async ({
       totalTime: totalTime - pausesSum
     }
 
-    // Restarting downloads aren't actually restarted until the setTimeout expires, so while a restartId exists
-    // we need to fake a 'pending' download.
-    if (restartId) {
+    // Restarting/cancelling files aren't actually restarted/cancelled until the setTimeout expires, so while a
+    // restartId/cancelId exists we need to fake a 'pending'/'cancelled' file.
+    if (restartId || cancelId) {
       return {
         downloadId,
         loadingMoreFiles: false,
@@ -74,7 +75,7 @@ const requestDownloadsProgress = async ({
           totalFiles,
           totalTime: 0
         },
-        state: downloadStates.pending,
+        state: restartId ? downloadStates.pending : downloadStates.cancelled,
         timeStart: null
       }
     }

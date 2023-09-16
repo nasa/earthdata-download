@@ -131,10 +131,16 @@ const DownloadListItem = ({
     && state !== downloadStates.pending
     && totalFiles > 0
 
-  const handleClearDownload = () => {
+  const onClickClearDownload = () => {
+    const now = new Date().getTime()
+    const clearId = `${downloadId}-${now}`
+
     // Clear the download
     deleteAllToastsById(downloadId)
-    clearDownload({ downloadId })
+    clearDownload({
+      clearId,
+      downloadId
+    })
 
     const toastId = `undo-clear-${downloadId}`
 
@@ -145,8 +151,7 @@ const DownloadListItem = ({
       // Undo was clicked, dismiss the setTimeout used to remove the undo toast
       clearTimeout(timeoutId)
 
-      // TODO need to be able to put the error toasts back?
-      undoClearDownload({ downloadId })
+      undoClearDownload({ clearId })
       deleteAllToastsById(toastId)
     }
 
@@ -173,7 +178,7 @@ const DownloadListItem = ({
     }, UNDO_TIMEOUT)
   }
 
-  const handleRestartDownload = () => {
+  const onClickRestartDownload = () => {
     const now = new Date().getTime()
     const restartId = `${downloadId}-${now}`
 
@@ -226,7 +231,7 @@ const DownloadListItem = ({
     }, UNDO_TIMEOUT)
   }
 
-  const handleCancelDownload = () => {
+  const onClickCancelDownload = () => {
     const now = new Date().getTime()
     const cancelId = `${downloadId}-${now}`
 
@@ -320,7 +325,7 @@ const DownloadListItem = ({
         isActive: shouldShowCancel,
         isPrimary: !isComplete,
         variant: 'danger',
-        callback: handleCancelDownload,
+        callback: onClickCancelDownload,
         icon: FaBan
       }
     ],
@@ -346,14 +351,14 @@ const DownloadListItem = ({
         label: 'Restart Download',
         isActive: shouldShowActions,
         isPrimary: false,
-        callback: handleRestartDownload,
+        callback: onClickRestartDownload,
         icon: FaInfoCircle
       },
       {
         label: 'Clear Download',
         isActive: shouldShowClear,
         isPrimary: false,
-        callback: handleClearDownload,
+        callback: onClickClearDownload,
         icon: FaInfoCircle
       }
     ]

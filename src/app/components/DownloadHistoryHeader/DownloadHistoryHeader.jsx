@@ -29,7 +29,7 @@ const DownloadHistoryHeader = () => {
     undoDeleteDownloadHistory
   } = useContext(ElectronApiContext)
 
-  const handleClearHistory = () => {
+  const onClickClearHistory = () => {
     const now = new Date().getTime()
     const deleteId = `clear-history-${now}`
 
@@ -90,7 +90,7 @@ const DownloadHistoryHeader = () => {
         size="sm"
         Icon={FaBan}
         variant="danger"
-        onClick={handleClearHistory}
+        onClick={onClickClearHistory}
       >
         Clear Download History
       </Button>

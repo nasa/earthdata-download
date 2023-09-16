@@ -10,9 +10,14 @@ const undoClearDownload = async ({
   database,
   info
 }) => {
-  const { downloadId } = info
+  const { clearId } = info
 
-  await database.updateDownloadById(downloadId, { active: true })
+  await database.updateDownloadsWhere({
+    clearId
+  }, {
+    active: true,
+    clearId: null
+  })
 }
 
 export default undoClearDownload

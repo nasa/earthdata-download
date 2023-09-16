@@ -10,9 +10,12 @@ const clearDownload = async ({
   database,
   info
 }) => {
-  const { downloadId } = info
+  const {
+    clearId,
+    downloadId
+  } = info
 
-  await database.clearDownload(downloadId)
+  await database.clearDownload(downloadId, clearId)
 }
 
 export default clearDownload

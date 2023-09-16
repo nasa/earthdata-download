@@ -5,10 +5,10 @@ import undoClearDownload from '../undoClearDownload'
 describe('undoClearDownload', () => {
   test('updates the database', async () => {
     const info = {
-      downloadId: 'mock-download-id'
+      clearId: 'mock-clear-id'
     }
     const database = {
-      updateDownloadById: jest.fn()
+      updateDownloadsWhere: jest.fn()
     }
 
     await undoClearDownload({
@@ -16,7 +16,12 @@ describe('undoClearDownload', () => {
       info
     })
 
-    expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
-    expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { active: true })
+    expect(database.updateDownloadsWhere).toHaveBeenCalledTimes(1)
+    expect(database.updateDownloadsWhere).toHaveBeenCalledWith({
+      clearId: 'mock-clear-id'
+    }, {
+      active: true,
+      clearId: null
+    })
   })
 })

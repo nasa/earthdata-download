@@ -118,14 +118,17 @@ class EddDatabase {
    * Sets the active column of a download to false.
    * @param {String} downloadId ID of download to update.
    */
-  async clearDownload(downloadId) {
+  async clearDownload(downloadId, clearId) {
     let query = this.db('downloads')
       .update({
-        active: false
+        active: false,
+        clearId
       })
 
     if (downloadId) {
       query = query.where({ id: downloadId })
+    } else {
+      query = query.where({ active: true })
     }
 
     return query

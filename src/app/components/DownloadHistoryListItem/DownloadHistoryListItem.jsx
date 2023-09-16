@@ -73,7 +73,7 @@ const DownloadHistoryListItem = ({
 
   const shouldShowActions = state !== downloadStates.errorFetchingLinks
 
-  const handleDeleteDownload = () => {
+  const onClickDeleteDownload = () => {
     const now = new Date().getTime()
     const deleteId = `${downloadId}-${now}`
 
@@ -127,7 +127,7 @@ const DownloadHistoryListItem = ({
     }, UNDO_TIMEOUT)
   }
 
-  const handleRestartDownload = () => {
+  const onClickRestartDownload = () => {
     const now = new Date().getTime()
     const restartId = `${downloadId}-${now}`
 
@@ -202,14 +202,14 @@ const DownloadHistoryListItem = ({
         label: 'Restart Download',
         isActive: shouldShowActions,
         isPrimary: false,
-        callback: handleRestartDownload,
+        callback: onClickRestartDownload,
         icon: FaInfoCircle
       },
       {
         label: 'Delete Download',
         isActive: true,
         isPrimary: false,
-        callback: handleDeleteDownload,
+        callback: onClickDeleteDownload,
         icon: FaBan
       }
     ]

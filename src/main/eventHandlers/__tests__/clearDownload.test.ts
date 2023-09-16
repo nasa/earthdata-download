@@ -3,8 +3,9 @@
 import clearDownload from '../clearDownload'
 
 describe('clearDownload', () => {
-  test('calls database.clearDownload', async () => {
+  test('updates the database', async () => {
     const info = {
+      clearId: 'mock-clear-id',
       downloadId: 'mock-download-id'
     }
     const database = {
@@ -17,6 +18,6 @@ describe('clearDownload', () => {
     })
 
     expect(database.clearDownload).toHaveBeenCalledTimes(1)
-    expect(database.clearDownload).toHaveBeenCalledWith('mock-download-id')
+    expect(database.clearDownload).toHaveBeenCalledWith('mock-download-id', 'mock-clear-id')
   })
 })

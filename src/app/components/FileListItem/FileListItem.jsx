@@ -4,7 +4,6 @@ import {
   FaBan,
   FaClipboard,
   FaFolderOpen,
-  FaInfoCircle,
   FaUndo
 } from 'react-icons/fa'
 
@@ -238,8 +237,7 @@ const FileListItem = ({
         label: 'Restart File',
         isActive: !shouldDisableFileRestart,
         isPrimary: false,
-        callback: onClickRestartFile,
-        icon: FaInfoCircle
+        callback: onClickRestartFile
       }
     ]
   ]

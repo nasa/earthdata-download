@@ -305,7 +305,6 @@ DownloadItem.propTypes = {
         isPrimary: PropTypes.bool.isRequired,
         variant: PropTypes.string,
         callback: PropTypes.func.isRequired,
-        icon: PropTypes.func.isRequired,
         disabled: PropTypes.bool
       })
     )

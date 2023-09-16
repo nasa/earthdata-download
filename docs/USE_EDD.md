@@ -2,6 +2,12 @@
 
 Earthdata Download was designed to be a bulk download application for [Earthdata Search](https://search.earthdata.nasa.gov), but can be reused by other applications with a bulk download need. In order to use your application with Earthdata Download, please follow this guide.
 
+## Application Download Page
+
+When integrating your application with Earthdata Download, please send your users to the following link for a first time download of the application.
+
+    https://nasa.github.io/earthdata-download/
+
 ## Adding Trusted Sources
 
 To extend Earthdata Download's list of trusted sources, please update the [trustedSources](../src/main/trustedSources.json) file by adding a new entry to the file and submitting a Pull Request. The key of JSON must match the domain of the API source and must use `https` or `http`. The body of the entry may contain any valid JSON.

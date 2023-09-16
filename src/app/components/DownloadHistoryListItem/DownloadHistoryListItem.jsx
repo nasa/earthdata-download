@@ -1,10 +1,8 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  FaBan,
   FaClipboard,
   FaFolderOpen,
-  FaInfoCircle,
   FaUndo
 } from 'react-icons/fa'
 
@@ -202,15 +200,13 @@ const DownloadHistoryListItem = ({
         label: 'Restart Download',
         isActive: shouldShowActions,
         isPrimary: false,
-        callback: onClickRestartDownload,
-        icon: FaInfoCircle
+        callback: onClickRestartDownload
       },
       {
         label: 'Delete Download',
         isActive: true,
         isPrimary: false,
-        callback: onClickDeleteDownload,
-        icon: FaBan
+        callback: onClickDeleteDownload
       }
     ]
   ]

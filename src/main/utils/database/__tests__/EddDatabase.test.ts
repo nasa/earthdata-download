@@ -89,6 +89,8 @@ describe('EddDatabase', () => {
             name: '20230916000143_add_cancel_id_to_downloads.js'
           }, {
             name: '20230916000205_add_cancel_id_to_files.js'
+          }, {
+            name: '20230916012751_add_clear_id_to_downloads.js'
           }])
         } else if (step === 5) {
           // Query: select `name` from `knex_migrations` order by `id` asc'
@@ -325,9 +327,10 @@ describe('EddDatabase', () => {
     describe('when a downloadId is provided', () => {
       test('sets the download to inactive', async () => {
         dbTracker.on('query', (query) => {
-          expect(query.sql).toEqual('update `downloads` set `active` = ? where `id` = ?')
+          expect(query.sql).toEqual('update `downloads` set `active` = ?, `clearId` = ? where `id` = ?')
           expect(query.bindings).toEqual([
             false,
+            'mock-clear-id',
             'mock-download-id'
           ])
 
@@ -336,16 +339,18 @@ describe('EddDatabase', () => {
 
         const database = new EddDatabase('./')
 
-        await database.clearDownload('mock-download-id')
+        await database.clearDownload('mock-download-id', 'mock-clear-id')
       })
     })
 
     describe('when a downloadId is not provided', () => {
       test('sets all downloads to inactive', async () => {
         dbTracker.on('query', (query) => {
-          expect(query.sql).toEqual('update `downloads` set `active` = ?')
+          expect(query.sql).toEqual('update `downloads` set `active` = ?, `clearId` = ? where `active` = ?')
           expect(query.bindings).toEqual([
-            false
+            false,
+            'mock-clear-id',
+            true
           ])
 
           query.response([1])
@@ -353,7 +358,7 @@ describe('EddDatabase', () => {
 
         const database = new EddDatabase('./')
 
-        await database.clearDownload()
+        await database.clearDownload(undefined, 'mock-clear-id')
       })
     })
   })

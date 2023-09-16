@@ -64,7 +64,8 @@ const DownloadHeader = ({
     pauseDownloadItem,
     resumeDownloadItem,
     setCancellingDownload,
-    undoCancellingDownload
+    undoCancellingDownload,
+    undoClearDownload
   } = useContext(ElectronApiContext)
 
   const onCancelDownloadItem = () => {
@@ -119,8 +120,51 @@ const DownloadHeader = ({
   }
 
   const onClearDownloads = () => {
-    clearDownload({})
+    const now = new Date().getTime()
+    const clearId = `clear-downloads-${now}`
+
+    // Set the download to be clearing by adding the clearId
     deleteAllToastsById()
+    clearDownload({
+      clearId
+    })
+
+    const toastId = 'undo-clear-downloads'
+
+    let timeoutId
+
+    // Setup an undo callback to provide to the toast that removes the clearId
+    const undoCallback = () => {
+      // Undo was clicked, dismiss the setTimeout used to remove the undo toast
+      clearTimeout(timeoutId)
+
+      deleteAllToastsById(toastId)
+      undoClearDownload({
+        clearId
+      })
+    }
+
+    // Show an `undo` toast
+    addToast({
+      id: toastId,
+      message: 'Downloads Cleared',
+      variant: 'spinner',
+      actions: [
+        {
+          altText: 'Undo',
+          buttonText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: undoCallback
+          }
+        }
+      ]
+    })
+
+    // After the UNDO_TIMEOUT time has passed, remove the undo toast
+    timeoutId = setTimeout(() => {
+      deleteAllToastsById(toastId)
+    }, UNDO_TIMEOUT)
   }
 
   const onPauseDownloadItem = () => {

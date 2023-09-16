@@ -92,7 +92,7 @@ const FileListItem = ({
     && state !== downloadStates.starting
     && state !== downloadStates.cancelled
 
-  const handleRestartFile = () => {
+  const onClickRestartFile = () => {
     const now = new Date().getTime()
     const restartId = `${filename}-${now}`
 
@@ -147,7 +147,7 @@ const FileListItem = ({
     }, UNDO_TIMEOUT)
   }
 
-  const handleCancelFile = () => {
+  const onClickCancelFile = () => {
     const now = new Date().getTime()
     const cancelId = `${filename}-${now}`
 
@@ -209,7 +209,7 @@ const FileListItem = ({
         isActive: shouldShowCancel,
         isPrimary: !isComplete,
         variant: 'danger',
-        callback: handleCancelFile,
+        callback: onClickCancelFile,
         icon: FaBan
       }
     ],
@@ -238,7 +238,7 @@ const FileListItem = ({
         label: 'Restart File',
         isActive: !shouldDisableFileRestart,
         isPrimary: false,
-        callback: handleRestartFile,
+        callback: onClickRestartFile,
         icon: FaInfoCircle
       }
     ]

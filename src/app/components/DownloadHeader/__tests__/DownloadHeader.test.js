@@ -28,6 +28,7 @@ const setup = (overrideProps) => {
   const setCancellingDownload = jest.fn()
   const setCurrentPage = jest.fn()
   const undoCancellingDownload = jest.fn()
+  const undoClearDownload = jest.fn()
 
   const props = {
     allDownloadsCompleted: false,
@@ -46,7 +47,8 @@ const setup = (overrideProps) => {
         pauseDownloadItem,
         resumeDownloadItem,
         setCancellingDownload,
-        undoCancellingDownload
+        undoCancellingDownload,
+        undoClearDownload
       }
     }
     >
@@ -75,7 +77,8 @@ const setup = (overrideProps) => {
     setCancellingDownload,
     setCurrentPage,
     toasts,
-    undoCancellingDownload
+    undoCancellingDownload,
+    undoClearDownload
   }
 }
 
@@ -109,25 +112,6 @@ describe('DownloadHeader component', () => {
       await userEvent.click(button)
 
       expect(resumeDownloadItem).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe('when clicking the Clear Downloads button', () => {
-    test('calls clearDownload and deleteAllToastsById', async () => {
-      const { clearDownload, deleteAllToastsById } = setup({
-        allDownloadsCompleted: true,
-        state: downloadStates.completed,
-        totalCompletedFiles: 10,
-        totalFiles: 10
-      })
-
-      const button = screen.getByRole('button', { name: 'Clear Downloads' })
-      await userEvent.click(button)
-
-      expect(clearDownload).toHaveBeenCalledTimes(1)
-      expect(clearDownload).toHaveBeenCalledWith({})
-      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
-      expect(deleteAllToastsById).toHaveBeenCalledWith()
     })
   })
 
@@ -181,6 +165,117 @@ describe('DownloadHeader component', () => {
       expect(screen.queryByRole('button', { name: 'Pause All' })).not.toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Resume All' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Cancel All' })).toBeInTheDocument()
+    })
+  })
+
+  describe('when clicking `Clear Downloads`', () => {
+    test('calls clearDownload and displays a toast', async () => {
+      const {
+        addToast,
+        clearDownload,
+        deleteAllToastsById
+      } = setup({
+        allDownloadsCompleted: true,
+        state: downloadStates.completed,
+        totalCompletedFiles: 10,
+        totalFiles: 10
+      })
+
+      const button = screen.getByRole('button', { name: 'Clear Downloads' })
+      await userEvent.click(button)
+
+      expect(clearDownload).toHaveBeenCalledTimes(1)
+      expect(clearDownload).toHaveBeenCalledWith({
+        clearId: 'clear-downloads-1684029600000'
+      })
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith()
+
+      expect(addToast).toHaveBeenCalledTimes(1)
+      expect(addToast).toHaveBeenCalledWith({
+        actions: [{
+          altText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: expect.any(Function)
+          },
+          buttonText: 'Undo'
+        }],
+        id: 'undo-clear-downloads',
+        message: 'Downloads Cleared',
+        variant: 'spinner'
+      })
+    })
+
+    describe('when calling the undo callback', () => {
+      test('calls undoClearDownload', async () => {
+        const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+
+        const {
+          deleteAllToastsById,
+          toasts,
+          undoClearDownload
+        } = setup({
+          allDownloadsCompleted: true,
+          state: downloadStates.completed,
+          totalCompletedFiles: 10,
+          totalFiles: 10
+        })
+
+        const button = screen.getByRole('button', { name: 'Clear Downloads' })
+        await userEvent.click(button)
+
+        expect(toasts).toHaveLength(1)
+
+        const [toast] = toasts
+        const { actions } = toast
+        const [undoAction] = actions
+        const { buttonProps } = undoAction
+        const { onClick } = buttonProps
+
+        jest.clearAllMocks()
+
+        // Click the undo button
+        onClick()
+
+        expect(clearTimeoutSpy).toHaveBeenCalledTimes(1)
+        expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
+
+        expect(undoClearDownload).toHaveBeenCalledTimes(1)
+        expect(undoClearDownload).toHaveBeenCalledWith({ clearId: 'clear-downloads-1684029600000' })
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-clear-downloads')
+      })
+    })
+
+    describe('when the undo timeout runs out', () => {
+      test('removes the toast', async () => {
+        const {
+          deleteAllToastsById
+        } = setup({
+          allDownloadsCompleted: true,
+          state: downloadStates.completed,
+          totalCompletedFiles: 10,
+          totalFiles: 10
+        })
+
+        jest.useFakeTimers({
+          now: 1684029600000
+        })
+
+        await waitFor(async () => {
+          const button = screen.getByRole('button', { name: 'Clear Downloads' })
+          await userEvent.click(button)
+        })
+
+        jest.clearAllMocks()
+        jest.advanceTimersByTime(UNDO_TIMEOUT)
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-clear-downloads')
+      })
     })
   })
 

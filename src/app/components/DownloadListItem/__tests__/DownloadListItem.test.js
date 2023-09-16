@@ -326,7 +326,10 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(clearDownload).toHaveBeenCalledTimes(1)
-      expect(clearDownload).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
+      expect(clearDownload).toHaveBeenCalledWith({
+        clearId: 'mock-download-id-1684029600000',
+        downloadId: 'mock-download-id'
+      })
 
       expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
       expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
@@ -385,7 +388,9 @@ describe('DownloadListItem component', () => {
         expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
 
         expect(undoClearDownload).toHaveBeenCalledTimes(1)
-        expect(undoClearDownload).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
+        expect(undoClearDownload).toHaveBeenCalledWith({
+          clearId: 'mock-download-id-1684029600000'
+        })
 
         expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
         expect(deleteAllToastsById).toHaveBeenCalledWith('undo-clear-mock-download-id')

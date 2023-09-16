@@ -4,7 +4,6 @@ import {
   FaBan,
   FaClipboard,
   FaFolderOpen,
-  FaInfoCircle,
   FaPause,
   FaPlay,
   FaSignInAlt,
@@ -351,15 +350,13 @@ const DownloadListItem = ({
         label: 'Restart Download',
         isActive: shouldShowActions,
         isPrimary: false,
-        callback: onClickRestartDownload,
-        icon: FaInfoCircle
+        callback: onClickRestartDownload
       },
       {
         label: 'Clear Download',
         isActive: shouldShowClear,
         isPrimary: false,
-        callback: onClickClearDownload,
-        icon: FaInfoCircle
+        callback: onClickClearDownload
       }
     ]
   ]

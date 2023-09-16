@@ -112,7 +112,10 @@ const ListPage = ({
       classNames([
         styles.listPage,
         {
-          [styles.isEmptyState]: !items.length && !hideCompleted,
+          // Sometimes `items` comes back as [undefined], this causes the `isEmptyState` class to not be applied.
+          // Filtering out empty items before checking the length fixes that problem, without dealing with the logic
+          // building the `items` array.
+          [styles.isEmptyState]: !items.filter(Boolean).length && !hideCompleted,
           [styles.hasScrolledList]: hasScrolledList
         }
       ])

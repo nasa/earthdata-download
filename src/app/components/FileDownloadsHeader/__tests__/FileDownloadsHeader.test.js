@@ -1,7 +1,13 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
+import { FaUndo } from 'react-icons/fa'
+import MockDate from 'mockdate'
 
 import { ElectronApiContext } from '../../../context/ElectronApiContext'
 import FileDownloadsHeader from '../FileDownloadsHeader'
@@ -9,6 +15,8 @@ import FileDownloadsHeader from '../FileDownloadsHeader'
 import { PAGES } from '../../../constants/pages'
 
 import downloadStates from '../../../constants/downloadStates'
+import AppContext from '../../../context/AppContext'
+import { UNDO_TIMEOUT } from '../../../constants/undoTimeout'
 
 const headerReport = {
   downloadLocation: '/mock/location',
@@ -24,14 +32,16 @@ const headerReport = {
 }
 
 const setup = (overrideProps) => {
-  // ElectronApiContext functions
+  const toasts = []
+  const addToast = jest.fn((toast) => toasts.push(toast))
   const cancelDownloadItem = jest.fn()
   const pauseDownloadItem = jest.fn()
   const resumeDownloadItem = jest.fn()
-
-  // Props
   const setCurrentPage = jest.fn()
   const setHideCompleted = jest.fn()
+  const deleteAllToastsById = jest.fn()
+  const setCancellingDownload = jest.fn()
+  const undoCancellingDownload = jest.fn()
 
   const props = {
     hideCompleted: false,
@@ -46,24 +56,48 @@ const setup = (overrideProps) => {
       {
         cancelDownloadItem,
         pauseDownloadItem,
-        resumeDownloadItem
+        resumeDownloadItem,
+        setCancellingDownload,
+        undoCancellingDownload
       }
     }
     >
-      <FileDownloadsHeader
-        {...props}
-      />
+      <AppContext.Provider
+        value={
+          {
+            addToast,
+            deleteAllToastsById
+          }
+        }
+      >
+        <FileDownloadsHeader
+          {...props}
+        />
+      </AppContext.Provider>
     </ElectronApiContext.Provider>
   )
 
   return {
+    addToast,
+    deleteAllToastsById,
     setHideCompleted,
     setCurrentPage,
     cancelDownloadItem,
     pauseDownloadItem,
-    resumeDownloadItem
+    resumeDownloadItem,
+    setCancellingDownload,
+    toasts,
+    undoCancellingDownload
   }
 }
+
+beforeEach(() => {
+  MockDate.set('2023-05-13T22:00:00')
+})
+
+afterEach(() => {
+  jest.useRealTimers()
+})
 
 describe('FileDownloadsHeader component', () => {
   describe('when clicking the Back to Downloads button', () => {
@@ -109,23 +143,6 @@ describe('FileDownloadsHeader component', () => {
 
       expect(resumeDownloadItem).toHaveBeenCalledTimes(1)
       expect(resumeDownloadItem).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
-    })
-  })
-
-  describe('when clicking the Cancel All button', () => {
-    test('calls cancelDownloadItem', async () => {
-      const { cancelDownloadItem } = setup({
-        headerReport: {
-          ...headerReport,
-          state: downloadStates.active
-        }
-      })
-
-      const button = screen.getByRole('button', { name: 'Cancel All' })
-      await userEvent.click(button)
-
-      expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
-      expect(cancelDownloadItem).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
     })
   })
 
@@ -334,6 +351,124 @@ describe('FileDownloadsHeader component', () => {
       expect(screen.getAllByText('Downloading to /mock/location')).toHaveLength(2)
 
       expect(screen.getByRole('checkbox', { name: 'Hide Completed' })).toBeInTheDocument()
+    })
+  })
+
+  describe('when clicking `Cancel All`', () => {
+    test('calls setCancellingDownload and displays a toast', async () => {
+      const {
+        addToast,
+        setCancellingDownload,
+        deleteAllToastsById
+      } = setup({
+        headerReport: {
+          ...headerReport,
+          state: downloadStates.active
+        }
+      })
+
+      const button = screen.getByRole('button', { name: 'Cancel All' })
+      await userEvent.click(button)
+
+      expect(setCancellingDownload).toHaveBeenCalledTimes(1)
+      expect(setCancellingDownload).toHaveBeenCalledWith({
+        cancelId: 'cancel-downloads-1684029600000',
+        downloadId: 'mock-download-id'
+      })
+
+      expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+      expect(deleteAllToastsById).toHaveBeenCalledWith()
+
+      expect(addToast).toHaveBeenCalledTimes(1)
+      expect(addToast).toHaveBeenCalledWith({
+        actions: [{
+          altText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: expect.any(Function)
+          },
+          buttonText: 'Undo'
+        }],
+        id: 'undo-cancel-downloads',
+        message: 'Download Cancelled',
+        variant: 'spinner'
+      })
+    })
+
+    describe('when calling the undo callback', () => {
+      test('calls undoCancellingDownload', async () => {
+        const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+
+        const {
+          deleteAllToastsById,
+          toasts,
+          undoCancellingDownload
+        } = setup({
+          headerReport: {
+            ...headerReport,
+            state: downloadStates.active
+          }
+        })
+
+        const button = screen.getByRole('button', { name: 'Cancel All' })
+        await userEvent.click(button)
+
+        expect(toasts).toHaveLength(1)
+
+        const [toast] = toasts
+        const { actions } = toast
+        const [undoAction] = actions
+        const { buttonProps } = undoAction
+        const { onClick } = buttonProps
+
+        jest.clearAllMocks()
+
+        // Click the undo button
+        onClick()
+
+        expect(clearTimeoutSpy).toHaveBeenCalledTimes(1)
+        expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
+
+        expect(undoCancellingDownload).toHaveBeenCalledTimes(1)
+        expect(undoCancellingDownload).toHaveBeenCalledWith({ cancelId: 'cancel-downloads-1684029600000' })
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-cancel-downloads')
+      })
+    })
+
+    describe('when the undo timeout runs out', () => {
+      test('removes the toast', async () => {
+        const {
+          deleteAllToastsById,
+          cancelDownloadItem
+        } = setup({
+          headerReport: {
+            ...headerReport,
+            state: downloadStates.active
+          }
+        })
+
+        jest.useFakeTimers({
+          now: 1684029600000
+        })
+
+        await waitFor(async () => {
+          const button = screen.getByRole('button', { name: 'Cancel All' })
+          await userEvent.click(button)
+        })
+
+        jest.clearAllMocks()
+        jest.advanceTimersByTime(UNDO_TIMEOUT)
+
+        expect(cancelDownloadItem).toHaveBeenCalledTimes(1)
+        expect(cancelDownloadItem).toHaveBeenCalledWith({
+          cancelId: 'cancel-downloads-1684029600100'
+        })
+
+        expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
+        expect(deleteAllToastsById).toHaveBeenCalledWith('undo-cancel-downloads')
+      })
     })
   })
 })

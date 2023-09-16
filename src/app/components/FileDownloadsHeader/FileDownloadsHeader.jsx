@@ -7,13 +7,16 @@ import {
   FaExclamationCircle,
   FaPause,
   FaPlay,
-  FaSpinner
+  FaSpinner,
+  FaUndo
 } from 'react-icons/fa'
 import humanizeDuration from 'humanize-duration'
 import MiddleEllipsis from 'react-middle-ellipsis'
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
-
 import classNames from 'classnames'
+
+import useAppContext from '../../hooks/useAppContext'
+
 import Button from '../Button/Button'
 import Checkbox from '../Checkbox/Checkbox'
 import Progress from '../Progress/Progress'
@@ -21,9 +24,10 @@ import Progress from '../Progress/Progress'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
 import { PAGES } from '../../constants/pages'
+import { UNDO_TIMEOUT } from '../../constants/undoTimeout'
+import downloadStates from '../../constants/downloadStates'
 import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
-import downloadStates from '../../constants/downloadStates'
 import createVariantClassName from '../../utils/createVariantClassName'
 import commafy from '../../utils/commafy'
 
@@ -57,10 +61,17 @@ const FileDownloadsHeader = ({
   setHideCompleted,
   setCurrentPage
 }) => {
+  const appContext = useAppContext()
+  const {
+    addToast,
+    deleteAllToastsById
+  } = appContext
   const {
     cancelDownloadItem,
     pauseDownloadItem,
-    resumeDownloadItem
+    resumeDownloadItem,
+    setCancellingDownload,
+    undoCancellingDownload
   } = useContext(ElectronApiContext)
 
   const {
@@ -77,7 +88,55 @@ const FileDownloadsHeader = ({
   } = headerReport
 
   const onCancelDownloadItem = () => {
-    cancelDownloadItem({ downloadId })
+    const now = new Date().getTime()
+    const cancelId = `cancel-downloads-${now}`
+
+    // Set the download to be canceling by adding the cancelId
+    deleteAllToastsById()
+    setCancellingDownload({
+      cancelId,
+      downloadId
+    })
+
+    const toastId = 'undo-cancel-downloads'
+
+    let timeoutId
+
+    // Setup an undo callback to provide to the toast that removes the cancelId
+    const undoCallback = () => {
+      // Undo was clicked, dismiss the setTimeout used to remove the undo toast
+      clearTimeout(timeoutId)
+
+      deleteAllToastsById(toastId)
+      undoCancellingDownload({ cancelId })
+    }
+
+    // Show an `undo` toast
+    addToast({
+      id: toastId,
+      message: 'Download Cancelled',
+      variant: 'spinner',
+      actions: [
+        {
+          altText: 'Undo',
+          buttonText: 'Undo',
+          buttonProps: {
+            Icon: FaUndo,
+            onClick: undoCallback
+          }
+        }
+      ]
+    })
+
+    // After the UNDO_TIMEOUT time has passed, remove the undo toast
+    timeoutId = setTimeout(() => {
+      deleteAllToastsById(toastId)
+
+      // Actually cancel the download
+      cancelDownloadItem({
+        cancelId
+      })
+    }, UNDO_TIMEOUT)
   }
 
   const onPauseDownloadItem = () => {

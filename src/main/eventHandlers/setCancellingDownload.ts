@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import downloadStates from '../../app/constants/downloadStates'
+
 /**
  * Adds a deleteId to the database
  * @param {Object} params
@@ -16,22 +18,43 @@ const setCancellingDownload = async ({
     cancelId
   } = info
 
-  const filesUpdateWhere = {
-    downloadId
-  }
-  if (filename) {
-    filesUpdateWhere.filename = filename
+  if (downloadId) {
+    const filesUpdateWhere = {
+      downloadId
+    }
+    if (filename) {
+      filesUpdateWhere.filename = filename
+    }
+
+    // Adds the cancelId to files
+    await database.updateFilesWhere(filesUpdateWhere, {
+      cancelId
+    })
+
+    // Adds the cancelId to downloads
+    await database.updateDownloadById(downloadId, {
+      cancelId
+    })
   }
 
-  // Adds the cancelId to files
-  await database.updateFilesWhere(filesUpdateWhere, {
-    cancelId
-  })
+  if (!downloadId) {
+    const updatedDownloads = await database.updateDownloadsWhereAndWhereNotIn({
+      active: true
+    }, [
+      'state',
+      [downloadStates.completed, downloadStates.cancelled]
+    ], {
+      cancelId
+    })
 
-  // Adds the cancelId to downloads
-  await database.updateDownloadById(downloadId, {
-    cancelId
-  })
+    await Promise.all(updatedDownloads.map(async (updatedDownload) => {
+      const { id } = updatedDownload
+
+      await database.updateFilesWhere({ downloadId: id }, {
+        cancelId
+      })
+    }))
+  }
 }
 
 export default setCancellingDownload

@@ -417,6 +417,16 @@ describe('requestFilesProgress', () => {
           remainingTime: 0,
           restartId: null,
           cancelId: 'mock-cancel-id'
+        }, {
+          downloadId: 'mock-download-id',
+          filename: 'file2.png',
+          state: downloadStates.active,
+          percent: 50,
+          receivedBytes: 12451363,
+          totalBytes: 24902726,
+          remainingTime: 123000,
+          restartId: null,
+          cancelId: 'mock-cancel-id'
         }]),
       getFilesHeaderReport: jest.fn()
         .mockResolvedValue({
@@ -454,6 +464,16 @@ describe('requestFilesProgress', () => {
         files: [{
           downloadId: 'mock-download-id',
           filename: 'file1.png',
+          percent: 100,
+          receivedBytes: 24902726,
+          totalBytes: 24902726,
+          state: downloadStates.completed,
+          remainingTime: 0,
+          restartId: null,
+          cancelId: 'mock-cancel-id'
+        }, {
+          downloadId: 'mock-download-id',
+          filename: 'file2.png',
           percent: 0,
           receivedBytes: 0,
           remainingTime: 0,

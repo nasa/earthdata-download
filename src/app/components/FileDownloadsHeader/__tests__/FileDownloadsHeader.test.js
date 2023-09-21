@@ -391,7 +391,7 @@ describe('FileDownloadsHeader component', () => {
         }],
         id: 'undo-cancel-downloads',
         message: 'Download Cancelled',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 
@@ -430,7 +430,10 @@ describe('FileDownloadsHeader component', () => {
         expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
 
         expect(undoCancellingDownload).toHaveBeenCalledTimes(1)
-        expect(undoCancellingDownload).toHaveBeenCalledWith({ cancelId: 'cancel-downloads-1684029600000' })
+        expect(undoCancellingDownload).toHaveBeenCalledWith({
+          cancelId: 'cancel-downloads-1684029600000',
+          downloadId: 'mock-download-id'
+        })
 
         expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
         expect(deleteAllToastsById).toHaveBeenCalledWith('undo-cancel-downloads')

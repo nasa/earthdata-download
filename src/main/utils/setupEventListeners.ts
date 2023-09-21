@@ -267,6 +267,7 @@ const setupEventListeners = ({
   // Set a download to be pending cancellation
   ipcMain.on('setCancellingDownload', async (event, info) => {
     await setCancellingDownload({
+      currentDownloadItems,
       database,
       info
     })
@@ -291,6 +292,7 @@ const setupEventListeners = ({
   // Undo a setCancellingDownload action
   ipcMain.on('undoCancellingDownload', async (event, info) => {
     await undoCancellingDownload({
+      currentDownloadItems,
       database,
       info
     })

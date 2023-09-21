@@ -661,6 +661,7 @@ describe('setupEventListeners', () => {
   describe('setCancellingDownload', () => {
     test('calls setCancellingDownload', () => {
       const {
+        currentDownloadItems,
         database
       } = setup()
 
@@ -671,6 +672,7 @@ describe('setupEventListeners', () => {
 
       expect(setCancellingDownload).toHaveBeenCalledTimes(1)
       expect(setCancellingDownload).toHaveBeenCalledWith({
+        currentDownloadItems,
         database,
         info
       })
@@ -718,6 +720,7 @@ describe('setupEventListeners', () => {
   describe('undoCancellingDownload', () => {
     test('calls undoCancellingDownload', () => {
       const {
+        currentDownloadItems,
         database
       } = setup()
 
@@ -728,6 +731,7 @@ describe('setupEventListeners', () => {
 
       expect(undoCancellingDownload).toHaveBeenCalledTimes(1)
       expect(undoCancellingDownload).toHaveBeenCalledWith({
+        currentDownloadItems,
         database,
         info
       })

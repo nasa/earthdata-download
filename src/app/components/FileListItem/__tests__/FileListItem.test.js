@@ -228,7 +228,7 @@ describe('FileListItem component', () => {
         }],
         id: 'undo-restart-file-mock-file.png',
         message: 'File Restarted',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 
@@ -355,7 +355,7 @@ describe('FileListItem component', () => {
         }],
         id: 'undo-cancel-file-mock-file.png',
         message: 'File Cancelled',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 
@@ -394,7 +394,11 @@ describe('FileListItem component', () => {
         expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
 
         expect(undoCancellingDownload).toHaveBeenCalledTimes(1)
-        expect(undoCancellingDownload).toHaveBeenCalledWith({ cancelId: 'mock-file.png-1684029600000' })
+        expect(undoCancellingDownload).toHaveBeenCalledWith({
+          cancelId: 'mock-file.png-1684029600000',
+          downloadId: 'mock-download-id',
+          filename: 'mock-file.png'
+        })
 
         expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
         expect(deleteAllToastsById).toHaveBeenCalledWith('undo-cancel-file-mock-file.png')

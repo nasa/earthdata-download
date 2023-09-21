@@ -30,9 +30,11 @@ const requestFilesProgress = async ({
   const headerReport = await database.getFilesHeaderReport(downloadId)
 
   const {
+    cancelId: downloadCancelId,
     filesWithProgress,
     percentSum,
     receivedBytesSum,
+    state: downloadState,
     totalTime,
     totalBytesSum,
     totalFiles
@@ -75,6 +77,13 @@ const requestFilesProgress = async ({
     }
   })
 
+  // If the file has been restarted, use these values
+  const restartedFileProgress = {
+    percent: 0,
+    receivedBytes: 0,
+    totalBytes: 0
+  }
+
   const files = filesReport.map((file) => {
     const {
       cancelId,
@@ -87,24 +96,27 @@ const requestFilesProgress = async ({
     if (restartId || (cancelId && state !== downloadStates.completed)) {
       return {
         ...file,
-        percent: 0,
-        receivedBytes: 0,
-        remainingTime: 0,
-        state: restartId ? downloadStates.pending : downloadStates.cancelled,
-        totalBytes: 0
+        ...(restartId ? restartedFileProgress : {}),
+        state: restartId ? downloadStates.pending : downloadStates.cancelled
       }
     }
 
     return file
   })
 
+  let newDownloadState = downloadState
+  if (downloadCancelId) {
+    newDownloadState = downloadStates.cancelled
+  }
+
   return {
     headerReport: {
       ...headerReport,
-      errors,
-      percent,
       elapsedTime,
-      estimatedTotalTimeRemaining
+      errors,
+      estimatedTotalTimeRemaining,
+      percent,
+      state: newDownloadState
     },
     filesReport: {
       files,

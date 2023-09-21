@@ -69,7 +69,7 @@ const requestDownloadsProgress = async ({
       return {
         downloadId,
         loadingMoreFiles: false,
-        progress: {
+        progress: cancelId ? progress : {
           percent: 0,
           finishedFiles: 0,
           totalFiles,

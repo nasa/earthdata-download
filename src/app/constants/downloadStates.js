@@ -8,7 +8,6 @@ const downloadStates = {
   interrupted: 'INTERRUPTED',
   paused: 'PAUSED',
   pending: 'PENDING',
-  restarting: 'RESTARTING',
   starting: 'STARTING',
   waitingForAuth: 'WAITING_FOR_AUTH',
   waitingForEula: 'WAITING_FOR_EULA',

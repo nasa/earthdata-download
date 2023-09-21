@@ -25,12 +25,6 @@ const restartDownload = async ({
     restartId
   } = info
 
-  // Set the files to cancelling
-  // const updateWhere = { downloadId }
-  // if (filename) {
-  //   updateWhere.filename = filename
-  // }
-
   await database.updateFilesWhere({
     restartId
   }, {

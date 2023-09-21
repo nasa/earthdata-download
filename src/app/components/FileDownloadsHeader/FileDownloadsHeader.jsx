@@ -108,14 +108,17 @@ const FileDownloadsHeader = ({
       clearTimeout(timeoutId)
 
       deleteAllToastsById(toastId)
-      undoCancellingDownload({ cancelId })
+      undoCancellingDownload({
+        cancelId,
+        downloadId
+      })
     }
 
     // Show an `undo` toast
     addToast({
       id: toastId,
       message: 'Download Cancelled',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',

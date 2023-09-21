@@ -57,7 +57,7 @@ const DownloadHistoryHeader = () => {
     addToast({
       id: toastId,
       message: 'Download History Cleared',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',

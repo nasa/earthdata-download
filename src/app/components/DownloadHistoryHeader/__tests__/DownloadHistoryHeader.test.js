@@ -89,7 +89,7 @@ describe('DownloadHistoryHeader component', () => {
         }],
         id: 'undo-clear-history',
         message: 'Download History Cleared',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 

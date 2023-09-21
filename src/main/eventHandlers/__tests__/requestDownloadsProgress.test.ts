@@ -649,10 +649,10 @@ describe('requestDownloadsProgress', () => {
         downloadId: 'mock-download-id-2',
         loadingMoreFiles: false,
         progress: {
-          finishedFiles: 0,
-          percent: 0,
+          finishedFiles: 5,
+          percent: 78,
           totalFiles: 7,
-          totalTime: 0
+          totalTime: 123000
         },
         state: downloadStates.cancelled,
         timeStart: null

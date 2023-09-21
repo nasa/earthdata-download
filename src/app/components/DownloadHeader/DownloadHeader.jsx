@@ -95,7 +95,7 @@ const DownloadHeader = ({
     addToast({
       id: toastId,
       message: 'Download Cancelled',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',
@@ -148,7 +148,7 @@ const DownloadHeader = ({
     addToast({
       id: toastId,
       message: 'Downloads Cleared',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',

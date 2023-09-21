@@ -204,7 +204,7 @@ describe('DownloadHeader component', () => {
         }],
         id: 'undo-clear-downloads',
         message: 'Downloads Cleared',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 
@@ -310,7 +310,7 @@ describe('DownloadHeader component', () => {
         }],
         id: 'undo-cancel-downloads',
         message: 'Download Cancelled',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 

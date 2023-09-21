@@ -346,7 +346,7 @@ describe('DownloadListItem component', () => {
         }],
         id: 'undo-clear-mock-download-id',
         message: 'Download Cleared',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 
@@ -470,7 +470,7 @@ describe('DownloadListItem component', () => {
         }],
         id: 'undo-restart-download-mock-download-id',
         message: 'Download Restarted',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 
@@ -595,7 +595,7 @@ describe('DownloadListItem component', () => {
         }],
         id: 'undo-cancel-download-mock-download-id',
         message: 'Download Cancelled',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 
@@ -634,7 +634,10 @@ describe('DownloadListItem component', () => {
         expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
 
         expect(undoCancellingDownload).toHaveBeenCalledTimes(1)
-        expect(undoCancellingDownload).toHaveBeenCalledWith({ cancelId: 'mock-download-id-1684029600000' })
+        expect(undoCancellingDownload).toHaveBeenCalledWith({
+          cancelId: 'mock-download-id-1684029600000',
+          downloadId: 'mock-download-id'
+        })
 
         expect(deleteAllToastsById).toHaveBeenCalledTimes(1)
         expect(deleteAllToastsById).toHaveBeenCalledWith('undo-cancel-download-mock-download-id')

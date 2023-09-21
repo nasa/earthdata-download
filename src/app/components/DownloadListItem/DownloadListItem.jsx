@@ -158,7 +158,7 @@ const DownloadListItem = ({
     addToast({
       id: toastId,
       message: 'Download Cleared',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',
@@ -205,7 +205,7 @@ const DownloadListItem = ({
     addToast({
       id: toastId,
       message: 'Download Restarted',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',
@@ -237,8 +237,8 @@ const DownloadListItem = ({
     // Set the download to be canceling by adding the cancelId
     deleteAllToastsById(downloadId)
     setCancellingDownload({
-      downloadId,
-      cancelId
+      cancelId,
+      downloadId
     })
 
     const toastId = `undo-cancel-download-${downloadId}`
@@ -251,14 +251,17 @@ const DownloadListItem = ({
       clearTimeout(timeoutId)
 
       deleteAllToastsById(toastId)
-      undoCancellingDownload({ cancelId })
+      undoCancellingDownload({
+        cancelId,
+        downloadId
+      })
     }
 
     // Show an `undo` toast
     addToast({
       id: toastId,
       message: 'Download Cancelled',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',

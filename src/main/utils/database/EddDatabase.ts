@@ -720,6 +720,7 @@ class EddDatabase {
   async getFilesHeaderReport(downloadId) {
     const query = this.db('files')
       .select(
+        'downloads.cancelId',
         'downloads.id',
         'downloads.downloadLocation',
         'downloads.loadingMoreFiles',

@@ -236,7 +236,7 @@ describe('DownloadHistoryListItem component', () => {
         }],
         id: 'undo-clear-history-mock-download-id',
         message: 'Download Deleted',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 
@@ -358,7 +358,7 @@ describe('DownloadHistoryListItem component', () => {
         }],
         id: 'undo-restart-download-mock-download-id',
         message: 'Download Restarted',
-        variant: 'spinner'
+        variant: 'none'
       })
     })
 

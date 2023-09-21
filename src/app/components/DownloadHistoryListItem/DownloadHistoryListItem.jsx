@@ -101,7 +101,7 @@ const DownloadHistoryListItem = ({
     addToast({
       id: toastId,
       message: 'Download Deleted',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',
@@ -153,7 +153,7 @@ const DownloadHistoryListItem = ({
     addToast({
       id: toastId,
       message: 'Download Restarted',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',

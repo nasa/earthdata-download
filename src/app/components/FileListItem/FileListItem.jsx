@@ -120,7 +120,7 @@ const FileListItem = ({
     addToast({
       id: toastId,
       message: 'File Restarted',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',
@@ -153,9 +153,9 @@ const FileListItem = ({
     // Set the download to be restarting by adding the cancelId
     deleteAllToastsById(downloadId)
     setCancellingDownload({
+      cancelId,
       downloadId,
-      filename,
-      cancelId
+      filename
     })
 
     const toastId = `undo-cancel-file-${filename}`
@@ -168,14 +168,18 @@ const FileListItem = ({
       clearTimeout(timeoutId)
 
       deleteAllToastsById(toastId)
-      undoCancellingDownload({ cancelId })
+      undoCancellingDownload({
+        cancelId,
+        downloadId,
+        filename
+      })
     }
 
     // Show an `undo` toast
     addToast({
       id: toastId,
       message: 'File Cancelled',
-      variant: 'spinner',
+      variant: 'none',
       actions: [
         {
           altText: 'Undo',

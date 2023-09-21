@@ -1,6 +1,6 @@
 {
   "name": "earthdata-download",
-  "version": "0.0.20",
+  "version": "0.1.0",
   "description": "Earthdata Download is a cross-platform download manager designed to improve how users download Earth Science data. It accepts lists of files from applications like Earthdata Search (https://search.earthdata.nasa.gov/) and enables clients to offer users a streamlined experience when downloading files from their browser.",
   "repository": "nasa/earthdata-download",
   "homepage": "https://github.com/nasa/earthdata-download#readme",
@@ -87,7 +87,7 @@
     "babel-jest": "^29.5.0",
     "babel-plugin-istanbul": "^6.1.1",
     "docdash": "^2.0.1",
-    "electron": "^25.8.0",
+    "electron": "^25.8.2",
     "electron-builder": "^24.6.4",
     "electron-icon-builder": "^2.0.1",
     "eslint": "^8.38.0",

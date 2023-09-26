@@ -55,9 +55,9 @@
   }
 
   .isPaused & {
-    border: 1px solid var(--color__yellow--350);
-    background-color: var(--color__yellow--050);
-    color: var(--color__yellow--700);
+    border: 1px solid var(--color__black--350);
+    background-color: var(--color__black--050);
+    color: var(--color__black--700);
   }
 
   .isInterrupted & {
@@ -84,6 +84,13 @@
     border: 1px solid var(--color__blue--500);
     background-color: var(--color__blue--100);
     color: var(--color__blue--850);
+  }
+
+  .isPaused &:hover,
+  .isPaused &:focus-visible  {
+    border: 1px solid var(--color__black--500);
+    background-color: var(--color__black--100);
+    color: var(--color__black--850);
   }
 
   .isInterrupted &:hover,
@@ -126,6 +133,15 @@
     color: var(--color__red--700);
   }
 
+  .isPaused & {
+    color: var(--color__black--700);
+  }
+
+  .isInterrupted & {
+    color: var(--color__yellow--700);
+  }
+
+
   .innerWrapper:hover &,
   .innerWrapper:focus-visible & {
     .isActive & {
@@ -138,6 +154,14 @@
 
     .isError & {
       color: var(--color__red--850);
+    }
+
+    .isPaused & {
+      color: var(--color__black--850);
+    }
+
+    .isInterrupted & {
+      color: var(--color__yellow--850);
     }
   }
 }
@@ -296,6 +320,22 @@
 
     .wrapper:hover & {
       background-color: var(--color__blue--150);
+    }
+  }
+
+  .isPaused & {
+    background-color: var(--color__black--100);
+
+    .wrapper:hover & {
+      background-color: var(--color__black--150);
+    }
+  }
+
+  .isInterrupted & {
+    background-color: var(--color__yellow--100);
+
+    .wrapper:hover & {
+      background-color: var(--color__yellow--150);
     }
   }
 }

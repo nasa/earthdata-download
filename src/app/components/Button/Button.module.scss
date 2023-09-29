@@ -38,9 +38,8 @@
 
   &:active {
     border: 1px solid var(--color__black--500);
-    background-color: var(--color__black--100);
+    background-color: var(--color__black--150);
     color: var(--color__black--900);
-    transform: translateY(-1px)
   }
 
   &[disabled] {

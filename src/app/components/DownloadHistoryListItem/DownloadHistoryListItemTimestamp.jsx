@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { FaDownload } from 'react-icons/fa'
+
 import * as styles from './DownloadHistoryListItemTimestamp.module.scss'
 
 /**
@@ -30,7 +32,7 @@ const DownloadHistoryListItemTimestamp = ({
     <div
       className={styles.time}
     >
-      Downloaded
+      <FaDownload className={styles.timeIcon} />
       {' '}
       {
         date.toLocaleDateString('en-us', {

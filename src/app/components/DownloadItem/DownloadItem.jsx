@@ -151,12 +151,22 @@ const DownloadItem = ({
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...accessibleEventProps}
       >
-        <h3
-          className={styles.name}
-          data-testid="download-item-name"
-        >
-          {itemName}
-        </h3>
+        <header className={styles.header}>
+          <h3
+            className={styles.name}
+            data-testid="download-item-name"
+          >
+            {itemName}
+          </h3>
+
+          {
+            subStatus && (
+              <div className={styles.subMeta}>
+                {subStatus}
+              </div>
+            )
+          }
+        </header>
 
         <div className={styles.meta}>
           <div className={styles.metaPrimary}>
@@ -178,16 +188,6 @@ const DownloadItem = ({
             )
           }
         </div>
-
-        {
-          subStatus && (
-            <div className={styles.subMeta}>
-              <div className={styles.metaPrimary}>
-                {subStatus}
-              </div>
-            </div>
-          )
-        }
 
         <div>
           <Progress

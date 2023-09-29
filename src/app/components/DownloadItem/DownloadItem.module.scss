@@ -14,9 +14,8 @@
   display: flex;
   overflow: hidden;
   flex-direction: column;
-  padding: var(--size__200);
+  padding: var(--size__350);
   padding-top: var(--size__350);
-  padding-bottom: var(--size__500);
   border: 1px solid var(--color__black--200);
   border-radius: var(--size__100);
   margin: var(--size__250);
@@ -112,33 +111,45 @@
   }
 }
 
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: var(--size__200);
+  line-height: 1;
+}
+
 .name {
   position: relative;
   z-index: 2;
+  overflow: hidden;
+  flex-grow: 1;
   margin: 0;
   color: var(--color__black--700);
   font-size: var(--text__small);
-  font-weight: 600;
-  letter-spacing: 0.03rem;
+  font-weight: 500;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   .isActive & {
-    color: var(--color__blue--700);
+    color: var(--color__blue--750);
   }
 
   .isCompleted & {
-    color: var(--color__green--700);
+    color: var(--color__green--750);
   }
 
   .isError & {
-    color: var(--color__red--700);
+    color: var(--color__red--750);
   }
 
   .isPaused & {
-    color: var(--color__black--700);
+    color: var(--color__black--750);
   }
 
   .isInterrupted & {
-    color: var(--color__yellow--700);
+    color: var(--color__yellow--750);
   }
 
 
@@ -166,22 +177,15 @@
   }
 }
 
-.meta {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  height: 1.75rem; // Height of action buttons
-  justify-content: space-between;
-  margin-top: var(--size__100);
-  font-size: var(--text__small);
-}
-
 .subMeta {
   position: relative;
   z-index: 3;
   display: flex;
-  height: 1.75rem; // Height of action buttons
-  margin-top: var(--size__050);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--size__350);
+  color: var(--color__black--600);
   font-size: var(--text__small);
 }
 
@@ -190,7 +194,6 @@
   overflow: hidden;
   flex-shrink: 1;
   align-items: center;
-
   // TODO EDD-44 Revisit this method of adding the margin
   & > div {
     margin-right: var(--size__200);
@@ -199,6 +202,17 @@
       margin-right: 0;
     }
   }
+}
+
+
+.meta {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  height: 1.75rem; // Height of action buttons
+  justify-content: space-between;
+  margin-top: var(--size__100);
+  font-size: var(--text__small);
 }
 
 .percentComplete {
@@ -212,7 +226,6 @@
   flex-grow: 0;
   flex-shrink: 0;
   align-items: center;
-  font-weight: 600;
 }
 
 .statusDescription {
@@ -240,6 +253,7 @@
   display: flex;
   align-items: center;
   margin: 0;
+  font-size: var(--text__smaller);
 }
 
 .statusInformationTooltip {

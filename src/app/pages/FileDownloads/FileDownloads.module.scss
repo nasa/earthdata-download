@@ -13,7 +13,7 @@
 
     .hasScrolledList & {
       border-bottom: 1px solid var(--color__black--200);
-      box-shadow: hsl(206deg 22% 7% / 15%) 0 10px 38px -10px, hsl(206deg 22% 7% / 5%) 0 10px 20px -15px;
+      box-shadow: var(--shadow__box-shadow--normal);
     }
   }
 

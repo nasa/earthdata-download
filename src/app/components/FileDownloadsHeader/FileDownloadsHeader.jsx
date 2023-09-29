@@ -275,7 +275,7 @@ const FileDownloadsHeader = ({
                 Icon={FaPlay}
                 onClick={() => onResumeDownloadItem(downloadId)}
               >
-                Resume All
+                Resume
               </Button>
             )
           }
@@ -287,7 +287,7 @@ const FileDownloadsHeader = ({
                 Icon={FaPause}
                 onClick={() => onPauseDownloadItem(downloadId)}
               >
-                Pause All
+                Pause
               </Button>
             )
           }
@@ -300,7 +300,7 @@ const FileDownloadsHeader = ({
                 variant="danger"
                 onClick={() => onCancelDownloadItem(downloadId)}
               >
-                Cancel All
+                Cancel
               </Button>
             )
           }
@@ -336,13 +336,6 @@ const FileDownloadsHeader = ({
             </span>
           </MiddleEllipsis>
         </div>
-
-        <Checkbox
-          id="hideCompleted"
-          label="Hide Completed"
-          onChange={
-            () => {
-              setHideCompleted(!hideCompleted)
         <div className={styles.footerSecondary}>
           <Checkbox
             id="hideCompleted"
@@ -352,9 +345,6 @@ const FileDownloadsHeader = ({
                 setHideCompleted(!hideCompleted)
               }
             }
-          }
-          checked={hideCompleted}
-        />
             checked={hideCompleted}
           />
         </div>

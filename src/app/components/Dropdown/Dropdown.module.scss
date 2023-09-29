@@ -2,23 +2,15 @@
 
 .separator {
   height: 1px;
-  background-color: var(--color__black--500);
+  background-color: var(--color__black--200);
 }
 
 .content {
   position: relative;
   z-index: 10;
-  width: 180px;
+  overflow: hidden;
   border: 1px solid var(--color__black--300);
   border-radius: var(--size__100);
   margin-bottom: var(--size__500);
   background-color: var(--color__white);
-  color: var(--color__black--500);
-  font-size: var(--text__smaller);
-  font-weight: 400;
-  text-align: left;
-}
-
-.action {
-  margin-right: var(--size__200);
 }

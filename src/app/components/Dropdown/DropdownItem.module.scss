@@ -1,14 +1,22 @@
 @use "../../css/vars/colors" as colors;
 
 .item {
-  padding: 5px;
-  padding-left: var(--size__500);
+  padding: var(--size__100) var(--size__300) ;
   font-weight: 500;
+  color: var(--color__black--800);
+  font-size: var(--text__smaller);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.5s var(--animation__spring);
 }
 
 .item[data-highlighted] {
-  background-color: var(--color__black--300);
-  color: var(--color__white);
+  background-color: var(--color__black--050 );
+  outline: 0;
+
+  &:focus-within {
+    outline: inherit;
+  }
 }
 
 .item[data-disabled] {

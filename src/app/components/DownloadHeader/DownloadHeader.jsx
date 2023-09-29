@@ -246,7 +246,7 @@ const DownloadHeader = ({
                         Icon={FaPause}
                         onClick={onPauseDownloadItem}
                       >
-                        Pause All
+                        Pause
                       </Button>
                     )
                     : (
@@ -256,7 +256,7 @@ const DownloadHeader = ({
                         Icon={FaPlay}
                         onClick={onResumeDownloadItem}
                       >
-                        Resume All
+                        Resume
                       </Button>
                     )
                 }
@@ -267,7 +267,7 @@ const DownloadHeader = ({
                   variant="danger"
                   onClick={onCancelDownloadItem}
                 >
-                  Cancel All
+                  Cancel
                 </Button>
               </>
             )

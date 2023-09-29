@@ -343,10 +343,21 @@ const FileDownloadsHeader = ({
           onChange={
             () => {
               setHideCompleted(!hideCompleted)
+        <div className={styles.footerSecondary}>
+          <Checkbox
+            id="hideCompleted"
+            label="Hide Completed"
+            onChange={
+              () => {
+                setHideCompleted(!hideCompleted)
+              }
             }
           }
           checked={hideCompleted}
         />
+            checked={hideCompleted}
+          />
+        </div>
       </div>
     </div>
   )

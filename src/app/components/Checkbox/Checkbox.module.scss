@@ -1,6 +1,6 @@
 .wrapper {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .checkboxRoot {
@@ -45,7 +45,7 @@
 
 .label {
   padding-left: var(--size__200);
-  color: var(--color__text--normal);
+  color: inherit;
   font-size: 0.875rem;
   line-height: 1.25;
   text-align: left;

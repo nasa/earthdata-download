@@ -141,6 +141,12 @@
     color: var(--color__gray);
     font-size: var(--text__smaller);
   }
+.footerSecondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color__text--normal);
+}
 }
 
 @keyframes spinnerRotate {

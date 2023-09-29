@@ -44,31 +44,29 @@ const Checkbox = ({
   labelNote,
   onChange
 }) => (
-  <form>
-    <div className={styles.wrapper}>
-      <RadixCheckbox.Root
-        className={styles.checkboxRoot}
-        defaultChecked={defaultChecked}
-        id={id}
-        checked={checked}
-        onCheckedChange={onChange}
-      >
-        <RadixCheckbox.Indicator className={styles.checkboxIndicator}>
-          <FaCheck className={styles.checkIcon} />
-        </RadixCheckbox.Indicator>
-      </RadixCheckbox.Root>
-      <label className={styles.label} htmlFor={id}>
-        {label}
-        {
-          labelNote && (
-            <span className={styles.labelNote}>
-              {labelNote}
-            </span>
-          )
-        }
-      </label>
-    </div>
-  </form>
+  <div className={styles.wrapper}>
+    <RadixCheckbox.Root
+      className={styles.checkboxRoot}
+      defaultChecked={defaultChecked}
+      id={id}
+      checked={checked}
+      onCheckedChange={onChange}
+    >
+      <RadixCheckbox.Indicator className={styles.checkboxIndicator}>
+        <FaCheck className={styles.checkIcon} />
+      </RadixCheckbox.Indicator>
+    </RadixCheckbox.Root>
+    <label className={styles.label} htmlFor={id}>
+      {label}
+      {
+        labelNote && (
+          <span className={styles.labelNote}>
+            {labelNote}
+          </span>
+        )
+      }
+    </label>
+  </div>
 )
 
 Checkbox.defaultProps = {

@@ -31,8 +31,6 @@ const setup = (overrideProps) => {
   const undoClearDownload = jest.fn()
 
   const props = {
-    allDownloadsCompleted: false,
-    allDownloadsPaused: false,
     state: downloadStates.pending,
     totalCompletedFiles: 0,
     totalFiles: 0,
@@ -105,7 +103,7 @@ describe('DownloadHeader component', () => {
   describe('when clicking the Resume All button', () => {
     test('calls resumeDownloadItem', async () => {
       const { resumeDownloadItem } = setup({
-        allDownloadsPaused: true
+        state: downloadStates.paused
       })
 
       const button = screen.getByRole('button', { name: 'Resume All' })
@@ -135,7 +133,6 @@ describe('DownloadHeader component', () => {
   describe('when all downloads are completed', () => {
     test('displays the correct information', () => {
       setup({
-        allDownloadsCompleted: true,
         state: downloadStates.completed,
         totalCompletedFiles: 10,
         totalFiles: 10
@@ -153,7 +150,6 @@ describe('DownloadHeader component', () => {
   describe('when all downloads are paused', () => {
     test('displays the correct information', () => {
       setup({
-        allDownloadsPaused: true,
         state: downloadStates.paused,
         totalCompletedFiles: 5,
         totalFiles: 10
@@ -175,7 +171,6 @@ describe('DownloadHeader component', () => {
         clearDownload,
         deleteAllToastsById
       } = setup({
-        allDownloadsCompleted: true,
         state: downloadStates.completed,
         totalCompletedFiles: 10,
         totalFiles: 10
@@ -217,7 +212,6 @@ describe('DownloadHeader component', () => {
           toasts,
           undoClearDownload
         } = setup({
-          allDownloadsCompleted: true,
           state: downloadStates.completed,
           totalCompletedFiles: 10,
           totalFiles: 10
@@ -255,7 +249,6 @@ describe('DownloadHeader component', () => {
         const {
           deleteAllToastsById
         } = setup({
-          allDownloadsCompleted: true,
           state: downloadStates.completed,
           totalCompletedFiles: 10,
           totalFiles: 10

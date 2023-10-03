@@ -47,8 +47,6 @@ import { UNDO_TIMEOUT } from '../../constants/undoTimeout'
  * )
  */
 const DownloadHeader = ({
-  allDownloadsCompleted,
-  allDownloadsPaused,
   state,
   totalCompletedFiles,
   totalFiles
@@ -236,11 +234,11 @@ const DownloadHeader = ({
       </div>
       <div className={styles.listHeaderSecondary}>
         {
-          !allDownloadsCompleted
+          state !== downloadStates.completed
             ? (
               <>
                 {
-                  !allDownloadsPaused
+                  state !== downloadStates.paused
                     ? (
                       <Button
                         className={styles.headerButton}
@@ -296,8 +294,6 @@ DownloadHeader.defaultProps = {
 }
 
 DownloadHeader.propTypes = {
-  allDownloadsCompleted: PropTypes.bool.isRequired,
-  allDownloadsPaused: PropTypes.bool.isRequired,
   state: PropTypes.string.isRequired,
   totalCompletedFiles: PropTypes.number,
   totalFiles: PropTypes.number

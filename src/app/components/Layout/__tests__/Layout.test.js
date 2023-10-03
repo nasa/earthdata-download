@@ -39,6 +39,8 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
   const closeWindow = jest.fn()
   const minimizeWindow = jest.fn()
   const maximizeWindow = jest.fn()
+  const showWaitingForEulaDialog = jest.fn()
+  const showWaitingForLoginDialog = jest.fn()
 
   const apiContextValue = {
     isWin: false,
@@ -47,6 +49,8 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
     closeWindow,
     minimizeWindow,
     maximizeWindow,
+    showWaitingForEulaDialog,
+    showWaitingForLoginDialog,
     ...overrideApiContextValue
   }
 

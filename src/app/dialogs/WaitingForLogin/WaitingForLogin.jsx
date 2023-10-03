@@ -63,8 +63,12 @@ const WaitingForLogin = ({
   )
 }
 
+WaitingForLogin.defaultProps = {
+  downloadId: null
+}
+
 WaitingForLogin.propTypes = {
-  downloadId: PropTypes.string.isRequired
+  downloadId: PropTypes.string
 }
 
 export default WaitingForLogin

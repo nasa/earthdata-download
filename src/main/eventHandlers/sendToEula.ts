@@ -69,7 +69,10 @@ const sendToEula = async ({
     shell.openExternal(eulaRedirect)
 
     // Send message to renderer to show waiting for eula dialog
-    webContents.send('showWaitingForEulaDialog', { showDialog: true })
+    webContents.send('showWaitingForEulaDialog', {
+      downloadId,
+      showDialog: true
+    })
   }
 
   await database.updateFileById(fileId, {

@@ -64,8 +64,6 @@ const Downloads = ({
   } = useContext(ElectronApiContext)
 
   const [items, setItems] = useState([])
-  const [allDownloadsPaused, setAllDownloadsPaused] = useState(false)
-  const [allDownloadsCompleted, setAllDownloadsCompleted] = useState(false)
   const [totalFiles, setTotalFiles] = useState(0)
   const [totalDownloads, setTotalDownloads] = useState(0)
   const [totalCompletedFiles, setTotalCompletedFiles] = useState(0)
@@ -145,14 +143,10 @@ const Downloads = ({
     const parsedReport = parseDownloadReport(downloadsReport)
 
     const {
-      allDownloadsCompleted: reportAllDownloadsCompleted,
-      allDownloadsPaused: reportAllDownloadsPaused,
       derivedStateFromDownloads: reportDerivedStateFromDownloads,
       hasActiveDownload: reportHasActiveDownload
     } = parsedReport
 
-    setAllDownloadsPaused(reportAllDownloadsPaused)
-    setAllDownloadsCompleted(reportAllDownloadsCompleted)
     setHasActiveDownload(reportHasActiveDownload)
     setTotalFiles(reportTotalFiles)
     setTotalCompletedFiles(reportTotalCompletedFiles)
@@ -203,8 +197,6 @@ const Downloads = ({
       header={
         !!items.length && (
           <DownloadHeader
-            allDownloadsCompleted={allDownloadsCompleted}
-            allDownloadsPaused={allDownloadsPaused}
             state={derivedStateFromDownloads}
             totalCompletedFiles={totalCompletedFiles}
             totalFiles={totalFiles}

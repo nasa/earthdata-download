@@ -63,8 +63,12 @@ const WaitingForEula = ({
   )
 }
 
+WaitingForEula.defaultProps = {
+  downloadId: null
+}
+
 WaitingForEula.propTypes = {
-  downloadId: PropTypes.string.isRequired
+  downloadId: PropTypes.string
 }
 
 export default WaitingForEula

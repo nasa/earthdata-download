@@ -55,8 +55,6 @@ const parseDownloadReport = (report) => {
   }
 
   return {
-    allDownloadsCompleted,
-    allDownloadsPaused,
     derivedStateFromDownloads,
     hasActiveDownload
   }

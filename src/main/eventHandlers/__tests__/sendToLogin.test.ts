@@ -43,7 +43,10 @@ describe('sendToLogin', () => {
     expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback%3FfileId%3D1234')
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
-    expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', { showDialog: true })
+    expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', {
+      downloadId: 'downloadID',
+      showDialog: true
+    })
 
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(1234, {
@@ -89,7 +92,10 @@ describe('sendToLogin', () => {
       expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback%3FfileId%3D1234')
 
       expect(webContents.send).toHaveBeenCalledTimes(1)
-      expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', { showDialog: true })
+      expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', {
+        downloadId: 'downloadID',
+        showDialog: true
+      })
 
       expect(database.updateFileById).toHaveBeenCalledTimes(1)
       expect(database.updateFileById).toHaveBeenCalledWith(1234, {
@@ -173,7 +179,10 @@ describe('sendToLogin', () => {
       expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback%3FfileId%3D1234')
 
       expect(webContents.send).toHaveBeenCalledTimes(1)
-      expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', { showDialog: true })
+      expect(webContents.send).toHaveBeenCalledWith('showWaitingForLoginDialog', {
+        downloadId: 'downloadID',
+        showDialog: true
+      })
 
       expect(database.updateFileById).toHaveBeenCalledTimes(1)
       expect(database.updateFileById).toHaveBeenCalledWith(1234, {

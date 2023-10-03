@@ -44,7 +44,10 @@ describe('sendToEula', () => {
     expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/accept_eula&redirect_uri=http%3A%2F%2Fexample.com%2Fauth%3FeddRedirect%3Dearthdata-download%253A%252F%252FeulaCallback%253FfileId%253D1234')
 
     expect(webContents.send).toHaveBeenCalledTimes(1)
-    expect(webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', { showDialog: true })
+    expect(webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', {
+      downloadId: 'downloadID',
+      showDialog: true
+    })
 
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(1234, {
@@ -91,7 +94,10 @@ describe('sendToEula', () => {
       expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/accept_eula&redirect_uri=http%3A%2F%2Fexample.com%2Fauth%3FeddRedirect%3Dearthdata-download%253A%252F%252FeulaCallback%253FfileId%253D1234')
 
       expect(webContents.send).toHaveBeenCalledTimes(1)
-      expect(webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', { showDialog: true })
+      expect(webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', {
+        downloadId: 'downloadID',
+        showDialog: true
+      })
 
       expect(database.updateFileById).toHaveBeenCalledTimes(1)
       expect(database.updateFileById).toHaveBeenCalledWith(1234, {
@@ -177,7 +183,10 @@ describe('sendToEula', () => {
       expect(shell.openExternal).toHaveBeenCalledWith('http://example.com/accept_eula&redirect_uri=http%3A%2F%2Fexample.com%2Fauth%3FeddRedirect%3Dearthdata-download%253A%252F%252FeulaCallback%253FfileId%253D1234')
 
       expect(webContents.send).toHaveBeenCalledTimes(1)
-      expect(webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', { showDialog: true })
+      expect(webContents.send).toHaveBeenCalledWith('showWaitingForEulaDialog', {
+        downloadId: 'downloadID',
+        showDialog: true
+      })
 
       expect(database.updateFileById).toHaveBeenCalledTimes(1)
       expect(database.updateFileById).toHaveBeenCalledWith(1234, {

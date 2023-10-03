@@ -7,7 +7,8 @@ import classNames from 'classnames'
 import {
   FaCog,
   FaDownload,
-  FaExclamationCircle
+  FaExclamationCircle,
+  FaSignInAlt
 } from 'react-icons/fa'
 import {
   VscChromeRestore,
@@ -33,6 +34,8 @@ import useAppContext from '../../hooks/useAppContext'
 import { PAGES } from '../../constants/pages'
 
 import * as styles from './Layout.module.scss'
+import WaitingForEula from '../../dialogs/WaitingForEula/WaitingForEula'
+import WaitingForLogin from '../../dialogs/WaitingForLogin/WaitingForLogin'
 
 const updateAvailableToastId = 'updateAvailable'
 
@@ -51,14 +54,16 @@ const Layout = () => {
     autoUpdateInstallLater,
     autoUpdateProgress,
     beginDownload,
-    initializeDownload,
     closeWindow,
-    minimizeWindow,
-    maximizeWindow,
+    initializeDownload,
+    isLinux,
     isMac,
     isWin,
-    isLinux,
+    maximizeWindow,
+    minimizeWindow,
     setDownloadLocation,
+    showWaitingForEulaDialog,
+    showWaitingForLoginDialog,
     windowsLinuxTitleBar
   } = useContext(ElectronApiContext)
 
@@ -82,6 +87,9 @@ const Layout = () => {
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
+  const [waitingForEulaDialogIsOpen, setWaitingForEulaDialogIsOpen] = useState(false)
+  const [waitingForLoginDialogIsOpen, setWaitingForLoginDialogIsOpen] = useState(false)
+  const [waitingForDownloadId, setWaitingForDownloadId] = useState(null)
 
   const showMoreInfoDialog = ({
     downloadId,
@@ -192,6 +200,26 @@ const Layout = () => {
     setSelectedDownloadLocation(newDownloadLocation)
   }
 
+  const onShowWaitingForEulaDialog = (event, info) => {
+    const {
+      downloadId,
+      showDialog
+    } = info
+
+    setWaitingForEulaDialogIsOpen(showDialog)
+    setWaitingForDownloadId(downloadId)
+  }
+
+  const onShowWaitingForLoginDialog = (event, info) => {
+    const {
+      downloadId,
+      showDialog
+    } = info
+
+    setWaitingForLoginDialogIsOpen(showDialog)
+    setWaitingForDownloadId(downloadId)
+  }
+
   useEffect(() => {
     switch (currentPage) {
       case PAGES.downloads:
@@ -244,12 +272,16 @@ const Layout = () => {
     autoUpdateAvailable(true, onAutoUpdateAvailable)
     autoUpdateProgress(true, onAutoUpdateProgress)
     setDownloadLocation(true, onSetDownloadLocation)
+    showWaitingForEulaDialog(true, onShowWaitingForEulaDialog)
+    showWaitingForLoginDialog(true, onShowWaitingForLoginDialog)
 
     return () => {
       windowsLinuxTitleBar(false, onWindowMaximized)
       autoUpdateAvailable(false, onAutoUpdateAvailable)
       autoUpdateProgress(false, onAutoUpdateProgress)
       setDownloadLocation(false, onSetDownloadLocation)
+      showWaitingForEulaDialog(false, onShowWaitingForEulaDialog)
+      showWaitingForLoginDialog(false, onShowWaitingForLoginDialog)
     }
   }, [])
 
@@ -469,6 +501,32 @@ const Layout = () => {
             onCloseMoreErrorInfoDialog={setMoreErrorInfoIsOpen}
             setCurrentPage={setCurrentPage}
             setSelectedDownloadId={setSelectedDownloadId}
+          />
+        </Dialog>
+
+        <Dialog
+          open={waitingForEulaDialogIsOpen}
+          setOpen={setWaitingForEulaDialogIsOpen}
+          showTitle
+          closeButton
+          title="Accept the license agreement to continue your download."
+          TitleIcon={FaSignInAlt}
+        >
+          <WaitingForEula
+            downloadId={waitingForDownloadId}
+          />
+        </Dialog>
+
+        <Dialog
+          open={waitingForLoginDialogIsOpen}
+          setOpen={setWaitingForLoginDialogIsOpen}
+          showTitle
+          closeButton
+          title="You must log in with Earthdata Login to download this data."
+          TitleIcon={FaSignInAlt}
+        >
+          <WaitingForLogin
+            downloadId={waitingForDownloadId}
           />
         </Dialog>
       </main>

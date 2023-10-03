@@ -1,25 +1,15 @@
-import React, {
-  useContext,
-  useEffect,
-  useState
-} from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { FaSignInAlt } from 'react-icons/fa'
 
 import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
 import DownloadItemActionButton from './DownloadItemActionButton'
 
-import Dialog from '../Dialog/Dialog'
-import WaitingForLogin from '../../dialogs/WaitingForLogin/WaitingForLogin'
-import WaitingForEula from '../../dialogs/WaitingForEula/WaitingForEula'
-
 import downloadStates from '../../constants/downloadStates'
 
 import createVariantClassName from '../../utils/createVariantClassName'
 
-import { ElectronApiContext } from '../../context/ElectronApiContext'
 import { PAGES } from '../../constants/pages'
 
 import useAccessibleEvent from '../../hooks/useAccessibleEvent'
@@ -30,7 +20,6 @@ import * as styles from './DownloadItem.module.scss'
  * @typedef {Object} DownloadItemProps
  * @property {Array} actionsList A 2-D array of objects detailing action attributes.
  * @property {String} downloadId The ID of the DownloadItem.
- * @property {Boolean} isFile Is the DownloadItem rendering a file item.
  * @property {String} itemName The name of the DownloadItem.
  * @property {Number} percent The download percent of the DownloadItem.
  * @property {Function} setCurrentPage A function which sets the active page.
@@ -67,7 +56,6 @@ import * as styles from './DownloadItem.module.scss'
 const DownloadItem = ({
   actionsList,
   downloadId,
-  isFile,
   itemName,
   percent,
   setCurrentPage,
@@ -80,24 +68,7 @@ const DownloadItem = ({
   subStatus,
   moreInfo
 }) => {
-  const {
-    showWaitingForEulaDialog,
-    showWaitingForLoginDialog
-  } = useContext(ElectronApiContext)
-
-  const [waitingForEulaDialogIsOpen, setWaitingForEulaDialogIsOpen] = useState(false)
-  const [waitingForLoginDialogIsOpen, setWaitingForLoginDialogIsOpen] = useState(false)
   const [moreActionsOpen, setMoreActionsOpen] = useState(false)
-
-  const onShowWaitingForEulaDialog = (event, info) => {
-    const { showDialog } = info
-    setWaitingForEulaDialogIsOpen(showDialog)
-  }
-
-  const onShowWaitingForLoginDialog = (event, info) => {
-    const { showDialog } = info
-    setWaitingForLoginDialogIsOpen(showDialog)
-  }
 
   const onSelectDownloadItem = () => {
     if (shouldBeClickable) {
@@ -110,21 +81,6 @@ const DownloadItem = ({
     onSelectDownloadItem()
     event.stopPropagation()
   })
-
-  // Setup event listeners
-  useEffect(() => {
-    if (!isFile) {
-      showWaitingForEulaDialog(true, onShowWaitingForEulaDialog)
-      showWaitingForLoginDialog(true, onShowWaitingForLoginDialog)
-    }
-
-    return () => {
-      if (!isFile) {
-        showWaitingForEulaDialog(false, onShowWaitingForEulaDialog)
-        showWaitingForLoginDialog(false, onShowWaitingForLoginDialog)
-      }
-    }
-  }, [])
 
   let primaryActions = []
 
@@ -181,39 +137,6 @@ const DownloadItem = ({
       }
       data-testid="download-item"
     >
-      {/* TODO Refactor: Move these dialogs to Layout */}
-      {
-        !isFile && (
-          <>
-            <Dialog
-              open={waitingForEulaDialogIsOpen}
-              setOpen={setWaitingForEulaDialogIsOpen}
-              showTitle
-              closeButton
-              title="Accept the license agreement to continue your download."
-              TitleIcon={FaSignInAlt}
-            >
-              <WaitingForEula
-                downloadId={downloadId}
-              />
-            </Dialog>
-
-            <Dialog
-              open={waitingForLoginDialogIsOpen}
-              setOpen={setWaitingForLoginDialogIsOpen}
-              showTitle
-              closeButton
-              title="You must log in with Earthdata Login to download this data."
-              TitleIcon={FaSignInAlt}
-            >
-              <WaitingForLogin
-                downloadId={downloadId}
-              />
-            </Dialog>
-          </>
-        )
-      }
-
       <div
         data-testid="download-item-open-file-downloads"
         className={
@@ -285,7 +208,6 @@ const DownloadItem = ({
 
 DownloadItem.defaultProps = {
   actionsList: null,
-  isFile: false,
   setCurrentPage: null,
   setSelectedDownloadId: null,
   shouldBeClickable: false,
@@ -310,7 +232,6 @@ DownloadItem.propTypes = {
     )
   ),
   downloadId: PropTypes.string.isRequired,
-  isFile: PropTypes.bool,
   itemName: PropTypes.string.isRequired,
   percent: PropTypes.number.isRequired,
   setCurrentPage: PropTypes.func,

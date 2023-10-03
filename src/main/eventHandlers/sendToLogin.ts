@@ -63,7 +63,10 @@ const sendToLogin = async ({
     shell.openExternal(url.toString())
 
     // Send message to renderer to show waiting for login dialog
-    webContents.send('showWaitingForLoginDialog', { showDialog: true })
+    webContents.send('showWaitingForLoginDialog', {
+      downloadId,
+      showDialog: true
+    })
   }
 
   await database.updateFileById(fileId, {

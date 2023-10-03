@@ -251,7 +251,6 @@ const FileListItem = ({
       actionsList={actionsList}
       downloadId={downloadId}
       itemName={filename}
-      isFile
       percent={percent}
       state={state}
       primaryStatus={

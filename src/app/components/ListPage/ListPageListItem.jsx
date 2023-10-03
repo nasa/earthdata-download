@@ -60,6 +60,8 @@ const ListPageListItem = ({
     setCurrentPage,
     setSelectedDownloadId,
     showMoreInfoDialog,
+    showWaitingForEulaDialog,
+    showWaitingForLoginDialog,
     type
   } = item
 
@@ -92,6 +94,8 @@ const ListPageListItem = ({
         setCurrentPage={setCurrentPage}
         setSelectedDownloadId={setSelectedDownloadId}
         showMoreInfoDialog={showMoreInfoDialog}
+        showWaitingForEulaDialog={showWaitingForEulaDialog}
+        showWaitingForLoginDialog={showWaitingForLoginDialog}
       />
     </div>
   )
@@ -105,6 +109,8 @@ ListPageListItem.propTypes = {
       setCurrentPage: PropTypes.func,
       setSelectedDownloadId: PropTypes.func,
       showMoreInfoDialog: PropTypes.func,
+      showWaitingForEulaDialog: PropTypes.func,
+      showWaitingForLoginDialog: PropTypes.func,
       type: PropTypes.string
     })
   ).isRequired,

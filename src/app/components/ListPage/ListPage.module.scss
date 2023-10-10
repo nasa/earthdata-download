@@ -30,8 +30,8 @@
 
   &::-webkit-scrollbar-thumb {
     border-radius: 1rem;
-    border-left: 2px solid transparent;
     border-right: 2px solid transparent;
+    border-left: 2px solid transparent;
     background-clip: padding-box;
     background-color: var(--color__black--300);
     transition: all .75s var(--animation__spring);
@@ -76,15 +76,12 @@
 
 .content {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
   display: flex;
   min-height: 100%;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  inset: 0;
 }
 
 .icon {

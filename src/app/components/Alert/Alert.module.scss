@@ -2,10 +2,10 @@
   padding: var(--size__250) var(--size__350);
   border-radius: var(--size__100);
   color: var(--color__yellow--750);
-  font-weight: 600;
   text-align: center;
+  font-size: var(--text__normal);
 
   &.isWarning {
-    background-color: var(--color__yellow--100);
+    background-color: var(--color__yellow--050);
   }
 }

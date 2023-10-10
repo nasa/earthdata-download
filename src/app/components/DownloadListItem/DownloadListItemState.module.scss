@@ -2,10 +2,33 @@
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
-  align-items: center;
+  align-items: baseline;
+  font-weight: 600;
+
+  .isCompleted & {
+    color: var(--color__green--700);
+  }
+
+  .isActive & {
+    color: var(--color__blue--700);
+  }
+
+  .isPaused & {
+    color: var(--color__black--700);
+  }
+
+  .isInterrupted & {
+    color: var(--color__yellow--700);
+  }
+
+  .isError & {
+    color: var(--color__red--700);
+  }
 }
 
 .statusDescriptionIcon {
+  position: relative;
+  top: 0.1125rem;
   margin-right: var(--size__100);
 
   .isCompleted & {
@@ -17,9 +40,14 @@
   }
 }
 
-.hasErrorsIcon {
-  margin-right: var(--size__100);
-  color: var(--color__red--550);
+.hasErrorsButton {
+  align-items: baseline;
+  color: var(--color__red--600);
+
+  &:hover,
+  &:focus {
+    color: var(--color__red--700)
+  }
 }
 
 @keyframes spinnerRotate {

@@ -20,7 +20,6 @@ import DownloadListItemPercent from './DownloadListItemPercent'
 import DownloadListItemFileProgress from './DownloadListItemFileProgress'
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 import useAppContext from '../../hooks/useAppContext'
-import DownloadListItemMoreInfo from './DownloadListItemMoreInfo'
 
 /**
  * @typedef {Object} DownloadListItemProps
@@ -376,7 +375,7 @@ const DownloadListItem = ({
       itemName={downloadId}
       percent={percent}
       primaryStatus={
-        (
+        state !== downloadStates.completed && percent > 0 && (
           <DownloadListItemPercent
             percent={percent}
           />
@@ -387,7 +386,9 @@ const DownloadListItem = ({
           <DownloadListItemState
             state={state}
             percent={percent}
-            hasErrors={numberErrors > 0}
+            downloadId={downloadId}
+            numberErrors={numberErrors}
+            showMoreInfoDialog={showMoreInfoDialog}
           />
         )
       }
@@ -401,16 +402,6 @@ const DownloadListItem = ({
             state={state}
             totalFiles={totalFiles}
             totalTime={totalTime}
-          />
-        )
-      }
-      moreInfo={
-        (
-          <DownloadListItemMoreInfo
-            downloadId={downloadId}
-            numberErrors={numberErrors}
-            state={state}
-            showMoreInfoDialog={showMoreInfoDialog}
           />
         )
       }

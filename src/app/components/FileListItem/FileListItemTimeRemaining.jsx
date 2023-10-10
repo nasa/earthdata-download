@@ -1,11 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import humanizeDuration from 'humanize-duration'
+import { FaCheckCircle } from 'react-icons/fa'
 
 import downloadStates from '../../constants/downloadStates'
+import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
+
+import humanizeDuration from '../../utils/humanizeDuration'
 
 import * as styles from './FileListItemTimeRemaining.module.scss'
-import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
 /**
  * @typedef {Object} FileListItemTimeRemainingProps
@@ -35,8 +37,7 @@ const FileListItemTimeRemaining = ({
   shouldShowTime,
   state
 }) => {
-  const shouldShowState = state !== downloadStates.completed
-    && state !== downloadStates.active
+  const shouldShowState = state !== downloadStates.active
 
   if (!shouldShowState && !shouldShowTime) return null
 
@@ -48,16 +49,16 @@ const FileListItemTimeRemaining = ({
         className={styles.statusInformation}
         data-testid="file-downloads-list-time-remaining"
       >
+        {
+          state === downloadStates.completed && (
+            <FaCheckCircle className={styles.statusDescriptionIcon} />
+          )
+        }
         {shouldShowState && getHumanizedDownloadStates(state, percent)}
         {
           shouldShowTime && (
             <>
-              {
-                humanizeDuration(remainingTime, {
-                  largest: 2,
-                  round: 1
-                })
-              }
+              {humanizeDuration(remainingTime)}
               {' '}
               remaining
             </>

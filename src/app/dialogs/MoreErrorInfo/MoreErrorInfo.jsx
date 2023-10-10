@@ -1,6 +1,10 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { FaBan, FaRedo } from 'react-icons/fa'
+import {
+  FaBan,
+  FaFolderOpen,
+  FaRedo
+} from 'react-icons/fa'
 
 import Button from '../../components/Button/Button'
 
@@ -72,8 +76,9 @@ const MoreErrorInfo = ({
   if (state === downloadStates.errorFetchingLinks) {
     return (
       <div className={styles.message}>
-        This download failed to find download links.
-        Try creating a new download to download your files.
+        The links associated with the download
+        were not able to be retrieved.
+        Try initializing the download again to download your files.
       </div>
     )
   }
@@ -81,42 +86,48 @@ const MoreErrorInfo = ({
   return (
     <>
       <div className={styles.message}>
-        {`${numberErrors} ${pluralize('file', numberErrors)}`}
-        {' '}
-        failed to download in
-        {' '}
-        <Button
-          size="sm"
-          onClick={
-            () => {
-              setCurrentPage(PAGES.fileDownloads)
-              setSelectedDownloadId(downloadId)
-              onCloseMoreErrorInfoDialog()
-            }
-          }
-        >
-          {downloadId}
-        </Button>
+        <p>
+          {`${numberErrors} ${pluralize('file', numberErrors)} `}
+          were not able to be downloaded. If the problem persists,
+          {' '}
+          try initializing the download again to download your files.
+          {' '}
+        </p>
       </div>
       <div className={styles.actions}>
+        <p className={styles.emphasis}>
+          What would you like to do with the unsuccessful downloads?
+        </p>
         <Button
           className={styles.actionsButton}
-          size="sm"
           Icon={FaRedo}
           onClick={() => onRetryErroredDownloadItem({ downloadId })}
         >
-          Retry Failed Files
+          Retry
         </Button>
         <Button
           className={styles.actionsButton}
-          size="sm"
           Icon={FaBan}
           variant="danger"
           onClick={() => onCancelDownloadItem({ downloadId })}
         >
-          Cancel Failed Files
+          Cancel
         </Button>
       </div>
+      <Button
+        className={styles.primaryButton}
+        Icon={FaFolderOpen}
+        fullWidth
+        onClick={
+          () => {
+            setCurrentPage(PAGES.fileDownloads)
+            setSelectedDownloadId(downloadId)
+            onCloseMoreErrorInfoDialog()
+          }
+        }
+      >
+        View Download
+      </Button>
     </>
   )
 }

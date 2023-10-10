@@ -1,5 +1,9 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 
@@ -418,6 +422,95 @@ describe('DownloadItem component', () => {
       }, {})
 
       expect(container.getElementsByClassName('progressBackground')[0]).toHaveStyle('width: 0%')
+    })
+  })
+
+  describe('when progressBar is set to false', () => {
+    test('does not display the progress bar', () => {
+      setup({
+        percent: 100,
+        state: downloadStates.completed,
+        progressBar: false
+      })
+
+      expect(Progress).toHaveBeenCalledTimes(0)
+      expect(screen.queryAllByRole('listitem').at(0)).toHaveClass('isWithoutProgress')
+    })
+  })
+
+  describe('when hovering over the title', () => {
+    test('displays a tooltip after 500 ms', async () => {
+      setup({
+        percent: 100,
+        state: downloadStates.completed
+      })
+
+      const firstItem = screen.queryAllByTestId('download-item-name').at(0)
+
+      await userEvent.hover(firstItem)
+
+      await waitFor(() => {
+        expect(screen.queryByRole('tooltip')).toHaveTextContent('Test download')
+      })
+    })
+  })
+
+  describe('when a subStatus is defined', () => {
+    test('displays a tooltip after 500 ms', () => {
+      setup({
+        percent: 100,
+        state: downloadStates.completed,
+        subStatus: <>Sub status</>
+      })
+
+      expect(screen.queryByText('Sub status')).toBeInTheDocument()
+    })
+  })
+
+  describe('when a primaryStatus is defined', () => {
+    test('renders the primary status', () => {
+      setup({
+        percent: 100,
+        state: downloadStates.completed,
+        primaryStatus: <>Primary status</>
+      })
+
+      expect(screen.queryByText('Primary status')).toBeInTheDocument()
+    })
+  })
+
+  describe('when a secondaryStatus is defined', () => {
+    test('renders the primary status', () => {
+      setup({
+        percent: 100,
+        state: downloadStates.completed,
+        secondaryStatus: <>Secondary status</>
+      })
+
+      expect(screen.queryByText('Secondary status')).toBeInTheDocument()
+    })
+  })
+
+  describe('when a tertiaryStatus is defined', () => {
+    test('renders the tertiary status', () => {
+      setup({
+        percent: 100,
+        state: downloadStates.completed,
+        tertiaryStatus: <>Tertiary status</>
+      })
+
+      expect(screen.queryByText('Tertiary status')).toBeInTheDocument()
+    })
+  })
+
+  describe('when actions is not defined', () => {
+    test('does not render any actions', () => {
+      setup({
+        actionsList: undefined
+      })
+
+      expect(screen.queryAllByRole('button').length).toEqual(1)
+      expect(screen.queryByText('More Actions')).not.toBeInTheDocument()
     })
   })
 

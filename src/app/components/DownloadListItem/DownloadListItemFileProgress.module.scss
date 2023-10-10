@@ -2,35 +2,39 @@
   overflow: hidden;
   flex-grow: 1;
   flex-shrink: 1;
+  font-size: var(--text__smaller);
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--text__smaller);
 }
 
 .statusInformation {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: baseline;
   margin: 0;
-  font-size: var(--text__smaller);
+  color: var(--color__black--650);
+  font-size: var(--text__small);
+}
+
+.statusInformationIcon {
+  position: relative;
+  top: 0.125rem;
+  margin-right: var(--size__100);
+  color: var(--color__black--650);
 }
 
 .statusInformationTooltip {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
   margin-left: var(--size__150);
   color: var(--color__black--600);
   cursor: default;
+  font-size: var(--text__small);
   text-decoration: underline;
-  font-size: var(--text__smaller);
 
   &:hover {
     color: var(--color__black--700);
   }
-}
-
-.statusInformationIcon {
-  margin-right: var(--size__050);
 }

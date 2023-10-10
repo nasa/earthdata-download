@@ -6,7 +6,6 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import SimpleBar from 'simplebar-react'
 import { FixedSizeList } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 
@@ -105,8 +104,6 @@ const ListPage = ({
     setWindowState(newWindowState)
   }
 
-  // TODO Trevor simplebar-mouse-entered is getting added to the simplebar element and causing a tiny dot to appear and top and left of y & x scrollbars
-  // TODO Trevor Y scrollbar has too much space beside it, between scrollbar and right edge of DownloadItem
   return (
     <section className={
       classNames([
@@ -135,43 +132,32 @@ const ListPage = ({
               <div className={styles.contentWrapper}>
                 <div className={styles.scrollableWrapper}>
                   {
-                    // TODO Trevor make pretty
                     items.length === 0 && (
                       <div>
-                        No Items remaining
+                        All items complete
                       </div>
                     )
                   }
-
-                  <SimpleBar
-                    className={styles.listWrapper}
-                    style={{ height: '100%' }}
-                  >
+                  <AutoSizer className={styles.list}>
                     {
-                      ({ contentNodeRef }) => (
-                        <AutoSizer className={styles.list}>
-                          {
-                            ({ height, width }) => (
-                              <FixedSizeList
-                                height={height}
-                                innerRef={contentNodeRef}
-                                itemCount={totalItemCount}
-                                itemData={items}
-                                itemSize={itemSize}
-                                onItemsRendered={onItemsRendered}
-                                outerRef={scrollableNodeRef}
-                                ref={listRef}
-                                width={width}
-                                overscanCount={4}
-                              >
-                                {ListPageListItem}
-                              </FixedSizeList>
-                            )
-                          }
-                        </AutoSizer>
+                      ({ height, width }) => (
+                        <FixedSizeList
+                          className={styles.listWrapper}
+                          height={height}
+                          itemCount={totalItemCount}
+                          itemData={items}
+                          itemSize={itemSize}
+                          onItemsRendered={onItemsRendered}
+                          outerRef={scrollableNodeRef}
+                          ref={listRef}
+                          width={width}
+                          overscanCount={10}
+                        >
+                          {ListPageListItem}
+                        </FixedSizeList>
                       )
                     }
-                  </SimpleBar>
+                  </AutoSizer>
                 </div>
               </div>
             </>

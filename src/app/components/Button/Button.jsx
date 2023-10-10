@@ -10,12 +10,15 @@ import createVariantClassName from '../../utils/createVariantClassName'
 
 /**
  * @typedef {Object} ButtonProps
+ * @property {String} [align] An optional string to set the alignment.
  * @property {String} [className] An optional css class name.
  * @property {React.ReactNode} [children] An optional React node.
  * @property {Boolean} [disabled] An optional flag to set `disabled` attribute on the button.
  * @property {Boolean} [hideLabel] An optional flag to set `hideLabel` attribute on the button.
  * @property {String} [href] An optional url. If passed, the button will be rendered as an <a> element.
+ * @property {Boolean} [fullWidth] An optional flag to make the button full width.
  * @property {Function} [Icon] An optional react-icons icon.
+ * @property {Function} [naked] An optional boolean to trigger the naked state.
  * @property {Function} [onClick] An optional callback function to be called when the button is clicked.
  * @property {String} [rel] An optional string to be used as the `rel` attribute on a link. If passed, the button will be rendered as an <a> element.
  * @property {String} [size] An optional string which modifies the size of the button.
@@ -56,14 +59,17 @@ import createVariantClassName from '../../utils/createVariantClassName'
  * )
  */
 const Button = forwardRef(({
+  align,
   className,
   children,
   dataTestId,
   disabled,
+  fullWidth,
   hideLabel,
   hideTooltip,
   href,
   Icon,
+  naked,
   onClick,
   rel,
   size,
@@ -94,7 +100,12 @@ const Button = forwardRef(({
           styles.button,
           styles[createVariantClassName(size)],
           styles[createVariantClassName(variant)],
-          { [styles.hasLabel]: !hideLabel }
+          {
+            [styles.hasLabel]: !hideLabel,
+            [styles.isNaked]: naked,
+            [styles.isAlignBaseline]: align === 'baseline',
+            [styles.isFullWidth]: fullWidth
+          }
         ])
       }
       data-testid={dataTestId}
@@ -135,6 +146,7 @@ const Button = forwardRef(({
 Button.displayName = 'Button'
 
 Button.defaultProps = {
+  align: null,
   children: null,
   className: null,
   dataTestId: null,
@@ -142,16 +154,19 @@ Button.defaultProps = {
   hideLabel: false,
   hideTooltip: false,
   href: null,
+  fullWidth: false,
   Icon: null,
+  naked: false,
   onClick: null,
   rel: null,
-  size: 'sm',
+  size: null,
   target: null,
   tooltipDelayDuration: 0,
   variant: null
 }
 
 Button.propTypes = {
+  align: PropTypes.string,
   className: PropTypes.string,
   children: PropTypes.oneOfType([
     PropTypes.func,
@@ -162,8 +177,10 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   hideLabel: PropTypes.bool,
   hideTooltip: PropTypes.bool,
+  fullWidth: PropTypes.bool,
   href: PropTypes.string,
   Icon: PropTypes.func,
+  naked: PropTypes.bool,
   onClick: PropTypes.func,
   rel: PropTypes.string,
   size: PropTypes.string,

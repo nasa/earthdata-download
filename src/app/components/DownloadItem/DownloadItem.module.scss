@@ -16,21 +16,26 @@
   flex-direction: column;
   padding: var(--size__350);
   padding-top: var(--size__350);
-  border: 1px solid var(--color__black--200);
+  border: 1px solid var(--color__black--150);
   border-radius: var(--size__100);
   margin: var(--size__250);
-  margin-bottom: var(--size__200);
-  background-color: var(--color__white);
+  margin-right: 0;
+  background-color: color-mix(in srgb, var(--color__white) 75%, var(--color__black--050));
   text-align: left;
   transition: all 200ms cubic-bezier(0.65, 0, 0.35, 1);
 
-  &.isClickable {
-    cursor: pointer;
+  .isWithoutProgress & {
+    padding-bottom: var(--size__200);
   }
 
-  &:hover,
-  &:focus-visible  {
-    background-color: var(--color__black--050);
+  &.isClickable {
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible  {
+      border: 1px solid var(--color__black--200);
+      background-color: var(--color__black--050);
+    }
   }
 
   .isStarting & {
@@ -39,71 +44,6 @@
 
   .isPending & {
     cursor: default;
-  }
-
-  .isCompleted & {
-    border: 1px solid var(--color__green--350);
-    background-color: var(--color__green--050);
-    color: var(--color__green--700);
-  }
-
-  .isActive & {
-    border: 1px solid var(--color__blue--350);
-    background-color: var(--color__blue--050);
-    color: var(--color__blue--700);
-  }
-
-  .isPaused & {
-    border: 1px solid var(--color__black--350);
-    background-color: var(--color__black--050);
-    color: var(--color__black--700);
-  }
-
-  .isInterrupted & {
-    border: 1px solid var(--color__yellow--350);
-    background-color: var(--color__yellow--050);
-    color: var(--color__yellow--700);
-  }
-
-  .isError & {
-    border: 1px solid var(--color__red--350);
-    background-color: var(--color__red--050);
-    color: var(--color__red--700);
-  }
-
-  .isCompleted &:hover,
-  .isCompleted &:focus-visible  {
-    border: 1px solid var(--color__green--500);
-    background-color: var(--color__green--100);
-    color: var(--color__green--850);
-  }
-
-  .isActive &:hover,
-  .isActive &:focus-visible  {
-    border: 1px solid var(--color__blue--500);
-    background-color: var(--color__blue--100);
-    color: var(--color__blue--850);
-  }
-
-  .isPaused &:hover,
-  .isPaused &:focus-visible  {
-    border: 1px solid var(--color__black--500);
-    background-color: var(--color__black--100);
-    color: var(--color__black--850);
-  }
-
-  .isInterrupted &:hover,
-  .isInterrupted &:focus-visible  {
-    border: 1px solid var(--color__yellow--500);
-    background-color: var(--color__yellow--100);
-    color: var(--color__yellow--850);
-  }
-
-  .isError &:hover,
-  .isError &:focus-visible  {
-    border: 1px solid var(--color__red--500);
-    background-color: var(--color__red--100);
-    color: var(--color__red--850);
   }
 
   .wrapper:first-child & {
@@ -115,6 +55,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: var(--size__200);
   line-height: 1;
 }
@@ -123,56 +64,34 @@
   position: relative;
   z-index: 2;
   overflow: hidden;
-  flex-grow: 1;
   margin: 0;
   color: var(--color__black--700);
   font-size: var(--text__small);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  .isActive & {
-    color: var(--color__blue--750);
-  }
-
-  .isCompleted & {
-    color: var(--color__green--750);
-  }
-
-  .isError & {
-    color: var(--color__red--750);
-  }
-
-  .isPaused & {
-    color: var(--color__black--750);
-  }
-
-  .isInterrupted & {
-    color: var(--color__yellow--750);
-  }
-
-
-  .innerWrapper:hover &,
-  .innerWrapper:focus-visible & {
+  .innerWrapper.isClickable:hover &,
+  .innerWrapper.isClickable:focus-visible & {
     .isActive & {
-      color: var(--color__blue--850);
+      color: var(--color__blue--800);
     }
 
     .isCompleted & {
-      color: var(--color__green--850);
+      color: var(--color__green--800);
     }
 
     .isError & {
-      color: var(--color__red--850);
+      color: var(--color__red--800);
     }
 
     .isPaused & {
-      color: var(--color__black--850);
+      color: var(--color__black--800);
     }
 
     .isInterrupted & {
-      color: var(--color__yellow--850);
+      color: var(--color__yellow--800);
     }
   }
 }
@@ -187,6 +106,10 @@
   margin-left: var(--size__350);
   color: var(--color__black--600);
   font-size: var(--text__small);
+
+  .wrapper:hover & {
+    display: none;
+  }
 }
 
 .metaPrimary {
@@ -194,16 +117,48 @@
   overflow: hidden;
   flex-shrink: 1;
   align-items: center;
-  // TODO EDD-44 Revisit this method of adding the margin
-  & > div {
-    margin-right: var(--size__200);
+}
 
-    &:last-child {
-      margin-right: 0;
-    }
+.status {
+  display: flex;
+  overflow: hidden;
+  flex-shrink: 1;
+  align-items: baseline;
+}
+
+.primaryStatus {
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-right: var(--size__150);
+
+  .isActive & {
+    color: var(--color__blue--700);
+  }
+
+  .isCompleted & {
+    color: var(--color__green--700);
+  }
+
+  .isError & {
+    color: var(--color__red--700);
+  }
+
+  .isPaused & {
+    color: var(--color__black--700);
+  }
+
+  .isInterrupted & {
+    color: var(--color__yellow--700);
   }
 }
 
+.tertiaryStatus {
+  overflow: hidden;
+  flex-grow: 1;
+  flex-shrink: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .meta {
   position: relative;
@@ -211,7 +166,6 @@
   display: flex;
   height: 1.75rem; // Height of action buttons
   justify-content: space-between;
-  margin-top: var(--size__100);
   font-size: var(--text__small);
 }
 
@@ -221,11 +175,33 @@
   font-weight: 600;
 }
 
-.displayStatus {
+.secondaryStatus {
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
   align-items: center;
+  margin-right: var(--size__150);
+  font-weight: 600;
+
+  .isCompleted & {
+    color: var(--color__green--650);
+  }
+
+  .isActive & {
+    color: var(--color__blue--650);
+  }
+
+  .isPaused & {
+    color: var(--color__black--650);
+  }
+
+  .isInterrupted & {
+    color: var(--color__yellow--650);
+  }
+
+  .isError & {
+    color: var(--color__red--650);
+  }
 }
 
 .statusDescription {
@@ -272,6 +248,7 @@
 
 .statusInformationIcon {
   margin-right: var(--size__050);
+  color: var(--color__black--650);
 }
 
 .hasErrorsIcon {
@@ -330,26 +307,35 @@
   transition: all 250ms cubic-bezier(0.65, 0, 0.35, 1);
 
   .isActive & {
-    background-color: var(--color__blue--100);
+    background-color: var(--color__blue--050);
 
     .wrapper:hover & {
-      background-color: var(--color__blue--150);
+      background-color: var(--color__blue--100);
     }
   }
 
-  .isPaused & {
-    background-color: var(--color__black--100);
+  .isError & {
+    background-color: var(--color__red--050);
 
     .wrapper:hover & {
-      background-color: var(--color__black--150);
+      background-color: var(--color__red--100);
+    }
+  }
+
+
+  .isPaused & {
+    background-color: var(--color__black--050);
+
+    .wrapper:hover & {
+      background-color: var(--color__black--100);
     }
   }
 
   .isInterrupted & {
-    background-color: var(--color__yellow--100);
+    background-color: var(--color__yellow--050);
 
     .wrapper:hover & {
-      background-color: var(--color__yellow--150);
+      background-color: var(--color__yellow--100);
     }
   }
 }

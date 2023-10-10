@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import MiddleEllipsis from 'react-middle-ellipsis'
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 
 import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
+import Tooltip from '../Tooltip/Tooltip'
 import DownloadItemActionButton from './DownloadItemActionButton'
 
 import downloadStates from '../../constants/downloadStates'
@@ -22,6 +25,7 @@ import * as styles from './DownloadItem.module.scss'
  * @property {String} downloadId The ID of the DownloadItem.
  * @property {String} itemName The name of the DownloadItem.
  * @property {Number} percent The download percent of the DownloadItem.
+ * @property {Boolean} progressBar Enables or disables the progress bar.
  * @property {Function} setCurrentPage A function which sets the active page.
  * @property {Function} setSelectedDownloadId A function which sets the setSelectedDownloadId.
  * @property {Boolean} shouldBeClickable Should the DownloadItem be clickable.
@@ -63,10 +67,10 @@ const DownloadItem = ({
   shouldBeClickable,
   state,
   primaryStatus,
+  progressBar,
   secondaryStatus,
   tertiaryStatus,
-  subStatus,
-  moreInfo
+  subStatus
 }) => {
   const [moreActionsOpen, setMoreActionsOpen] = useState(false)
 
@@ -132,7 +136,10 @@ const DownloadItem = ({
       className={
         classNames([
           styles.wrapper,
-          styles[createVariantClassName(stateForClassName)]
+          styles[createVariantClassName(stateForClassName)],
+          {
+            [styles.isWithoutProgress]: !progressBar
+          }
         ])
       }
       data-testid="download-item"
@@ -152,13 +159,27 @@ const DownloadItem = ({
         {...accessibleEventProps}
       >
         <header className={styles.header}>
-          <h3
-            className={styles.name}
-            data-testid="download-item-name"
+          <Tooltip
+            content={itemName}
+            delayDuration={500}
           >
-            {itemName}
-          </h3>
-
+            <h3
+              className={styles.name}
+              data-testid="download-item-name"
+            >
+              <VisuallyHidden.Root>
+                {itemName}
+              </VisuallyHidden.Root>
+              <MiddleEllipsis key={itemName}>
+                <span
+                  className={styles.downloadLocationText}
+                  aria-hidden="true"
+                >
+                  {itemName}
+                </span>
+              </MiddleEllipsis>
+            </h3>
+          </Tooltip>
           {
             subStatus && (
               <div className={styles.subMeta}>
@@ -170,10 +191,23 @@ const DownloadItem = ({
 
         <div className={styles.meta}>
           <div className={styles.metaPrimary}>
-            {primaryStatus}
-            {secondaryStatus}
-            {tertiaryStatus}
-            {moreInfo}
+            <div className={styles.status}>
+              {
+                primaryStatus && (
+                  <div className={styles.primaryStatus}>{primaryStatus}</div>
+                )
+              }
+              {
+                secondaryStatus && (
+                  <div className={styles.secondaryStatus}>{secondaryStatus}</div>
+                )
+              }
+              {
+                tertiaryStatus && (
+                  <div className={styles.tertiaryStatus}>{tertiaryStatus}</div>
+                )
+              }
+            </div>
           </div>
 
           {
@@ -189,18 +223,24 @@ const DownloadItem = ({
           }
         </div>
 
-        <div>
-          <Progress
-            className={styles.progress}
-            progress={percent}
-            state={state}
-          />
-        </div>
+        {
+          progressBar && (
+            <>
+              <div>
+                <Progress
+                  className={styles.progress}
+                  progress={percent}
+                  state={state}
+                />
+              </div>
 
-        <div
-          style={{ width: `${percent}%` }}
-          className={styles.progressBackground}
-        />
+              <div
+                style={{ width: `${percent}%` }}
+                className={styles.progressBackground}
+              />
+            </>
+          )
+        }
       </div>
     </li>
   )
@@ -212,6 +252,7 @@ DownloadItem.defaultProps = {
   setSelectedDownloadId: null,
   shouldBeClickable: false,
   primaryStatus: null,
+  progressBar: true,
   secondaryStatus: null,
   tertiaryStatus: null,
   subStatus: null,
@@ -234,6 +275,7 @@ DownloadItem.propTypes = {
   downloadId: PropTypes.string.isRequired,
   itemName: PropTypes.string.isRequired,
   percent: PropTypes.number.isRequired,
+  progressBar: PropTypes.bool,
   setCurrentPage: PropTypes.func,
   setSelectedDownloadId: PropTypes.func,
   shouldBeClickable: PropTypes.bool,

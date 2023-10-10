@@ -67,7 +67,7 @@ describe('MoreErrorInfo component', () => {
       })
 
       expect(screen.getByText(
-        'This download failed to find download links. Try creating a new download to download your files.'
+        'The links associated with the download were not able to be retrieved. Try initializing the download again to download your files.'
       )).toBeInTheDocument()
     })
   })
@@ -76,9 +76,9 @@ describe('MoreErrorInfo component', () => {
     test('displays the error message and button to the files', () => {
       setup()
 
-      expect(screen.getByText('3 files failed to download in')).toBeInTheDocument()
+      expect(screen.getByText('3 files were not able to be downloaded. If the problem persists, try initializing the download again to download your files.')).toBeInTheDocument()
 
-      expect(screen.getByRole('button', { name: 'mock-download-id' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'View Download' })).toBeInTheDocument()
     })
 
     test('clicking the downloadId button calls setCurrentPage, setSelectedDownloadId and closes the dialog', async () => {
@@ -99,7 +99,7 @@ describe('MoreErrorInfo component', () => {
         }
       ])
 
-      await user.click(screen.getByRole('button', { name: 'mock-download-id' }))
+      await user.click(screen.getByRole('button', { name: 'View Download' }))
 
       expect(setCurrentPage).toHaveBeenCalledTimes(1)
       expect(setCurrentPage).toHaveBeenCalledWith(PAGES.fileDownloads)
@@ -124,7 +124,7 @@ describe('MoreErrorInfo component', () => {
         }
       ])
 
-      await user.click(screen.getByRole('button', { name: /Retry Failed Files/i }))
+      await user.click(screen.getByRole('button', { name: /Retry/i }))
 
       expect(retryErroredDownloadItem).toHaveBeenCalledTimes(1)
       expect(retryErroredDownloadItem).toHaveBeenCalledWith({
@@ -135,7 +135,7 @@ describe('MoreErrorInfo component', () => {
       expect(deleteAllToastsById).toHaveBeenCalledWith('mock-download-id')
     })
 
-    test('clicking the Cancel All Errored button sends a message to the main process', async () => {
+    test('clicking the Cancel button sends a message to the main process', async () => {
       const user = userEvent.setup()
 
       const { cancelErroredDownloadItem, deleteAllToastsById } = setup([
@@ -149,7 +149,7 @@ describe('MoreErrorInfo component', () => {
         }
       ])
 
-      await user.click(screen.getByRole('button', { name: /Cancel Failed Files/i }))
+      await user.click(screen.getByRole('button', { name: /Cancel/i }))
 
       expect(cancelErroredDownloadItem).toHaveBeenCalledTimes(1)
       expect(cancelErroredDownloadItem).toHaveBeenCalledWith({

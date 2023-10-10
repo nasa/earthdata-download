@@ -89,24 +89,24 @@ afterEach(() => {
 })
 
 describe('DownloadHeader component', () => {
-  describe('when clicking the Pause All button', () => {
+  describe('when clicking the Pause button', () => {
     test('calls pauseDownloadItem', async () => {
       const { pauseDownloadItem } = setup()
 
-      const button = screen.getByRole('button', { name: 'Pause All' })
+      const button = screen.getByRole('button', { name: 'Pause' })
       await userEvent.click(button)
 
       expect(pauseDownloadItem).toHaveBeenCalledTimes(1)
     })
   })
 
-  describe('when clicking the Resume All button', () => {
+  describe('when clicking the Resume button', () => {
     test('calls resumeDownloadItem', async () => {
       const { resumeDownloadItem } = setup({
         state: downloadStates.paused
       })
 
-      const button = screen.getByRole('button', { name: 'Resume All' })
+      const button = screen.getByRole('button', { name: 'Resume' })
       await userEvent.click(button)
 
       expect(resumeDownloadItem).toHaveBeenCalledTimes(1)
@@ -122,11 +122,11 @@ describe('DownloadHeader component', () => {
       })
 
       expect(screen.getByText('Downloading')).toHaveClass('derivedStatus')
-      expect(screen.getByText('5 of 10 files done')).toHaveClass('humanizedStatus')
+      expect(screen.getByText('5 of 10 done')).toHaveClass('humanizedStatus')
 
-      expect(screen.getByRole('button', { name: 'Pause All' })).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Resume All' })).not.toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Cancel All' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Resume' })).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
     })
   })
 
@@ -138,12 +138,12 @@ describe('DownloadHeader component', () => {
         totalFiles: 10
       })
 
-      expect(screen.getByText('Completed')).toHaveClass('derivedStatus')
-      expect(screen.getByText('10 of 10 files done')).toHaveClass('humanizedStatus')
+      expect(screen.getByText('Complete')).toHaveClass('derivedStatus')
+      expect(screen.getByText('10 of 10 done')).toHaveClass('humanizedStatus')
 
-      expect(screen.queryByRole('button', { name: 'Pause All' })).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Resume All' })).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Cancel All' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Pause' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Resume' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
     })
   })
 
@@ -156,11 +156,11 @@ describe('DownloadHeader component', () => {
       })
 
       expect(screen.getByText('Paused')).toHaveClass('derivedStatus')
-      expect(screen.getByText('5 of 10 files done')).toHaveClass('humanizedStatus')
+      expect(screen.getByText('5 of 10 done')).toHaveClass('humanizedStatus')
 
-      expect(screen.queryByRole('button', { name: 'Pause All' })).not.toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Resume All' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Cancel All' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Pause' })).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Resume' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
     })
   })
 
@@ -280,7 +280,7 @@ describe('DownloadHeader component', () => {
         deleteAllToastsById
       } = setup()
 
-      const button = screen.getByRole('button', { name: 'Cancel All' })
+      const button = screen.getByRole('button', { name: 'Cancel' })
       await userEvent.click(button)
 
       expect(setCancellingDownload).toHaveBeenCalledTimes(1)
@@ -317,7 +317,7 @@ describe('DownloadHeader component', () => {
           undoCancellingDownload
         } = setup()
 
-        const button = screen.getByRole('button', { name: 'Cancel All' })
+        const button = screen.getByRole('button', { name: 'Cancel' })
         await userEvent.click(button)
 
         expect(toasts).toHaveLength(1)
@@ -356,7 +356,7 @@ describe('DownloadHeader component', () => {
         })
 
         await waitFor(async () => {
-          const button = screen.getByRole('button', { name: 'Cancel All' })
+          const button = screen.getByRole('button', { name: 'Cancel' })
           await userEvent.click(button)
         })
 

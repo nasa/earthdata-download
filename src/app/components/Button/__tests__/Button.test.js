@@ -88,4 +88,49 @@ describe('Button component', () => {
       expect(screen.queryByTestId('visually-hidden')).toBeInTheDocument()
     })
   })
+
+  describe('when the alignment is set to baseline', () => {
+    test('adds the classname', async () => {
+      render(
+        <Button
+          align="baseline"
+          onClick={() => {}}
+        >
+          Button Text
+        </Button>
+      )
+
+      expect(screen.queryByRole('button')).toHaveClass('isAlignBaseline')
+    })
+  })
+
+  describe('when the button is set to fullWidth', () => {
+    test('adds the classname', async () => {
+      render(
+        <Button
+          fullWidth
+          onClick={() => {}}
+        >
+          Button Text
+        </Button>
+      )
+
+      expect(screen.queryByRole('button')).toHaveClass('isFullWidth')
+    })
+  })
+
+  describe('when the naked is set to true', () => {
+    test('adds the classname', async () => {
+      render(
+        <Button
+          naked
+          onClick={() => {}}
+        >
+          Button Text
+        </Button>
+      )
+
+      expect(screen.queryByRole('button')).toHaveClass('isNaked')
+    })
+  })
 })

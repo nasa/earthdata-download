@@ -22,7 +22,7 @@ describe('DownloadHistoryListItemFileProgress component', () => {
   test('returns the progress', () => {
     setup()
 
-    expect(screen.getByText('5 files in 3 minutes, 54 seconds')).toHaveClass('statusInformation')
+    expect(screen.getByText('5 files in 3m, 54s')).toHaveClass('statusInformation')
   })
 
   describe('when the state is cancelled', () => {

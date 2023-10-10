@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { FaDownload } from 'react-icons/fa'
 
 import convertBytes from '../../utils/convertBytes'
 
@@ -34,13 +35,10 @@ const FileListItemSizeProgress = ({
 
   return (
     <div className={styles.statusInformationByteStats}>
-      <span>
-        {convertBytes(receivedBytes)}
-        /
-        {convertBytes(totalBytes)}
-        {' '}
-        downloaded
-      </span>
+      <FaDownload className={styles.statusInformationIcon} />
+      {convertBytes(receivedBytes)}
+      /
+      {convertBytes(totalBytes)}
     </div>
   )
 }

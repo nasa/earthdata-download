@@ -220,7 +220,8 @@ const DownloadHistoryListItem = ({
       state={state}
       itemName={downloadId}
       percent={percent}
-      primaryStatus={
+      progressBar={false}
+      secondaryStatus={
         (
           <DownloadHistoryListItemState
             state={state}
@@ -229,7 +230,7 @@ const DownloadHistoryListItem = ({
           />
         )
       }
-      secondaryStatus={
+      tertiaryStatus={
         (
           <DownloadHistoryListItemFileProgress
             finishedFiles={finishedFiles}

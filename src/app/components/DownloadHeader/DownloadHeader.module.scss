@@ -11,6 +11,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
+
   margin-right: var(--size__200);
   color: var(--color__black--650);
 
@@ -62,6 +63,13 @@
   font-size: var(--text__smaller);
   font-weight: 500;
   text-align: left;
+}
+
+.statusInformationIcon {
+  position: relative;
+  top: 0.1rem;
+  margin-right: var(--size__100);
+  color: var(--color__black--600);
 }
 
 @keyframes spinnerRotate {

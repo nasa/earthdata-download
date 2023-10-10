@@ -87,7 +87,6 @@ const DownloadHistoryHeader = () => {
     >
       <Button
         className={styles.headerButton}
-        size="sm"
         Icon={FaBan}
         variant="danger"
         onClick={onClickClearHistory}

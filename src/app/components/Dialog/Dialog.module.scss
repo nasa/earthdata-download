@@ -23,16 +23,23 @@ input {
 
 .closeButton {
   position: absolute;
-  top: var(--size__300);
+  top: var(--size__350);
   right: var(--size__500);
+
+  .hasHeaderIcon & {
+    top: var(--size__500);
+    border: 0;
+    text-align: center;
+  }
 }
 
 .header {
-  padding: var(--size__350) var(--size__500);
+  padding: var(--size__350) var(--size__600);
   border-bottom: 1px solid var(--color__black--300);
   text-align: left;
 
-  &.hasIcon {
+  .hasHeaderIcon & {
+    padding: var(--size__600) var(--size__600) 0;
     border: 0;
     text-align: center;
   }
@@ -64,27 +71,27 @@ input {
 }
 
 .innerContent {
-  padding: var(--size__500);
+  padding: var(--size__600);
   text-align: left;
 }
 
 .title {
-  margin: 0;
+  margin: 0 auto;
   color: var(--color__text--normal);
-  font-size: var(--text__larger);
+  font-size: var(--text__large);
   font-weight: 700;
 }
 
 .titleIcon {
   margin-bottom: var(--size__250);
-  color: var(--color__black--300);
+  color: var(--color__black--200);
   font-size: 3rem;
 }
 
 .description {
-  margin: 10px 0 20px;
+  margin: var(--size__250) 0 var(--size__250);
   color: var(--color__black--600);
-  font-size: 15px;
+  font-size: var(--text__normal);
   line-height: 1.5;
 }
 

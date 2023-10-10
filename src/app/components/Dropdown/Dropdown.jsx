@@ -78,7 +78,6 @@ const Dropdown = ({
         >
           <Button
             className={styles.action}
-            size="sm"
             Icon={FaEllipsisV}
             hideLabel
             tabIndex="0"

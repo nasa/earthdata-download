@@ -122,7 +122,7 @@ describe('ListPage', () => {
         totalItemCount: 1
       })
 
-      expect(screen.getByText('No Items remaining')).toBeInTheDocument()
+      expect(screen.getByText('All items complete')).toBeInTheDocument()
     })
   })
 })

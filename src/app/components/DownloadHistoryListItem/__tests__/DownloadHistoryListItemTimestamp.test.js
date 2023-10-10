@@ -19,7 +19,7 @@ describe('DownloadHistoryListItemTimestamp component', () => {
   test('returns the time', () => {
     setup()
 
-    expect(screen.getByText('Downloaded Sep 6, 2023 at 1:10:48 PM')).toBeInTheDocument()
+    expect(screen.getByText('Sep 6, 2023 at 1:10:48 PM')).toBeInTheDocument()
   })
 
   describe('when time does not exist', () => {

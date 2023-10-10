@@ -31,4 +31,14 @@ describe('FileListItemPercent component', () => {
       expect(container).toBeEmptyDOMElement()
     })
   })
+
+  describe('when the percent contains a decimal', () => {
+    test('returns the a rounded percent', () => {
+      setup({
+        percent: 42.2
+      })
+
+      expect(screen.getByText('42%')).toHaveClass('percentComplete')
+    })
+  })
 })

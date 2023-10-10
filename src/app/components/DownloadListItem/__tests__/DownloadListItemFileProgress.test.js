@@ -26,7 +26,7 @@ describe('DownloadListItemFileProgress component', () => {
   test('returns the percent', () => {
     setup()
 
-    expect(screen.getByText('5 of 10 files done in 3 minutes, 54 seconds')).toHaveClass('statusInformation')
+    expect(screen.getByText('5 of 10 done in 3m, 54s')).toHaveClass('statusInformation')
   })
 
   describe('when loadingMoreFiles is true', () => {
@@ -35,7 +35,7 @@ describe('DownloadListItemFileProgress component', () => {
         loadingMoreFiles: true
       })
 
-      expect(screen.getByText('5 files done in 3 minutes, 54 seconds (determining file count)')).toHaveClass('statusInformation')
+      expect(screen.getByText('5 done in 3m, 54s (determining file count)')).toHaveClass('statusInformation')
     })
   })
 
@@ -45,7 +45,7 @@ describe('DownloadListItemFileProgress component', () => {
         shouldShowTime: false
       })
 
-      expect(screen.getByText('5 of 10 files')).toHaveClass('statusInformation')
+      expect(screen.getByText('5 of 10')).toHaveClass('statusInformation')
     })
   })
 
@@ -55,7 +55,7 @@ describe('DownloadListItemFileProgress component', () => {
         shouldShowProgress: false
       })
 
-      expect(screen.getByText('done in 3 minutes, 54 seconds')).toHaveClass('statusInformation')
+      expect(screen.getByText('done in 3m, 54s')).toHaveClass('statusInformation')
     })
   })
 
@@ -67,7 +67,7 @@ describe('DownloadListItemFileProgress component', () => {
         shouldShowProgress: false
       })
 
-      expect(screen.getByText('Waiting for log in with Earthdata Login')).toHaveClass('statusInformation')
+      expect(screen.getByText('Waiting for log in').parentElement).toHaveClass('statusInformation')
     })
   })
 
@@ -79,7 +79,7 @@ describe('DownloadListItemFileProgress component', () => {
         shouldShowProgress: false
       })
 
-      expect(screen.getByText('Accept license agreement to continue')).toHaveClass('statusInformation')
+      expect(screen.getByText('Accept license agreement')).toHaveClass('statusInformation')
     })
   })
 

@@ -206,7 +206,7 @@ const Downloads = ({
       }
       Icon={FaDownload}
       items={items}
-      itemSize={97}
+      itemSize={91}
       listRef={listRef}
       totalItemCount={totalDownloads}
     />

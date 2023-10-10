@@ -28,7 +28,7 @@ const DownloadListItemPercent = ({
     <div
       className={styles.percentComplete}
     >
-      {percent}
+      {Math.round(percent)}
       %
     </div>
   )

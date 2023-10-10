@@ -155,6 +155,44 @@ describe('FileListItem component', () => {
     }), {})
   })
 
+  describe('when the item is complete', () => {
+    test('does not render the percentage', () => {
+      DownloadItem.mockImplementation(() => <div />)
+
+      setup({
+        file: {
+          ...file,
+          state: downloadStates.completed,
+          percent: 100
+        }
+      })
+
+      expect(DownloadItem).toHaveBeenCalledTimes(1)
+      expect(DownloadItem).toHaveBeenCalledWith(expect.objectContaining({
+        primaryStatus: false
+      }), {})
+    })
+  })
+
+  describe('when the percentage is 0', () => {
+    test('does not render the percentage', () => {
+      DownloadItem.mockImplementation(() => <div />)
+
+      setup({
+        file: {
+          ...file,
+          state: downloadStates.starting,
+          percent: 0
+        }
+      })
+
+      expect(DownloadItem).toHaveBeenCalledTimes(1)
+      expect(DownloadItem).toHaveBeenCalledWith(expect.objectContaining({
+        primaryStatus: false
+      }), {})
+    })
+  })
+
   describe('when clicking `Open File`', () => {
     test('calls openDownloadFolder', async () => {
       const { openDownloadFolder } = setup({

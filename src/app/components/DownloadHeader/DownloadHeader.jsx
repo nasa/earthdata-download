@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import {
   FaBan,
   FaCheckCircle,
+  FaFileDownload,
   FaPause,
   FaPlay,
   FaSpinner,
@@ -223,13 +224,14 @@ const DownloadHeader = ({
           }
         </span>
         <span className={styles.humanizedStatus}>
+          <FaFileDownload className={styles.statusInformationIcon} />
           {totalCompletedFiles}
           {' '}
           of
           {' '}
           {totalFiles}
           {' '}
-          files done
+          done
         </span>
       </div>
       <div className={styles.listHeaderSecondary}>
@@ -242,7 +244,6 @@ const DownloadHeader = ({
                     ? (
                       <Button
                         className={styles.headerButton}
-                        size="sm"
                         Icon={FaPause}
                         onClick={onPauseDownloadItem}
                       >
@@ -252,7 +253,6 @@ const DownloadHeader = ({
                     : (
                       <Button
                         className={styles.headerButton}
-                        size="sm"
                         Icon={FaPlay}
                         onClick={onResumeDownloadItem}
                       >
@@ -262,7 +262,6 @@ const DownloadHeader = ({
                 }
                 <Button
                   className={styles.headerButton}
-                  size="sm"
                   Icon={FaBan}
                   variant="danger"
                   onClick={onCancelDownloadItem}
@@ -274,7 +273,6 @@ const DownloadHeader = ({
             : (
               <Button
                 className={styles.headerButton}
-                size="sm"
                 Icon={FaBan}
                 variant="danger"
                 onClick={onClearDownloads}

@@ -138,10 +138,10 @@ body {
 
 .toastList {
   position: absolute;
-  right: 0;
   bottom: 0;
+  left: 0;
 
   @media (width >= 30em) {
-    max-width: 80%;
+    width: 30rem;
   }
 }

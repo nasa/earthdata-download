@@ -9,8 +9,9 @@
 
 .statusInformation {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   margin: 0;
+  color: var(--color__black--650);
   font-size: var(--text__smaller);
 }
 
@@ -29,5 +30,8 @@
 }
 
 .statusInformationIcon {
-  margin-right: var(--size__050);
+  position: relative;
+  top: 0.1rem;
+  margin-right: var(--size__100);
+  color: var(--color__black--650);
 }

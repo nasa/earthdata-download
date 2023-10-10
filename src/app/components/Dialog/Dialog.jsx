@@ -58,17 +58,13 @@ const Dialog = ({
   title,
   TitleIcon
 }) => {
-  const headerClassNames = classNames([
-    styles.header,
-    {
-      [styles.hasIcon]: TitleIcon
-    }
-  ])
-
   const contentClassNames = classNames([
     styles.content,
     {
       [styles.isLg]: size === 'lg'
+    },
+    {
+      [styles.hasHeaderIcon]: TitleIcon
     }
   ])
 
@@ -84,10 +80,11 @@ const Dialog = ({
           <RadixDialog.Content
             className={contentClassNames}
             onEscapeKeyDown={onEscapeKeyDown}
+            onOpenAutoFocus={(e) => e.preventDefault()}
             onPointerDownOutside={onPointerDownOutside}
             onInteractOutside={onInteractOutside}
           >
-            <header className={headerClassNames}>
+            <header className={styles.header}>
               {
                 showTitle
                   ? (

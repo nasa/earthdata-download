@@ -182,7 +182,7 @@ const Layout = () => {
         newDownloadIds.forEach((downloadId) => {
           addToast({
             id: `new-download-${downloadId}`,
-            title: 'New Download',
+            title: 'Download started',
             message: downloadId,
             numberErrors: 0
           })
@@ -446,8 +446,6 @@ const Layout = () => {
 
       <main className={styles.main}>
         {pageComponent}
-
-        {/* TODO Trevor toastList maxWidth 80% is covering up click/scroll events on DownloadItems under the toast */}
         <ToastList
           className={styles.toastList}
           dismissToast={onDismissToast}
@@ -489,9 +487,10 @@ const Layout = () => {
 
         <Dialog
           open={moreErrorInfoIsOpen}
+          closeButton
           setOpen={setMoreErrorInfoIsOpen}
           showTitle
-          title="Errors occurred while downloading files"
+          title={`An error occurred in ${moreInfoDownloadId}`}
           TitleIcon={FaExclamationCircle}
         >
           <MoreErrorInfo

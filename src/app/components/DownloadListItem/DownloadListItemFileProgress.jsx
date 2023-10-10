@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { FaInfoCircle } from 'react-icons/fa'
-import humanizeDuration from 'humanize-duration'
+import { FaFileDownload, FaInfoCircle } from 'react-icons/fa'
 
 import downloadStates from '../../constants/downloadStates'
 import commafy from '../../utils/commafy'
+import humanizeDuration from '../../utils/humanizeDuration'
 
 import Tooltip from '../Tooltip/Tooltip'
 
@@ -57,21 +57,15 @@ const DownloadListItemFileProgress = ({
     <div className={styles.statusDescription}>
       <p className={styles.statusInformation}>
         {
+          state !== downloadStates.waitingForAuth && (
+            <FaFileDownload className={styles.statusInformationIcon} />
+          )
+        }
+        {
           shouldShowProgress && (
             <>
               {commafy(finishedFiles)}
-              {
-                !loadingMoreFiles && (
-                  <>
-                    {' '}
-                    of
-                    {' '}
-                    {commafy(totalFiles)}
-                  </>
-                )
-              }
-              {' '}
-              files
+              {!loadingMoreFiles && ` of ${commafy(totalFiles)}`}
             </>
           )
         }
@@ -82,12 +76,7 @@ const DownloadListItemFileProgress = ({
                 {' '}
                 done in
                 {' '}
-                {
-                  humanizeDuration(totalTime, {
-                    largest: 2,
-                    round: 1
-                  })
-                }
+                {humanizeDuration(totalTime)}
               </>
             )
           )
@@ -102,36 +91,34 @@ const DownloadListItemFileProgress = ({
         }
         {
           state === downloadStates.waitingForAuth && (
-            <>
-              {' '}
-              Waiting for log in with Earthdata Login
-              {' '}
-              <Tooltip
-                content="This download requires authentication with Earthdata Login. If your browser did not automatically open, click Log In."
-              >
+            <Tooltip
+              content="This download requires authentication with Earthdata Login. If your browser did not automatically open, click Log In."
+            >
+              <span>
+                Waiting for log in
+                {' '}
                 <span className={styles.statusInformationTooltip}>
                   <FaInfoCircle className={styles.statusInformationIcon} />
                   <span>More Info</span>
                 </span>
-              </Tooltip>
-            </>
+              </span>
+            </Tooltip>
           )
         }
         {
           state === downloadStates.waitingForEula && (
-            <>
-              {' '}
-              Accept license agreement to continue
-              {' '}
-              <Tooltip
-                content="Accept the license agreement to access the data you've requested. If your browser did not automatically open, click View & Accept License Agreement."
-              >
+            <Tooltip
+              content="Accept the license agreement to access the data you've requested. If your browser did not automatically open, click View & Accept License Agreement."
+            >
+              <>
+                Accept license agreement
+                {' '}
                 <span className={styles.statusInformationTooltip}>
                   <FaInfoCircle className={styles.statusInformationIcon} />
                   <span>More Info</span>
                 </span>
-              </Tooltip>
-            </>
+              </>
+            </Tooltip>
           )
         }
       </p>

@@ -28,13 +28,9 @@ body {
   color: var(--color__black--800);
   font-size: var(--size__500);
   font-weight: 400;
-  letter-spacing: calc(1em * 0.005);
-  line-height: 1.425rem;
+  letter-spacing: 0.01rem;
+  line-height: 1.5;
   text-align: center;
-}
-
-p {
-  letter-spacing: calc(1em * -0.002);
 }
 
 .root {

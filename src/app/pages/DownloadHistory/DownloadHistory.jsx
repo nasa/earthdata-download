@@ -205,7 +205,7 @@ const DownloadHistory = ({
       }
       Icon={FaHistory}
       items={items}
-      itemSize={127}
+      itemSize={87}
       listRef={listRef}
       totalItemCount={totalDownloads}
     />

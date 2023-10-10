@@ -2,11 +2,11 @@
 
 .item {
   padding: var(--size__100) var(--size__300) ;
-  font-weight: 500;
   color: var(--color__black--800);
-  font-size: var(--text__smaller);
-  text-align: left;
   cursor: pointer;
+  font-size: var(--text__smaller);
+  font-weight: 500;
+  text-align: left;
   transition: background-color 0.5s var(--animation__spring);
 }
 

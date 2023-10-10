@@ -23,7 +23,7 @@ describe('FileListItemTimeRemaining component', () => {
   test('returns the remaining time', () => {
     setup()
 
-    expect(screen.getByText('2 minutes, 3 seconds remaining').parentElement).toHaveClass('statusDescription')
+    expect(screen.getByText('2m, 3s remaining').parentElement).toHaveClass('statusDescription')
   })
 
   test('returns the state', () => {
@@ -43,6 +43,16 @@ describe('FileListItemTimeRemaining component', () => {
       })
 
       expect(container).toBeEmptyDOMElement()
+    })
+  })
+
+  describe('when the item is complete', () => {
+    test('returns the remaining time', () => {
+      const { container } = setup({
+        state: downloadStates.completed
+      })
+
+      expect(container.querySelector('.statusDescriptionIcon')).toBeInTheDocument()
     })
   })
 })

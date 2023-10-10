@@ -4,7 +4,7 @@ import * as RadixToast from '@radix-ui/react-toast'
 import classNames from 'classnames'
 import {
   FaCheckCircle,
-  FaExclamationTriangle,
+  FaExclamationCircle,
   FaInfoCircle,
   FaSpinner,
   FaTimes
@@ -77,7 +77,7 @@ const Toast = ({
       }
       {
         variant === 'danger' && (
-          <FaExclamationTriangle className={styles.icon} />
+          <FaExclamationCircle className={styles.icon} />
         )
       }
       {

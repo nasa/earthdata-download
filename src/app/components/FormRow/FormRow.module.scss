@@ -5,7 +5,6 @@
 .label {
   font-size: var(--text__large);
   font-weight: 600;
-  letter-spacing: -0.005rem;
   line-height: var(--size__700);
   text-align: left;
 }
@@ -13,4 +12,5 @@
 .description {
   margin: 0;
   margin-bottom: var(--size__350);
+  font-size: var(--text__normal);
 }

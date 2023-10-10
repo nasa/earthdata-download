@@ -1,9 +1,20 @@
 .message {
-  margin-bottom: var(--size__250);
+  font-size: var(--text__normal);
+  text-align: center;
+}
+
+.emphasis {
+  margin: 0;
+  margin-bottom: var(--size__300);
+  font-size: var(--text__normal);
   text-align: center;
 }
 
 .actions {
+  padding: var(--size__300);
+  border-radius: var(--size__100);
+  margin-top: var(--size__600);
+  background-color: var(--color__black--050);
   text-align: center;
 }
 
@@ -13,4 +24,8 @@
   &:last-child {
     margin-right: 0;
   }
+}
+
+.primaryButton {
+  margin-top: var(--size__500);
 }

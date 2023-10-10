@@ -23,9 +23,11 @@ describe('DownloadHistoryListItemState component', () => {
     test('returns the state', () => {
       setup()
 
-      const status = screen.getByText('Completed')
+      const status = screen.getByText('Complete')
       expect(status).toHaveClass('displayStatus')
       expect(status.childNodes[0]).toHaveClass('statusDescriptionIcon')
+      expect(status.childNodes[1]).toHaveTextContent('Complete')
+      expect(status.childNodes[3]).not.toBeDefined()
     })
   })
 
@@ -35,10 +37,11 @@ describe('DownloadHistoryListItemState component', () => {
         hasErrors: true
       })
 
-      const status = screen.getByText('Completed with errors')
+      const status = screen.getByText('Complete')
       expect(status).toHaveClass('displayStatus')
       expect(status.childNodes[0]).toHaveClass('statusDescriptionIcon')
-      expect(status.childNodes[1]).toHaveClass('hasErrorsIcon')
+      expect(status.childNodes[1]).toHaveTextContent('Complete')
+      expect(status.childNodes[2]).toHaveClass('hasErrorsIcon')
     })
   })
 })

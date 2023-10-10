@@ -32,6 +32,16 @@ describe('Dialog component', () => {
 
       expect(screen.queryByText('Test Dialog Content')).toBeInTheDocument()
     })
+
+    test('does not focus on the first element in the modal', () => {
+      render(
+        <Dialog open>
+          <button type="button">No focus</button>
+        </Dialog>
+      )
+
+      expect(screen.queryByRole('button')).not.toHaveFocus()
+    })
   })
 
   describe('when showTitle is set', () => {
@@ -80,6 +90,24 @@ describe('Dialog component', () => {
       )
 
       expect(IconMock).toHaveBeenCalledTimes(1)
+    })
+
+    test('adds the classname to the content', () => {
+      const IconMock = jest.fn()
+
+      render(
+        <Dialog
+          open
+          TitleIcon={IconMock}
+          showTitle
+        >
+          Test Dialog Content
+        </Dialog>
+      )
+
+      const dialog = screen.queryByRole('dialog')
+
+      expect(dialog).toHaveClass('hasHeaderIcon')
     })
   })
 

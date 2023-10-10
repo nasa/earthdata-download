@@ -5,7 +5,7 @@
   height: 1.75rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--color__black--350);
+  border: 1px solid var(--color__black--300);
   border-radius: 0.25rem;
   -webkit-app-region: no-drag;
   background-color: var(--color__black--050);
@@ -31,7 +31,7 @@
 
   &:hover,
   &:focus-visible {
-    border: 1px solid var(--color__black--450);
+    border: 1px solid var(--color__black--400);
     background-color: var(--color__black--100);
     color: var(--color__black--900);
   }
@@ -47,6 +47,18 @@
     color: var(--color__black--600);
     cursor: not-allowed;
     opacity: 0.7;
+  }
+
+  &.isSm {
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0 var(--size__100);
+    font-size: var(--text__small);
+
+    &.hasLabel {
+      width: auto;
+      padding: 0 var(--size__100);
+    }
   }
 
   &.isLg {
@@ -71,6 +83,14 @@
       background-color: rgba(0 0 0 / 25%);
       color: rgba(0 0 0 / 32.5%);
     }
+  }
+
+  &.isAlignBaseline {
+    align-items: baseline;
+  }
+
+  &.isFullWidth {
+    width: 100%;
   }
 
   &.primary {
@@ -109,6 +129,17 @@
       color: var(--color__red--650);
     }
   }
+
+  &.isNaked {
+    height: auto;
+    padding: 0 var(--size__050);
+    border-color: transparent;
+    background-color: transparent;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 .icon {
@@ -116,5 +147,10 @@
 
   .hasLabel & {
     margin-right: var(--size__100);
+  }
+
+  .isAlignBaseline & {
+    position: relative;
+    top: 0.125rem;
   }
 }

@@ -3,15 +3,15 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import { ToastProvider, ToastViewport } from '@radix-ui/react-toast'
-import { FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa'
+import { FaExclamationCircle, FaInfoCircle } from 'react-icons/fa'
 
 import AppContext from '../../../context/AppContext'
 
 import Toast from '../Toast'
 
 jest.mock('react-icons/fa', () => ({
-  FaExclamationTriangle: jest.fn(() => (
-    <mock-FaExclamationTriangle data-testid="FaExclamationTriangle" />
+  FaExclamationCircle: jest.fn(() => (
+    <mock-FaExclamationCircle data-testid="FaExclamationCircle" />
   )),
   FaInfoCircle: jest.fn(() => (
     <mock-FaInfoCircle data-testid="FaInfoCircle" />
@@ -129,7 +129,7 @@ describe('Toast component', () => {
         </ToastProvider>
       )
 
-      expect(FaExclamationTriangle).toHaveBeenCalledTimes(1)
+      expect(FaExclamationCircle).toHaveBeenCalledTimes(1)
     })
   })
 

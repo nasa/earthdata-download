@@ -255,9 +255,13 @@ const FileListItem = ({
       state={state}
       primaryStatus={
         (
-          <FileListItemPercent
-            percent={percent}
-          />
+          state !== downloadStates.completed
+          && percent > 0
+          && (
+            <FileListItemPercent
+              percent={percent}
+            />
+          )
         )
       }
       secondaryStatus={

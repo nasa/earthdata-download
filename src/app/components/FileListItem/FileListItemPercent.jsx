@@ -26,7 +26,7 @@ const FileListItemPercent = ({
 
   return (
     <div className={styles.percentComplete}>
-      {percent}
+      {Math.round(percent)}
       %
     </div>
   )

@@ -4,13 +4,15 @@ import {
   FaBan,
   FaCheckCircle,
   FaChevronLeft,
+  FaClipboard,
   FaExclamationCircle,
+  FaFolder,
+  FaFolderOpen,
   FaPause,
   FaPlay,
   FaSpinner,
   FaUndo
 } from 'react-icons/fa'
-import humanizeDuration from 'humanize-duration'
 import MiddleEllipsis from 'react-middle-ellipsis'
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import classNames from 'classnames'
@@ -20,6 +22,7 @@ import useAppContext from '../../hooks/useAppContext'
 import Button from '../Button/Button'
 import Checkbox from '../Checkbox/Checkbox'
 import Progress from '../Progress/Progress'
+import Tooltip from '../Tooltip/Tooltip'
 
 import { ElectronApiContext } from '../../context/ElectronApiContext'
 
@@ -30,6 +33,7 @@ import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 
 import createVariantClassName from '../../utils/createVariantClassName'
 import commafy from '../../utils/commafy'
+import humanizeDuration from '../../utils/humanizeDuration'
 
 import * as styles from './FileDownloadsHeader.module.scss'
 
@@ -68,6 +72,8 @@ const FileDownloadsHeader = ({
   } = appContext
   const {
     cancelDownloadItem,
+    copyDownloadPath,
+    openDownloadFolder,
     pauseDownloadItem,
     resumeDownloadItem,
     setCancellingDownload,
@@ -178,7 +184,7 @@ const FileDownloadsHeader = ({
     fileProgressMessage += ` of ${commafy(totalFiles)}`
   }
 
-  fileProgressMessage += ` files completed in ${humanizeDuration(elapsedTime, {
+  fileProgressMessage += ` files downloaded in ${humanizeDuration(elapsedTime, {
     largest: 2,
     round: true
   })}`
@@ -236,6 +242,10 @@ const FileDownloadsHeader = ({
               )
             }
 
+            <span className={styles.status}>
+              {getHumanizedDownloadStates(state, percent, hasErrors)}
+            </span>
+
             {
               hasErrors && (
                 <FaExclamationCircle
@@ -243,35 +253,25 @@ const FileDownloadsHeader = ({
                 />
               )
             }
-            <span className={styles.status}>
-              {getHumanizedDownloadStates(state, percent, hasErrors)}
-            </span>
 
-            <span className={styles.statusPercent}>
-              {percent}
-              %
-            </span>
           </div>
         </div>
 
-        <div>
+        <div className={styles.progressMeta}>
           <div className={styles.progressFiles}>
             {fileProgressMessage}
           </div>
 
           <div className={styles.progressRemaining}>
-            {/* TODO Trevor this makes the progress bar jump up when the remaining time should not be displayed */}
             {!isComplete && remainingTimeMessage}
           </div>
         </div>
 
         <div className={styles.actions}>
           {
-            // TODO Trevor when completed, file progress jumps to the right of the page because no buttons are visible
             shouldShowResume && (
               <Button
                 className={styles.actionsButton}
-                size="sm"
                 Icon={FaPlay}
                 onClick={() => onResumeDownloadItem(downloadId)}
               >
@@ -283,7 +283,6 @@ const FileDownloadsHeader = ({
             shouldShowPause && (
               <Button
                 className={styles.actionsButton}
-                size="sm"
                 Icon={FaPause}
                 onClick={() => onPauseDownloadItem(downloadId)}
               >
@@ -295,7 +294,6 @@ const FileDownloadsHeader = ({
             shouldShowCancel && (
               <Button
                 className={styles.actionsButton}
-                size="sm"
                 Icon={FaBan}
                 variant="danger"
                 onClick={() => onCancelDownloadItem(downloadId)}
@@ -304,10 +302,35 @@ const FileDownloadsHeader = ({
               </Button>
             )
           }
+
+          {
+            state === downloadStates.completed && (
+              <>
+                <Button
+                  className={styles.actionsButton}
+                  Icon={FaFolderOpen}
+                  onClick={() => openDownloadFolder({ downloadId })}
+                >
+                  Open Folder
+                </Button>
+                <Button
+                  className={styles.actionsButton}
+                  Icon={FaClipboard}
+                  onClick={() => copyDownloadPath({ downloadId })}
+                >
+                  Copy Path
+                </Button>
+              </>
+            )
+          }
         </div>
       </div>
 
       <div className={styles.progressBarWrapper}>
+        <span className={styles.statusPercent}>
+          {Math.round(percent)}
+          %
+        </span>
         <Progress
           className={styles.progressBar}
           progress={percent}
@@ -316,30 +339,29 @@ const FileDownloadsHeader = ({
       </div>
 
       <div className={styles.footer}>
-        <div className={styles.downloadLocation}>
-          <VisuallyHidden.Root>
-            <span>
-              Downloading to
-              {' '}
+        <Tooltip
+          content={downloadLocation}
+        >
+          <div className={styles.downloadLocation}>
+            <FaFolder className={styles.downloadLocationIcon} />
+            {' '}
+            <VisuallyHidden.Root>
               {downloadLocation}
-            </span>
-          </VisuallyHidden.Root>
-
-          <MiddleEllipsis key={downloadLocation}>
-            <span
-              className={styles.downloadLocationText}
-              aria-hidden="true"
-            >
-              Downloading to
-              {' '}
-              {downloadLocation}
-            </span>
-          </MiddleEllipsis>
-        </div>
+            </VisuallyHidden.Root>
+            <MiddleEllipsis key={downloadLocation}>
+              <span
+                className={styles.downloadLocationText}
+                aria-hidden="true"
+              >
+                {downloadLocation}
+              </span>
+            </MiddleEllipsis>
+          </div>
+        </Tooltip>
         <div className={styles.footerSecondary}>
           <Checkbox
             id="hideCompleted"
-            label="Hide Completed"
+            label="Hide Complete"
             onChange={
               () => {
                 setHideCompleted(!hideCompleted)

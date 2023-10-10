@@ -26,19 +26,37 @@
 }
 
 .progress {
-  display: flex;
+  display: grid;
   width: 100%;
   align-items: center;
   justify-content: space-between;
   padding: var(--size__200);
+  padding-bottom: 0;
   padding-left: var(--size__300);
-}
+  grid-template:
+    [row1-start] "status-description actions" auto [row1-end]
+    [row2-start] "progress-meta progress-meta" auto [row2-end]
+    [row2-start] "progress-bar progress-bar" auto [row2-end]
+    / auto auto;
+  row-gap: 0.75rem;
 
+  @media (width >= 43em) {
+    padding-bottom: var(--size__200);
+    grid-template:
+    [row1-start] "status-description progress-meta actions" auto [row1-end]
+    / auto 1fr auto;
+  }
+}
 
 .statusDescription {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  grid-area: status-description;
+}
+
+.progressMeta {
+  grid-area: progress-meta;
 }
 
 .statusDescriptionPrimary {
@@ -80,12 +98,15 @@
 }
 
 .statusPercent {
-  font-weight: 400;
+  padding-left: var(--size__100);
+  margin-right: var(--size__150);
+  font-size: var(--text__small);
+  font-weight: 600;
 }
 
 .statusDescriptionIcon {
   flex-shrink: 0;
-  margin-right: var(--size__200);
+  margin-right: var(--size__100);
   font-size: var(--text__normal);
 
   &.spinner {
@@ -95,8 +116,8 @@
 
 .progressFiles {
   color: var(--color__blue--600);
-  font-weight: 500;
   font-size: var(--text__small);
+  font-weight: 500;
   line-height: 1.4;
 }
 
@@ -109,6 +130,7 @@
   display: flex;
   flex-shrink: 0;
   margin-left: var(--size__300);
+  grid-area: actions;
   text-align: center;
 }
 
@@ -123,6 +145,7 @@
 .progressBarWrapper {
   display: flex;
   width: 100%;
+  align-items: center;
   padding: 0 var(--size__200);
 }
 
@@ -135,7 +158,7 @@
   overflow: hidden;
   width: 100%;
   justify-content: space-between;
-  padding: var(--size__200) var(--size__300);
+  padding: var(--size__300) var(--size__300);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -150,9 +173,14 @@
 .downloadLocation {
   display: flex;
   overflow: hidden;
+  align-items: center;
   margin-right: var(--size__500);
-  color: var(--color__text--normal);
   font-size: var(--text__small);
+}
+
+.downloadLocationIcon {
+  margin-right: var(--size__150);
+  color: var(--color__black--500);
 }
 
 @keyframes spinnerRotate {

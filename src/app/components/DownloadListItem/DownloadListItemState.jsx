@@ -1,22 +1,23 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  FaCheckCircle,
-  FaExclamationCircle,
-  FaSpinner
-} from 'react-icons/fa'
-import classNames from 'classnames'
+import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa'
+import pluralize from '../../utils/pluralize'
 
 import getHumanizedDownloadStates from '../../constants/humanizedDownloadStates'
 import downloadStates from '../../constants/downloadStates'
+import useAccessibleEvent from '../../hooks/useAccessibleEvent'
 
 import * as styles from './DownloadListItemState.module.scss'
+import Tooltip from '../Tooltip/Tooltip'
+import Button from '../Button/Button'
 
 /**
  * @typedef {Object} DownloadListItemStateProps
- * @property {String} state The state of the download.
+ * @property {String} downloadId The id of the download.
+ * @property {Number} numberErrors The number of errors.
  * @property {Number} percent The download percent of the DownloadItem.
- * @property {Boolean} hasErrors Does the download have any errors.
+ * @property {Boolean} showMoreInfoDialog A function to open the error modal.
+ * @property {String} state The state of the download.
  */
 
 /**
@@ -33,48 +34,63 @@ import * as styles from './DownloadListItemState.module.scss'
  * )
  */
 const DownloadListItemState = ({
-  state,
+  downloadId,
+  numberErrors,
   percent,
-  hasErrors
-}) => (
-  <div
-    className={styles.displayStatus}
-  >
-    {
-      state === downloadStates.active && (
-        <FaSpinner
-          className={
-            classNames([
-              styles.statusDescriptionIcon,
-              styles.spinner
-            ])
-          }
-        />
-      )
-    }
-    {
-      state === downloadStates.completed && (
-        <FaCheckCircle className={styles.statusDescriptionIcon} />
-      )
-    }
-    {
-      hasErrors && (
-        <FaExclamationCircle
-          className={styles.hasErrorsIcon}
-        />
-      )
-    }
-    {getHumanizedDownloadStates(state, percent, hasErrors)}
-  </div>
-)
+  showMoreInfoDialog,
+  state
+}) => {
+  const accessibleEventProps = useAccessibleEvent((event) => {
+    event.stopPropagation()
+    showMoreInfoDialog({
+      downloadId,
+      numberErrors,
+      state
+    })
+  })
 
-DownloadListItemState.defaultProps = {
-  hasErrors: false
+  return (
+    <div
+      className={styles.displayStatus}
+    >
+      {
+        state === downloadStates.completed && (
+          <FaCheckCircle className={styles.statusDescriptionIcon} />
+        )
+      }
+      {getHumanizedDownloadStates(state, percent, numberErrors > 0)}
+      {
+        numberErrors > 0
+        && (
+          state !== downloadStates.waitingForAuth
+          && state !== downloadStates.waitingForEula
+        ) && (
+          <Tooltip
+            content="View more info"
+            delayDuration={300}
+          >
+            <Button
+              className={styles.hasErrorsButton}
+              align="baseline"
+              size="sm"
+              Icon={FaExclamationCircle}
+              naked
+              {...accessibleEventProps}
+            >
+              {`${numberErrors} ${pluralize('error', numberErrors)}`}
+            </Button>
+          </Tooltip>
+        )
+      }
+    </div>
+  )
 }
 
 DownloadListItemState.propTypes = {
-  hasErrors: PropTypes.bool,
+  downloadId: PropTypes.string.isRequired,
+  numberErrors: PropTypes.number.isRequired,
   percent: PropTypes.number.isRequired,
+  showMoreInfoDialog: PropTypes.func.isRequired,
   state: PropTypes.string.isRequired
 }
 

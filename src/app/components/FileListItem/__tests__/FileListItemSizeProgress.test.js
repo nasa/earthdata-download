@@ -21,7 +21,7 @@ describe('FileListItemSizeProgress component', () => {
   test('returns the size progress', () => {
     setup()
 
-    expect(screen.getByText('123 b/5 kb downloaded').parentElement).toHaveClass('statusInformationByteStats')
+    expect(screen.getByText('123 b/5 kb')).toHaveClass('statusInformationByteStats')
   })
 
   describe('when shouldShowBytes is false', () => {

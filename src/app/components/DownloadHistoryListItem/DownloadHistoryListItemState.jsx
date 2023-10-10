@@ -40,6 +40,7 @@ const DownloadHistoryListItemState = ({
         <FaCheckCircle className={styles.statusDescriptionIcon} />
       )
     }
+    {getHumanizedDownloadStates(state, percent, hasErrors)}
     {
       hasErrors && (
         <FaExclamationCircle
@@ -47,7 +48,6 @@ const DownloadHistoryListItemState = ({
         />
       )
     }
-    {getHumanizedDownloadStates(state, percent, hasErrors)}
   </div>
 )
 

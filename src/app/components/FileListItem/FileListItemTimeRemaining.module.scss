@@ -8,7 +8,27 @@
 
 .statusInformation {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   margin: 0;
-  font-size: var(--text__smaller);
+}
+
+.statusInformationIcon {
+  position: relative;
+  top: 0.1rem;
+  margin-right: var(--size__100);
+  color: var(--color__black--600);
+}
+
+.statusDescriptionIcon {
+  position: relative;
+  top: 0.1125rem;
+  margin-right: var(--size__100);
+
+  .isCompleted & {
+    color: var(--color__green--500);
+  }
+
+  &.spinner {
+    animation: spinnerRotate 2s linear infinite;
+  }
 }

@@ -1,9 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import humanizeDuration from 'humanize-duration'
+import { FaFileDownload } from 'react-icons/fa'
 
 import downloadStates from '../../constants/downloadStates'
 import commafy from '../../utils/commafy'
+import humanizeDuration from '../../utils/humanizeDuration'
 
 import * as styles from './DownloadHistoryListItemFileProgress.module.scss'
 
@@ -41,16 +42,12 @@ const DownloadHistoryListItemFileProgress = ({
   return (
     <div className={styles.statusDescription}>
       <p className={styles.statusInformation}>
+        <FaFileDownload className={styles.statusInformationIcon} />
         {commafy(finishedFiles)}
         {' '}
         files in
         {' '}
-        {
-          humanizeDuration(totalTime, {
-            largest: 2,
-            round: 1
-          })
-        }
+        {humanizeDuration(totalTime)}
       </p>
     </div>
   )

@@ -53,8 +53,8 @@ const createWindow = async () => {
   appWindow = new BrowserWindow({
     width: windowState.width,
     height: windowState.height,
-    minWidth: 400,
-    minHeight: 445,
+    minWidth: 450,
+    minHeight: 450,
     x: windowState.x,
     y: windowState.y,
     show: false,

@@ -23,6 +23,7 @@ import createVariantClassName from '../../utils/createVariantClassName'
  * @property {String} [rel] An optional string to be used as the `rel` attribute on a link. If passed, the button will be rendered as an <a> element.
  * @property {String} [size] An optional string which modifies the size of the button.
  * @property {String} [target] An optional string to be used as the `target` attribute on a link.
+ * @property {('slow')} [tooltipDelayDuration] An optional variant which modifies the visual appearance of the button.
  * @property {String} [variant] An optional variant which modifies the visual appearance of the button.
  * @property {...*} [rest] Any additional props will be spread as props onto the root element, which is important for allowing tooltips and other enhancements.
  */
@@ -133,7 +134,7 @@ const Button = forwardRef(({
     return (
       <Tooltip
         content={children}
-        delayDuration={tooltipDelayDuration}
+        duration={tooltipDelayDuration}
       >
         {button}
       </Tooltip>
@@ -161,7 +162,7 @@ Button.defaultProps = {
   rel: null,
   size: null,
   target: null,
-  tooltipDelayDuration: 0,
+  tooltipDelayDuration: 'default',
   variant: null
 }
 
@@ -185,7 +186,7 @@ Button.propTypes = {
   rel: PropTypes.string,
   size: PropTypes.string,
   target: PropTypes.string,
-  tooltipDelayDuration: PropTypes.number,
+  tooltipDelayDuration: PropTypes.oneOf(['default', 'slow']),
   variant: PropTypes.string
 }
 

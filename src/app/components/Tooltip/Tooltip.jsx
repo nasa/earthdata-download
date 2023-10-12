@@ -2,6 +2,8 @@ import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import * as RadixTooltip from '@radix-ui/react-tooltip'
 
+import delayDurations from '../../constants/delayDurations'
+
 import * as styles from './Tooltip.module.scss'
 
 /**
@@ -9,7 +11,7 @@ import * as styles from './Tooltip.module.scss'
  * @property {React.ReactNode} [additionalContent]  A React node to be used as the additional content for the tooltip.
  * @property {React.ReactNode} children A React node to be wrapped in the tooltip trigger.
  * @property {React.ReactNode} content A React node to be used as the content for the tooltip.
- * @property {Number} delayDuration A number representing the tooltip delay in milliseconds.
+ * @property {('slow')} [duration] A number representing the tooltip delay in milliseconds.
  * @property {Boolean} open A boolean representing the "open" state of the tooltip.
 */
 
@@ -23,6 +25,7 @@ import * as styles from './Tooltip.module.scss'
  *   <Tooltip
  *      content="I show on hover"
  *      additionalContent="Me too!"
+ *      duration="slow"
  *   >
  *      Hover me
  *   </Tooltip>
@@ -32,15 +35,17 @@ const Tooltip = forwardRef(({
   additionalContent,
   children,
   content,
-  delayDuration,
+  duration,
   open
 }, ref) => {
   const conditionalRootProps = {}
 
+  const tooltipDuration = delayDurations[duration]
+
   if (open) conditionalRootProps.open = true
 
   return (
-    <RadixTooltip.Provider delayDuration={delayDuration}>
+    <RadixTooltip.Provider delayDuration={tooltipDuration}>
       <RadixTooltip.Root {...conditionalRootProps} ref={ref}>
         <RadixTooltip.Trigger asChild>
           {children}
@@ -70,13 +75,13 @@ Tooltip.displayName = 'Tooltip'
 
 Tooltip.defaultProps = {
   additionalContent: null,
-  delayDuration: 0,
+  duration: 'default',
   open: null
 }
 
 Tooltip.propTypes = {
   additionalContent: PropTypes.node,
-  delayDuration: PropTypes.number,
+  duration: PropTypes.oneOf(['default', 'slow']),
   children: PropTypes.node.isRequired,
   content: PropTypes.node.isRequired,
   open: PropTypes.bool

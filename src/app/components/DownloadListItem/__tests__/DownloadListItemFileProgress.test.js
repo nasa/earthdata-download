@@ -5,6 +5,8 @@ import '@testing-library/jest-dom'
 import DownloadListItemFileProgress from '../DownloadListItemFileProgress'
 import downloadStates from '../../../constants/downloadStates'
 
+const fileIconLabel = 'A document with a downward facing arrow'
+
 const setup = (overrideProps = {}) => {
   const props = {
     finishedFiles: 5,
@@ -37,6 +39,16 @@ describe('DownloadListItemFileProgress component', () => {
 
       expect(screen.getByText('5 done in 3m, 54s (determining file count)')).toHaveClass('statusInformation')
     })
+
+    test('shows the file icon', () => {
+      setup({
+        loadingMoreFiles: true
+      })
+
+      const fileIcon = screen.queryByLabelText(fileIconLabel)
+
+      expect(fileIcon).toBeInTheDocument()
+    })
   })
 
   describe('when shouldShowTime is false', () => {
@@ -46,6 +58,16 @@ describe('DownloadListItemFileProgress component', () => {
       })
 
       expect(screen.getByText('5 of 10')).toHaveClass('statusInformation')
+    })
+
+    test('shows the file icon', () => {
+      setup({
+        loadingMoreFiles: true
+      })
+
+      const fileIcon = screen.queryByLabelText(fileIconLabel)
+
+      expect(fileIcon).toBeInTheDocument()
     })
   })
 
@@ -69,6 +91,18 @@ describe('DownloadListItemFileProgress component', () => {
 
       expect(screen.getByText('Waiting for log in').parentElement).toHaveClass('statusInformation')
     })
+
+    test('does not show the file icon', () => {
+      setup({
+        state: downloadStates.waitingForAuth,
+        shouldShowTime: false,
+        shouldShowProgress: false
+      })
+
+      const fileIcon = screen.queryByLabelText(fileIconLabel)
+
+      expect(fileIcon).not.toBeInTheDocument()
+    })
   })
 
   describe('when the state is waitingForEula', () => {
@@ -81,6 +115,18 @@ describe('DownloadListItemFileProgress component', () => {
 
       expect(screen.getByText('Accept license agreement')).toHaveClass('statusInformation')
     })
+
+    test('does not show the file icon', () => {
+      setup({
+        state: downloadStates.waitingForEula,
+        shouldShowTime: false,
+        shouldShowProgress: false
+      })
+
+      const fileIcon = screen.queryByLabelText(fileIconLabel)
+
+      expect(fileIcon).not.toBeInTheDocument()
+    })
   })
 
   describe('when the state is pending', () => {
@@ -90,6 +136,16 @@ describe('DownloadListItemFileProgress component', () => {
       })
 
       expect(container).toBeEmptyDOMElement()
+    })
+
+    test('does not show the file icon', () => {
+      setup({
+        state: downloadStates.pending
+      })
+
+      const fileIcon = screen.queryByLabelText(fileIconLabel)
+
+      expect(fileIcon).not.toBeInTheDocument()
     })
   })
 
@@ -101,6 +157,16 @@ describe('DownloadListItemFileProgress component', () => {
 
       expect(container).toBeEmptyDOMElement()
     })
+
+    test('does not show the file icon', () => {
+      setup({
+        state: downloadStates.error
+      })
+
+      const fileIcon = screen.queryByLabelText(fileIconLabel)
+
+      expect(fileIcon).not.toBeInTheDocument()
+    })
   })
 
   describe('when the state is errorFetchingLinks', () => {
@@ -110,6 +176,16 @@ describe('DownloadListItemFileProgress component', () => {
       })
 
       expect(container).toBeEmptyDOMElement()
+    })
+
+    test('does not show the file icon', () => {
+      setup({
+        state: downloadStates.errorFetchingLinks
+      })
+
+      const fileIcon = screen.queryByLabelText(fileIconLabel)
+
+      expect(fileIcon).not.toBeInTheDocument()
     })
   })
 })

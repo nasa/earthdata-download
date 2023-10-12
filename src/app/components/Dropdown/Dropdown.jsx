@@ -81,7 +81,6 @@ const Dropdown = ({
             Icon={FaEllipsisV}
             hideLabel
             tabIndex="0"
-            tooltipDelayDuration={300}
             {...accessibleEventProps}
           >
             More Actions

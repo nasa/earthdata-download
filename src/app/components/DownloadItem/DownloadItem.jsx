@@ -105,8 +105,7 @@ const DownloadItem = ({
                   Icon: action.icon,
                   hideLabel: true,
                   variant: action.variant,
-                  dataTestId: `download-item-${action.label}`,
-                  tooltipDelayDuration: 300
+                  dataTestId: `download-item-${action.label}`
                 }
               }
             />
@@ -161,7 +160,7 @@ const DownloadItem = ({
         <header className={styles.header}>
           <Tooltip
             content={itemName}
-            delayDuration={500}
+            duration="slow"
           >
             <h3
               className={styles.name}

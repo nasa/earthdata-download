@@ -4,7 +4,6 @@ import Layout from './components/Layout/Layout'
 
 import Providers from './providers/Providers/Providers'
 
-import 'simplebar-react/dist/simplebar.min.css'
 import 'inter-ui/inter.css'
 
 import './App.scss'

@@ -22,12 +22,6 @@
     background-color: transparent;
   }
 
-  // &::-webkit-scrollbar-track {
-  //   border: 0.09375rem solid transparent;
-  //   background-clip: padding-box;
-  //   background-color: transparent;
-  // }
-
   &::-webkit-scrollbar-thumb {
     border-radius: 1rem;
     border-right: 2px solid transparent;
@@ -113,9 +107,7 @@
 .actions {
   display: flex;
   width: auto;
-  flex-direction: column;
-  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
-  flex-wrap: wrap;
+  flex-flow: column wrap;
   align-items: center;
   margin-top: var(--size__500);
 }

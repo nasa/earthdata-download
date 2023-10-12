@@ -65,10 +65,7 @@ const DownloadListItemState = ({
           state !== downloadStates.waitingForAuth
           && state !== downloadStates.waitingForEula
         ) && (
-          <Tooltip
-            content="View more info"
-            delayDuration={300}
-          >
+          <Tooltip content="View more info">
             <Button
               className={styles.hasErrorsButton}
               align="baseline"

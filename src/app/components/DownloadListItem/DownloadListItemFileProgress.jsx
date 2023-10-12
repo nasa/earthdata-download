@@ -57,8 +57,14 @@ const DownloadListItemFileProgress = ({
     <div className={styles.statusDescription}>
       <p className={styles.statusInformation}>
         {
-          state !== downloadStates.waitingForAuth && (
-            <FaFileDownload className={styles.statusInformationIcon} />
+          state !== downloadStates.waitingForAuth
+          && state !== downloadStates.waitingForEula
+          && (
+            <FaFileDownload
+              className={styles.statusInformationIcon}
+              role="graphics-symbol"
+              aria-label="A document with a downward facing arrow"
+            />
           )
         }
         {

@@ -16,9 +16,9 @@ describe('humanizeDuration', () => {
       expect.objectContaining({
         largest: 2,
         round: 1,
-        language: 'shortEn',
+        language: 'abbreviatedEnglish',
         languages: {
-          shortEn: expect.objectContaining({
+          abbreviatedEnglish: expect.objectContaining({
             y: expect.any(Function),
             mo: expect.any(Function),
             w: expect.any(Function),
@@ -35,18 +35,18 @@ describe('humanizeDuration', () => {
     )
   })
 
-  test('the functions that define the custom shortEn language return the correct values', () => {
+  test('the functions that define the custom abbreviatedEnglish language return the correct values', () => {
     humanizeDuration(1234)
 
-    const shortEnConfig = hd.mock.calls[0][1].languages.shortEn
+    const abbreviatedEnglishConfig = hd.mock.calls[0][1].languages.abbreviatedEnglish
 
-    expect(shortEnConfig.y()).toEqual('y')
-    expect(shortEnConfig.mo()).toEqual('mo')
-    expect(shortEnConfig.w()).toEqual('w')
-    expect(shortEnConfig.d()).toEqual('d')
-    expect(shortEnConfig.h()).toEqual('h')
-    expect(shortEnConfig.m()).toEqual('m')
-    expect(shortEnConfig.s()).toEqual('s')
-    expect(shortEnConfig.ms()).toEqual('ms')
+    expect(abbreviatedEnglishConfig.y()).toEqual('y')
+    expect(abbreviatedEnglishConfig.mo()).toEqual('mo')
+    expect(abbreviatedEnglishConfig.w()).toEqual('w')
+    expect(abbreviatedEnglishConfig.d()).toEqual('d')
+    expect(abbreviatedEnglishConfig.h()).toEqual('h')
+    expect(abbreviatedEnglishConfig.m()).toEqual('m')
+    expect(abbreviatedEnglishConfig.s()).toEqual('s')
+    expect(abbreviatedEnglishConfig.ms()).toEqual('ms')
   })
 })

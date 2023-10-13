@@ -73,12 +73,26 @@ describe('MoreErrorInfo component', () => {
   })
 
   describe('when the state is not errorFetchingLinks', () => {
-    test('displays the error message and button to the files', () => {
-      setup()
+    describe('when a single error exists', () => {
+      test('displays the error message and button to the files', () => {
+        setup({
+          numberErrors: 1
+        })
 
-      expect(screen.getByText('3 files were not able to be downloaded. If the problem persists, try initializing the download again to download your files.')).toBeInTheDocument()
+        expect(screen.getByText('1 file was not able to be downloaded. If the problem persists, try initializing the download again to download your file.')).toBeInTheDocument()
 
-      expect(screen.getByRole('button', { name: 'View Download' })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'View Download' })).toBeInTheDocument()
+      })
+    })
+
+    describe('when multiple exists', () => {
+      test('displays the error message and button to the files', () => {
+        setup()
+
+        expect(screen.getByText('3 files were not able to be downloaded. If the problem persists, try initializing the download again to download your files.')).toBeInTheDocument()
+
+        expect(screen.getByRole('button', { name: 'View Download' })).toBeInTheDocument()
+      })
     })
 
     test('clicking the downloadId button calls setCurrentPage, setSelectedDownloadId and closes the dialog', async () => {

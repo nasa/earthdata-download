@@ -8,9 +8,9 @@ import hd from 'humanize-duration'
 export const humanizeDuration = (duration) => hd(duration, {
   largest: 2,
   round: 1,
-  language: 'shortEn',
+  language: 'abbreviatedEnglish',
   languages: {
-    shortEn: {
+    abbreviatedEnglish: {
       y: () => 'y',
       mo: () => 'mo',
       w: () => 'w',

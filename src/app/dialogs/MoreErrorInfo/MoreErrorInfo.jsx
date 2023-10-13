@@ -87,11 +87,8 @@ const MoreErrorInfo = ({
     <>
       <div className={styles.message}>
         <p>
-          {`${numberErrors} ${pluralize('file', numberErrors)} `}
-          were not able to be downloaded. If the problem persists,
-          {' '}
-          try initializing the download again to download your files.
-          {' '}
+          {`${numberErrors} ${pluralize('file', numberErrors)} ${numberErrors > 1 ? 'were' : 'was'} not able to be downloaded. `}
+          {`If the problem persists, try initializing the download again to download your ${pluralize('file', numberErrors)}.`}
         </p>
       </div>
       <div className={styles.actions}>

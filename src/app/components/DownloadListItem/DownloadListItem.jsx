@@ -10,6 +10,7 @@ import {
   FaUndo
 } from 'react-icons/fa'
 
+import metricsLogger from '../../logging/metricsLogger.ts'
 import downloadStates from '../../constants/downloadStates'
 import { UNDO_TIMEOUT } from '../../constants/undoTimeout'
 
@@ -200,6 +201,16 @@ const DownloadListItem = ({
       undoRestartingDownload({ restartId })
     }
 
+    metricsLogger({
+      eventType: 'DownloadRestart',
+      data: {
+        downloadId: download.downloadId,
+        percent: download.progress.percent,
+        finishedFiles: download.progress.finishedFiles,
+        totalFiles: download.progress.totalFiles
+      }
+    })
+
     // Show an `undo` toast
     addToast({
       id: toastId,
@@ -255,6 +266,16 @@ const DownloadListItem = ({
         downloadId
       })
     }
+
+    metricsLogger({
+      eventType: 'DownloadCancel',
+      data: {
+        downloadId: download.downloadId,
+        percent: download.progress.percent,
+        finishedFiles: download.progress.finishedFiles,
+        totalFiles: download.progress.totalFiles
+      }
+    })
 
     // Show an `undo` toast
     addToast({

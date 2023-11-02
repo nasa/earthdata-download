@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../app/constants/downloadStates'
+import metricsLogger from '../../app/logging/metricsLogger.ts'
 
 /**
  * Pauses a download and updates the database
@@ -17,6 +18,13 @@ const pauseDownloadItem = async ({
   const { downloadId, filename } = info
 
   currentDownloadItems.pauseItem(downloadId, filename)
+
+  metricsLogger({
+    eventType: 'DownloadPause',
+    data: {
+      currentDownloadItems
+    }
+  })
 
   if (downloadId && filename) {
     await database.createPauseByDownloadIdAndFilename(downloadId, filename)

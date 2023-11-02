@@ -4,6 +4,7 @@ import 'array-foreach-async'
 
 import downloadStates from '../../app/constants/downloadStates'
 import startNextDownload from '../utils/startNextDownload'
+import metricsLogger from '../../app/logging/metricsLogger.ts'
 
 /**
  * Resumes a download and updates the database
@@ -22,6 +23,13 @@ const resumeDownloadItem = async ({
   const { downloadId, filename } = info
 
   currentDownloadItems.resumeItem(downloadId, filename)
+
+  metricsLogger({
+    eventType: 'DownloadResume',
+    data: {
+      currentDownloadItems
+    }
+  })
 
   if (downloadId && filename) {
     await database.endPause(downloadId, filename)

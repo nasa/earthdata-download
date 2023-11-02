@@ -27,6 +27,7 @@ const resumeDownloadItem = async ({
   metricsLogger({
     eventType: 'DownloadResume',
     data: {
+      downloadId,
       currentDownloadItems
     }
   })

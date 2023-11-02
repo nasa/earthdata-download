@@ -21,15 +21,24 @@ const finishDownload = async ({
       state: downloadStates.completed
     })
 
-    metricsLogger({
-      eventType: 'DownloadComplete',
-      data: {
-        downloadId,
-        receivedBytes: item.getReceivedBytes(),
-        totalBytes: item.getTotalBytes(),
-        duration: ((Date.now() / 1000) - item.getStartTime()).toFixed(1)
-      }
-    })
+    const urlChain = item.getURLChain()
+    const lastUrl = urlChain.pop()
+
+    const fileCount = await database.getFileCountWhere({ downloadId })
+    if (item) {
+      metricsLogger({
+        eventType: 'DownloadComplete',
+        data: {
+          downloadId,
+          receivedBytes: item.getReceivedBytes(),
+          totalBytes: item.getTotalBytes(),
+          duration: ((Date.now() / 1000) - item.getStartTime()).toFixed(1),
+          filesDownloaded: fileCount,
+          filesFailed: notCompleteFilesCount,
+          usedEdl: lastUrl.includes('oauth/authorize')
+        }
+      })
+    }
   }
 }
 

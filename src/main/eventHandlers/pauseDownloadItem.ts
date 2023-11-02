@@ -18,10 +18,10 @@ const pauseDownloadItem = async ({
   const { downloadId, filename } = info
 
   currentDownloadItems.pauseItem(downloadId, filename)
-
   metricsLogger({
     eventType: 'DownloadPause',
     data: {
+      downloadId,
       currentDownloadItems
     }
   })

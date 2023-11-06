@@ -37,7 +37,7 @@ describe('metricsLogger', () => {
 
     await metricsLogger(event)
 
-    expect(axios.post).toHaveBeenCalledWith('http://localhost:3001/dev/edd_logger', {
+    expect(axios.post).toHaveBeenCalledWith('https://dycghwhsgr9el.cloudfront.net/edd_logger', {
       params: {
         eventType: 'DownloadComplete',
         data: {
@@ -92,7 +92,7 @@ describe('metricsLogger', () => {
 
     await metricsLogger(event)
 
-    expect(axios.post).toHaveBeenCalledWith('http://localhost:3001/dev/edd_logger', {
+    expect(axios.post).toHaveBeenCalledWith('https://dycghwhsgr9el.cloudfront.net/edd_logger', {
       params: {
         eventType: 'DownloadRestart',
         data: {
@@ -135,7 +135,7 @@ describe('metricsLogger', () => {
 
     await metricsLogger(event)
 
-    expect(axios.post).toHaveBeenCalledWith('http://localhost:3001/dev/edd_logger', {
+    expect(axios.post).toHaveBeenCalledWith('https://dycghwhsgr9el.cloudfront.net/edd_logger', {
       params: {
         eventType: 'DownloadComplete',
         data: {
@@ -201,7 +201,7 @@ describe('metricsLogger', () => {
 
     await metricsLogger(event)
 
-    expect(axios.post).toHaveBeenCalledWith('http://localhost:3001/dev/edd_logger', {
+    expect(axios.post).toHaveBeenCalledWith('https://dycghwhsgr9el.cloudfront.net/edd_logger', {
       params: {
         eventType: 'DownloadPause',
         data: {
@@ -296,7 +296,7 @@ describe('metricsLogger', () => {
 
     await metricsLogger(event)
 
-    expect(axios.post).toHaveBeenCalledWith('http://localhost:3001/dev/edd_logger', {
+    expect(axios.post).toHaveBeenCalledWith('https://dycghwhsgr9el.cloudfront.net/edd_logger', {
       params: {
         eventType: 'DownloadResume',
         data: {

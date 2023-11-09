@@ -4,7 +4,7 @@ import 'array-foreach-async'
 
 import downloadStates from '../../app/constants/downloadStates'
 import startNextDownload from '../utils/startNextDownload'
-import metricsLogger from '../../app/logging/metricsLogger.ts'
+import metricsLogger from '../utils/metricsLogger'
 
 /**
  * Resumes a download and updates the database
@@ -24,11 +24,26 @@ const resumeDownloadItem = async ({
 
   currentDownloadItems.resumeItem(downloadId, filename)
 
+  const resumingDownloads = await database.getAllDownloadsWhere({ state: downloadStates.paused })
+  let filesCompleted = 0
+  let filesInProgress = 0
+  const downloadIds = []
+  await Promise.all(
+    resumingDownloads.map(async (download) => {
+      downloadIds.push(download.id)
+      const report = await database.getDownloadReport(download.id)
+      filesCompleted += report.finishedFiles
+      filesInProgress += report.totalFiles - report.finishedFiles
+    })
+  )
+
   metricsLogger({
     eventType: 'DownloadResume',
     data: {
-      downloadId,
-      currentDownloadItems
+      downloadIds,
+      downloadCount: downloadIds.length,
+      filesCompleted,
+      filesInProgress
     }
   })
 

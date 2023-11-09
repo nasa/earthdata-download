@@ -393,6 +393,21 @@ class EddDatabase {
   }
 
   /**
+   * Returns count of files that are in the `paused` state for the given downloadId
+   * @param {String} downloadId Id of the download to count files.
+   */
+  async getPausedFilesCountByDownloadId(downloadId) {
+    const [result] = await this.db('files')
+      .count('id')
+      .where({ downloadId })
+      .where({ state: downloadStates.paused })
+
+    const { 'count(`id`)': number } = result
+
+    return number
+  }
+
+  /**
    * Returns count of files that are active for the given downloadId
    * @param {String} downloadId Id of the download to count files.
    */

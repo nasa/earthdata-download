@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../app/constants/downloadStates'
-import metricsLogger from '../../app/logging/metricsLogger.ts'
+import metricsLogger from '../utils/metricsLogger'
 
 /**
  * Pauses a download and updates the database
@@ -18,11 +18,27 @@ const pauseDownloadItem = async ({
   const { downloadId, filename } = info
 
   currentDownloadItems.pauseItem(downloadId, filename)
+
+  const pausingDownloads = await database.getAllDownloadsWhere({ state: downloadStates.active })
+  let filesCompleted = 0
+  let filesInProgress = 0
+  const downloadIds = []
+  await Promise.all(
+    pausingDownloads.map(async (download) => {
+      downloadIds.push(download.id)
+      const report = await database.getDownloadReport(download.id)
+      filesCompleted += report.finishedFiles
+      filesInProgress += report.totalFiles - report.finishedFiles
+    })
+  )
+
   metricsLogger({
     eventType: 'DownloadPause',
     data: {
-      downloadId,
-      currentDownloadItems
+      downloadIds,
+      downloadCount: downloadIds.length,
+      filesCompleted,
+      filesInProgress
     }
   })
 

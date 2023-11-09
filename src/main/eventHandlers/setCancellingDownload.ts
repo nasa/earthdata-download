@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../app/constants/downloadStates'
+import metricsLogger from '../utils/metricsLogger'
 
 /**
  * Adds a deleteId to the database
@@ -34,6 +35,16 @@ const setCancellingDownload = async ({
   }
 
   if (downloadId) {
+    const report = await database.getDownloadReport(downloadId)
+    metricsLogger({
+      eventType: 'DownloadCancel',
+      data: {
+        downloadId,
+        filesCompleted: report.finishedFiles,
+        filesInProgress: report.totalFiles
+      }
+    })
+
     const filesUpdateWhere = {
       downloadId
     }
@@ -53,6 +64,29 @@ const setCancellingDownload = async ({
   }
 
   if (!downloadId) {
+    const cancelledDownloads = await database.getAllDownloadsWhere({ state: downloadStates.active })
+    let filesCompleted = 0
+    let filesInProgress = 0
+    const cancelledDownloadIds = []
+    await Promise.all(
+      cancelledDownloads.map(async (download) => {
+        cancelledDownloadIds.push(download.id)
+        const report = await database.getDownloadReport(download.id)
+        filesCompleted += report.finishedFiles
+        filesInProgress += report.totalFiles - report.finishedFiles
+      })
+    )
+
+    metricsLogger({
+      eventType: 'DownloadCancelAll',
+      data: {
+        cancelledDownloadIds,
+        cancelledDownloadCount: cancelledDownloadIds.length,
+        filesCompleted,
+        filesInProgress
+      }
+    })
+
     // If no downloadId was given, add a pause for all active downloads
     await database.createPauseForAllActiveDownloads()
 

@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../app/constants/downloadStates'
+import metricsLogger from '../utils/metricsLogger'
 import startNextDownload from '../utils/startNextDownload'
 
 /**
@@ -24,6 +25,16 @@ const restartDownload = async ({
     filename,
     restartId
   } = info
+
+  const report = await database.getDownloadReport(downloadId)
+  metricsLogger({
+    eventType: 'DownloadRestart',
+    data: {
+      downloadId,
+      filesCompleted: report.finishedFiles,
+      filesInProgress: report.totalFiles
+    }
+  })
 
   await database.updateFilesWhere({
     restartId

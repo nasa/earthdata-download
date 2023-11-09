@@ -346,6 +346,34 @@ class EddDatabase {
   }
 
   /**
+   * Returns the sum of total bytes for files with the specified downloadId.
+   * @param {String} downloadId ID of the download to calculate total bytes sum.
+   */
+  async getTotalBytesSumByDownloadId(downloadId) {
+    const [result] = await this.db('files')
+      .sum('totalBytes as totalBytesSum')
+      .where({ downloadId })
+
+    const { totalBytesSum } = result
+
+    return totalBytesSum || 0
+  }
+
+  /**
+   * Returns the sum of received bytes for files with the specified downloadId.
+   * @param {String} downloadId ID of the download to calculate received bytes sum.
+   */
+  async getReceivedBytesSumByDownloadId(downloadId) {
+    const [result] = await this.db('files')
+      .sum('receivedBytes as receivedBytesSum')
+      .where({ downloadId })
+
+    const { receivedBytesSum } = result
+
+    return receivedBytesSum || 0
+  }
+
+  /**
    * Returns count of files that are not in the `completed` state for the given downloadId
    * @param {String} downloadId Id of the download to count files.
    */
@@ -565,6 +593,21 @@ class EddDatabase {
     const { pausesSum } = result
 
     return pausesSum
+  }
+
+  /**
+   * Returns the total download time for a given downloadId.
+   * @param {String} downloadId ID of the download to calculate total download time.
+   */
+  async getTotalDownloadTimeByDownloadId(downloadId) {
+    const download = await this.getDownloadById(downloadId)
+
+    const { timeStart, timeEnd } = download
+    const timeTaken = timeEnd - timeStart
+    const pausesSum = await this.getPausesSum(downloadId)
+    const totalDownloadTime = timeTaken - pausesSum
+
+    return totalDownloadTime
   }
 
   /**

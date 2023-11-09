@@ -86,8 +86,7 @@ const onDone = async ({
   // Finish the download
   await finishDownload({
     database,
-    downloadId,
-    item
+    downloadId
   })
 }
 

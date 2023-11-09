@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../../app/constants/downloadStates'
-import metricsLogger from '../../../app/logging/metricsLogger.ts'
+import metricsLogger from '../../utils/metricsLogger'
 
 /**
  * If no more files are not completed, mark the download as completed
@@ -11,8 +11,7 @@ import metricsLogger from '../../../app/logging/metricsLogger.ts'
  */
 const finishDownload = async ({
   database,
-  downloadId,
-  item
+  downloadId
 }) => {
   const notCompleteFilesCount = await database.getNotCompletedFilesCountByDownloadId(downloadId)
   if (notCompleteFilesCount === 0) {
@@ -21,24 +20,28 @@ const finishDownload = async ({
       state: downloadStates.completed
     })
 
-    const urlChain = item.getURLChain()
-    const lastUrl = urlChain.pop()
-
-    const fileCount = await database.getFileCountWhere({ downloadId })
-    if (item) {
-      metricsLogger({
-        eventType: 'DownloadComplete',
-        data: {
-          downloadId,
-          receivedBytes: item.getReceivedBytes(),
-          totalBytes: item.getTotalBytes(),
-          duration: ((Date.now() / 1000) - item.getStartTime()).toFixed(1),
-          filesDownloaded: fileCount,
-          filesFailed: notCompleteFilesCount,
-          usedEdl: lastUrl.includes('oauth/authorize')
-        }
-      })
-    }
+    const [
+      fileCount,
+      receivedBytes,
+      totalBytes,
+      downloadDuration
+    ] = await Promise.all([
+      database.getFileCountWhere({ downloadId }),
+      database.getReceivedBytesSumByDownloadId(downloadId),
+      database.getTotalBytesSumByDownloadId(downloadId),
+      database.getTotalDownloadTimeByDownloadId(downloadId)
+    ])
+    metricsLogger({
+      eventType: 'DownloadComplete',
+      data: {
+        downloadId,
+        receivedBytes,
+        totalBytes,
+        duration: (downloadDuration / 1000).toFixed(1),
+        filesDownloaded: fileCount,
+        filesFailed: notCompleteFilesCount
+      }
+    })
   }
 }
 

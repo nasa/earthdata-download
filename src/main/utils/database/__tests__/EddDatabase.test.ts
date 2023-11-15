@@ -1820,4 +1820,73 @@ describe('EddDatabase', () => {
       })
     })
   })
+
+  describe('getTotalBytesSumByDownloadId', () => {
+    test('returns correct sum of totalBytes for a downloadId', async () => {
+      const database = new EddDatabase('./')
+      const mockDownloadId = 'mock-download-id'
+
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toMatch(/sum/)
+        expect(query.bindings).toEqual([mockDownloadId])
+        query.response([{ totalBytesSum: 1024 }])
+      })
+
+      const result = await database.getTotalBytesSumByDownloadId(mockDownloadId)
+      expect(result).toEqual(1024)
+    })
+  })
+
+  describe('EddDatabase - getReceivedBytesSumByDownloadId', () => {
+    test('returns correct sum of receivedBytes for a downloadId', async () => {
+      const database = new EddDatabase('./')
+      const mockDownloadId = 'mock-download-id'
+
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toMatch(/sum/)
+        expect(query.bindings).toEqual([mockDownloadId])
+        query.response([{ receivedBytesSum: 2048 }])
+      })
+
+      const result = await database.getReceivedBytesSumByDownloadId(mockDownloadId)
+      expect(result).toEqual(2048)
+    })
+  })
+
+  describe('EddDatabase - getPausedFilesCountByDownloadId', () => {
+    test('returns count of paused files for a given downloadId', async () => {
+      const database = new EddDatabase('./')
+      const mockDownloadId = 'mock-download-id'
+
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toMatch(/count/)
+        expect(query.bindings).toEqual([mockDownloadId, downloadStates.paused])
+        query.response([{ 'count(`id`)': 3 }])
+      })
+
+      const result = await database.getPausedFilesCountByDownloadId(mockDownloadId)
+      expect(result).toEqual(3)
+    })
+  })
+
+  describe('EddDatabase - getTotalDownloadTimeByDownloadId', () => {
+    test('calculates total download time for a given downloadId', async () => {
+      const database = new EddDatabase('./')
+      const mockDownloadId = 'mock-download-id'
+      const mockTimeStart = 1000
+      const mockTimeEnd = 5000
+      const mockPausesSum = 1000
+      const expectedTotalDownloadTime = mockTimeEnd - mockTimeStart - mockPausesSum
+
+      jest.spyOn(database, 'getDownloadById').mockResolvedValue({
+        timeStart: mockTimeStart,
+        timeEnd: mockTimeEnd
+      })
+
+      jest.spyOn(database, 'getPausesSum').mockResolvedValue(mockPausesSum)
+
+      const result = await database.getTotalDownloadTimeByDownloadId(mockDownloadId)
+      expect(result).toEqual(expectedTotalDownloadTime)
+    })
+  })
 })

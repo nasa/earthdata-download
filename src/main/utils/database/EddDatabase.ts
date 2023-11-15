@@ -115,6 +115,24 @@ class EddDatabase {
   }
 
   /**
+   * Returns statstics for a completed download.
+   * @param {String} downloadId downloadId for download.
+   */
+  async getDownloadStatistics(downloadId) {
+    const result = await this.db('files')
+      .select(
+        this.db.raw('COUNT(id) as fileCount'),
+        this.db.raw('SUM(receivedBytes) as receivedBytesSum'),
+        this.db.raw('SUM(totalBytes) as totalBytesSum'),
+        this.db.raw('(IFNULL(MAX(timeEnd), UNIXEPOCH() * 1000) - MIN(timeStart)) as totalDownloadTime')
+      )
+      .where({ downloadId })
+      .first()
+
+    return result
+  }
+
+  /**
    * Sets the active column of a download to false.
    * @param {String} downloadId ID of download to update.
    */

@@ -3,6 +3,11 @@
 import pauseDownloadItem from '../pauseDownloadItem'
 import downloadStates from '../../../app/constants/downloadStates'
 
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 describe('pauseDownloadItem', () => {
   describe('when downloadId and name are provided', () => {
     test('calls currentDownloadItems.pauseItem', async () => {
@@ -19,7 +24,17 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn()
+        createPauseForAllActiveDownloads: jest.fn(),
+        getAllDownloadsWhere: jest.fn().mockResolvedValue([
+          {
+            id: '7072_Test_2019.0-20231109_032409',
+            state: 'ACTIVE'
+          },
+          {
+            id: 'AE_DySno_002-20231010_140411',
+            state: 'ACTIVE'
+          }
+        ])
       }
 
       await pauseDownloadItem({
@@ -46,6 +61,8 @@ describe('pauseDownloadItem', () => {
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(0)
+
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -63,7 +80,17 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn()
+        createPauseForAllActiveDownloads: jest.fn(),
+        getAllDownloadsWhere: jest.fn().mockResolvedValue([
+          {
+            id: '7072_Test_2019.0-20231109_032409',
+            state: 'ACTIVE'
+          },
+          {
+            id: 'AE_DySno_002-20231010_140411',
+            state: 'ACTIVE'
+          }
+        ])
       }
 
       await pauseDownloadItem({
@@ -86,6 +113,8 @@ describe('pauseDownloadItem', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(0)
+
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -101,7 +130,17 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn()
+        createPauseForAllActiveDownloads: jest.fn(),
+        getAllDownloadsWhere: jest.fn().mockResolvedValue([
+          {
+            id: '7072_Test_2019.0-20231109_032409',
+            state: 'ACTIVE'
+          },
+          {
+            id: 'AE_DySno_002-20231010_140411',
+            state: 'ACTIVE'
+          }
+        ])
       }
 
       await pauseDownloadItem({
@@ -121,6 +160,8 @@ describe('pauseDownloadItem', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
+
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
 
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledWith(

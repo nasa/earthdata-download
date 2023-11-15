@@ -13,6 +13,11 @@ jest.mock('../../utils/startNextDownload', () => ({
   default: jest.fn(() => {})
 }))
 
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 beforeEach(() => {
   MockDate.set('2023-05-01')
 
@@ -32,7 +37,11 @@ describe('restartDownload', () => {
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
         deletePausesByDownloadIdAndFilename: jest.fn(),
-        deleteAllPausesByDownloadId: jest.fn()
+        deleteAllPausesByDownloadId: jest.fn(),
+        getDownloadReport: jest.fn().mockResolvedValue({
+          filesCompleted: 8,
+          filesInProgress: 2
+        })
       }
       const downloadIdContext = {}
       const webContents = {}
@@ -56,6 +65,8 @@ describe('restartDownload', () => {
       expect(database.createPauseWith).toHaveBeenCalledTimes(0)
 
       expect(database.deletePausesByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
+
+      expect(database.getDownloadReport).toHaveBeenCalledTimes(1)
 
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledTimes(1)
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledWith('mock-download-id')
@@ -111,7 +122,11 @@ describe('restartDownload', () => {
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
         deletePausesByDownloadIdAndFilename: jest.fn(),
-        deleteAllPausesByDownloadId: jest.fn()
+        deleteAllPausesByDownloadId: jest.fn(),
+        getDownloadReport: jest.fn().mockResolvedValue({
+          filesCompleted: 8,
+          filesInProgress: 2
+        })
       }
       const downloadIdContext = {}
       const webContents = {}
@@ -141,6 +156,8 @@ describe('restartDownload', () => {
       expect(database.deletePausesByDownloadIdAndFilename).toHaveBeenCalledWith('mock-download-id', 'mock-filename')
 
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledTimes(0)
+
+      expect(database.getDownloadReport).toHaveBeenCalledTimes(1)
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(2)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
@@ -188,7 +205,11 @@ describe('restartDownload', () => {
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
         deletePausesByDownloadIdAndFilename: jest.fn(),
-        deleteAllPausesByDownloadId: jest.fn()
+        deleteAllPausesByDownloadId: jest.fn(),
+        getDownloadReport: jest.fn().mockResolvedValue({
+          filesCompleted: 8,
+          filesInProgress: 2
+        })
       }
       const downloadIdContext = {}
       const webContents = {}
@@ -211,6 +232,8 @@ describe('restartDownload', () => {
 
       expect(database.getDownloadById).toHaveBeenCalledTimes(1)
       expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
+
+      expect(database.getDownloadReport).toHaveBeenCalledTimes(1)
 
       expect(database.createPauseWith).toHaveBeenCalledTimes(1)
       expect(database.createPauseWith).toHaveBeenCalledWith({

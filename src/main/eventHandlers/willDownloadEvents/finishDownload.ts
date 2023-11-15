@@ -20,25 +20,16 @@ const finishDownload = async ({
       state: downloadStates.completed
     })
 
-    const [
-      fileCount,
-      receivedBytes,
-      totalBytes,
-      downloadDuration
-    ] = await Promise.all([
-      database.getFileCountWhere({ downloadId }),
-      database.getReceivedBytesSumByDownloadId(downloadId),
-      database.getTotalBytesSumByDownloadId(downloadId),
-      database.getTotalDownloadTimeByDownloadId(downloadId)
-    ])
+    const downloadStatistics = await database.getDownloadStatistics(downloadId)
+
     metricsLogger({
       eventType: 'DownloadComplete',
       data: {
         downloadId,
-        receivedBytes,
-        totalBytes,
-        duration: (downloadDuration / 1000).toFixed(1),
-        filesDownloaded: fileCount,
+        receivedBytes: downloadStatistics.receivedBytesSum,
+        totalBytes: downloadStatistics.totalBytesSum,
+        duration: (downloadStatistics.totalDownloadTime / 1000).toFixed(1),
+        filesDownloaded: downloadStatistics.fileCount,
         filesFailed: notCompleteFilesCount
       }
     })

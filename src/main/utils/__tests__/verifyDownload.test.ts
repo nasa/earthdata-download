@@ -120,7 +120,7 @@ describe('verifyDownload', () => {
 
       expect(result).toEqual(false)
 
-      expect(fetch).toHaveBeenCalledTimes(1)
+      expect(fetch).toHaveBeenCalledTimes(2)
       expect(fetch).toHaveBeenCalledWith(
         'http://example.com/file.png',
         expect.objectContaining({

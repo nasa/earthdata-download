@@ -10,6 +10,11 @@ beforeEach(() => {
   MockDate.set('2023-05-01')
 })
 
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 describe('cancelDownloadItem', () => {
   describe('when downloadId and name are provided', () => {
     test('updates the file state', async () => {

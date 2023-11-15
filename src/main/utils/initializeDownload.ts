@@ -2,6 +2,8 @@
 
 import { app } from 'electron'
 
+import metricsLogger from './metricsLogger'
+
 /**
  * Sends a message to the renderer process to start a download for the given downloadIds.
  * @param {Object} params
@@ -39,6 +41,13 @@ const initializeDownload = async ({
       downloadIds,
       downloadLocation: location,
       shouldUseDefaultLocation: !!defaultDownloadLocation
+    })
+
+    metricsLogger({
+      eventType: 'DownloadStarted',
+      data: {
+        downloadIds
+      }
     })
   }
 }

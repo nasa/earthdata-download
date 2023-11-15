@@ -8,6 +8,11 @@ jest.mock('electron', () => ({
   }
 }))
 
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 describe('initializeDownload', () => {
   test('sends the initializeDownload message with the system default downloadLocation', async () => {
     const webContents = {

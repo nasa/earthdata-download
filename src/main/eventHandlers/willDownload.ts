@@ -11,6 +11,7 @@ import onUpdated from './willDownloadEvents/onUpdated'
 import downloadStates from '../../app/constants/downloadStates'
 import verifyDownload from '../utils/verifyDownload'
 import finishDownload from './willDownloadEvents/finishDownload'
+import metricsLogger from '../utils/metricsLogger'
 
 /**
  * Handles the DownloadItem events
@@ -117,6 +118,14 @@ const willDownload = async ({
         fileId
       },
       webContents
+    })
+
+    metricsLogger({
+      eventType: 'SentToEdl',
+      data: {
+        downloadId,
+        fileId
+      }
     })
 
     return

@@ -4,6 +4,11 @@ import setCancellingDownload from '../setCancellingDownload'
 
 import downloadStates from '../../../app/constants/downloadStates'
 
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 describe('setCancellingDownload', () => {
   describe('when no filename is provided', () => {
     test('updates the database', async () => {
@@ -17,7 +22,22 @@ describe('setCancellingDownload', () => {
       const database = {
         createPauseByDownloadId: jest.fn(),
         updateDownloadById: jest.fn(),
-        updateFilesWhere: jest.fn()
+        updateFilesWhere: jest.fn(),
+        getDownloadReport: jest.fn().mockResolvedValue({
+          percentSum: 196,
+          totalFiles: 7,
+          finishedFiles: 1
+        }),
+        getAllDownloadsWhere: jest.fn().mockResolvedValue([
+          {
+            id: '7072_Test_2019.0-20231109_032409',
+            state: 'ACTIVE'
+          },
+          {
+            id: 'AE_DySno_002-20231010_140411',
+            state: 'ACTIVE'
+          }
+        ])
       }
 
       await setCancellingDownload({
@@ -59,7 +79,22 @@ describe('setCancellingDownload', () => {
       const database = {
         createPauseByDownloadIdAndFilename: jest.fn(),
         updateDownloadById: jest.fn(),
-        updateFilesWhere: jest.fn()
+        updateFilesWhere: jest.fn(),
+        getDownloadReport: jest.fn().mockResolvedValue({
+          percentSum: 196,
+          totalFiles: 7,
+          finishedFiles: 1
+        }),
+        getAllDownloadsWhere: jest.fn().mockResolvedValue([
+          {
+            id: '7072_Test_2019.0-20231109_032409',
+            state: 'ACTIVE'
+          },
+          {
+            id: 'AE_DySno_002-20231010_140411',
+            state: 'ACTIVE'
+          }
+        ])
       }
 
       await setCancellingDownload({
@@ -104,7 +139,22 @@ describe('setCancellingDownload', () => {
           .mockResolvedValue([{
             id: 'mock-download-id'
           }]),
-        updateFilesWhere: jest.fn()
+        updateFilesWhere: jest.fn(),
+        getDownloadReport: jest.fn().mockResolvedValue({
+          percentSum: 196,
+          totalFiles: 7,
+          finishedFiles: 1
+        }),
+        getAllDownloadsWhere: jest.fn().mockResolvedValue([
+          {
+            id: '7072_Test_2019.0-20231109_032409',
+            state: 'ACTIVE'
+          },
+          {
+            id: 'AE_DySno_002-20231010_140411',
+            state: 'ACTIVE'
+          }
+        ])
       }
 
       await setCancellingDownload({

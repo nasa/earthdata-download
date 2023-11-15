@@ -2,10 +2,17 @@
 
 import setPreferenceFieldValue from '../setPreferenceFieldValue'
 
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 describe('set a field in the preferences', () => {
   test('Updates the value of an existing field in the preferences to specified user value', async () => {
     const database = {
-      setPreferences: jest.fn()
+      setPreferences: jest.fn(),
+      setPreferenceFieldValue: jest.fn(),
+      getPreferences: jest.fn().mockResolvedValue({ concurrentDownloads: 5 })
     }
     const info = {
       field: 'concurrentDownloads',

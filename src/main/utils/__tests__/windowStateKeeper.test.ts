@@ -2,6 +2,11 @@
 
 import windowStateKeeper from '../windowStateKeeper'
 
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 describe('windowStateKeeper', () => {
   test('returns the default window state', async () => {
     const database = {

@@ -9,6 +9,11 @@ jest.mock('../../utils/startNextDownload', () => ({
   default: jest.fn(() => {})
 }))
 
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 describe('resumeDownloadItem', () => {
   describe('when downloadId and name are provided', () => {
     test('calls currentDownloadItems.resumeItem', async () => {
@@ -20,7 +25,16 @@ describe('resumeDownloadItem', () => {
         filename: 'mock-filename.png'
       }
       const database = {
-        getAllDownloadsWhere: jest.fn(),
+        getAllDownloadsWhere: jest.fn().mockResolvedValue([
+          {
+            id: '7072_Test_2019.0-20231109_032409',
+            state: 'PAUSED'
+          },
+          {
+            id: 'AE_DySno_002-20231010_140411',
+            state: 'PAUSED'
+          }
+        ]),
         getFileCountWhere: jest.fn(),
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
@@ -45,7 +59,7 @@ describe('resumeDownloadItem', () => {
         filename: 'mock-filename.png'
       }, { state: downloadStates.active })
 
-      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
       expect(database.getFileCountWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 
@@ -72,7 +86,16 @@ describe('resumeDownloadItem', () => {
           downloadId: 'mock-download-id'
         }
         const database = {
-          getAllDownloadsWhere: jest.fn(),
+          getAllDownloadsWhere: jest.fn().mockResolvedValue([
+            {
+              id: '7072_Test_2019.0-20231109_032409',
+              state: 'PAUSED'
+            },
+            {
+              id: 'AE_DySno_002-20231010_140411',
+              state: 'PAUSED'
+            }
+          ]),
           getFileCountWhere: jest.fn().mockResolvedValue(0),
           updateDownloadById: jest.fn(),
           endPause: jest.fn()
@@ -89,7 +112,7 @@ describe('resumeDownloadItem', () => {
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
-        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
+        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
 
         expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
         expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
@@ -120,7 +143,16 @@ describe('resumeDownloadItem', () => {
           downloadId: 'mock-download-id'
         }
         const database = {
-          getAllDownloadsWhere: jest.fn(),
+          getAllDownloadsWhere: jest.fn().mockResolvedValue([
+            {
+              id: '7072_Test_2019.0-20231109_032409',
+              state: 'PAUSED'
+            },
+            {
+              id: 'AE_DySno_002-20231010_140411',
+              state: 'PAUSED'
+            }
+          ]),
           getFileCountWhere: jest.fn().mockResolvedValue(1),
           updateDownloadById: jest.fn(),
           endPause: jest.fn()
@@ -137,7 +169,7 @@ describe('resumeDownloadItem', () => {
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
-        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
+        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
 
         expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
         expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
@@ -196,7 +228,7 @@ describe('resumeDownloadItem', () => {
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith(undefined, undefined)
 
-      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(2)
       expect(database.getAllDownloadsWhere).toHaveBeenCalledWith({ active: true })
 
       expect(database.getFileCountWhere).toHaveBeenCalledTimes(3)

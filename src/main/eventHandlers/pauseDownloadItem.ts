@@ -20,15 +20,10 @@ const pauseDownloadItem = async ({
   currentDownloadItems.pauseItem(downloadId, filename)
 
   const pausingDownloads = await database.getAllDownloadsWhere({ state: downloadStates.active })
-  let filesCompleted = 0
-  let filesInProgress = 0
   const downloadIds = []
   await Promise.all(
     pausingDownloads.map(async (download) => {
       downloadIds.push(download.id)
-      const report = await database.getDownloadReport(download.id)
-      filesCompleted += report.finishedFiles
-      filesInProgress += report.totalFiles - report.finishedFiles
     })
   )
 
@@ -36,9 +31,7 @@ const pauseDownloadItem = async ({
     eventType: 'DownloadPause',
     data: {
       downloadIds,
-      downloadCount: downloadIds.length,
-      filesCompleted,
-      filesInProgress
+      downloadCount: downloadIds.length
     }
   })
 

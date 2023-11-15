@@ -46,6 +46,11 @@ jest.mock('../willDownloadEvents/finishDownload', () => ({
   default: jest.fn(() => { })
 }))
 
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 jest.mock('../willDownloadEvents/onUpdated')
 jest.mock('../willDownloadEvents/onDone')
 

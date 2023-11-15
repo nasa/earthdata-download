@@ -1793,4 +1793,31 @@ describe('EddDatabase', () => {
       await database.deleteByDeleteId('mock-delete-id')
     })
   })
+
+  describe('getDownloadStatistics', () => {
+    test('returns statistics for a completed download', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual(expect.stringContaining('select COUNT(id) as fileCount'))
+        expect(query.bindings).toEqual(['mock-download-id', 1])
+
+        query.response({
+          fileCount: 5,
+          receivedBytesSum: 1000,
+          totalBytesSum: 2000,
+          totalDownloadTime: 5000
+        })
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getDownloadStatistics('mock-download-id')
+
+      expect(result).toEqual({
+        fileCount: 5,
+        receivedBytesSum: 1000,
+        totalBytesSum: 2000,
+        totalDownloadTime: 5000
+      })
+    })
+  })
 })

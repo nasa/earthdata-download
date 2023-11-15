@@ -8,10 +8,9 @@ jest.mock('../../utils/metricsLogger.ts', () => ({
 }))
 
 describe('set a field in the preferences', () => {
-  test('Updates the value of an existing field in the preferences to specified user value', async () => {
+  test('Updates the value of an existing "concurrentDownloads" field in the preferences to the specified user value', async () => {
     const database = {
       setPreferences: jest.fn(),
-      setPreferenceFieldValue: jest.fn(),
       getPreferences: jest.fn().mockResolvedValue({ concurrentDownloads: 5 })
     }
     const info = {
@@ -25,5 +24,23 @@ describe('set a field in the preferences', () => {
 
     expect(database.setPreferences).toHaveBeenCalledTimes(1)
     expect(database.setPreferences).toHaveBeenCalledWith({ concurrentDownloads: '2' })
+  })
+
+  test('Updates the "defaultDownloadLocation" field in the preferences', async () => {
+    const database = {
+      setPreferences: jest.fn(),
+      getPreferences: jest.fn().mockResolvedValue({})
+    }
+    const info = {
+      field: 'defaultDownloadLocation',
+      value: 'new/location'
+    }
+    await setPreferenceFieldValue({
+      database,
+      info
+    })
+
+    expect(database.setPreferences).toHaveBeenCalledTimes(1)
+    expect(database.setPreferences).toHaveBeenCalledWith({ defaultDownloadLocation: 'new/location' })
   })
 })

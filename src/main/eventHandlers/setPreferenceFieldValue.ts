@@ -30,12 +30,16 @@ const setPreferenceFieldValue = async ({
 
     case 'defaultDownloadLocation':
       metricsLogger({
-        eventType: 'NewDefaultDownloadLocatin'
+        eventType: 'NewDefaultDownloadLocation'
       })
 
       break
 
     default:
+      metricsLogger({
+        eventType: `UpdatedField:${field}`
+      })
+
       break
   }
 

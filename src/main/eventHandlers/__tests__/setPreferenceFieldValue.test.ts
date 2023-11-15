@@ -43,4 +43,22 @@ describe('set a field in the preferences', () => {
     expect(database.setPreferences).toHaveBeenCalledTimes(1)
     expect(database.setPreferences).toHaveBeenCalledWith({ defaultDownloadLocation: 'new/location' })
   })
+
+  test('Updates preferences for an unknown field and logs the field name', async () => {
+    const database = {
+      setPreferences: jest.fn(),
+      getPreferences: jest.fn().mockResolvedValue({})
+    }
+    const info = {
+      field: 'unknownField',
+      value: 'unknownValue'
+    }
+    await setPreferenceFieldValue({
+      database,
+      info
+    })
+
+    expect(database.setPreferences).toHaveBeenCalledTimes(1)
+    expect(database.setPreferences).toHaveBeenCalledWith({ unknownField: 'unknownValue' })
+  })
 })

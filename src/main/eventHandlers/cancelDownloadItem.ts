@@ -2,6 +2,7 @@
 
 import downloadStates from '../../app/constants/downloadStates'
 import finishDownload from './willDownloadEvents/finishDownload'
+import metricsLogger from '../utils/metricsLogger'
 
 /**
  * Cancels a download and updates the database state
@@ -36,6 +37,13 @@ const cancelDownloadItem = async ({
     await finishDownload({
       database,
       downloadId
+    })
+
+    metricsLogger({
+      eventType: 'DownloadItemCancel',
+      data: {
+        downloadId
+      }
     })
   }
 

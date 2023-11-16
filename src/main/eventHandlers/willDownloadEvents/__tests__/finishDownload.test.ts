@@ -41,6 +41,8 @@ describe('finishDownload', () => {
         timeEnd: 1684029600000
       }
     )
+
+    expect(database.getDownloadStatistics).toHaveBeenCalledTimes(1)
   })
 
   test('does not mark the download as completed if files are still downloading', async () => {
@@ -61,5 +63,7 @@ describe('finishDownload', () => {
     })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
+
+    expect(database.getDownloadStatistics).toHaveBeenCalledTimes(0)
   })
 })

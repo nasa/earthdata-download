@@ -35,13 +35,11 @@ const setCancellingDownload = async ({
   }
 
   if (downloadId) {
-    const report = await database.getDownloadReport(downloadId)
     metricsLogger({
       eventType: 'DownloadCancel',
       data: {
-        downloadId,
-        filesCompleted: report.finishedFiles,
-        filesInProgress: report.totalFiles
+        cancelledDownloadIds: [downloadId],
+        cancelledDownloadCount: 1
       }
     })
 

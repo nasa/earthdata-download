@@ -64,7 +64,9 @@ const setCancellingDownload = async ({
   }
 
   if (!downloadId) {
-    const cancelledDownloads = await database.getAllDownloadsWhere({ state: downloadStates.active })
+    const cancelledDownloads = await database.getAllDownloadsWhere({
+      state: downloadStates.active || downloadStates.paused
+    })
     const cancelledDownloadIds = []
     await Promise.all(
       cancelledDownloads.map(async (download) => {

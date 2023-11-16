@@ -10,15 +10,13 @@ import config from '../config.json'
  */
 const metricsLogger = async (event: any) => {
   try {
-    const response = await fetch(config.logging, {
+    await fetch(config.logging, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ params: event })
     })
-
-    console.log(response)
   } catch (error) {
     console.error(error)
   }

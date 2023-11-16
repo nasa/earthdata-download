@@ -7,6 +7,7 @@ import verifyDownload from '../verifyDownload'
 
 import downloadStates from '../../../app/constants/downloadStates'
 import sendToEula from '../../eventHandlers/sendToEula'
+import metricsLogger from '../metricsLogger.ts'
 
 jest.mock('node-fetch', () => ({
   __esModule: true,
@@ -16,6 +17,11 @@ jest.mock('node-fetch', () => ({
 jest.mock('../../eventHandlers/sendToEula', () => ({
   __esModule: true,
   default: jest.fn()
+}))
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
 }))
 
 beforeEach(() => {
@@ -118,9 +124,18 @@ describe('verifyDownload', () => {
         webContents
       })
 
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'SentToEula',
+        data: {
+          downloadId: 'mock-download-id',
+          fileId: 123
+        }
+      })
+
       expect(result).toEqual(false)
 
-      expect(fetch).toHaveBeenCalledTimes(2)
+      expect(fetch).toHaveBeenCalledTimes(1)
       expect(fetch).toHaveBeenCalledWith(
         'http://example.com/file.png',
         expect.objectContaining({

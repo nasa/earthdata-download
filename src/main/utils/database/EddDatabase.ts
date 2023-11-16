@@ -411,21 +411,6 @@ class EddDatabase {
   }
 
   /**
-   * Returns count of files that are in the `paused` state for the given downloadId
-   * @param {String} downloadId Id of the download to count files.
-   */
-  async getPausedFilesCountByDownloadId(downloadId) {
-    const [result] = await this.db('files')
-      .count('id')
-      .where({ downloadId })
-      .where({ state: downloadStates.paused })
-
-    const { 'count(`id`)': number } = result
-
-    return number
-  }
-
-  /**
    * Returns count of files that are active for the given downloadId
    * @param {String} downloadId Id of the download to count files.
    */
@@ -626,21 +611,6 @@ class EddDatabase {
     const { pausesSum } = result
 
     return pausesSum
-  }
-
-  /**
-   * Returns the total download time for a given downloadId.
-   * @param {String} downloadId ID of the download to calculate total download time.
-   */
-  async getTotalDownloadTimeByDownloadId(downloadId) {
-    const download = await this.getDownloadById(downloadId)
-
-    const { timeStart, timeEnd } = download
-    const timeTaken = timeEnd - timeStart
-    const pausesSum = await this.getPausesSum(downloadId)
-    const totalDownloadTime = timeTaken - pausesSum
-
-    return totalDownloadTime
   }
 
   /**

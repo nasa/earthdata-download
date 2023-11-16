@@ -3,6 +3,7 @@
 import resumeDownloadItem from '../resumeDownloadItem'
 import downloadStates from '../../../app/constants/downloadStates'
 import startNextDownload from '../../utils/startNextDownload'
+import metricsLogger from '../../utils/metricsLogger.ts'
 
 jest.mock('../../utils/startNextDownload', () => ({
   __esModule: true,
@@ -47,6 +48,15 @@ describe('resumeDownloadItem', () => {
         downloadIdContext: {},
         info,
         webContents: {}
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadResume',
+        data: {
+          downloadIds: ['7072_Test_2019.0-20231109_032409', 'AE_DySno_002-20231010_140411'],
+          downloadCount: 2
+        }
       })
 
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
@@ -107,6 +117,15 @@ describe('resumeDownloadItem', () => {
           downloadIdContext: {},
           info,
           webContents: {}
+        })
+
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'DownloadResume',
+          data: {
+            downloadIds: ['7072_Test_2019.0-20231109_032409', 'AE_DySno_002-20231010_140411'],
+            downloadCount: 2
+          }
         })
 
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)

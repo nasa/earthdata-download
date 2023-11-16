@@ -24,22 +24,6 @@ const resumeDownloadItem = async ({
 
   currentDownloadItems.resumeItem(downloadId, filename)
 
-  const resumingDownloads = await database.getAllDownloadsWhere({ state: downloadStates.paused })
-  const downloadIds = []
-  await Promise.all(
-    resumingDownloads.map(async (download) => {
-      downloadIds.push(download.id)
-    })
-  )
-
-  metricsLogger({
-    eventType: 'DownloadResume',
-    data: {
-      downloadIds,
-      downloadCount: downloadIds.length
-    }
-  })
-
   if (downloadId && filename) {
     await database.endPause(downloadId, filename)
 
@@ -52,6 +36,14 @@ const resumeDownloadItem = async ({
   }
 
   if (downloadId && !filename) {
+    metricsLogger({
+      eventType: 'DownloadResume',
+      data: {
+        downloadIds: [downloadId],
+        downloadCount: 1
+      }
+    })
+
     await database.endPause(downloadId)
 
     const numberFiles = await database.getFileCountWhere({ downloadId })
@@ -69,6 +61,7 @@ const resumeDownloadItem = async ({
 
   if (!downloadId) {
     const downloads = await database.getAllDownloadsWhere({ active: true })
+    const downloadIds = []
 
     await downloads.forEachAsync(async (download) => {
       const { id, state } = download
@@ -86,6 +79,16 @@ const resumeDownloadItem = async ({
       await database.updateDownloadById(id, {
         state: newState
       })
+
+      downloadIds.push(id)
+    })
+
+    metricsLogger({
+      eventType: 'DownloadResume',
+      data: {
+        downloadIds,
+        downloadCount: downloadIds.length
+      }
     })
   }
 

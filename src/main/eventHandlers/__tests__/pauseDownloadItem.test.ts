@@ -25,16 +25,8 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn(),
-        getAllDownloadsWhere: jest.fn().mockResolvedValue([
-          {
-            id: '7072_Test_2019.0-20231109_032409',
-            state: 'ACTIVE'
-          },
-          {
-            id: 'AE_DySno_002-20231010_140411',
-            state: 'ACTIVE'
-          }
+        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue([
+          50, 2, ['mock-download-id-1', 'mock-download-id-2']
         ])
       }
 
@@ -42,15 +34,6 @@ describe('pauseDownloadItem', () => {
         currentDownloadItems,
         database,
         info
-      })
-
-      expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
-        eventType: 'DownloadPause',
-        data: {
-          downloadIds: expect.arrayContaining(['7072_Test_2019.0-20231109_032409', 'AE_DySno_002-20231010_140411']),
-          downloadCount: 2
-        }
       })
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
@@ -71,8 +54,6 @@ describe('pauseDownloadItem', () => {
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(0)
-
-      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -90,16 +71,8 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn(),
-        getAllDownloadsWhere: jest.fn().mockResolvedValue([
-          {
-            id: '7072_Test_2019.0-20231109_032409',
-            state: 'ACTIVE'
-          },
-          {
-            id: 'AE_DySno_002-20231010_140411',
-            state: 'ACTIVE'
-          }
+        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue([
+          50, 2, ['mock-download-id-1', 'mock-download-id-2']
         ])
       }
 
@@ -123,8 +96,6 @@ describe('pauseDownloadItem', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(0)
-
-      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -140,16 +111,8 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn(),
-        getAllDownloadsWhere: jest.fn().mockResolvedValue([
-          {
-            id: '7072_Test_2019.0-20231109_032409',
-            state: 'ACTIVE'
-          },
-          {
-            id: 'AE_DySno_002-20231010_140411',
-            state: 'ACTIVE'
-          }
+        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue([
+          50, 2, ['mock-download-id-1', 'mock-download-id-2']
         ])
       }
 
@@ -170,8 +133,6 @@ describe('pauseDownloadItem', () => {
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
-
-      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
 
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledTimes(1)
       expect(database.updateDownloadsWhereIn).toHaveBeenCalledWith(

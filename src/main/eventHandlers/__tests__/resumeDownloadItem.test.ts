@@ -50,15 +50,6 @@ describe('resumeDownloadItem', () => {
         webContents: {}
       })
 
-      expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
-        eventType: 'DownloadResume',
-        data: {
-          downloadIds: ['7072_Test_2019.0-20231109_032409', 'AE_DySno_002-20231010_140411'],
-          downloadCount: 2
-        }
-      })
-
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
@@ -69,7 +60,6 @@ describe('resumeDownloadItem', () => {
         filename: 'mock-filename.png'
       }, { state: downloadStates.active })
 
-      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
       expect(database.getFileCountWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 
@@ -123,15 +113,13 @@ describe('resumeDownloadItem', () => {
         expect(metricsLogger).toHaveBeenCalledWith({
           eventType: 'DownloadResume',
           data: {
-            downloadIds: ['7072_Test_2019.0-20231109_032409', 'AE_DySno_002-20231010_140411'],
-            downloadCount: 2
+            downloadIds: ['mock-download-id'],
+            downloadCount: 1
           }
         })
 
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
-
-        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
 
         expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
         expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
@@ -187,8 +175,6 @@ describe('resumeDownloadItem', () => {
 
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
-
-        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
 
         expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
         expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
@@ -247,7 +233,7 @@ describe('resumeDownloadItem', () => {
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith(undefined, undefined)
 
-      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(2)
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(1)
       expect(database.getAllDownloadsWhere).toHaveBeenCalledWith({ active: true })
 
       expect(database.getFileCountWhere).toHaveBeenCalledTimes(3)

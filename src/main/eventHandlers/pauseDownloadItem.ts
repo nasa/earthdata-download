@@ -19,22 +19,6 @@ const pauseDownloadItem = async ({
 
   currentDownloadItems.pauseItem(downloadId, filename)
 
-  const pausingDownloads = await database.getAllDownloadsWhere({ state: downloadStates.active })
-  const downloadIds = []
-  await Promise.all(
-    pausingDownloads.map(async (download) => {
-      downloadIds.push(download.id)
-    })
-  )
-
-  metricsLogger({
-    eventType: 'DownloadPause',
-    data: {
-      downloadIds,
-      downloadCount: downloadIds.length
-    }
-  })
-
   if (downloadId && filename) {
     await database.createPauseByDownloadIdAndFilename(downloadId, filename)
 
@@ -52,16 +36,32 @@ const pauseDownloadItem = async ({
     await database.updateDownloadById(downloadId, {
       state: downloadStates.paused
     })
+
+    metricsLogger({
+      eventType: 'DownloadPause',
+      data: {
+        downloadIds: [downloadId],
+        downloadCount: 1
+      }
+    })
   }
 
   if (!downloadId) {
-    await database.createPauseForAllActiveDownloads()
+    const pauseResponse = await database.createPauseForAllActiveDownloads()
 
     await database.updateDownloadsWhereIn([
       'state',
       [downloadStates.active, downloadStates.pending]
     ], {
       state: downloadStates.paused
+    })
+
+    metricsLogger({
+      eventType: 'DownloadPause',
+      data: {
+        downloadIds: pauseResponse[2],
+        downloadCount: pauseResponse[1]
+      }
     })
   }
 }

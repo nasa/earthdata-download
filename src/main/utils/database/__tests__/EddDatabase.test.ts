@@ -941,7 +941,7 @@ describe('EddDatabase', () => {
 
         const result = await database.createPauseForAllActiveDownloads()
 
-        expect(result).toEqual(null)
+        expect(result).toEqual([null, 0, []])
       })
     })
 

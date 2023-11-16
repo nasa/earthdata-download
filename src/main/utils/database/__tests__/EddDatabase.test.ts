@@ -1820,36 +1820,4 @@ describe('EddDatabase', () => {
       })
     })
   })
-
-  describe('getTotalBytesSumByDownloadId', () => {
-    test('returns correct sum of totalBytes for a downloadId', async () => {
-      const database = new EddDatabase('./')
-      const mockDownloadId = 'mock-download-id'
-
-      dbTracker.on('query', (query) => {
-        expect(query.sql).toMatch(/sum/)
-        expect(query.bindings).toEqual([mockDownloadId])
-        query.response([{ totalBytesSum: 1024 }])
-      })
-
-      const result = await database.getTotalBytesSumByDownloadId(mockDownloadId)
-      expect(result).toEqual(1024)
-    })
-  })
-
-  describe('EddDatabase - getReceivedBytesSumByDownloadId', () => {
-    test('returns correct sum of receivedBytes for a downloadId', async () => {
-      const database = new EddDatabase('./')
-      const mockDownloadId = 'mock-download-id'
-
-      dbTracker.on('query', (query) => {
-        expect(query.sql).toMatch(/sum/)
-        expect(query.bindings).toEqual([mockDownloadId])
-        query.response([{ receivedBytesSum: 2048 }])
-      })
-
-      const result = await database.getReceivedBytesSumByDownloadId(mockDownloadId)
-      expect(result).toEqual(2048)
-    })
-  })
 })

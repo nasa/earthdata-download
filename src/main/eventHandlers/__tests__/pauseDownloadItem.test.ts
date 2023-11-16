@@ -122,6 +122,15 @@ describe('pauseDownloadItem', () => {
         info
       })
 
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadPause',
+        data: {
+          downloadIds: ['mock-download-id-1', 'mock-download-id-2'],
+          downloadCount: 2
+        }
+      })
+
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith(undefined, undefined)
 

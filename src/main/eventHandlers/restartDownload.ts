@@ -32,7 +32,7 @@ const restartDownload = async ({
     data: {
       downloadId,
       filesCompleted: report.finishedFiles,
-      filesInProgress: report.totalFiles
+      filesInProgress: report.totalFiles - report.finishedFiles
     }
   })
 

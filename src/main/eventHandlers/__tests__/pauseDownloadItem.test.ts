@@ -2,6 +2,7 @@
 
 import pauseDownloadItem from '../pauseDownloadItem'
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsLogger from '../../utils/metricsLogger.ts'
 
 jest.mock('../../utils/metricsLogger.ts', () => ({
   __esModule: true,
@@ -41,6 +42,15 @@ describe('pauseDownloadItem', () => {
         currentDownloadItems,
         database,
         info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadPause',
+        data: {
+          downloadIds: expect.arrayContaining(['7072_Test_2019.0-20231109_032409', 'AE_DySno_002-20231010_140411']),
+          downloadCount: 2
+        }
       })
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)

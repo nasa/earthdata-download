@@ -7,6 +7,7 @@ import downloadStates from '../../../app/constants/downloadStates'
 import restartDownload from '../restartDownload'
 
 import startNextDownload from '../../utils/startNextDownload'
+import metricsLogger from '../../utils/metricsLogger'
 
 jest.mock('../../utils/startNextDownload', () => ({
   __esModule: true,
@@ -39,8 +40,8 @@ describe('restartDownload', () => {
         deletePausesByDownloadIdAndFilename: jest.fn(),
         deleteAllPausesByDownloadId: jest.fn(),
         getDownloadReport: jest.fn().mockResolvedValue({
-          filesCompleted: 8,
-          filesInProgress: 2
+          finishedFiles: 8,
+          totalFiles: 10
         })
       }
       const downloadIdContext = {}
@@ -56,6 +57,16 @@ describe('restartDownload', () => {
         downloadIdContext,
         info,
         webContents
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadRestart',
+        data: {
+          downloadId: 'mock-download-id',
+          filesCompleted: 8,
+          filesInProgress: 2
+        }
       })
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
@@ -124,8 +135,8 @@ describe('restartDownload', () => {
         deletePausesByDownloadIdAndFilename: jest.fn(),
         deleteAllPausesByDownloadId: jest.fn(),
         getDownloadReport: jest.fn().mockResolvedValue({
-          filesCompleted: 8,
-          filesInProgress: 2
+          finishedFiles: 8,
+          totalFiles: 10
         })
       }
       const downloadIdContext = {}
@@ -142,6 +153,16 @@ describe('restartDownload', () => {
         downloadIdContext,
         info,
         webContents
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadRestart',
+        data: {
+          downloadId: 'mock-download-id',
+          filesCompleted: 8,
+          filesInProgress: 2
+        }
       })
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
@@ -207,8 +228,8 @@ describe('restartDownload', () => {
         deletePausesByDownloadIdAndFilename: jest.fn(),
         deleteAllPausesByDownloadId: jest.fn(),
         getDownloadReport: jest.fn().mockResolvedValue({
-          filesCompleted: 8,
-          filesInProgress: 2
+          finishedFiles: 8,
+          totalFiles: 10
         })
       }
       const downloadIdContext = {}

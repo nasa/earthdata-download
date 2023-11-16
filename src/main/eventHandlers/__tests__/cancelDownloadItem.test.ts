@@ -48,6 +48,14 @@ describe('cancelDownloadItem', () => {
         }
       })
 
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadItemCancel',
+        data: {
+          downloadId: 'mock-download-id'
+        }
+      })
+
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
@@ -88,6 +96,15 @@ describe('cancelDownloadItem', () => {
         currentDownloadItems,
         database,
         info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadCancel',
+        data: {
+          downloadIds: ['mock-download-id'],
+          cancelCount: 1
+        }
       })
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
@@ -137,6 +154,15 @@ describe('cancelDownloadItem', () => {
         currentDownloadItems,
         database,
         info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadCancel',
+        data: {
+          downloadIds: [123, 456],
+          cancelCount: 2
+        }
       })
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)

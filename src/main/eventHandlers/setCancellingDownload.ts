@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import downloadStates from '../../app/constants/downloadStates'
-import metricsLogger from '../utils/metricsLogger'
 
 /**
  * Adds a deleteId to the database
@@ -35,14 +34,6 @@ const setCancellingDownload = async ({
   }
 
   if (downloadId) {
-    metricsLogger({
-      eventType: 'DownloadCancel',
-      data: {
-        cancelledDownloadIds: [downloadId],
-        cancelledDownloadCount: 1
-      }
-    })
-
     const filesUpdateWhere = {
       downloadId
     }
@@ -71,14 +62,6 @@ const setCancellingDownload = async ({
         cancelledDownloadIds.push(download.id)
       })
     )
-
-    metricsLogger({
-      eventType: 'DownloadCancelAll',
-      data: {
-        cancelledDownloadIds,
-        cancelledDownloadCount: cancelledDownloadIds.length
-      }
-    })
 
     // If no downloadId was given, add a pause for all active downloads
     await database.createPauseForAllActiveDownloads()

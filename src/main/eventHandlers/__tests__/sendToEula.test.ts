@@ -5,11 +5,17 @@ import { shell } from 'electron'
 import sendToEula from '../sendToEula'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsLogger from '../../utils/metricsLogger'
 
 jest.mock('electronShell', () => ({
   shell: {
     openExternal: jest.fn()
   }
+}))
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
 }))
 
 describe('sendToEula', () => {
@@ -36,6 +42,14 @@ describe('sendToEula', () => {
       downloadsWaitingForEula,
       info,
       webContents
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'SentToEula',
+      data: {
+        downloadId: 'downloadID'
+      }
     })
 
     expect(database.getFileWhere).toHaveBeenCalledTimes(0)

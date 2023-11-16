@@ -6,7 +6,6 @@ import AbortController from 'abort-controller'
 
 import downloadStates from '../../app/constants/downloadStates'
 import sendToEula from '../eventHandlers/sendToEula'
-import metricsLogger from './metricsLogger'
 
 /**
  * Verify the download works and log any errors. Also redirects the user to accept a EULA if that is detected.
@@ -78,14 +77,6 @@ const verifyDownload = async ({
           fileId
         },
         webContents
-      })
-
-      metricsLogger({
-        eventType: 'SentToEula',
-        data: {
-          downloadId,
-          fileId
-        }
       })
     }
   } catch (error) {

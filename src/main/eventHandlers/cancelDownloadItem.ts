@@ -64,6 +64,14 @@ const cancelDownloadItem = async ({
     )
 
     await database.endPause(downloadId)
+
+    metricsLogger({
+      eventType: 'DownloadCancel',
+      data: {
+        downloadIds: [downloadId],
+        cancelCount: 1
+      }
+    })
   }
 
   if (!downloadId) {
@@ -79,10 +87,20 @@ const cancelDownloadItem = async ({
       timeEnd: new Date().getTime()
     })
 
+    const cancelledDownloadIds = []
     await Promise.all(updatedDownloads.map(async (updatedDownload) => {
       const { id } = updatedDownload
+      cancelledDownloadIds.push(id)
       await database.endPause(id)
     }))
+
+    metricsLogger({
+      eventType: 'DownloadCancel',
+      data: {
+        downloadIds: cancelledDownloadIds,
+        cancelCount: cancelledDownloadIds.length
+      }
+    })
   }
 }
 

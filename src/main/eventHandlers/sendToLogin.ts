@@ -3,6 +3,7 @@
 import { shell } from 'electron'
 
 import downloadStates from '../../app/constants/downloadStates'
+import metricsLogger from '../utils/metricsLogger'
 
 /**
  * Sends the user to the download's authUrl to get a new token
@@ -66,6 +67,13 @@ const sendToLogin = async ({
     webContents.send('showWaitingForLoginDialog', {
       downloadId,
       showDialog: true
+    })
+
+    metricsLogger({
+      eventType: 'SentToEdl',
+      data: {
+        downloadId
+      }
     })
   }
 

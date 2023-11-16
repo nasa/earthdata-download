@@ -3,12 +3,6 @@
 import setCancellingDownload from '../setCancellingDownload'
 
 import downloadStates from '../../../app/constants/downloadStates'
-import metricsLogger from '../../utils/metricsLogger.ts'
-
-jest.mock('../../utils/metricsLogger.ts', () => ({
-  __esModule: true,
-  default: jest.fn(() => {})
-}))
 
 describe('setCancellingDownload', () => {
   describe('when no filename is provided', () => {
@@ -45,15 +39,6 @@ describe('setCancellingDownload', () => {
         currentDownloadItems,
         database,
         info
-      })
-
-      expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
-        eventType: 'DownloadCancel',
-        data: {
-          cancelledDownloadIds: ['mock-download-id'],
-          cancelledDownloadCount: 1
-        }
       })
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
@@ -111,15 +96,6 @@ describe('setCancellingDownload', () => {
         currentDownloadItems,
         database,
         info
-      })
-
-      expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
-        eventType: 'DownloadCancel',
-        data: {
-          cancelledDownloadIds: ['mock-download-id'],
-          cancelledDownloadCount: 1
-        }
       })
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)

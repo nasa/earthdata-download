@@ -2,6 +2,7 @@
 
 import downloadStates from '../../../app/constants/downloadStates'
 import metricsLogger from '../../utils/metricsLogger'
+import downloadIdForMetrics from '../../utils/downloadIdForMetrics'
 
 /**
  * If no more files are not completed, mark the download as completed
@@ -25,12 +26,13 @@ const finishDownload = async ({
     metricsLogger({
       eventType: 'DownloadComplete',
       data: {
-        downloadId,
+        downloadId: downloadIdForMetrics(downloadId),
         receivedBytes: downloadStatistics.receivedBytesSum,
         totalBytes: downloadStatistics.totalBytesSum,
         duration: (downloadStatistics.totalDownloadTime / 1000).toFixed(1),
         filesDownloaded: downloadStatistics.fileCount,
-        filesFailed: downloadStatistics.incompleteFileCount
+        filesFailed: downloadStatistics.incompleteFileCount,
+        pauseCount: downloadStatistics.pauseCount
       }
     })
   }

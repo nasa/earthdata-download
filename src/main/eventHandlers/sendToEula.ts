@@ -4,6 +4,7 @@ import { shell } from 'electron'
 
 import downloadStates from '../../app/constants/downloadStates'
 import metricsLogger from '../utils/metricsLogger'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Sends the user to the download's eulaUrl to get a new token
@@ -78,7 +79,7 @@ const sendToEula = async ({
     metricsLogger({
       eventType: 'SentToEula',
       data: {
-        downloadId
+        downloadId: downloadIdForMetrics(downloadId)
       }
     })
   }

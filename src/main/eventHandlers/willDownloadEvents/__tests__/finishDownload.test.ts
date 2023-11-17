@@ -25,7 +25,8 @@ describe('finishDownload', () => {
         receivedBytesSum: 461748278,
         totalBytesSum: 461748278,
         totalDownloadTime: 18938,
-        incompleteFileCount: 0
+        incompleteFileCount: 0,
+        pauseCount: 2
       })
     }
 
@@ -55,7 +56,8 @@ describe('finishDownload', () => {
         receivedBytesSum: 461748278,
         totalBytesSum: 461748278,
         totalDownloadTime: 18938,
-        incompleteFileCount: 0
+        incompleteFileCount: 0,
+        pauseCount: 2
       })
     }
 

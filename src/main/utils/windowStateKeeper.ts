@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import metricsLogger from './metricsLogger'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Keeps the current window state (size/location) update in the database. So the window

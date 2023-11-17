@@ -3,6 +3,7 @@
 import downloadStates from '../../app/constants/downloadStates'
 import metricsLogger from '../utils/metricsLogger'
 import startNextDownload from '../utils/startNextDownload'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Updates the files of a download to `pending`, sets the download to `active`, and calls `startNextDownload`
@@ -30,7 +31,7 @@ const restartDownload = async ({
   metricsLogger({
     eventType: 'DownloadRestart',
     data: {
-      downloadId,
+      downloadId: downloadIdForMetrics(downloadId),
       filesCompleted: report.finishedFiles,
       filesInProgress: report.totalFiles - report.finishedFiles
     }

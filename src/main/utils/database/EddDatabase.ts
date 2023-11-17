@@ -699,7 +699,8 @@ class EddDatabase {
         this.db.raw('SUM(receivedBytes) as receivedBytesSum'),
         this.db.raw('SUM(totalBytes) as totalBytesSum'),
         this.db.raw('(IFNULL(MAX(timeEnd), UNIXEPOCH() * 1000) - MIN(timeStart)) as totalDownloadTime'),
-        this.db.raw('(SELECT COUNT(*) FROM files WHERE downloadId = ? AND state != "COMPLETED") as incompleteFileCount')
+        this.db.raw('(SELECT COUNT(*) FROM files WHERE downloadId = ? AND state != "COMPLETED") as incompleteFileCount'),
+        this.db.raw('(SELECT COUNT(*) FROM pauses WHERE downloadId = ?) as pauseCount')
       )
       .where({ downloadId })
       .first()

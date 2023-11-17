@@ -1805,7 +1805,8 @@ describe('EddDatabase', () => {
           receivedBytesSum: 1000,
           totalBytesSum: 2000,
           totalDownloadTime: 5000,
-          incompleteFileCount: 0
+          incompleteFileCount: 0,
+          pauseCount: 2
         })
       })
 
@@ -1818,7 +1819,8 @@ describe('EddDatabase', () => {
         receivedBytesSum: 1000,
         totalBytesSum: 2000,
         totalDownloadTime: 5000,
-        incompleteFileCount: 0
+        incompleteFileCount: 0,
+        pauseCount: 2
       })
     })
   })

@@ -2,6 +2,7 @@
 
 import downloadStates from '../../app/constants/downloadStates'
 import metricsLogger from '../utils/metricsLogger'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Pauses a download and updates the database
@@ -40,7 +41,7 @@ const pauseDownloadItem = async ({
     metricsLogger({
       eventType: 'DownloadPause',
       data: {
-        downloadIds: [downloadId],
+        downloadIds: [downloadIdForMetrics(downloadId)],
         downloadCount: 1
       }
     })
@@ -56,10 +57,11 @@ const pauseDownloadItem = async ({
       state: downloadStates.paused
     })
 
+    const metricIds = pauseResponse[2].map(downloadIdForMetrics)
     metricsLogger({
       eventType: 'DownloadPause',
       data: {
-        downloadIds: pauseResponse[2],
+        downloadIds: metricIds,
         downloadCount: pauseResponse[1]
       }
     })

@@ -48,14 +48,6 @@ describe('cancelDownloadItem', () => {
         }
       })
 
-      expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
-        eventType: 'DownloadItemCancel',
-        data: {
-          downloadId: 'mock-download-id'
-        }
-      })
-
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 

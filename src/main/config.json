@@ -1,3 +1,4 @@
 {
-  "logging": "https://dycghwhsgr9el.cloudfront.net"
+  "note": "This endpoint is for EDSC-UAT CloudWatch",
+  "logging": "https://dycghwhsgr9el.cloudfront.net/edd_logger"
 }

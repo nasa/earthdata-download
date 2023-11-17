@@ -1,9 +1,9 @@
 // @ts-nocheck
 
 import downloadStates from '../../app/constants/downloadStates'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 import metricsLogger from '../utils/metricsLogger'
 import startNextDownload from '../utils/startNextDownload'
-import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Updates the files of a download to `pending`, sets the download to `active`, and calls `startNextDownload`

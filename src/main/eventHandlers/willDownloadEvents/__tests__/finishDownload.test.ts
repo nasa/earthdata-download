@@ -6,6 +6,8 @@ import finishDownload from '../finishDownload'
 
 import downloadStates from '../../../../app/constants/downloadStates'
 
+import metricsLogger from '../../../utils/metricsLogger'
+
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00.000')
 })
@@ -33,6 +35,20 @@ describe('finishDownload', () => {
     await finishDownload({
       database,
       downloadId: 'mock-download-id'
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'DownloadComplete',
+      data: {
+        downloadId: 'mock-download-id',
+        receivedBytes: 461748278,
+        totalBytes: 461748278,
+        duration: '18.9',
+        filesFailed: 0,
+        filesDownloaded: 7,
+        pauseCount: 2
+      }
     })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(1)

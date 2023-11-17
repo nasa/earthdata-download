@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import metricsLogger from '../metricsLogger'
 import windowStateKeeper from '../windowStateKeeper'
 
 jest.mock('../../utils/metricsLogger.ts', () => ({
@@ -22,6 +23,20 @@ describe('windowStateKeeper', () => {
       x: undefined,
       y: undefined
     }))
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'WindowSizePreferences',
+      data: {
+        windowStateInfo: {
+          height: 600,
+          width: 800,
+          x: undefined,
+          y: undefined,
+          isMaximized: undefined
+        }
+      }
+    })
   })
 
   test('returns the saved window state', async () => {
@@ -45,6 +60,20 @@ describe('windowStateKeeper', () => {
       x: 0,
       y: 0
     }))
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'WindowSizePreferences',
+      data: {
+        windowStateInfo: {
+          height: 700,
+          width: 900,
+          x: 0,
+          y: 0,
+          isMaximized: undefined
+        }
+      }
+    })
   })
 
   describe('when tracking the window state changes', () => {

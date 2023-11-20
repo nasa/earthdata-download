@@ -25,9 +25,11 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue([
-          50, 2, ['mock-download-id-1', 'mock-download-id-2']
-        ])
+        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
+          insertedCount: 50,
+          length: 2,
+          pausedIds: ['mock-download-id-1', 'mock-download-id-2']
+        })
       }
 
       await pauseDownloadItem({
@@ -71,9 +73,11 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue([
-          50, 2, ['mock-download-id-1', 'mock-download-id-2']
-        ])
+        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
+          insertedCount: 50,
+          length: 2,
+          pausedIds: ['mock-download-id-1', 'mock-download-id-2']
+        })
       }
 
       await pauseDownloadItem({
@@ -111,9 +115,11 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue([
-          50, 2, ['mock-download-id-1', 'mock-download-id-2']
-        ])
+        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
+          insertedCount: 50,
+          length: 2,
+          pausedIds: ['mock-download-id-1', 'mock-download-id-2']
+        })
       }
 
       await pauseDownloadItem({

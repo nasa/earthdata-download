@@ -1,8 +1,10 @@
+// @ts-nocheck
+
 /**
  * Trims timestamp suffix from downloadId
  * @param {String} downloadId downloadId for a given download
  */
-const downloadIdForMetrics = (downloadId: string | number) => {
+const downloadIdForMetrics = (downloadId) => {
   const downloadIdString = downloadId.toString()
 
   const regexPattern = /^(.+)-\d{8}_\d{6}$/

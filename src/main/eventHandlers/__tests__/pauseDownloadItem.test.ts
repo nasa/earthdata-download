@@ -26,8 +26,6 @@ describe('pauseDownloadItem', () => {
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
         createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
-          insertedCount: 50,
-          length: 2,
           pausedIds: ['mock-download-id-1', 'mock-download-id-2']
         })
       }
@@ -74,8 +72,6 @@ describe('pauseDownloadItem', () => {
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
         createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
-          insertedCount: 50,
-          length: 2,
           pausedIds: ['mock-download-id-1', 'mock-download-id-2']
         })
       }
@@ -116,8 +112,6 @@ describe('pauseDownloadItem', () => {
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
         createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
-          insertedCount: 50,
-          length: 2,
           pausedIds: ['mock-download-id-1', 'mock-download-id-2']
         })
       }
@@ -132,8 +126,7 @@ describe('pauseDownloadItem', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'DownloadPause',
         data: {
-          downloadIds: ['mock-download-id-1', 'mock-download-id-2'],
-          downloadCount: 2
+          downloadIds: ['mock-download-id-1', 'mock-download-id-2']
         }
       })
 

@@ -942,8 +942,6 @@ describe('EddDatabase', () => {
         const result = await database.createPauseForAllActiveDownloads()
 
         expect(result).toEqual({
-          insertCount: 0,
-          length: 0,
           pausedIds: []
         })
       })
@@ -1801,7 +1799,7 @@ describe('EddDatabase', () => {
   describe('getDownloadStatistics', () => {
     test('returns statistics for a completed download', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual(expect.stringContaining('select COUNT(id) as fileCount'))
+        expect(query.sql).toEqual(expect.stringContaining('select count(`id`) as `fileCount'))
         expect(query.bindings).toEqual(['mock-download-id', 1])
 
         query.response({

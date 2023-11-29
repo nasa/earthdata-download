@@ -27,7 +27,7 @@ describe('metricsLogger', () => {
     }
   }
 
-  it('should send a POST request to the specified logging endpoint', async () => {
+  test('should send a POST request to the specified logging endpoint', async () => {
     const expectedBody = JSON.stringify({ params: event })
 
     await metricsLogger(event)
@@ -45,10 +45,13 @@ describe('metricsLogger', () => {
     )
   })
 
-  it('should log an error when POST request fails', async () => {
+  test('should log an error when POST request fails', async () => {
     const expectedError = new Error('Request failed');
 
-    (fetch as jest.Mock).mockRejectedValueOnce(expectedError)
+    fetch
+      .mockImplementationOnce(() => {
+        throw new Error('Request failed')
+      })
 
     console.error = jest.fn()
 

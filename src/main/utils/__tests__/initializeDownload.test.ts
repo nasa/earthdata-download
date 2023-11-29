@@ -70,6 +70,14 @@ describe('initializeDownload', () => {
       webContents
     })
 
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'DownloadStarted',
+      data: {
+        downloadIds: ['mockDownloadId']
+      }
+    })
+
     expect(app.getPath).toHaveBeenCalledTimes(1)
 
     expect(database.getPreferences).toHaveBeenCalledTimes(1)
@@ -101,6 +109,14 @@ describe('initializeDownload', () => {
       database,
       downloadIds,
       webContents
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'DownloadStarted',
+      data: {
+        downloadIds: ['mockDownloadId']
+      }
     })
 
     expect(app.getPath).toHaveBeenCalledTimes(1)

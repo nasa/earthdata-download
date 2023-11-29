@@ -1,7 +1,7 @@
 import downloadIdForMetrics from '../downloadIdForMetrics'
 
 describe('downloadIdForMetrics', () => {
-  it('should extract download ID when it matches the pattern', () => {
+  test('should extract download ID when it matches the pattern', () => {
     const inputDownloadId = 'downloadId-20231116_164945'
     const expectedExtractedId = 'downloadId-20231116_164945'
 
@@ -10,7 +10,7 @@ describe('downloadIdForMetrics', () => {
     expect(result).toEqual(expectedExtractedId)
   })
 
-  it('should return the original download ID when it does not match the pattern', () => {
+  test('should return the original download ID when it does not match the pattern', () => {
     const inputDownloadId = 'invalidId123'
     const expectedDownloadId = 'invalidId123'
 

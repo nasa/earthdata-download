@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import metricsLogger from '../../utils/metricsLogger'
 import setPreferenceFieldValue from '../setPreferenceFieldValue'
 
 jest.mock('../../utils/metricsLogger.ts', () => ({
@@ -22,6 +23,14 @@ describe('set a field in the preferences', () => {
       info
     })
 
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'NewConcurrentDownloadsLimit',
+      data: {
+        newConcurrentDownloads: '2'
+      }
+    })
+
     expect(database.setPreferences).toHaveBeenCalledTimes(1)
     expect(database.setPreferences).toHaveBeenCalledWith({ concurrentDownloads: '2' })
   })
@@ -38,6 +47,11 @@ describe('set a field in the preferences', () => {
     await setPreferenceFieldValue({
       database,
       info
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'NewDefaultDownloadLocation'
     })
 
     expect(database.setPreferences).toHaveBeenCalledTimes(1)
@@ -57,6 +71,8 @@ describe('set a field in the preferences', () => {
       database,
       info
     })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(0)
 
     expect(database.setPreferences).toHaveBeenCalledTimes(1)
     expect(database.setPreferences).toHaveBeenCalledWith({ unknownField: 'unknownValue' })

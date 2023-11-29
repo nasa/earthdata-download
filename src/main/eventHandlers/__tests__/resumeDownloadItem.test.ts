@@ -50,6 +50,8 @@ describe('resumeDownloadItem', () => {
         webContents: {}
       })
 
+      expect(metricsLogger).toHaveBeenCalledTimes(0)
+
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
@@ -60,6 +62,7 @@ describe('resumeDownloadItem', () => {
         filename: 'mock-filename.png'
       }, { state: downloadStates.active })
 
+      expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
       expect(database.getFileCountWhere).toHaveBeenCalledTimes(0)
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 
@@ -173,6 +176,8 @@ describe('resumeDownloadItem', () => {
           webContents: {}
         })
 
+        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
+
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
@@ -228,6 +233,15 @@ describe('resumeDownloadItem', () => {
         downloadIdContext: {},
         info,
         webContents: {}
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadResume',
+        data: {
+          downloadIds: ['download1', 'download2', 'download3'],
+          downloadCount: 3
+        }
       })
 
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)

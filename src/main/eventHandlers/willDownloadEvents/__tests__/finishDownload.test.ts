@@ -82,6 +82,8 @@ describe('finishDownload', () => {
       downloadId: 'mock-download-id'
     })
 
+    expect(metricsLogger).toHaveBeenCalledTimes(0)
+
     expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 
     expect(database.getDownloadStatistics).toHaveBeenCalledTimes(0)

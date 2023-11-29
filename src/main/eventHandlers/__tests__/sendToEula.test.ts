@@ -98,6 +98,14 @@ describe('sendToEula', () => {
         webContents
       })
 
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'SentToEula',
+        data: {
+          downloadId: 'downloadID'
+        }
+      })
+
       expect(database.getFileWhere).toHaveBeenCalledTimes(1)
       expect(database.getFileWhere).toHaveBeenCalledWith({
         downloadId: 'downloadID',
@@ -150,6 +158,8 @@ describe('sendToEula', () => {
         webContents
       })
 
+      expect(metricsLogger).toHaveBeenCalledTimes(0)
+
       expect(database.getFileWhere).toHaveBeenCalledTimes(0)
       expect(shell.openExternal).toHaveBeenCalledTimes(0)
       expect(webContents.send).toHaveBeenCalledTimes(0)
@@ -189,6 +199,14 @@ describe('sendToEula', () => {
         downloadsWaitingForEula,
         info,
         webContents
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'SentToEula',
+        data: {
+          downloadId: 'downloadID'
+        }
       })
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(0)

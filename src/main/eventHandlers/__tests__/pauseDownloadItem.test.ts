@@ -36,6 +36,8 @@ describe('pauseDownloadItem', () => {
         info
       })
 
+      expect(metricsLogger).toHaveBeenCalledTimes(0)
+
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
 
@@ -80,6 +82,15 @@ describe('pauseDownloadItem', () => {
         currentDownloadItems,
         database,
         info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadPause',
+        data: {
+          downloadCount: 1,
+          downloadIds: ['mock-download-id']
+        }
       })
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)

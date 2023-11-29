@@ -46,7 +46,7 @@ describe('metricsLogger', () => {
   })
 
   test('should log an error when POST request fails', async () => {
-    const expectedError = new Error('Request failed');
+    const expectedError = new Error('Request failed')
 
     fetch
       .mockImplementationOnce(() => {

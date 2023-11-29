@@ -248,6 +248,16 @@ describe('restartDownload', () => {
         webContents
       })
 
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadRestart',
+        data: {
+          downloadId: 'mock-download-id',
+          filesCompleted: 8,
+          filesInProgress: 2
+        }
+      })
+
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename')
 

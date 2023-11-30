@@ -116,6 +116,20 @@ describe('windowStateKeeper', () => {
 
         window.send('resize')
 
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'WindowSizePreferences',
+          data: {
+            windowStateInfo: {
+              height: 700,
+              width: 900,
+              x: 0,
+              y: 0,
+              isMaximized: true
+            }
+          }
+        })
+
         expect(database.setPreferences).toHaveBeenCalledTimes(1)
         expect(database.setPreferences).toHaveBeenCalledWith({
           windowState: '{"x":0,"y":0,"width":900,"height":700,"isMaximized":true}'
@@ -159,6 +173,20 @@ describe('windowStateKeeper', () => {
         windowState.track(window)
 
         window.send('resize')
+
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'WindowSizePreferences',
+          data: {
+            windowStateInfo: {
+              height: 700,
+              width: 900,
+              x: 0,
+              y: 0,
+              isMaximized: false
+            }
+          }
+        })
 
         expect(database.setPreferences).toHaveBeenCalledTimes(1)
         expect(database.setPreferences).toHaveBeenCalledWith({
@@ -206,6 +234,20 @@ describe('windowStateKeeper', () => {
 
         window.send('move')
 
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'WindowSizePreferences',
+          data: {
+            windowStateInfo: {
+              height: 700,
+              width: 900,
+              x: 0,
+              y: 0,
+              isMaximized: true
+            }
+          }
+        })
+
         expect(database.setPreferences).toHaveBeenCalledTimes(1)
         expect(database.setPreferences).toHaveBeenCalledWith({
           windowState: '{"x":0,"y":0,"width":900,"height":700,"isMaximized":true}'
@@ -249,6 +291,20 @@ describe('windowStateKeeper', () => {
         windowState.track(window)
 
         window.send('move')
+
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'WindowSizePreferences',
+          data: {
+            windowStateInfo: {
+              height: 700,
+              width: 900,
+              x: 0,
+              y: 0,
+              isMaximized: false
+            }
+          }
+        })
 
         expect(database.setPreferences).toHaveBeenCalledTimes(1)
         expect(database.setPreferences).toHaveBeenCalledWith({
@@ -300,6 +356,20 @@ describe('windowStateKeeper', () => {
         expect(database.setPreferences).toHaveBeenCalledWith({
           windowState: '{"x":0,"y":0,"width":900,"height":700,"isMaximized":true}'
         })
+
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'WindowSizePreferences',
+          data: {
+            windowStateInfo: {
+              height: 700,
+              width: 900,
+              x: 0,
+              y: 0,
+              isMaximized: true
+            }
+          }
+        })
       })
 
       test('saves the non-maximized window state ', async () => {
@@ -339,6 +409,20 @@ describe('windowStateKeeper', () => {
         windowState.track(window)
 
         window.send('close')
+
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'WindowSizePreferences',
+          data: {
+            windowStateInfo: {
+              height: 700,
+              width: 900,
+              x: 0,
+              y: 0,
+              isMaximized: false
+            }
+          }
+        })
 
         expect(database.setPreferences).toHaveBeenCalledTimes(1)
         expect(database.setPreferences).toHaveBeenCalledWith({

@@ -514,13 +514,9 @@ class EddDatabase {
       }
     }
 
-    const insertedCount = await this.db('pauses')
-      .insert(data)
-
     const pausedDownloadIds = data.map((item) => item.downloadId)
 
     return {
-      length: insertedCount.length,
       pausedIds: pausedDownloadIds
     }
   }

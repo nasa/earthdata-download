@@ -176,6 +176,15 @@ describe('resumeDownloadItem', () => {
           webContents: {}
         })
 
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'DownloadResume',
+          data: {
+            downloadIds: ['mock-download-id'],
+            downloadCount: 1
+          }
+        })
+
         expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
 
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)

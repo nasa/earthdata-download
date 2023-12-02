@@ -121,6 +121,8 @@ describe('resumeDownloadItem', () => {
           }
         })
 
+        expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
+
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 

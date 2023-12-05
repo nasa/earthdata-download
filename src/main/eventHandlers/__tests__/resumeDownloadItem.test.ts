@@ -3,8 +3,14 @@
 import resumeDownloadItem from '../resumeDownloadItem'
 import downloadStates from '../../../app/constants/downloadStates'
 import startNextDownload from '../../utils/startNextDownload'
+import metricsLogger from '../../utils/metricsLogger.ts'
 
 jest.mock('../../utils/startNextDownload', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
   __esModule: true,
   default: jest.fn(() => {})
 }))
@@ -20,7 +26,16 @@ describe('resumeDownloadItem', () => {
         filename: 'mock-filename.png'
       }
       const database = {
-        getAllDownloadsWhere: jest.fn(),
+        getAllDownloadsWhere: jest.fn().mockResolvedValue([
+          {
+            id: '7072_Test_2019.0-20231109_032409',
+            state: 'PAUSED'
+          },
+          {
+            id: 'AE_DySno_002-20231010_140411',
+            state: 'PAUSED'
+          }
+        ]),
         getFileCountWhere: jest.fn(),
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
@@ -34,6 +49,8 @@ describe('resumeDownloadItem', () => {
         info,
         webContents: {}
       })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(0)
 
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
@@ -72,7 +89,16 @@ describe('resumeDownloadItem', () => {
           downloadId: 'mock-download-id'
         }
         const database = {
-          getAllDownloadsWhere: jest.fn(),
+          getAllDownloadsWhere: jest.fn().mockResolvedValue([
+            {
+              id: '7072_Test_2019.0-20231109_032409',
+              state: 'PAUSED'
+            },
+            {
+              id: 'AE_DySno_002-20231010_140411',
+              state: 'PAUSED'
+            }
+          ]),
           getFileCountWhere: jest.fn().mockResolvedValue(0),
           updateDownloadById: jest.fn(),
           endPause: jest.fn()
@@ -86,10 +112,19 @@ describe('resumeDownloadItem', () => {
           webContents: {}
         })
 
-        expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
-        expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'DownloadResume',
+          data: {
+            downloadIds: ['mock-download-id'],
+            downloadCount: 1
+          }
+        })
 
         expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
+
+        expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
+        expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
         expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
         expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
@@ -120,7 +155,16 @@ describe('resumeDownloadItem', () => {
           downloadId: 'mock-download-id'
         }
         const database = {
-          getAllDownloadsWhere: jest.fn(),
+          getAllDownloadsWhere: jest.fn().mockResolvedValue([
+            {
+              id: '7072_Test_2019.0-20231109_032409',
+              state: 'PAUSED'
+            },
+            {
+              id: 'AE_DySno_002-20231010_140411',
+              state: 'PAUSED'
+            }
+          ]),
           getFileCountWhere: jest.fn().mockResolvedValue(1),
           updateDownloadById: jest.fn(),
           endPause: jest.fn()
@@ -134,10 +178,19 @@ describe('resumeDownloadItem', () => {
           webContents: {}
         })
 
-        expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
-        expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
+        expect(metricsLogger).toHaveBeenCalledTimes(1)
+        expect(metricsLogger).toHaveBeenCalledWith({
+          eventType: 'DownloadResume',
+          data: {
+            downloadIds: ['mock-download-id'],
+            downloadCount: 1
+          }
+        })
 
         expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
+
+        expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
+        expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
         expect(database.getFileCountWhere).toHaveBeenCalledTimes(1)
         expect(database.getFileCountWhere).toHaveBeenCalledWith({ downloadId: 'mock-download-id' })
@@ -191,6 +244,15 @@ describe('resumeDownloadItem', () => {
         downloadIdContext: {},
         info,
         webContents: {}
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadResume',
+        data: {
+          downloadIds: ['download1', 'download2', 'download3'],
+          downloadCount: 3
+        }
       })
 
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)

@@ -2,6 +2,8 @@
 
 import downloadStates from '../../app/constants/downloadStates'
 import finishDownload from './willDownloadEvents/finishDownload'
+import metricsLogger from '../utils/metricsLogger'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Cancels a download and updates the database state
@@ -37,6 +39,13 @@ const cancelDownloadItem = async ({
       database,
       downloadId
     })
+
+    metricsLogger({
+      eventType: 'DownloadItemCancel',
+      data: {
+        downloadId: downloadIdForMetrics(downloadId)
+      }
+    })
   }
 
   if (downloadId && !filename) {
@@ -56,6 +65,14 @@ const cancelDownloadItem = async ({
     )
 
     await database.endPause(downloadId)
+
+    metricsLogger({
+      eventType: 'DownloadCancel',
+      data: {
+        downloadIds: [downloadIdForMetrics(downloadId)],
+        cancelCount: 1
+      }
+    })
   }
 
   if (!downloadId) {
@@ -71,10 +88,20 @@ const cancelDownloadItem = async ({
       timeEnd: new Date().getTime()
     })
 
+    const cancelledDownloadIds = []
     await Promise.all(updatedDownloads.map(async (updatedDownload) => {
       const { id } = updatedDownload
+      cancelledDownloadIds.push(downloadIdForMetrics(id))
       await database.endPause(id)
     }))
+
+    metricsLogger({
+      eventType: 'DownloadCancel',
+      data: {
+        downloadIds: cancelledDownloadIds,
+        cancelCount: cancelledDownloadIds.length
+      }
+    })
   }
 }
 

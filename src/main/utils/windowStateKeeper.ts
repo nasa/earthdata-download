@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import metricsLogger from './metricsLogger'
+
 /**
  * Keeps the current window state (size/location) update in the database. So the window
  * will open in the same place as the user last had it open.
@@ -50,12 +52,23 @@ const windowStateKeeper = async (database) => {
 
   await setBounds()
 
-  return ({
+  const windowStateInfo = {
     x: windowState.x,
     y: windowState.y,
     width: windowState.width,
     height: windowState.height,
-    isMaximized: windowState.isMaximized,
+    isMaximized: windowState.isMaximized
+  }
+
+  metricsLogger({
+    eventType: 'WindowSizePreferences',
+    data: {
+      windowStateInfo
+    }
+  })
+
+  return ({
+    ...windowStateInfo,
     track
   })
 }

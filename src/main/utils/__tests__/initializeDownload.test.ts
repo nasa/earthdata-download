@@ -1,11 +1,17 @@
 import { app } from 'electron'
 
 import initializeDownload from '../initializeDownload'
+import metricsLogger from '../metricsLogger'
 
 jest.mock('electron', () => ({
   app: {
     getPath: jest.fn().mockReturnValue('/system/default')
   }
+}))
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
 }))
 
 describe('initializeDownload', () => {
@@ -22,6 +28,14 @@ describe('initializeDownload', () => {
       database,
       downloadIds,
       webContents
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'DownloadStarted',
+      data: {
+        downloadIds: ['mockDownloadId']
+      }
     })
 
     expect(app.getPath).toHaveBeenCalledTimes(1)
@@ -56,6 +70,14 @@ describe('initializeDownload', () => {
       webContents
     })
 
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'DownloadStarted',
+      data: {
+        downloadIds: ['mockDownloadId']
+      }
+    })
+
     expect(app.getPath).toHaveBeenCalledTimes(1)
 
     expect(database.getPreferences).toHaveBeenCalledTimes(1)
@@ -87,6 +109,14 @@ describe('initializeDownload', () => {
       database,
       downloadIds,
       webContents
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'DownloadStarted',
+      data: {
+        downloadIds: ['mockDownloadId']
+      }
     })
 
     expect(app.getPath).toHaveBeenCalledTimes(1)

@@ -2,6 +2,12 @@
 
 import pauseDownloadItem from '../pauseDownloadItem'
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsLogger from '../../utils/metricsLogger.ts'
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
 
 describe('pauseDownloadItem', () => {
   describe('when downloadId and name are provided', () => {
@@ -19,7 +25,9 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn()
+        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
+          pausedIds: ['mock-download-id-1', 'mock-download-id-2']
+        })
       }
 
       await pauseDownloadItem({
@@ -27,6 +35,8 @@ describe('pauseDownloadItem', () => {
         database,
         info
       })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(0)
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
@@ -63,13 +73,24 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn()
+        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
+          pausedIds: ['mock-download-id-1', 'mock-download-id-2']
+        })
       }
 
       await pauseDownloadItem({
         currentDownloadItems,
         database,
         info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadPause',
+        data: {
+          downloadCount: 1,
+          downloadIds: ['mock-download-id']
+        }
       })
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
@@ -101,13 +122,23 @@ describe('pauseDownloadItem', () => {
         updateFilesWhere: jest.fn(),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn()
+        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
+          pausedIds: ['mock-download-id-1', 'mock-download-id-2']
+        })
       }
 
       await pauseDownloadItem({
         currentDownloadItems,
         database,
         info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadPause',
+        data: {
+          downloadIds: ['mock-download-id-1', 'mock-download-id-2']
+        }
       })
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)

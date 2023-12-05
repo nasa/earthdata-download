@@ -5,10 +5,16 @@ import MockDate from 'mockdate'
 import cancelDownloadItem from '../cancelDownloadItem'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsLogger from '../../utils/metricsLogger.ts'
 
 beforeEach(() => {
   MockDate.set('2023-05-01')
 })
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
 
 describe('cancelDownloadItem', () => {
   describe('when downloadId and name are provided', () => {
@@ -32,6 +38,14 @@ describe('cancelDownloadItem', () => {
         currentDownloadItems,
         database,
         info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadItemCancel',
+        data: {
+          downloadId: 'mock-download-id'
+        }
       })
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
@@ -74,6 +88,15 @@ describe('cancelDownloadItem', () => {
         currentDownloadItems,
         database,
         info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadCancel',
+        data: {
+          downloadIds: ['mock-download-id'],
+          cancelCount: 1
+        }
       })
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
@@ -123,6 +146,15 @@ describe('cancelDownloadItem', () => {
         currentDownloadItems,
         database,
         info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'DownloadCancel',
+        data: {
+          downloadIds: [123, 456],
+          cancelCount: 2
+        }
       })
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)

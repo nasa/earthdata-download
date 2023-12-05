@@ -1,6 +1,8 @@
 // @ts-nocheck
 
 import downloadStates from '../../app/constants/downloadStates'
+import metricsLogger from '../utils/metricsLogger'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Pauses a download and updates the database
@@ -35,16 +37,32 @@ const pauseDownloadItem = async ({
     await database.updateDownloadById(downloadId, {
       state: downloadStates.paused
     })
+
+    metricsLogger({
+      eventType: 'DownloadPause',
+      data: {
+        downloadIds: [downloadIdForMetrics(downloadId)],
+        downloadCount: 1
+      }
+    })
   }
 
   if (!downloadId) {
-    await database.createPauseForAllActiveDownloads()
+    const pauseResponse = await database.createPauseForAllActiveDownloads()
 
     await database.updateDownloadsWhereIn([
       'state',
       [downloadStates.active, downloadStates.pending]
     ], {
       state: downloadStates.paused
+    })
+
+    const metricIds = pauseResponse.pausedIds.map(downloadIdForMetrics)
+    metricsLogger({
+      eventType: 'DownloadPause',
+      data: {
+        downloadIds: metricIds
+      }
     })
   }
 }

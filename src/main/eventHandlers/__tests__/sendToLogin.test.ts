@@ -5,11 +5,17 @@ import { shell } from 'electron'
 import sendToLogin from '../sendToLogin'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsLogger from '../../utils/metricsLogger'
 
 jest.mock('electronShell', () => ({
   shell: {
     openExternal: jest.fn()
   }
+}))
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
 }))
 
 describe('sendToLogin', () => {
@@ -35,6 +41,14 @@ describe('sendToLogin', () => {
       downloadsWaitingForAuth,
       info,
       webContents
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith({
+      eventType: 'SentToEdl',
+      data: {
+        downloadId: 'downloadID'
+      }
     })
 
     expect(database.getFileWhere).toHaveBeenCalledTimes(0)
@@ -80,6 +94,14 @@ describe('sendToLogin', () => {
         downloadsWaitingForAuth,
         info,
         webContents
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'SentToEdl',
+        data: {
+          downloadId: 'downloadID'
+        }
       })
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(1)
@@ -133,6 +155,8 @@ describe('sendToLogin', () => {
         webContents
       })
 
+      expect(metricsLogger).toHaveBeenCalledTimes(0)
+
       expect(database.getFileWhere).toHaveBeenCalledTimes(0)
       expect(shell.openExternal).toHaveBeenCalledTimes(0)
       expect(webContents.send).toHaveBeenCalledTimes(0)
@@ -171,6 +195,14 @@ describe('sendToLogin', () => {
         downloadsWaitingForAuth,
         info,
         webContents
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith({
+        eventType: 'SentToEdl',
+        data: {
+          downloadId: 'downloadID'
+        }
       })
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(0)

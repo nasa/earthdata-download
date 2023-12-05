@@ -4,6 +4,8 @@ import 'array-foreach-async'
 
 import downloadStates from '../../app/constants/downloadStates'
 import startNextDownload from '../utils/startNextDownload'
+import metricsLogger from '../utils/metricsLogger'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Resumes a download and updates the database
@@ -35,6 +37,14 @@ const resumeDownloadItem = async ({
   }
 
   if (downloadId && !filename) {
+    metricsLogger({
+      eventType: 'DownloadResume',
+      data: {
+        downloadIds: [downloadIdForMetrics(downloadId)],
+        downloadCount: 1
+      }
+    })
+
     await database.endPause(downloadId)
 
     const numberFiles = await database.getFileCountWhere({ downloadId })
@@ -52,6 +62,7 @@ const resumeDownloadItem = async ({
 
   if (!downloadId) {
     const downloads = await database.getAllDownloadsWhere({ active: true })
+    const downloadIds = []
 
     await downloads.forEachAsync(async (download) => {
       const { id, state } = download
@@ -69,6 +80,16 @@ const resumeDownloadItem = async ({
       await database.updateDownloadById(id, {
         state: newState
       })
+
+      downloadIds.push(downloadIdForMetrics(id))
+    })
+
+    metricsLogger({
+      eventType: 'DownloadResume',
+      data: {
+        downloadIds,
+        downloadCount: downloadIds.length
+      }
     })
   }
 

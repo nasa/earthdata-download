@@ -508,10 +508,17 @@ class EddDatabase {
       ...downloadsData
     ]
 
-    if (!data.length) return null
+    if (!data.length) {
+      return {
+        pausedIds: []
+      }
+    }
 
-    return this.db('pauses')
-      .insert(data)
+    const pausedDownloadIds = data.map((item) => item.downloadId)
+
+    return {
+      pausedIds: pausedDownloadIds
+    }
   }
 
   /**
@@ -682,6 +689,26 @@ class EddDatabase {
       .orderBy('createdAt', 'asc')
 
     return query
+  }
+
+  /**
+   * Returns statstics for a completed download.
+   * @param {String} downloadId downloadId for download.
+   */
+  async getDownloadStatistics(downloadId) {
+    const result = await this.db('files')
+      .where({ downloadId })
+      .first()
+      .count('id as fileCount')
+      .sum('receivedBytes as receivedBytesSum')
+      .sum('totalBytes as totalBytesSum')
+      .select(
+        this.db.raw('(IFNULL(MAX(timeEnd), UNIXEPOCH() * 1000) - MIN(timeStart)) as totalDownloadTime'),
+        this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state != "COMPLETED") as incompleteFileCount'),
+        this.db.raw('(SELECT COUNT(id) FROM pauses WHERE downloadId = ? AND fileId IS NULL) as pauseCount')
+      )
+
+    return result
   }
 
   /**

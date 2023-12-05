@@ -3,6 +3,8 @@
 import { shell } from 'electron'
 
 import downloadStates from '../../app/constants/downloadStates'
+import metricsLogger from '../utils/metricsLogger'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Sends the user to the download's eulaUrl to get a new token
@@ -72,6 +74,13 @@ const sendToEula = async ({
     webContents.send('showWaitingForEulaDialog', {
       downloadId,
       showDialog: true
+    })
+
+    metricsLogger({
+      eventType: 'SentToEula',
+      data: {
+        downloadId: downloadIdForMetrics(downloadId)
+      }
     })
   }
 

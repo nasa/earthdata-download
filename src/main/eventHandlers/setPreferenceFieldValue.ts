@@ -1,4 +1,5 @@
 // @ts-nocheck
+import metricsLogger from '../utils/metricsLogger'
 
 /**
  * Set the preference field to a specific value
@@ -11,6 +12,29 @@ const setPreferenceFieldValue = async ({
   info
 }) => {
   const { field, value } = info
+
+  switch (field) {
+    case 'concurrentDownloads':
+      metricsLogger({
+        eventType: 'NewConcurrentDownloadsLimit',
+        data: {
+          newConcurrentDownloads: value
+        }
+      })
+
+      break
+
+    case 'defaultDownloadLocation':
+      metricsLogger({
+        eventType: 'NewDefaultDownloadLocation'
+      })
+
+      break
+
+    default:
+      break
+  }
+
   database.setPreferences({
     [field]: value
   })

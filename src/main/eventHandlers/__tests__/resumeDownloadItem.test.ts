@@ -26,16 +26,8 @@ describe('resumeDownloadItem', () => {
         filename: 'mock-filename.png'
       }
       const database = {
-        getAllDownloadsWhere: jest.fn().mockResolvedValue([
-          {
-            id: '7072_Test_2019.0-20231109_032409',
-            state: 'PAUSED'
-          },
-          {
-            id: 'AE_DySno_002-20231010_140411',
-            state: 'PAUSED'
-          }
-        ]),
+        getDownloadById: jest.fn(),
+        getAllDownloadsWhere: jest.fn(),
         getFileCountWhere: jest.fn(),
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
@@ -51,6 +43,7 @@ describe('resumeDownloadItem', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(0)
+      expect(database.getDownloadById).toHaveBeenCalledTimes(0)
 
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
@@ -89,16 +82,11 @@ describe('resumeDownloadItem', () => {
           downloadId: 'mock-download-id'
         }
         const database = {
-          getAllDownloadsWhere: jest.fn().mockResolvedValue([
-            {
-              id: '7072_Test_2019.0-20231109_032409',
-              state: 'PAUSED'
-            },
-            {
-              id: 'AE_DySno_002-20231010_140411',
-              state: 'PAUSED'
-            }
-          ]),
+          getDownloadById: jest.fn().mockResolvedValue({
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 'mock-download-id'
+          }),
+          getAllDownloadsWhere: jest.fn(),
           getFileCountWhere: jest.fn().mockResolvedValue(0),
           updateDownloadById: jest.fn(),
           endPause: jest.fn()
@@ -116,11 +104,16 @@ describe('resumeDownloadItem', () => {
         expect(metricsLogger).toHaveBeenCalledWith({
           eventType: 'DownloadResume',
           data: {
-            downloadIds: ['mock-download-id'],
+            downloadIds: [{
+              clientId: 'eed-edsc-dev-serverless-client',
+              downloadId: 'mock-download-id'
+            }],
             downloadCount: 1
           }
         })
 
+        expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+        expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
         expect(database.getAllDownloadsWhere).toHaveBeenCalledTimes(0)
 
         expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
@@ -155,16 +148,11 @@ describe('resumeDownloadItem', () => {
           downloadId: 'mock-download-id'
         }
         const database = {
-          getAllDownloadsWhere: jest.fn().mockResolvedValue([
-            {
-              id: '7072_Test_2019.0-20231109_032409',
-              state: 'PAUSED'
-            },
-            {
-              id: 'AE_DySno_002-20231010_140411',
-              state: 'PAUSED'
-            }
-          ]),
+          getDownloadById: jest.fn().mockResolvedValue({
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 'mock-download-id'
+          }),
+          getAllDownloadsWhere: jest.fn(),
           getFileCountWhere: jest.fn().mockResolvedValue(1),
           updateDownloadById: jest.fn(),
           endPause: jest.fn()
@@ -182,7 +170,10 @@ describe('resumeDownloadItem', () => {
         expect(metricsLogger).toHaveBeenCalledWith({
           eventType: 'DownloadResume',
           data: {
-            downloadIds: ['mock-download-id'],
+            downloadIds: [{
+              clientId: 'eed-edsc-dev-serverless-client',
+              downloadId: 'mock-download-id'
+            }],
             downloadCount: 1
           }
         })
@@ -219,14 +210,18 @@ describe('resumeDownloadItem', () => {
       }
       const info = {}
       const database = {
+        getDownloadById: jest.fn(),
         getAllDownloadsWhere: jest.fn().mockResolvedValue([{
           id: 'download1',
+          clientId: 'eed-edsc-dev-serverless-client',
           state: downloadStates.completed
         }, {
           id: 'download2',
+          clientId: 'eed-edsc-dev-serverless-client',
           state: downloadStates.paused
         }, {
           id: 'download3',
+          clientId: 'eed-edsc-dev-serverless-client',
           files: {},
           state: downloadStates.paused
         }]),
@@ -250,10 +245,21 @@ describe('resumeDownloadItem', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'DownloadResume',
         data: {
-          downloadIds: ['download1', 'download2', 'download3'],
+          downloadIds: [{
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 'download1'
+          }, {
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 'download2'
+          }, {
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 'download3'
+          }],
           downloadCount: 3
         }
       })
+
+      expect(database.getDownloadById).toHaveBeenCalledTimes(0)
 
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.resumeItem).toHaveBeenCalledWith(undefined, undefined)

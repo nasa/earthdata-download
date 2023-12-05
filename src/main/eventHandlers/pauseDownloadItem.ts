@@ -3,6 +3,7 @@
 import downloadStates from '../../app/constants/downloadStates'
 import metricsLogger from '../utils/metricsLogger'
 import downloadIdForMetrics from '../utils/downloadIdForMetrics'
+import processDownloadIdsForMetrics from '../utils/processDownloadIdsForMetrics'
 
 /**
  * Pauses a download and updates the database
@@ -38,10 +39,17 @@ const pauseDownloadItem = async ({
       state: downloadStates.paused
     })
 
+    const { clientId } = await database.getDownloadById(downloadId)
+
     metricsLogger({
       eventType: 'DownloadPause',
       data: {
-        downloadIds: [downloadIdForMetrics(downloadId)],
+        downloadIds: [
+          {
+            clientId,
+            downloadId: downloadIdForMetrics(downloadId)
+          }
+        ],
         downloadCount: 1
       }
     })
@@ -57,11 +65,15 @@ const pauseDownloadItem = async ({
       state: downloadStates.paused
     })
 
-    const metricIds = pauseResponse.pausedIds.map(downloadIdForMetrics)
+    const metricIds = await processDownloadIdsForMetrics({
+      database,
+      downloadIds: pauseResponse.pausedIds
+    })
     metricsLogger({
       eventType: 'DownloadPause',
       data: {
-        downloadIds: metricIds
+        downloadIds: metricIds,
+        downloadCount: metricIds.length
       }
     })
   }

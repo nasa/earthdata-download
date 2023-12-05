@@ -50,7 +50,8 @@ const sendToEula = async ({
       // `eulaUrl` comes from the 403 response
       eulaUrl,
       // `eulaRedirectUrl` comes from EDSC, should point to EDSC auth_callback
-      eulaRedirectUrl
+      eulaRedirectUrl,
+      clientId
     } = download
 
     // Pull `eddRedirect` out of `authUrl` and add `fileId` to it
@@ -79,6 +80,7 @@ const sendToEula = async ({
     metricsLogger({
       eventType: 'SentToEula',
       data: {
+        clientId,
         downloadId: downloadIdForMetrics(downloadId)
       }
     })

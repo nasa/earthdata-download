@@ -23,11 +23,10 @@ describe('pauseDownloadItem', () => {
         updateDownloadById: jest.fn(),
         updateDownloadsWhereIn: jest.fn(),
         updateFilesWhere: jest.fn(),
+        getDownloadById: jest.fn().mockResolvedValue({ clientId: 'eed-edsc-dev-serverless-client' }),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
-          pausedIds: ['mock-download-id-1', 'mock-download-id-2']
-        })
+        createPauseForAllActiveDownloads: jest.fn()
       }
 
       await pauseDownloadItem({
@@ -71,11 +70,10 @@ describe('pauseDownloadItem', () => {
         updateDownloadById: jest.fn(),
         updateDownloadsWhereIn: jest.fn(),
         updateFilesWhere: jest.fn(),
+        getDownloadById: jest.fn().mockResolvedValue({ clientId: 'eed-edsc-dev-serverless-client' }),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
-        createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
-          pausedIds: ['mock-download-id-1', 'mock-download-id-2']
-        })
+        createPauseForAllActiveDownloads: jest.fn()
       }
 
       await pauseDownloadItem({
@@ -89,9 +87,15 @@ describe('pauseDownloadItem', () => {
         eventType: 'DownloadPause',
         data: {
           downloadCount: 1,
-          downloadIds: ['mock-download-id']
+          downloadIds: [{
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 'mock-download-id'
+          }]
         }
       })
+
+      expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+      expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith('mock-download-id', undefined)
@@ -120,6 +124,7 @@ describe('pauseDownloadItem', () => {
         updateDownloadById: jest.fn(),
         updateDownloadsWhereIn: jest.fn(),
         updateFilesWhere: jest.fn(),
+        getDownloadById: jest.fn().mockResolvedValue({ clientId: 'eed-edsc-dev-serverless-client' }),
         createPauseByDownloadIdAndFilename: jest.fn(),
         createPauseByDownloadId: jest.fn(),
         createPauseForAllActiveDownloads: jest.fn().mockResolvedValue({
@@ -137,9 +142,18 @@ describe('pauseDownloadItem', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'DownloadPause',
         data: {
-          downloadIds: ['mock-download-id-1', 'mock-download-id-2']
+          downloadCount: 2,
+          downloadIds: [{
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 'mock-download-id-1'
+          }, {
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 'mock-download-id-2'
+          }]
         }
       })
+
+      expect(database.getDownloadById).toHaveBeenCalledTimes(2)
 
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.pauseItem).toHaveBeenCalledWith(undefined, undefined)

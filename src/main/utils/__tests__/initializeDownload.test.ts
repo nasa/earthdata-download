@@ -20,9 +20,13 @@ describe('initializeDownload', () => {
       send: jest.fn()
     }
     const database = {
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'eed-edsc-dev-serverless-client',
+        downloadId: 'mock-download-id'
+      }),
       getPreferences: jest.fn().mockResolvedValue({})
     }
-    const downloadIds = ['mockDownloadId']
+    const downloadIds = ['mock-download-id']
 
     await initializeDownload({
       database,
@@ -34,9 +38,16 @@ describe('initializeDownload', () => {
     expect(metricsLogger).toHaveBeenCalledWith({
       eventType: 'DownloadStarted',
       data: {
-        downloadIds: ['mockDownloadId']
+        downloadIds: [{
+          clientId: 'eed-edsc-dev-serverless-client',
+          downloadId: 'mock-download-id'
+        }],
+        downloadCount: 1
       }
     })
+
+    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
 
     expect(app.getPath).toHaveBeenCalledTimes(1)
 
@@ -46,7 +57,7 @@ describe('initializeDownload', () => {
     expect(webContents.send).toHaveBeenCalledWith(
       'initializeDownload',
       {
-        downloadIds: ['mockDownloadId'],
+        downloadIds: ['mock-download-id'],
         downloadLocation: '/system/default',
         shouldUseDefaultLocation: false
       }
@@ -58,11 +69,15 @@ describe('initializeDownload', () => {
       send: jest.fn()
     }
     const database = {
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'eed-edsc-dev-serverless-client',
+        downloadId: 'mock-download-id'
+      }),
       getPreferences: jest.fn().mockResolvedValue({
         lastDownloadLocation: '/last/download/location'
       })
     }
-    const downloadIds = ['mockDownloadId']
+    const downloadIds = ['mock-download-id']
 
     await initializeDownload({
       database,
@@ -74,9 +89,16 @@ describe('initializeDownload', () => {
     expect(metricsLogger).toHaveBeenCalledWith({
       eventType: 'DownloadStarted',
       data: {
-        downloadIds: ['mockDownloadId']
+        downloadIds: [{
+          clientId: 'eed-edsc-dev-serverless-client',
+          downloadId: 'mock-download-id'
+        }],
+        downloadCount: 1
       }
     })
+
+    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
 
     expect(app.getPath).toHaveBeenCalledTimes(1)
 
@@ -86,7 +108,7 @@ describe('initializeDownload', () => {
     expect(webContents.send).toHaveBeenCalledWith(
       'initializeDownload',
       {
-        downloadIds: ['mockDownloadId'],
+        downloadIds: ['mock-download-id'],
         downloadLocation: '/last/download/location',
         shouldUseDefaultLocation: false
       }
@@ -98,12 +120,16 @@ describe('initializeDownload', () => {
       send: jest.fn()
     }
     const database = {
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'eed-edsc-dev-serverless-client',
+        downloadId: 'mock-download-id'
+      }),
       getPreferences: jest.fn().mockResolvedValue({
         lastDownloadLocation: '/last/download/location',
         defaultDownloadLocation: '/default/download/location'
       })
     }
-    const downloadIds = ['mockDownloadId']
+    const downloadIds = ['mock-download-id']
 
     await initializeDownload({
       database,
@@ -115,9 +141,16 @@ describe('initializeDownload', () => {
     expect(metricsLogger).toHaveBeenCalledWith({
       eventType: 'DownloadStarted',
       data: {
-        downloadIds: ['mockDownloadId']
+        downloadIds: [{
+          clientId: 'eed-edsc-dev-serverless-client',
+          downloadId: 'mock-download-id'
+        }],
+        downloadCount: 1
       }
     })
+
+    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
 
     expect(app.getPath).toHaveBeenCalledTimes(1)
 
@@ -127,7 +160,7 @@ describe('initializeDownload', () => {
     expect(webContents.send).toHaveBeenCalledWith(
       'initializeDownload',
       {
-        downloadIds: ['mockDownloadId'],
+        downloadIds: ['mock-download-id'],
         downloadLocation: '/default/download/location',
         shouldUseDefaultLocation: true
       }

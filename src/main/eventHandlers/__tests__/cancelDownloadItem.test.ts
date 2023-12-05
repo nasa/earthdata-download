@@ -27,6 +27,10 @@ describe('cancelDownloadItem', () => {
         filename: 'mock-filename.png'
       }
       const database = {
+        getDownloadById: jest.fn().mockResolvedValue({
+          clientId: 'eed-edsc-dev-serverless-client',
+          downloadId: 'mock-download-id'
+        }),
         endPause: jest.fn(),
         updateDownloadsWhereAndWhereNotIn: jest.fn(),
         updateDownloadById: jest.fn(),
@@ -44,9 +48,13 @@ describe('cancelDownloadItem', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'DownloadItemCancel',
         data: {
+          clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'mock-download-id'
         }
       })
+
+      expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+      expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', 'mock-filename.png')
@@ -77,6 +85,10 @@ describe('cancelDownloadItem', () => {
         downloadId: 'mock-download-id'
       }
       const database = {
+        getDownloadById: jest.fn().mockResolvedValue({
+          clientId: 'eed-edsc-dev-serverless-client',
+          downloadId: 'mock-download-id'
+        }),
         endPause: jest.fn(),
         updateDownloadsWhereAndWhereNotIn: jest.fn(),
         updateDownloadById: jest.fn(),
@@ -94,10 +106,16 @@ describe('cancelDownloadItem', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'DownloadCancel',
         data: {
-          downloadIds: ['mock-download-id'],
+          downloadIds: [{
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 'mock-download-id'
+          }],
           cancelCount: 1
         }
       })
+
+      expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+      expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', undefined)
@@ -135,6 +153,15 @@ describe('cancelDownloadItem', () => {
       const database = {
         endPause: jest.fn(),
         deleteDownloadById: jest.fn(),
+        getDownloadById: jest.fn()
+          .mockResolvedValueOnce({
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 123
+          })
+          .mockResolvedValueOnce({
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 456
+          }),
         updateDownloadsWhereAndWhereNotIn: jest.fn().mockResolvedValue([
           { id: 123 },
           { id: 456 }
@@ -152,10 +179,20 @@ describe('cancelDownloadItem', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'DownloadCancel',
         data: {
-          downloadIds: [123, 456],
+          downloadIds: [{
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 123
+          }, {
+            clientId: 'eed-edsc-dev-serverless-client',
+            downloadId: 456
+          }],
           cancelCount: 2
         }
       })
+
+      expect(database.getDownloadById).toHaveBeenCalledTimes(2)
+      expect(database.getDownloadById).toHaveBeenCalledWith(123)
+      expect(database.getDownloadById).toHaveBeenCalledWith(456)
 
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith(undefined, undefined)

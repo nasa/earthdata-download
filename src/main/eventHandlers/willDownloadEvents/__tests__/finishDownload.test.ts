@@ -22,6 +22,7 @@ describe('finishDownload', () => {
     const database = {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(0),
       updateDownloadById: jest.fn(),
+      getDownloadById: jest.fn().mockResolvedValue({ clientId: 'eed-edsc-dev-serverless-client' }),
       getDownloadStatistics: jest.fn().mockResolvedValue({
         fileCount: 7,
         receivedBytesSum: 461748278,
@@ -41,6 +42,7 @@ describe('finishDownload', () => {
     expect(metricsLogger).toHaveBeenCalledWith({
       eventType: 'DownloadComplete',
       data: {
+        clientId: 'eed-edsc-dev-serverless-client',
         downloadId: 'mock-download-id',
         receivedBytes: 461748278,
         totalBytes: 461748278,
@@ -50,6 +52,9 @@ describe('finishDownload', () => {
         pauseCount: 2
       }
     })
+
+    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+    expect(database.getDownloadById).toHaveBeenCalledWith('mock-download-id')
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
     expect(database.updateDownloadById).toHaveBeenCalledWith(
@@ -67,6 +72,7 @@ describe('finishDownload', () => {
     const database = {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
       updateDownloadById: jest.fn(),
+      getDownloadById: jest.fn(),
       getDownloadStatistics: jest.fn().mockResolvedValue({
         fileCount: 7,
         receivedBytesSum: 461748278,
@@ -83,6 +89,8 @@ describe('finishDownload', () => {
     })
 
     expect(metricsLogger).toHaveBeenCalledTimes(0)
+
+    expect(database.getDownloadById).toHaveBeenCalledTimes(0)
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 

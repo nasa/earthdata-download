@@ -28,14 +28,6 @@ const restartDownload = async ({
   } = info
 
   const report = await database.getDownloadReport(downloadId)
-  metricsLogger({
-    eventType: 'DownloadRestart',
-    data: {
-      downloadId: downloadIdForMetrics(downloadId),
-      filesCompleted: report.finishedFiles,
-      filesInProgress: report.totalFiles - report.finishedFiles
-    }
-  })
 
   await database.updateFilesWhere({
     restartId
@@ -59,7 +51,17 @@ const restartDownload = async ({
 
   if (downloadId && filename) {
     const download = await database.getDownloadById(downloadId)
-    const { timeEnd } = download
+    const { clientId, timeEnd } = download
+
+    metricsLogger({
+      eventType: 'DownloadRestart',
+      data: {
+        clientId,
+        downloadId: downloadIdForMetrics(downloadId),
+        filesCompleted: report.finishedFiles,
+        filesInProgress: report.totalFiles - report.finishedFiles
+      }
+    })
 
     if (timeEnd !== null) {
       // If the download was previously finished, create a new pause from the previous `timeEnd` to now
@@ -103,6 +105,18 @@ const restartDownload = async ({
       errors: null,
       cancelId: null,
       restartId: null
+    })
+
+    const { clientId } = await database.getDownloadById(downloadId)
+
+    metricsLogger({
+      eventType: 'DownloadRestart',
+      data: {
+        clientId,
+        downloadId: downloadIdForMetrics(downloadId),
+        filesCompleted: report.finishedFiles,
+        filesInProgress: report.totalFiles - report.finishedFiles
+      }
     })
   }
 

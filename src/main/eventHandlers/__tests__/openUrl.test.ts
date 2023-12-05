@@ -27,7 +27,7 @@ describe('openUrl', () => {
   describe('when hostname is startDownload', () => {
     test('calls startPendingDownloads when no update is available', async () => {
       const appWindow = {}
-      const deepLink = 'earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgranule_links%3Fid%3D42%26flattenLinks%3Dtrue%26linkTypes%3Ddata&downloadId=shortName_versionId&token=Bearer mock-token'
+      const deepLink = 'earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgranule_links%3Fid%3D42%26flattenLinks%3Dtrue%26linkTypes%3Ddata&downloadId=shortName_versionId&clientId=eed-edsc-dev-serverless-client&token=Bearer mock-token'
       const database = {
         createDownload: jest.fn()
       }
@@ -49,6 +49,7 @@ describe('openUrl', () => {
           authUrl: null,
           createdAt: 1682899200000,
           eulaRedirectUrl: null,
+          clientId: 'eed-edsc-dev-serverless-client',
           getLinksToken: 'Bearer mock-token',
           getLinksUrl: 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data',
           state: downloadStates.pending
@@ -64,7 +65,7 @@ describe('openUrl', () => {
 
     test('does not call startPendingDownloads when an update is available', async () => {
       const appWindow = {}
-      const deepLink = 'earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgranule_links%3Fid%3D42%26flattenLinks%3Dtrue%26linkTypes%3Ddata&downloadId=shortName_versionId&token=Bearer mock-token'
+      const deepLink = 'earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgranule_links%3Fid%3D42%26flattenLinks%3Dtrue%26linkTypes%3Ddata&downloadId=shortName_versionId&clientId=eed-edsc-dev-serverless-client&token=Bearer mock-token'
       const database = {
         createDownload: jest.fn()
       }
@@ -86,6 +87,7 @@ describe('openUrl', () => {
           authUrl: null,
           createdAt: 1682899200000,
           eulaRedirectUrl: null,
+          clientId: 'eed-edsc-dev-serverless-client',
           getLinksToken: 'Bearer mock-token',
           getLinksUrl: 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data',
           state: downloadStates.pending

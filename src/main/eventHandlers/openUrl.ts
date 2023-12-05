@@ -39,6 +39,7 @@ const openUrl = async ({
     const eulaRedirectUrl = searchParams.get('eulaRedirectUrl')
     const getLinksToken = searchParams.get('token')
     const getLinksUrl = searchParams.get('getLinks')
+    const clientId = searchParams.get('clientId')
 
     const now = new Date()
       .toISOString()
@@ -49,7 +50,6 @@ const openUrl = async ({
     const downloadIdWithoutTimeFormatted = downloadIdWithoutTime.replace(/\s/g, '_')
 
     const downloadId = `${downloadIdWithoutTimeFormatted}-${now}`
-
     // Create a download in the database
     await database.createDownload(downloadId, {
       authUrl,
@@ -57,6 +57,7 @@ const openUrl = async ({
       eulaRedirectUrl,
       getLinksToken,
       getLinksUrl,
+      clientId,
       state: downloadStates.pending
     })
 

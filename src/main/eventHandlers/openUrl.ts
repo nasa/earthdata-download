@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
+import metricsLogger from '../utils/metricsLogger'
 import startNextDownload from '../utils/startNextDownload'
 import startPendingDownloads from '../utils/startPendingDownloads'
 
@@ -57,8 +59,15 @@ const openUrl = async ({
       eulaRedirectUrl,
       getLinksToken,
       getLinksUrl,
-      clientId,
       state: downloadStates.pending
+    })
+
+    metricsLogger({
+      eventType: 'OpenUrl',
+      data: {
+        clientId,
+        downloadId: downloadIdForMetrics(downloadId)
+      }
     })
 
     // If an app update is not available, start fetching links

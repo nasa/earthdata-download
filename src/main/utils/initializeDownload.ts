@@ -3,7 +3,7 @@
 import { app } from 'electron'
 
 import metricsLogger from './metricsLogger'
-import processDownloadIdsForMetrics from '../utils/processDownloadIdsForMetrics'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Sends a message to the renderer process to start a download for the given downloadIds.
@@ -44,15 +44,11 @@ const initializeDownload = async ({
       shouldUseDefaultLocation: !!defaultDownloadLocation
     })
 
-    const metricIds = await processDownloadIdsForMetrics({
-      database,
-      downloadIds
-    })
+    const metricIds = downloadIds.map(downloadIdForMetrics)
     metricsLogger({
       eventType: 'DownloadStarted',
       data: {
-        downloadIds: metricIds,
-        downloadCount: metricIds.length
+        downloadIds: metricIds
       }
     })
   }

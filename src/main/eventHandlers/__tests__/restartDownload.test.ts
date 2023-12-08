@@ -34,10 +34,7 @@ describe('restartDownload', () => {
       const database = {
         createPauseWith: jest.fn(),
         getDownloadById: jest.fn()
-          .mockResolvedValue({
-            clientId: 'eed-edsc-dev-serverless-client',
-            timeEnd: null
-          }),
+          .mockResolvedValue({ timeEnd: null }),
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
         deletePausesByDownloadIdAndFilename: jest.fn(),
@@ -66,7 +63,6 @@ describe('restartDownload', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'DownloadRestart',
         data: {
-          clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'mock-download-id',
           filesCompleted: 8,
           filesInProgress: 2
@@ -76,13 +72,12 @@ describe('restartDownload', () => {
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledTimes(1)
       expect(currentDownloadItems.cancelItem).toHaveBeenCalledWith('mock-download-id', undefined)
 
-      expect(database.getDownloadById).toHaveBeenCalledTimes(1)
+      expect(database.getDownloadById).toHaveBeenCalledTimes(0)
       expect(database.createPauseWith).toHaveBeenCalledTimes(0)
 
       expect(database.deletePausesByDownloadIdAndFilename).toHaveBeenCalledTimes(0)
 
       expect(database.getDownloadReport).toHaveBeenCalledTimes(1)
-      expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id')
 
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledTimes(1)
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledWith('mock-download-id')
@@ -134,10 +129,7 @@ describe('restartDownload', () => {
       const database = {
         createPauseWith: jest.fn(),
         getDownloadById: jest.fn()
-          .mockResolvedValue({
-            clientId: 'eed-edsc-dev-serverless-client',
-            timeEnd: null
-          }),
+          .mockResolvedValue({ timeEnd: null }),
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
         deletePausesByDownloadIdAndFilename: jest.fn(),
@@ -167,7 +159,6 @@ describe('restartDownload', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'DownloadRestart',
         data: {
-          clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'mock-download-id',
           filesCompleted: 8,
           filesInProgress: 2
@@ -188,7 +179,6 @@ describe('restartDownload', () => {
       expect(database.deleteAllPausesByDownloadId).toHaveBeenCalledTimes(0)
 
       expect(database.getDownloadReport).toHaveBeenCalledTimes(1)
-      expect(database.getDownloadReport).toHaveBeenCalledWith('mock-download-id')
 
       expect(database.updateFilesWhere).toHaveBeenCalledTimes(2)
       expect(database.updateFilesWhere).toHaveBeenCalledWith({
@@ -232,10 +222,7 @@ describe('restartDownload', () => {
       const database = {
         createPauseWith: jest.fn(),
         getDownloadById: jest.fn()
-          .mockResolvedValue({
-            clientId: 'eed-edsc-dev-serverless-client',
-            timeEnd: 1234
-          }),
+          .mockResolvedValue({ timeEnd: 1234 }),
         updateDownloadById: jest.fn(),
         updateFilesWhere: jest.fn(),
         deletePausesByDownloadIdAndFilename: jest.fn(),
@@ -265,7 +252,6 @@ describe('restartDownload', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'DownloadRestart',
         data: {
-          clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'mock-download-id',
           filesCompleted: 8,
           filesInProgress: 2

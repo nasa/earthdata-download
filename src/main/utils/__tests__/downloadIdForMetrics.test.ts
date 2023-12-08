@@ -3,7 +3,7 @@ import downloadIdForMetrics from '../downloadIdForMetrics'
 describe('downloadIdForMetrics', () => {
   test('should extract download ID when it matches the pattern', () => {
     const inputDownloadId = 'downloadId-20231116_164945'
-    const expectedExtractedId = 'downloadId-20231116_164945'
+    const expectedExtractedId = 'downloadId'
 
     const result = downloadIdForMetrics(inputDownloadId)
 

@@ -64,7 +64,8 @@ describe('EddDatabase', () => {
             name: '20230616233921_create_token.js'
           }, {
             name: '20230706005138_add_getLinks_token_to_downloads.js'
-          }, {
+          },
+          {
             name: '20230717153820_add_byte_columns_to_files_table.js'
           }, {
             name: '20230724200528_add_eulaUrl_to_downloads.js'
@@ -90,8 +91,6 @@ describe('EddDatabase', () => {
             name: '20230916000205_add_cancel_id_to_files.js'
           }, {
             name: '20230916012751_add_clear_id_to_downloads.js'
-          }, {
-            name: '20231201141537_add_client_id_to_downloads.js'
           }])
         } else if (step === 5) {
           // Query: select `name` from `knex_migrations` order by `id` asc'

@@ -23,7 +23,6 @@ describe('sendToLogin', () => {
     const database = {
       getFileWhere: jest.fn(),
       getDownloadById: jest.fn().mockResolvedValue({
-        clientId: 'eed-edsc-dev-serverless-client',
         authUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback'
       }),
       updateFileById: jest.fn()
@@ -48,13 +47,9 @@ describe('sendToLogin', () => {
     expect(metricsLogger).toHaveBeenCalledWith({
       eventType: 'SentToEdl',
       data: {
-        clientId: 'eed-edsc-dev-serverless-client',
         downloadId: 'downloadID'
       }
     })
-
-    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
-    expect(database.getDownloadById).toHaveBeenCalledWith('downloadID')
 
     expect(database.getFileWhere).toHaveBeenCalledTimes(0)
 
@@ -81,7 +76,6 @@ describe('sendToLogin', () => {
           id: 1234
         }),
         getDownloadById: jest.fn().mockResolvedValue({
-          clientId: 'eed-edsc-dev-serverless-client',
           authUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback'
         }),
         updateFileById: jest.fn()
@@ -106,13 +100,9 @@ describe('sendToLogin', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'SentToEdl',
         data: {
-          clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'downloadID'
         }
       })
-
-      expect(database.getDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.getDownloadById).toHaveBeenCalledWith('downloadID')
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(1)
       expect(database.getFileWhere).toHaveBeenCalledWith({
@@ -141,7 +131,9 @@ describe('sendToLogin', () => {
     test('does not open the authUrl', async () => {
       const database = {
         getFileWhere: jest.fn(),
-        getDownloadById: jest.fn(),
+        getDownloadById: jest.fn().mockResolvedValue({
+          authUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback'
+        }),
         updateFileById: jest.fn()
       }
       const downloadsWaitingForAuth = {
@@ -164,7 +156,7 @@ describe('sendToLogin', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(0)
-      expect(database.getDownloadById).toHaveBeenCalledTimes(0)
+
       expect(database.getFileWhere).toHaveBeenCalledTimes(0)
       expect(shell.openExternal).toHaveBeenCalledTimes(0)
       expect(webContents.send).toHaveBeenCalledTimes(0)
@@ -182,7 +174,6 @@ describe('sendToLogin', () => {
       const database = {
         getFileWhere: jest.fn(),
         getDownloadById: jest.fn().mockResolvedValue({
-          clientId: 'eed-edsc-dev-serverless-client',
           authUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FauthCallback'
         }),
         updateFileById: jest.fn()
@@ -210,13 +201,9 @@ describe('sendToLogin', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'SentToEdl',
         data: {
-          clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'downloadID'
         }
       })
-
-      expect(database.getDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.getDownloadById).toHaveBeenCalledWith('downloadID')
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(0)
 

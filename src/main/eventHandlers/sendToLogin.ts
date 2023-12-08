@@ -47,8 +47,7 @@ const sendToLogin = async ({
     const download = await database.getDownloadById(downloadId)
 
     const {
-      authUrl,
-      clientId
+      authUrl
     } = download
 
     // Pull `eddRedirect` out of `authUrl` and add `fileId` to it
@@ -74,7 +73,6 @@ const sendToLogin = async ({
     metricsLogger({
       eventType: 'SentToEdl',
       data: {
-        clientId,
         downloadId: downloadIdForMetrics(downloadId)
       }
     })

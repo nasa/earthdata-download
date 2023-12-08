@@ -23,7 +23,6 @@ describe('sendToEula', () => {
     const database = {
       getFileWhere: jest.fn(),
       getDownloadById: jest.fn().mockResolvedValue({
-        clientId: 'eed-edsc-dev-serverless-client',
         eulaUrl: 'http://example.com/accept_eula',
         eulaRedirectUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FeulaCallback'
       }),
@@ -49,13 +48,9 @@ describe('sendToEula', () => {
     expect(metricsLogger).toHaveBeenCalledWith({
       eventType: 'SentToEula',
       data: {
-        clientId: 'eed-edsc-dev-serverless-client',
         downloadId: 'downloadID'
       }
     })
-
-    expect(database.getDownloadById).toHaveBeenCalledTimes(1)
-    expect(database.getDownloadById).toHaveBeenCalledWith('downloadID')
 
     expect(database.getFileWhere).toHaveBeenCalledTimes(0)
 
@@ -82,7 +77,6 @@ describe('sendToEula', () => {
           id: 1234
         }),
         getDownloadById: jest.fn().mockResolvedValue({
-          clientId: 'eed-edsc-dev-serverless-client',
           eulaUrl: 'http://example.com/accept_eula',
           eulaRedirectUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FeulaCallback'
         }),
@@ -108,13 +102,9 @@ describe('sendToEula', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'SentToEula',
         data: {
-          clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'downloadID'
         }
       })
-
-      expect(database.getDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.getDownloadById).toHaveBeenCalledWith('downloadID')
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(1)
       expect(database.getFileWhere).toHaveBeenCalledWith({
@@ -143,7 +133,10 @@ describe('sendToEula', () => {
     test('does not open the eulaRedirectUrl', async () => {
       const database = {
         getFileWhere: jest.fn(),
-        getDownloadById: jest.fn(),
+        getDownloadById: jest.fn().mockResolvedValue({
+          eulaUrl: 'http://example.com/accept_eula',
+          eulaRedirectUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FeulaCallback'
+        }),
         updateFileById: jest.fn()
       }
       const downloadsWaitingForEula = {
@@ -166,7 +159,6 @@ describe('sendToEula', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(0)
-      expect(database.getDownloadById).toHaveBeenCalledTimes(0)
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(0)
       expect(shell.openExternal).toHaveBeenCalledTimes(0)
@@ -185,7 +177,6 @@ describe('sendToEula', () => {
       const database = {
         getFileWhere: jest.fn(),
         getDownloadById: jest.fn().mockResolvedValue({
-          clientId: 'eed-edsc-dev-serverless-client',
           eulaUrl: 'http://example.com/accept_eula',
           eulaRedirectUrl: 'http://example.com/auth?eddRedirect=earthdata-download%3A%2F%2FeulaCallback'
         }),
@@ -214,13 +205,9 @@ describe('sendToEula', () => {
       expect(metricsLogger).toHaveBeenCalledWith({
         eventType: 'SentToEula',
         data: {
-          clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'downloadID'
         }
       })
-
-      expect(database.getDownloadById).toHaveBeenCalledTimes(1)
-      expect(database.getDownloadById).toHaveBeenCalledWith('downloadID')
 
       expect(database.getFileWhere).toHaveBeenCalledTimes(0)
 

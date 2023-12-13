@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
+import metricsLogger from '../utils/metricsLogger'
 import startNextDownload from '../utils/startNextDownload'
 import startPendingDownloads from '../utils/startPendingDownloads'
 
@@ -39,6 +41,7 @@ const openUrl = async ({
     const eulaRedirectUrl = searchParams.get('eulaRedirectUrl')
     const getLinksToken = searchParams.get('token')
     const getLinksUrl = searchParams.get('getLinks')
+    const clientId = searchParams.get('clientId')
 
     const now = new Date()
       .toISOString()
@@ -49,7 +52,6 @@ const openUrl = async ({
     const downloadIdWithoutTimeFormatted = downloadIdWithoutTime.replace(/\s/g, '_')
 
     const downloadId = `${downloadIdWithoutTimeFormatted}-${now}`
-
     // Create a download in the database
     await database.createDownload(downloadId, {
       authUrl,
@@ -58,6 +60,14 @@ const openUrl = async ({
       getLinksToken,
       getLinksUrl,
       state: downloadStates.pending
+    })
+
+    metricsLogger({
+      eventType: 'OpenUrl',
+      data: {
+        clientId,
+        downloadId: downloadIdForMetrics(downloadId)
+      }
     })
 
     // If an app update is not available, start fetching links

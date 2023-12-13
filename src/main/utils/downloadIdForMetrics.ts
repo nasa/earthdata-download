@@ -11,7 +11,7 @@ const downloadIdForMetrics = (downloadId) => {
   const match = downloadIdString.match(regexPattern)
 
   if (match) {
-    return match[0]
+    return match[1]
   }
 
   return downloadId

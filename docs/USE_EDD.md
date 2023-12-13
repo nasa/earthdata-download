@@ -29,7 +29,7 @@ In order to have your web application launch the Earthdata Download application,
 This link will start a new download in Earthdata Download.
 
 ```text
-earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgranule_links%3Fid%3D42%26flattenLinks%3Dtrue%26linkTypes%3Ddata&downloadId=shortName_versionId&token=Bearer mock-token
+earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgranule_links%3Fid%3D42%26flattenLinks%3Dtrue%26linkTypes%3Ddata&downloadId=shortName_versionId&clientId=eed-edsc-dev-serverless-client&token=Bearer mock-token
 ```
 
 #### Query Parameters
@@ -42,6 +42,7 @@ earthdata-download://startDownload?getLinks=http%3A%2F%2Flocalhost%3A3000%2Fgran
 | | authUrl | false | This is a URL where Earthdata Download can send the user to login with Earthdata Login. After logging in the user needs to be redirected to the Authentication callback. See [this document](EDL_AUTH.md) for more information on Earthdata Login authentication. |
 | | eulaRedirectUrl | false | This is a URL that Earthdata Download will use as a redirect after the user is sent to Earthdata Login to accept a EULA. See [this document](EULA_CALLBACK.md) for more information on the EULA acceptance workflow. |
 | | token | false | A token to be passed in the `getLinks` request. Value will be added to the `Authorization` header. |
+| | clientId | false | The clientId for the application initiating the download. |
 
 ### Authentication callback
 

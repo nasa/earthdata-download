@@ -56,6 +56,14 @@
   color: var(--color__black--500);
 }
 
+.sendUsageMetricsForm {
+  min-width: 0;
+  flex-shrink: 1;
+  border-radius: 0.25rem;
+  font-size: 1.1em;
+  padding: 5px 5px;
+}
+
 .settingsClearDefaultDownload {
   width: 20%;
   color: var(--color__text--dark);

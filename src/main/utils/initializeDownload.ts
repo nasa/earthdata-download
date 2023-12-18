@@ -45,7 +45,7 @@ const initializeDownload = async ({
     })
 
     const metricIds = downloadIds.map(downloadIdForMetrics)
-    metricsLogger({
+    metricsLogger(database, {
       eventType: 'DownloadStarted',
       data: {
         downloadIds: metricIds

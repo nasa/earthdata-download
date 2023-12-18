@@ -60,7 +60,7 @@ const windowStateKeeper = async (database) => {
     isMaximized: windowState.isMaximized
   }
 
-  metricsLogger({
+  metricsLogger(database, {
     eventType: 'WindowSizePreferences',
     data: {
       windowStateInfo

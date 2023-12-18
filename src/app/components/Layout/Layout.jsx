@@ -8,7 +8,9 @@ import {
   FaCog,
   FaDownload,
   FaExclamationCircle,
-  FaSignInAlt
+  FaSignInAlt,
+  FaCheck,
+  FaBan
 } from 'react-icons/fa'
 import {
   VscChromeRestore,
@@ -62,6 +64,8 @@ const Layout = () => {
     maximizeWindow,
     minimizeWindow,
     setDownloadLocation,
+    setPreferenceFieldValue,
+    getPreferenceFieldValue,
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
     windowsLinuxTitleBar
@@ -158,7 +162,28 @@ const Layout = () => {
     }
   }
 
-  const onInitializeDownload = (event, info) => {
+  const metricsToastResponder = async (selection) => {
+    onDismissToast('allow-metrics-id')
+
+    if (selection === 'Settings') {
+      setSettingsDialogIsOpen(true)
+
+      return
+    }
+
+    setPreferenceFieldValue({
+      field: 'allowMetrics',
+      value: selection
+    })
+  }
+
+  const isMetricsPreferenceSet = async () => {
+    const metricsPreference = await getPreferenceFieldValue('allowMetrics')
+
+    return metricsPreference === 'Allow' || metricsPreference === 'Opt-Out'
+  }
+
+  const onInitializeDownload = async (event, info) => {
     const {
       downloadIds: newDownloadIds,
       downloadLocation: newDownloadLocation,
@@ -175,6 +200,42 @@ const Layout = () => {
         downloadLocation: newDownloadLocation,
         makeDefaultDownloadLocation: true
       })
+
+      // Displaying Allow Metrics prompt if the user hasn't set a value
+      const metricsPreferenceSet = await isMetricsPreferenceSet()
+      if (!metricsPreferenceSet) {
+        addToast({
+          id: 'allow-metrics-id',
+          message: 'Send Anonymous Usage Data',
+          variant: 'none',
+          actions: [
+            {
+              altText: 'Allow',
+              buttonText: 'Allow',
+              buttonProps: {
+                Icon: FaCheck,
+                onClick: () => metricsToastResponder('Allow')
+              }
+            },
+            {
+              altText: 'Opt-Out',
+              buttonText: 'Opt-Out',
+              buttonProps: {
+                Icon: FaBan,
+                onClick: () => metricsToastResponder('Opt-Out')
+              }
+            },
+            {
+              altText: 'Settings',
+              buttonText: 'Settings',
+              buttonProps: {
+                Icon: FaCog,
+                onClick: () => metricsToastResponder('Settings')
+              }
+            }
+          ]
+        })
+      }
 
       // Display a toast notification if a download is initialized
       // while current page is not Downloads

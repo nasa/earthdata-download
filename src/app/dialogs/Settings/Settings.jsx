@@ -54,6 +54,7 @@ const Settings = ({
     getPreferenceFieldValue
   } = useContext(ElectronApiContext)
   const [concurrentDownloads, setConcurrentDownloads] = useState('')
+  const [metricsPreference, setMetricsPreference] = useState('')
 
   const onClearDefaultDownload = () => {
     setPreferenceFieldValue({
@@ -82,6 +83,17 @@ const Settings = ({
     // Allow set if non-decimal value and > 0 allow setting of the text field
     if (valueNumeric > 0 && value.indexOf('.') < 0) {
       setConcurrentDownloads(valueNumeric.toString())
+    }
+  }
+
+  const onChangeAllowMetrics = (event) => {
+    const { value } = event.target
+    if (value !== 'Select Options') {
+      setMetricsPreference(value)
+      setPreferenceFieldValue({
+        field: 'allowMetrics',
+        value
+      })
     }
   }
 
@@ -117,7 +129,10 @@ const Settings = ({
   useEffect(() => {
     const fetchConcurrentDownloads = async () => {
       const newConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
+      const newUsageMetrics = await getPreferenceFieldValue('allowMetrics')
+
       setConcurrentDownloads(newConcurrentDownloads.toString())
+      setMetricsPreference(newUsageMetrics)
     }
 
     fetchConcurrentDownloads()
@@ -224,6 +239,21 @@ const Settings = ({
           value={concurrentDownloads}
           onBlur={onBlurConcurrentDownloads}
         />
+      </FormRow>
+      <FormRow
+        label="Send Usage Metrics"
+        description="Allow us to collect anonymous usage data to help us improve our application."
+      >
+        <select
+          className={styles.sendUsageMetricsForm}
+          id="allow-metrics"
+          value={metricsPreference}
+          onChange={(event) => onChangeAllowMetrics(event)}
+        >
+          <option value="Select Option">Select Option</option>
+          <option value="Allow">Allow</option>
+          <option value="Opt-Out">Opt-Out</option>
+        </select>
       </FormRow>
     </div>
   )

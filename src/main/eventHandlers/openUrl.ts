@@ -62,7 +62,7 @@ const openUrl = async ({
       state: downloadStates.pending
     })
 
-    metricsLogger({
+    metricsLogger(database, {
       eventType: 'OpenUrl',
       data: {
         clientId,

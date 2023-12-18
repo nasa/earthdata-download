@@ -22,8 +22,7 @@ const finishDownload = async ({
     })
 
     const downloadStatistics = await database.getDownloadStatistics(downloadId)
-
-    metricsLogger({
+    metricsLogger(database, {
       eventType: 'DownloadComplete',
       data: {
         downloadId: downloadIdForMetrics(downloadId),

@@ -8,7 +8,12 @@ import config from '../config.json'
  * Dispatches specified events to edd_logger lambda to be logged on CloudWatch
  * @param {Object} event json object to be sent to edd_logger
  */
-const metricsLogger = async (event) => {
+const metricsLogger = async (database, event) => {
+  const allowMetrics = await database.getPreferencesByField('allowMetrics')
+  if (allowMetrics !== 'Allow') {
+    return
+  }
+
   try {
     await fetch(config.logging, {
       method: 'POST',

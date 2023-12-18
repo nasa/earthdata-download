@@ -37,7 +37,7 @@ const resumeDownloadItem = async ({
   }
 
   if (downloadId && !filename) {
-    metricsLogger({
+    metricsLogger(database, {
       eventType: 'DownloadResume',
       data: {
         downloadIds: [downloadIdForMetrics(downloadId)],
@@ -84,7 +84,7 @@ const resumeDownloadItem = async ({
       downloadIds.push(downloadIdForMetrics(id))
     })
 
-    metricsLogger({
+    metricsLogger(database, {
       eventType: 'DownloadResume',
       data: {
         downloadIds,

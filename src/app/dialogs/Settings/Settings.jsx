@@ -88,7 +88,7 @@ const Settings = ({
 
   const onChangeAllowMetrics = (event) => {
     const { value } = event.target
-    if (value !== 'Select Options') {
+    if (value !== 'Select Option') {
       setMetricsPreference(value)
       setPreferenceFieldValue({
         field: 'allowMetrics',

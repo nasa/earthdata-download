@@ -28,8 +28,6 @@ describe('metricsLogger', () => {
   }
 
   test('should not send any metrics when user hasn\'t opted in', async () => {
-    const expectedBody = JSON.stringify({ params: event })
-
     const database = {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
       updateDownloadById: jest.fn(),

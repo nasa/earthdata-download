@@ -60,7 +60,7 @@ describe('restartDownload', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'DownloadRestart',
         data: {
           downloadId: 'mock-download-id',
@@ -156,7 +156,7 @@ describe('restartDownload', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'DownloadRestart',
         data: {
           downloadId: 'mock-download-id',
@@ -249,7 +249,7 @@ describe('restartDownload', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'DownloadRestart',
         data: {
           downloadId: 'mock-download-id',

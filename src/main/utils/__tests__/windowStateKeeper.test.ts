@@ -25,7 +25,7 @@ describe('windowStateKeeper', () => {
     }))
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'WindowSizePreferences',
       data: {
         windowStateInfo: {
@@ -62,7 +62,7 @@ describe('windowStateKeeper', () => {
     }))
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'WindowSizePreferences',
       data: {
         windowStateInfo: {
@@ -117,7 +117,7 @@ describe('windowStateKeeper', () => {
         window.send('resize')
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
-        expect(metricsLogger).toHaveBeenCalledWith({
+        expect(metricsLogger).toHaveBeenCalledWith(database, {
           eventType: 'WindowSizePreferences',
           data: {
             windowStateInfo: {
@@ -175,7 +175,7 @@ describe('windowStateKeeper', () => {
         window.send('resize')
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
-        expect(metricsLogger).toHaveBeenCalledWith({
+        expect(metricsLogger).toHaveBeenCalledWith(database, {
           eventType: 'WindowSizePreferences',
           data: {
             windowStateInfo: {
@@ -235,7 +235,7 @@ describe('windowStateKeeper', () => {
         window.send('move')
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
-        expect(metricsLogger).toHaveBeenCalledWith({
+        expect(metricsLogger).toHaveBeenCalledWith(database, {
           eventType: 'WindowSizePreferences',
           data: {
             windowStateInfo: {
@@ -293,7 +293,7 @@ describe('windowStateKeeper', () => {
         window.send('move')
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
-        expect(metricsLogger).toHaveBeenCalledWith({
+        expect(metricsLogger).toHaveBeenCalledWith(database, {
           eventType: 'WindowSizePreferences',
           data: {
             windowStateInfo: {
@@ -358,7 +358,7 @@ describe('windowStateKeeper', () => {
         })
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
-        expect(metricsLogger).toHaveBeenCalledWith({
+        expect(metricsLogger).toHaveBeenCalledWith(database, {
           eventType: 'WindowSizePreferences',
           data: {
             windowStateInfo: {
@@ -411,7 +411,7 @@ describe('windowStateKeeper', () => {
         window.send('close')
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
-        expect(metricsLogger).toHaveBeenCalledWith({
+        expect(metricsLogger).toHaveBeenCalledWith(database, {
           eventType: 'WindowSizePreferences',
           data: {
             windowStateInfo: {

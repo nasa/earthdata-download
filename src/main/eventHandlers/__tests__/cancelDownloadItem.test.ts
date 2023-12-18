@@ -41,7 +41,7 @@ describe('cancelDownloadItem', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'DownloadItemCancel',
         data: {
           downloadId: 'mock-download-id'
@@ -91,7 +91,7 @@ describe('cancelDownloadItem', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'DownloadCancel',
         data: {
           downloadIds: ['mock-download-id'],
@@ -149,7 +149,7 @@ describe('cancelDownloadItem', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'DownloadCancel',
         data: {
           downloadIds: [123, 456],

@@ -31,7 +31,7 @@ describe('initializeDownload', () => {
     })
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'DownloadStarted',
       data: {
         downloadIds: ['mockDownloadId']
@@ -71,7 +71,7 @@ describe('initializeDownload', () => {
     })
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'DownloadStarted',
       data: {
         downloadIds: ['mockDownloadId']
@@ -112,7 +112,7 @@ describe('initializeDownload', () => {
     })
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'DownloadStarted',
       data: {
         downloadIds: ['mockDownloadId']

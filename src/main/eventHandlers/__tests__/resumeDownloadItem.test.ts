@@ -113,7 +113,7 @@ describe('resumeDownloadItem', () => {
         })
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
-        expect(metricsLogger).toHaveBeenCalledWith({
+        expect(metricsLogger).toHaveBeenCalledWith(database, {
           eventType: 'DownloadResume',
           data: {
             downloadIds: ['mock-download-id'],
@@ -179,7 +179,7 @@ describe('resumeDownloadItem', () => {
         })
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
-        expect(metricsLogger).toHaveBeenCalledWith({
+        expect(metricsLogger).toHaveBeenCalledWith(database, {
           eventType: 'DownloadResume',
           data: {
             downloadIds: ['mock-download-id'],
@@ -247,7 +247,7 @@ describe('resumeDownloadItem', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'DownloadResume',
         data: {
           downloadIds: ['download1', 'download2', 'download3'],

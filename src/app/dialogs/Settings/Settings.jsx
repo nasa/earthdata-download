@@ -132,7 +132,7 @@ const Settings = ({
       const newUsageMetrics = await getPreferenceFieldValue('allowMetrics')
 
       setConcurrentDownloads(newConcurrentDownloads.toString())
-      setMetricsPreference(newUsageMetrics)
+      setMetricsPreference(newUsageMetrics || '')
     }
 
     fetchConcurrentDownloads()

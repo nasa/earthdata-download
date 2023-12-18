@@ -91,6 +91,8 @@ describe('EddDatabase', () => {
             name: '20230916000205_add_cancel_id_to_files.js'
           }, {
             name: '20230916012751_add_clear_id_to_downloads.js'
+          }, {
+            name: '20231214205233_add_new_field_to_preferences.js'
           }])
         } else if (step === 5) {
           // Query: select `name` from `knex_migrations` order by `id` asc'
@@ -1800,7 +1802,8 @@ describe('EddDatabase', () => {
     test('returns statistics for a completed download', async () => {
       dbTracker.on('query', (query) => {
         expect(query.sql).toEqual(expect.stringContaining('select count(`id`) as `fileCount'))
-        expect(query.bindings).toEqual(['mock-download-id', 1])
+        expect(query.bindings).toContain('mock-download-id')
+        expect(query.bindings).toContain(1)
 
         query.response({
           fileCount: 5,

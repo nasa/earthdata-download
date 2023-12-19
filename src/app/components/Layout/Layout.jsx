@@ -190,6 +190,43 @@ const Layout = () => {
       shouldUseDefaultLocation
     } = info
 
+    // Displaying Allow Metrics prompt if the user hasn't set a value
+    const metricsPreferenceSet = await isMetricsPreferenceSet()
+    if (!metricsPreferenceSet) {
+      addToast({
+        showCloseButton: false,
+        id: 'allow-metrics-id',
+        message: 'Send Anonymous Usage Data?',
+        variant: 'none',
+        actions: [
+          {
+            altText: 'Allow',
+            buttonText: 'Yes',
+            buttonProps: {
+              Icon: FaCheck,
+              onClick: () => metricsToastResponder('Allow')
+            }
+          },
+          {
+            altText: 'Opt-Out',
+            buttonText: 'No',
+            buttonProps: {
+              Icon: FaBan,
+              onClick: () => metricsToastResponder('Opt-Out')
+            }
+          },
+          {
+            altText: 'Settings',
+            buttonText: 'Settings',
+            buttonProps: {
+              Icon: FaCog,
+              onClick: () => metricsToastResponder('Settings')
+            }
+          }
+        ]
+      })
+    }
+
     setDownloadIds(newDownloadIds)
     setSelectedDownloadLocation(newDownloadLocation)
     setUseDefaultLocation(shouldUseDefaultLocation)
@@ -200,43 +237,6 @@ const Layout = () => {
         downloadLocation: newDownloadLocation,
         makeDefaultDownloadLocation: true
       })
-
-      // Displaying Allow Metrics prompt if the user hasn't set a value
-      const metricsPreferenceSet = await isMetricsPreferenceSet()
-      if (!metricsPreferenceSet) {
-        addToast({
-          showCloseButton: false,
-          id: 'allow-metrics-id',
-          message: 'Send Anonymous Usage Data?',
-          variant: 'none',
-          actions: [
-            {
-              altText: 'Allow',
-              buttonText: 'Yes',
-              buttonProps: {
-                Icon: FaCheck,
-                onClick: () => metricsToastResponder('Allow')
-              }
-            },
-            {
-              altText: 'Opt-Out',
-              buttonText: 'No',
-              buttonProps: {
-                Icon: FaBan,
-                onClick: () => metricsToastResponder('Opt-Out')
-              }
-            },
-            {
-              altText: 'Settings',
-              buttonText: 'Settings',
-              buttonProps: {
-                Icon: FaCog,
-                onClick: () => metricsToastResponder('Settings')
-              }
-            }
-          ]
-        })
-      }
 
       // Display a toast notification if a download is initialized
       // while current page is not Downloads

@@ -1,6 +1,15 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {
+  FaCheck,
+  FaBan,
+  FaCog
+} from 'react-icons/fa'
 import '@testing-library/jest-dom'
 
 import Layout from '../Layout'
@@ -36,7 +45,10 @@ jest.mock('../../../components/ToastList/ToastList', () => jest.fn(() => (
 )))
 
 const setup = (overrideApiContextValue = {}, toasts = {}) => {
+  const addToast = jest.fn()
   const closeWindow = jest.fn()
+  const dismissToast = jest.fn()
+  const getPreferenceFieldValue = jest.fn()
   const minimizeWindow = jest.fn()
   const maximizeWindow = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
@@ -47,11 +59,16 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
     isMac: true,
     isLinux: false,
     closeWindow,
+    getPreferenceFieldValue,
     minimizeWindow,
     maximizeWindow,
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
     ...overrideApiContextValue
+  }
+
+  const callbacks = {
+    initializeDownload: null
   }
 
   render(
@@ -62,10 +79,11 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
         isLinux: false,
         autoUpdateAvailable: jest.fn(),
         autoUpdateInstallLater: jest.fn(),
-        beginDownload: jest.fn(),
         autoUpdateProgress: jest.fn(),
-        initializeDownload: jest.fn(),
+        beginDownload: jest.fn(),
+        initializeDownload: jest.fn((on, callback) => { callbacks.initializeDownload = callback }),
         setDownloadLocation: jest.fn(),
+        setPreferenceFieldValue: jest.fn(),
         windowsLinuxTitleBar: jest.fn(),
         ...apiContextValue
       }
@@ -73,6 +91,8 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
     >
       <AppContext.Provider value={
         {
+          addToast,
+          dismissToast,
           toasts
         }
       }
@@ -83,6 +103,10 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
   )
 
   return {
+    addToast,
+    dismissToast,
+    callbacks,
+    getPreferenceFieldValue,
     closeWindow,
     minimizeWindow,
     maximizeWindow
@@ -142,6 +166,98 @@ describe('Layout component', () => {
     expect(Downloads).toHaveBeenCalledTimes(1)
 
     expect(screen.getByTestId('layout-header').className).toContain('isMac')
+  })
+
+  describe('when a new download is initialized', () => {
+    describe('when the user has opted into metrics', () => {
+      test('addToast is not called', async () => {
+        const {
+          callbacks,
+          getPreferenceFieldValue,
+          addToast
+        } = setup()
+
+        getPreferenceFieldValue.mockResolvedValueOnce('Allow')
+
+        waitFor(() => {
+          callbacks.initializeDownload({ mock: 'event' }, {
+            mock: 'info'
+          })
+
+          expect(getPreferenceFieldValue).toHaveBeenCalledTimes(1)
+          expect(addToast).toHaveBeenCalledTimes(0)
+        })
+      })
+    })
+
+    describe('when the user has opted out of metrics', () => {
+      test('addToast is not called', async () => {
+        const { callbacks, getPreferenceFieldValue, addToast } = setup()
+
+        getPreferenceFieldValue.mockResolvedValueOnce('Opt-Out')
+
+        waitFor(() => {
+          callbacks.initializeDownload({ mock: 'event' }, {
+            mock: 'info'
+          })
+
+          expect(getPreferenceFieldValue).toHaveBeenCalledTimes(1)
+          expect(addToast).toHaveBeenCalledTimes(0)
+        })
+      })
+    })
+
+    describe('when the user has not selected whether to opt into metrics', () => {
+      test('addToast is called', async () => {
+        const {
+          addToast,
+          callbacks,
+          getPreferenceFieldValue
+        } = setup()
+
+        getPreferenceFieldValue.mockResolvedValueOnce('mock')
+
+        waitFor(() => {
+          callbacks.initializeDownload({ mock: 'event' }, {
+            mock: 'info'
+          })
+
+          expect(getPreferenceFieldValue).toHaveBeenCalledTimes(1)
+          expect(addToast).toHaveBeenCalledTimes(1)
+          expect(addToast).toHaveBeenCalledWith({
+            actions: [
+              {
+                altText: 'Allow',
+                buttonText: 'Yes',
+                buttonProps: {
+                  Icon: FaCheck,
+                  onClick: () => expect.any(Function)
+                }
+              },
+              {
+                altText: 'Opt-Out',
+                buttonText: 'No',
+                buttonProps: {
+                  Icon: FaBan,
+                  onClick: () => expect.any(Function)
+                }
+              },
+              {
+                altText: 'Settings',
+                buttonText: 'Settings',
+                buttonProps: {
+                  Icon: FaCog,
+                  onClick: () => expect.any(Function)
+                }
+              }
+            ],
+            id: 'undo-cancel-downloads',
+            message: 'Download Cancelled',
+            variant: 'none'
+          })
+        })
+      })
+    })
   })
 
   test('renders the settings button on windows', () => {

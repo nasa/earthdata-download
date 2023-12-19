@@ -245,6 +245,7 @@ const Settings = ({
         description="Allow us to collect anonymous usage data to help us improve our application."
       >
         <select
+          aria-label="Send Usage Metrics"
           className={styles.sendUsageMetricsForm}
           id="allow-metrics"
           value={metricsPreference}

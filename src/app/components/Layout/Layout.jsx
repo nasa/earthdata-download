@@ -205,13 +205,14 @@ const Layout = () => {
       const metricsPreferenceSet = await isMetricsPreferenceSet()
       if (!metricsPreferenceSet) {
         addToast({
+          showCloseButton: false,
           id: 'allow-metrics-id',
-          message: 'Send Anonymous Usage Data',
+          message: 'Send Anonymous Usage Data?',
           variant: 'none',
           actions: [
             {
               altText: 'Allow',
-              buttonText: 'Allow',
+              buttonText: 'Yes',
               buttonProps: {
                 Icon: FaCheck,
                 onClick: () => metricsToastResponder('Allow')
@@ -219,7 +220,7 @@ const Layout = () => {
             },
             {
               altText: 'Opt-Out',
-              buttonText: 'Opt-Out',
+              buttonText: 'No',
               buttonProps: {
                 Icon: FaBan,
                 onClick: () => metricsToastResponder('Opt-Out')

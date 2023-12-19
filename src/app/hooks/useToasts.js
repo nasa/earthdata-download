@@ -4,7 +4,6 @@ import { initialState, toastsReducer } from '../reducers/toastsReducer'
 
 const useToasts = () => {
   const [toasts, toastsDispatch] = useReducer(toastsReducer, initialState)
-
   /**
    * Add a new toast
    */
@@ -13,6 +12,7 @@ const useToasts = () => {
     id,
     message,
     numberErrors,
+    showCloseButton,
     title,
     variant
   }) => {
@@ -23,6 +23,7 @@ const useToasts = () => {
         id,
         message,
         numberErrors,
+        showCloseButton,
         title,
         variant
       }

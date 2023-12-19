@@ -252,8 +252,8 @@ const Settings = ({
           onChange={(event) => onChangeAllowMetrics(event)}
         >
           <option value="Select Option">Select Option</option>
-          <option value="Allow">Allow</option>
-          <option value="Opt-Out">Opt-Out</option>
+          <option value="Allow">Yes</option>
+          <option value="Opt-Out">No</option>
         </select>
       </FormRow>
     </div>

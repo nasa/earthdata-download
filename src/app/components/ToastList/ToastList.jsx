@@ -40,6 +40,7 @@ const ToastList = ({
           actions,
           id,
           message,
+          showCloseButton,
           title,
           variant
         }) => (
@@ -50,6 +51,7 @@ const ToastList = ({
             message={message}
             actions={actions}
             title={title}
+            showCloseButton={showCloseButton}
             variant={variant}
           />
         ))
@@ -73,6 +75,7 @@ ToastList.propTypes = {
       actions: PropTypes.arrayOf(
         PropTypes.shape({})
       ),
+      showCloseButton: PropTypes.bool,
       title: PropTypes.string,
       variant: PropTypes.string
     })

@@ -44,13 +44,14 @@ jest.mock('../../../components/ToastList/ToastList', () => jest.fn(() => (
   <mock-ToastList data-testid="ToastList" />
 )))
 
-const setup = (overrideApiContextValue = {}, toasts = {}) => {
-  const addToast = jest.fn()
+const setup = (overrideApiContextValue = {}, toasts = []) => {
+  const addToast = jest.fn((toast) => toasts.push(toast))
   const closeWindow = jest.fn()
   const dismissToast = jest.fn()
   const getPreferenceFieldValue = jest.fn()
   const minimizeWindow = jest.fn()
   const maximizeWindow = jest.fn()
+  const setPreferenceFieldValue = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
 
@@ -62,6 +63,7 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
     getPreferenceFieldValue,
     minimizeWindow,
     maximizeWindow,
+    setPreferenceFieldValue,
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
     ...overrideApiContextValue
@@ -83,7 +85,6 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
         beginDownload: jest.fn(),
         initializeDownload: jest.fn((on, callback) => { callbacks.initializeDownload = callback }),
         setDownloadLocation: jest.fn(),
-        setPreferenceFieldValue: jest.fn(),
         windowsLinuxTitleBar: jest.fn(),
         ...apiContextValue
       }
@@ -109,7 +110,9 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
     getPreferenceFieldValue,
     closeWindow,
     minimizeWindow,
-    maximizeWindow
+    maximizeWindow,
+    toasts,
+    setPreferenceFieldValue
   }
 }
 
@@ -264,6 +267,239 @@ describe('Layout component', () => {
                 }
               }
             ]
+          })
+        })
+      })
+
+      describe('when the user selects one of the metrics toast options', () => {
+        describe('when user selects `Yes` to allow metrics', () => {
+          test('setPreferenceFieldValue is called and toast is dismissed', async () => {
+            const {
+              addToast,
+              callbacks,
+              dismissToast,
+              getPreferenceFieldValue,
+              setPreferenceFieldValue,
+              toasts
+            } = setup()
+
+            getPreferenceFieldValue.mockResolvedValueOnce('mock')
+
+            await waitFor(() => {
+              callbacks.initializeDownload({ mock: 'event' }, {
+                mock: 'info'
+              })
+            })
+
+            await waitFor(() => {
+              expect(addToast).toHaveBeenCalledTimes(1)
+              expect(addToast).toHaveBeenCalledWith({
+                showCloseButton: false,
+                id: 'allow-metrics-id',
+                message: 'Send Anonymous Usage Data?',
+                variant: 'none',
+                actions: [
+                  {
+                    altText: 'Allow',
+                    buttonText: 'Yes',
+                    buttonProps: {
+                      Icon: FaCheck,
+                      onClick: expect.any(Function)
+                    }
+                  },
+                  {
+                    altText: 'Opt-Out',
+                    buttonText: 'No',
+                    buttonProps: {
+                      Icon: FaBan,
+                      onClick: expect.any(Function)
+                    }
+                  },
+                  {
+                    altText: 'Settings',
+                    buttonText: 'Settings',
+                    buttonProps: {
+                      Icon: FaCog,
+                      onClick: expect.any(Function)
+                    }
+                  }
+                ]
+              })
+            })
+
+            expect(toasts).toHaveLength(1)
+            const [toast] = toasts
+            const { actions } = toast
+
+            const allowButton = actions[0]
+            const { buttonProps } = allowButton
+            const { onClick } = buttonProps
+
+            // Call the `metricsToastResponder` function
+            await onClick()
+
+            expect(dismissToast).toBeCalledTimes(1)
+            expect(dismissToast).toHaveBeenCalledWith('allow-metrics-id')
+            expect(setPreferenceFieldValue).toBeCalledTimes(1)
+            expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+              field: 'allowMetrics',
+              value: 'Allow'
+            })
+          })
+        })
+
+        describe('when user selects `No` to opt-out of metrics', () => {
+          test('setPreferenceFieldValue is called and toast is dismissed', async () => {
+            const {
+              addToast,
+              callbacks,
+              dismissToast,
+              getPreferenceFieldValue,
+              setPreferenceFieldValue,
+              toasts
+            } = setup()
+
+            getPreferenceFieldValue.mockResolvedValueOnce('mock')
+
+            await waitFor(() => {
+              callbacks.initializeDownload({ mock: 'event' }, {
+                mock: 'info'
+              })
+            })
+
+            await waitFor(() => {
+              expect(addToast).toHaveBeenCalledTimes(1)
+              expect(addToast).toHaveBeenCalledWith({
+                showCloseButton: false,
+                id: 'allow-metrics-id',
+                message: 'Send Anonymous Usage Data?',
+                variant: 'none',
+                actions: [
+                  {
+                    altText: 'Allow',
+                    buttonText: 'Yes',
+                    buttonProps: {
+                      Icon: FaCheck,
+                      onClick: expect.any(Function)
+                    }
+                  },
+                  {
+                    altText: 'Opt-Out',
+                    buttonText: 'No',
+                    buttonProps: {
+                      Icon: FaBan,
+                      onClick: expect.any(Function)
+                    }
+                  },
+                  {
+                    altText: 'Settings',
+                    buttonText: 'Settings',
+                    buttonProps: {
+                      Icon: FaCog,
+                      onClick: expect.any(Function)
+                    }
+                  }
+                ]
+              })
+            })
+
+            expect(toasts).toHaveLength(1)
+            const [toast] = toasts
+            const { actions } = toast
+
+            const allowButton = actions[1]
+            const { buttonProps } = allowButton
+            const { onClick } = buttonProps
+
+            // Call the `metricsToastResponder` function
+            await onClick()
+
+            expect(dismissToast).toBeCalledTimes(1)
+            expect(dismissToast).toHaveBeenCalledWith('allow-metrics-id')
+            expect(setPreferenceFieldValue).toBeCalledTimes(1)
+            expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+              field: 'allowMetrics',
+              value: 'Opt-Out'
+            })
+          })
+        })
+
+        describe('when user selects `Settings` from the toast options', () => {
+          test('setPreferenceFieldValue is not called, toast is dismissed, and settings modal opens', async () => {
+            const {
+              addToast,
+              callbacks,
+              dismissToast,
+              getPreferenceFieldValue,
+              setPreferenceFieldValue,
+              toasts
+            } = setup()
+
+            getPreferenceFieldValue.mockResolvedValueOnce('mock')
+
+            await waitFor(() => {
+              callbacks.initializeDownload({ mock: 'event' }, {
+                mock: 'info'
+              })
+            })
+
+            await waitFor(() => {
+              expect(addToast).toHaveBeenCalledTimes(1)
+              expect(addToast).toHaveBeenCalledWith({
+                showCloseButton: false,
+                id: 'allow-metrics-id',
+                message: 'Send Anonymous Usage Data?',
+                variant: 'none',
+                actions: [
+                  {
+                    altText: 'Allow',
+                    buttonText: 'Yes',
+                    buttonProps: {
+                      Icon: FaCheck,
+                      onClick: expect.any(Function)
+                    }
+                  },
+                  {
+                    altText: 'Opt-Out',
+                    buttonText: 'No',
+                    buttonProps: {
+                      Icon: FaBan,
+                      onClick: expect.any(Function)
+                    }
+                  },
+                  {
+                    altText: 'Settings',
+                    buttonText: 'Settings',
+                    buttonProps: {
+                      Icon: FaCog,
+                      onClick: expect.any(Function)
+                    }
+                  }
+                ]
+              })
+            })
+
+            expect(toasts).toHaveLength(1)
+            const [toast] = toasts
+            const { actions } = toast
+
+            const allowButton = actions[2]
+            const { buttonProps } = allowButton
+            const { onClick } = buttonProps
+
+            // Call the `metricsToastResponder` function
+            await waitFor(() => {
+              onClick()
+            })
+
+            expect(dismissToast).toBeCalledTimes(1)
+            expect(dismissToast).toHaveBeenCalledWith('allow-metrics-id')
+            expect(setPreferenceFieldValue).toBeCalledTimes(0)
+
+            // Ensure Settings modal is brought up
+            const modalTitle = screen.getAllByText('Settings')[1]
+            expect(modalTitle).toBeInTheDocument()
+            expect(modalTitle).toHaveClass('title')
           })
         })
       })

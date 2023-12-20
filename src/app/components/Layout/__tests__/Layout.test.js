@@ -113,6 +113,10 @@ const setup = (overrideApiContextValue = {}, toasts = {}) => {
   }
 }
 
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
 describe('Layout component', () => {
   test('renders the downloads page', () => {
     setup()
@@ -179,11 +183,13 @@ describe('Layout component', () => {
 
         getPreferenceFieldValue.mockResolvedValueOnce('Allow')
 
-        waitFor(() => {
+        await waitFor(() => {
           callbacks.initializeDownload({ mock: 'event' }, {
             mock: 'info'
           })
+        })
 
+        await waitFor(() => {
           expect(getPreferenceFieldValue).toHaveBeenCalledTimes(1)
           expect(addToast).toHaveBeenCalledTimes(0)
         })
@@ -196,11 +202,13 @@ describe('Layout component', () => {
 
         getPreferenceFieldValue.mockResolvedValueOnce('Opt-Out')
 
-        waitFor(() => {
+        await waitFor(() => {
           callbacks.initializeDownload({ mock: 'event' }, {
             mock: 'info'
           })
+        })
 
+        await waitFor(() => {
           expect(getPreferenceFieldValue).toHaveBeenCalledTimes(1)
           expect(addToast).toHaveBeenCalledTimes(0)
         })
@@ -217,21 +225,26 @@ describe('Layout component', () => {
 
         getPreferenceFieldValue.mockResolvedValueOnce('mock')
 
-        waitFor(() => {
+        await waitFor(() => {
           callbacks.initializeDownload({ mock: 'event' }, {
             mock: 'info'
           })
+        })
 
-          expect(getPreferenceFieldValue).toHaveBeenCalledTimes(1)
+        await waitFor(() => {
           expect(addToast).toHaveBeenCalledTimes(1)
           expect(addToast).toHaveBeenCalledWith({
+            showCloseButton: false,
+            id: 'allow-metrics-id',
+            message: 'Send Anonymous Usage Data?',
+            variant: 'none',
             actions: [
               {
                 altText: 'Allow',
                 buttonText: 'Yes',
                 buttonProps: {
                   Icon: FaCheck,
-                  onClick: () => expect.any(Function)
+                  onClick: expect.any(Function)
                 }
               },
               {
@@ -239,7 +252,7 @@ describe('Layout component', () => {
                 buttonText: 'No',
                 buttonProps: {
                   Icon: FaBan,
-                  onClick: () => expect.any(Function)
+                  onClick: expect.any(Function)
                 }
               },
               {
@@ -247,13 +260,10 @@ describe('Layout component', () => {
                 buttonText: 'Settings',
                 buttonProps: {
                   Icon: FaCog,
-                  onClick: () => expect.any(Function)
+                  onClick: expect.any(Function)
                 }
               }
-            ],
-            id: 'undo-cancel-downloads',
-            message: 'Download Cancelled',
-            variant: 'none'
+            ]
           })
         })
       })

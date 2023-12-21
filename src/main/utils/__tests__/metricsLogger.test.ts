@@ -32,7 +32,7 @@ describe('metricsLogger', () => {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
       updateDownloadById: jest.fn(),
       getPreferencesByField: jest.fn().mockResolvedValue(
-        ''
+        0
       )
     }
 
@@ -48,7 +48,7 @@ describe('metricsLogger', () => {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
       updateDownloadById: jest.fn(),
       getPreferencesByField: jest.fn().mockResolvedValue(
-        'Allow'
+        1
       )
     }
 
@@ -72,7 +72,7 @@ describe('metricsLogger', () => {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
       updateDownloadById: jest.fn(),
       getPreferencesByField: jest.fn().mockResolvedValue(
-        'Allow'
+        1
       )
     }
 

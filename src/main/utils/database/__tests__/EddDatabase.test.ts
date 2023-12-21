@@ -93,6 +93,8 @@ describe('EddDatabase', () => {
             name: '20230916012751_add_clear_id_to_downloads.js'
           }, {
             name: '20231214205233_add_new_field_to_preferences.js'
+          }, {
+            name: '20231221003323_add_hasMetricsPreferenceBeenSet_column_to_preferences_table.js'
           }])
         } else if (step === 5) {
           // Query: select `name` from `knex_migrations` order by `id` asc'

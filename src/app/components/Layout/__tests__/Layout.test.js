@@ -184,7 +184,7 @@ describe('Layout component', () => {
           addToast
         } = setup()
 
-        getPreferenceFieldValue.mockResolvedValueOnce('Allow')
+        getPreferenceFieldValue.mockResolvedValueOnce(1)
 
         await waitFor(() => {
           callbacks.initializeDownload({ mock: 'event' }, {
@@ -203,7 +203,7 @@ describe('Layout component', () => {
       test('addToast is not called', async () => {
         const { callbacks, getPreferenceFieldValue, addToast } = setup()
 
-        getPreferenceFieldValue.mockResolvedValueOnce('Opt-Out')
+        getPreferenceFieldValue.mockResolvedValueOnce(2)
 
         await waitFor(() => {
           callbacks.initializeDownload({ mock: 'event' }, {
@@ -226,7 +226,7 @@ describe('Layout component', () => {
           getPreferenceFieldValue
         } = setup()
 
-        getPreferenceFieldValue.mockResolvedValueOnce('mock')
+        getPreferenceFieldValue.mockResolvedValueOnce(0)
 
         await waitFor(() => {
           callbacks.initializeDownload({ mock: 'event' }, {
@@ -283,7 +283,7 @@ describe('Layout component', () => {
               toasts
             } = setup()
 
-            getPreferenceFieldValue.mockResolvedValueOnce('mock')
+            getPreferenceFieldValue.mockResolvedValueOnce(0)
 
             await waitFor(() => {
               callbacks.initializeDownload({ mock: 'event' }, {
@@ -340,10 +340,10 @@ describe('Layout component', () => {
 
             expect(dismissToast).toBeCalledTimes(1)
             expect(dismissToast).toHaveBeenCalledWith('allow-metrics-id')
-            expect(setPreferenceFieldValue).toBeCalledTimes(1)
-            expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+            expect(setPreferenceFieldValue).toBeCalledTimes(2)
+            expect(setPreferenceFieldValue).toHaveBeenLastCalledWith({
               field: 'allowMetrics',
-              value: 'Allow'
+              value: true
             })
           })
         })
@@ -359,7 +359,7 @@ describe('Layout component', () => {
               toasts
             } = setup()
 
-            getPreferenceFieldValue.mockResolvedValueOnce('mock')
+            getPreferenceFieldValue.mockResolvedValueOnce(0)
 
             await waitFor(() => {
               callbacks.initializeDownload({ mock: 'event' }, {
@@ -416,10 +416,10 @@ describe('Layout component', () => {
 
             expect(dismissToast).toBeCalledTimes(1)
             expect(dismissToast).toHaveBeenCalledWith('allow-metrics-id')
-            expect(setPreferenceFieldValue).toBeCalledTimes(1)
+            expect(setPreferenceFieldValue).toBeCalledTimes(2)
             expect(setPreferenceFieldValue).toHaveBeenCalledWith({
               field: 'allowMetrics',
-              value: 'Opt-Out'
+              value: false
             })
           })
         })
@@ -435,7 +435,7 @@ describe('Layout component', () => {
               toasts
             } = setup()
 
-            getPreferenceFieldValue.mockResolvedValueOnce('mock')
+            getPreferenceFieldValue.mockResolvedValueOnce(0)
 
             await waitFor(() => {
               callbacks.initializeDownload({ mock: 'event' }, {

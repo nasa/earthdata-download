@@ -138,7 +138,7 @@ const Settings = ({
       const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
 
       setConcurrentDownloads(newConcurrentDownloads.toString())
-      if (hasMetricsPreferenceBeenSet === 0) {
+      if (!hasMetricsPreferenceBeenSet) {
         setMetricsPreference('Select Option')
       } else {
         setMetricsPreference(newUsageMetrics === 1)

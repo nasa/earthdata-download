@@ -211,11 +211,16 @@ describe('Settings dialog', () => {
     )
 
     const metricsSelect = screen.getByLabelText('Send Usage Metrics', { exact: false })
-    await user.selectOptions(metricsSelect, 'true')
+    await user.selectOptions(metricsSelect, 'Yes')
 
     await waitFor(() => {
       expect(setPreferenceFieldValue).toHaveBeenCalledWith({
         field: 'allowMetrics',
+        value: 1
+      })
+
+      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+        field: 'hasMetricsPreferenceBeenSet',
         value: true
       })
     })

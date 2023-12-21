@@ -53,8 +53,9 @@ const Settings = ({
     setPreferenceFieldValue,
     getPreferenceFieldValue
   } = useContext(ElectronApiContext)
+
   const [concurrentDownloads, setConcurrentDownloads] = useState('')
-  const [metricsPreference, setMetricsPreference] = useState('')
+  // const [metricsPreference, setMetricsPreference] = useState('')
 
   const onClearDefaultDownload = () => {
     setPreferenceFieldValue({
@@ -87,14 +88,18 @@ const Settings = ({
   }
 
   const onChangeAllowMetrics = (event) => {
-    const { value } = event.target
-    if (value !== 'Select Option') {
-      setMetricsPreference(value)
+    const { value: metricsApproval } = event.target
+
+    // DOMString type by default must convert: https://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-C74D1578
+    const numMetricsApproval = parseInt(metricsApproval, 10)
+
+    if (metricsApproval !== 'Select Option') {
       setPreferenceFieldValue({
         field: 'allowMetrics',
-        value: value === 'true'
+        value: numMetricsApproval
       })
 
+      // Ensure users won't be prompted by toast after they have chosen a preference
       setPreferenceFieldValue({
         field: 'hasMetricsPreferenceBeenSet',
         value: true
@@ -132,20 +137,22 @@ const Settings = ({
   }, [])
 
   useEffect(() => {
-    const fetchConcurrentDownloadsAndMetricsPreference = async () => {
+    const fetchCurrentSettings = async () => {
+      // Fetch current `concurrentDownloads`
       const newConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
-      const newUsageMetrics = await getPreferenceFieldValue('allowMetrics')
-      const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
-
       setConcurrentDownloads(newConcurrentDownloads.toString())
-      if (!hasMetricsPreferenceBeenSet) {
-        setMetricsPreference('Select Option')
-      } else {
-        setMetricsPreference(newUsageMetrics === 1)
-      }
+
+      // // Fetch current `allowMetrics`
+      // const currentUsageMetrics = await getPreferenceFieldValue('allowMetrics')
+      // const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
+      // if (!hasMetricsPreferenceBeenSet) {
+      //   setMetricsPreference('Select Option')
+      // } else {
+      //   setMetricsPreference(currentUsageMetrics)
+      // }
     }
 
-    fetchConcurrentDownloadsAndMetricsPreference()
+    fetchCurrentSettings()
   }, [])
 
   useEffect(() => {
@@ -153,6 +160,7 @@ const Settings = ({
     const updateConcurrentDownloadsPreference = async () => {
       const valueNumeric = parseInt(concurrentDownloads.toString(), 10)
       const currentConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
+
       if (valueNumeric > 0 && valueNumeric !== currentConcurrentDownloads) {
         setPreferenceFieldValue({
           field: 'concurrentDownloads',
@@ -164,8 +172,9 @@ const Settings = ({
     if (!settingsDialogIsOpen) {
       updateConcurrentDownloadsPreference()
     }
-  }, [settingsDialogIsOpen, concurrentDownloads, getPreferenceFieldValue, setPreferenceFieldValue])
+  }, [settingsDialogIsOpen])
 
+  // Todo I think we can remove those extra ones
   const downloadLocationInputClassNames = classNames([
     'input',
     styles.downloadLocationInputWrapper
@@ -263,17 +272,17 @@ const Settings = ({
           aria-label="Send Usage Metrics"
           className={styles.sendUsageMetricsForm}
           id="allow-metrics"
-          value={metricsPreference}
           onChange={(event) => onChangeAllowMetrics(event)}
         >
-          <option value="Select Option">Select Option</option>
-          <option value="true">Yes</option>
-          <option value="false">No</option>
+          <option hidden value="Select Option">Select Option</option>
+          <option value={1}>Yes</option>
+          <option value={0}>No</option>
         </select>
       </FormRow>
     </div>
   )
 }
+// Todo display Select Options if the value has not been set already
 
 Settings.defaultProps = {
   defaultDownloadLocation: ''

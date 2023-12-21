@@ -172,15 +172,20 @@ const Layout = () => {
     }
 
     setPreferenceFieldValue({
+      field: 'hasMetricsPreferenceBeenSet',
+      value: true
+    })
+
+    setPreferenceFieldValue({
       field: 'allowMetrics',
       value: selection
     })
   }
 
   const isMetricsPreferenceSet = async () => {
-    const metricsPreference = await getPreferenceFieldValue('allowMetrics')
+    const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
 
-    return metricsPreference === 'Allow' || metricsPreference === 'Opt-Out'
+    return hasMetricsPreferenceBeenSet
   }
 
   const onInitializeDownload = async (event, info) => {
@@ -191,8 +196,8 @@ const Layout = () => {
     } = info
 
     // Displaying Allow Metrics prompt if the user hasn't set a value
-    const metricsPreferenceSet = await isMetricsPreferenceSet()
-    if (!metricsPreferenceSet) {
+    const hasMetricsPreferenceBeenSet = await isMetricsPreferenceSet()
+    if (!hasMetricsPreferenceBeenSet) {
       addToast({
         showCloseButton: false,
         id: 'allow-metrics-id',
@@ -204,7 +209,7 @@ const Layout = () => {
             buttonText: 'Yes',
             buttonProps: {
               Icon: FaCheck,
-              onClick: () => metricsToastResponder('Allow')
+              onClick: () => metricsToastResponder(true)
             }
           },
           {
@@ -212,7 +217,7 @@ const Layout = () => {
             buttonText: 'No',
             buttonProps: {
               Icon: FaBan,
-              onClick: () => metricsToastResponder('Opt-Out')
+              onClick: () => metricsToastResponder(false)
             }
           },
           {

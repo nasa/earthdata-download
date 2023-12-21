@@ -10,7 +10,7 @@ import config from '../config.json'
  */
 const metricsLogger = async (database, event) => {
   const allowMetrics = await database.getPreferencesByField('allowMetrics')
-  if (allowMetrics !== 'Allow') {
+  if (allowMetrics === 0) {
     return
   }
 

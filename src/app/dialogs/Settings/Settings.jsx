@@ -92,7 +92,12 @@ const Settings = ({
       setMetricsPreference(value)
       setPreferenceFieldValue({
         field: 'allowMetrics',
-        value
+        value: value === 'true'
+      })
+
+      setPreferenceFieldValue({
+        field: 'hasMetricsPreferenceBeenSet',
+        value: true
       })
     }
   }
@@ -130,9 +135,14 @@ const Settings = ({
     const fetchConcurrentDownloads = async () => {
       const newConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
       const newUsageMetrics = await getPreferenceFieldValue('allowMetrics')
+      const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
 
       setConcurrentDownloads(newConcurrentDownloads.toString())
-      setMetricsPreference(newUsageMetrics || '')
+      if (hasMetricsPreferenceBeenSet === 0) {
+        setMetricsPreference('Select Option')
+      } else {
+        setMetricsPreference(newUsageMetrics === 1)
+      }
     }
 
     fetchConcurrentDownloads()
@@ -140,16 +150,21 @@ const Settings = ({
 
   useEffect(() => {
     // Handle edge case where change is made to the concurrency field but, exits
-    if (!settingsDialogIsOpen) {
+    const fetchMetricsPreference = async () => {
       const valueNumeric = parseInt(concurrentDownloads.toString(), 10)
-      if (valueNumeric > 0) {
+      const currentConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
+      if (valueNumeric > 0 && valueNumeric !== currentConcurrentDownloads) {
         setPreferenceFieldValue({
           field: 'concurrentDownloads',
           value: valueNumeric
         })
       }
     }
-  }, [settingsDialogIsOpen])
+
+    if (!settingsDialogIsOpen) {
+      fetchMetricsPreference()
+    }
+  }, [settingsDialogIsOpen, concurrentDownloads, getPreferenceFieldValue, setPreferenceFieldValue])
 
   const downloadLocationInputClassNames = classNames([
     'input',
@@ -252,8 +267,8 @@ const Settings = ({
           onChange={(event) => onChangeAllowMetrics(event)}
         >
           <option value="Select Option">Select Option</option>
-          <option value="Allow">Yes</option>
-          <option value="Opt-Out">No</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
         </select>
       </FormRow>
     </div>

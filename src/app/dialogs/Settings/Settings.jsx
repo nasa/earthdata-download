@@ -55,7 +55,7 @@ const Settings = ({
   } = useContext(ElectronApiContext)
 
   const [concurrentDownloads, setConcurrentDownloads] = useState('')
-  // const [metricsPreference, setMetricsPreference] = useState('')
+  const [metricsPreference, setMetricsPreference] = useState('')
 
   const onClearDefaultDownload = () => {
     setPreferenceFieldValue({
@@ -93,18 +93,18 @@ const Settings = ({
     // DOMString type by default must convert: https://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-C74D1578
     const numMetricsApproval = parseInt(metricsApproval, 10)
 
-    if (metricsApproval !== 'Select Option') {
-      setPreferenceFieldValue({
-        field: 'allowMetrics',
-        value: numMetricsApproval
-      })
+    setPreferenceFieldValue({
+      field: 'allowMetrics',
+      value: numMetricsApproval
+    })
 
-      // Ensure users won't be prompted by toast after they have chosen a preference
-      setPreferenceFieldValue({
-        field: 'hasMetricsPreferenceBeenSet',
-        value: true
-      })
-    }
+    // Ensure users won't be prompted by toast after they have chosen a preference
+    setPreferenceFieldValue({
+      field: 'hasMetricsPreferenceBeenSet',
+      value: true
+    })
+
+    setMetricsPreference(numMetricsApproval)
   }
 
   // Event occurs when element loses focus, write to preferences.json
@@ -142,14 +142,15 @@ const Settings = ({
       const newConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
       setConcurrentDownloads(newConcurrentDownloads.toString())
 
-      // // Fetch current `allowMetrics`
-      // const currentUsageMetrics = await getPreferenceFieldValue('allowMetrics')
-      // const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
-      // if (!hasMetricsPreferenceBeenSet) {
-      //   setMetricsPreference('Select Option')
-      // } else {
-      //   setMetricsPreference(currentUsageMetrics)
-      // }
+      // Fetch current `allowMetrics`
+      const currentUsageMetrics = await getPreferenceFieldValue('allowMetrics')
+      const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
+
+      if (!hasMetricsPreferenceBeenSet) {
+        setMetricsPreference('Select Option')
+      } else {
+        setMetricsPreference(currentUsageMetrics)
+      }
     }
 
     fetchCurrentSettings()
@@ -174,7 +175,6 @@ const Settings = ({
     }
   }, [settingsDialogIsOpen])
 
-  // Todo I think we can remove those extra ones
   const downloadLocationInputClassNames = classNames([
     'input',
     styles.downloadLocationInputWrapper
@@ -272,7 +272,8 @@ const Settings = ({
           aria-label="Send Usage Metrics"
           className={styles.sendUsageMetricsForm}
           id="allow-metrics"
-          onChange={(event) => onChangeAllowMetrics(event)}
+          onChange={onChangeAllowMetrics}
+          value={metricsPreference}
         >
           <option hidden value="Select Option">Select Option</option>
           <option value={1}>Yes</option>
@@ -282,7 +283,6 @@ const Settings = ({
     </div>
   )
 }
-// Todo display Select Options if the value has not been set already
 
 Settings.defaultProps = {
   defaultDownloadLocation: ''

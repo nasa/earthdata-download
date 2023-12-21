@@ -132,7 +132,7 @@ const Settings = ({
   }, [])
 
   useEffect(() => {
-    const fetchConcurrentDownloads = async () => {
+    const fetchConcurrentDownloadsAndMetricsPreference = async () => {
       const newConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
       const newUsageMetrics = await getPreferenceFieldValue('allowMetrics')
       const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
@@ -145,12 +145,12 @@ const Settings = ({
       }
     }
 
-    fetchConcurrentDownloads()
+    fetchConcurrentDownloadsAndMetricsPreference()
   }, [])
 
   useEffect(() => {
     // Handle edge case where change is made to the concurrency field but, exits
-    const fetchMetricsPreference = async () => {
+    const updateConcurrentDownloadsPreference = async () => {
       const valueNumeric = parseInt(concurrentDownloads.toString(), 10)
       const currentConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
       if (valueNumeric > 0 && valueNumeric !== currentConcurrentDownloads) {
@@ -162,7 +162,7 @@ const Settings = ({
     }
 
     if (!settingsDialogIsOpen) {
-      fetchMetricsPreference()
+      updateConcurrentDownloadsPreference()
     }
   }, [settingsDialogIsOpen, concurrentDownloads, getPreferenceFieldValue, setPreferenceFieldValue])
 

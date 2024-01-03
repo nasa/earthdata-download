@@ -38,7 +38,7 @@ const pauseDownloadItem = async ({
       state: downloadStates.paused
     })
 
-    metricsLogger({
+    metricsLogger(database, {
       eventType: 'DownloadPause',
       data: {
         downloadIds: [downloadIdForMetrics(downloadId)],
@@ -58,7 +58,7 @@ const pauseDownloadItem = async ({
     })
 
     const metricIds = pauseResponse.pausedIds.map(downloadIdForMetrics)
-    metricsLogger({
+    metricsLogger(database, {
       eventType: 'DownloadPause',
       data: {
         downloadIds: metricIds

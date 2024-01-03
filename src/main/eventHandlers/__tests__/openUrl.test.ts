@@ -62,7 +62,7 @@ describe('openUrl', () => {
       )
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'OpenUrl',
         data: {
           clientId: 'eed-edsc-dev-serverless-client',
@@ -108,7 +108,7 @@ describe('openUrl', () => {
       )
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'OpenUrl',
         data: {
           clientId: null,
@@ -154,7 +154,7 @@ describe('openUrl', () => {
       )
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'OpenUrl',
         data: {
           clientId: 'eed-edsc-dev-serverless-client',

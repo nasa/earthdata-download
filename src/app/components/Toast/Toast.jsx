@@ -57,6 +57,7 @@ const Toast = ({
   dismissToast,
   id,
   message,
+  showCloseButton,
   title,
   variant
 }) => (
@@ -128,24 +129,29 @@ const Toast = ({
           </RadixToast.Action>
         ))
       }
-      <RadixToast.Action asChild altText="Dismiss">
-        <Button
-          className={styles.action}
-          data-testid="toast-close-button"
-          onClick={() => dismissToast(id)}
-          Icon={FaTimes}
-          size="lg"
-          hideLabel
-        >
-          Dismiss
-        </Button>
-      </RadixToast.Action>
+      {
+        showCloseButton && (
+          <RadixToast.Action asChild altText="Dismiss">
+            <Button
+              className={styles.action}
+              data-testid="toast-close-button"
+              onClick={() => dismissToast(id)}
+              Icon={FaTimes}
+              size="lg"
+              hideLabel
+            >
+              Dismiss
+            </Button>
+          </RadixToast.Action>
+        )
+      }
     </div>
   </RadixToast.Root>
 )
 
 Toast.defaultProps = {
   actions: [],
+  showCloseButton: true,
   title: null,
   variant: null
 }
@@ -165,6 +171,7 @@ Toast.propTypes = {
   dismissToast: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
   message: PropTypes.string.isRequired,
+  showCloseButton: PropTypes.bool,
   title: PropTypes.string,
   variant: PropTypes.string
 }

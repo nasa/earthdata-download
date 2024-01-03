@@ -44,7 +44,7 @@ describe('sendToLogin', () => {
     })
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'SentToEdl',
       data: {
         downloadId: 'downloadID'
@@ -97,7 +97,7 @@ describe('sendToLogin', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'SentToEdl',
         data: {
           downloadId: 'downloadID'
@@ -198,7 +198,7 @@ describe('sendToLogin', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'SentToEdl',
         data: {
           downloadId: 'downloadID'

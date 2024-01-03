@@ -192,6 +192,40 @@ describe('Settings dialog', () => {
     })
   })
 
+  test('Changing metrics preferences calls setPreferenceFieldValue', async () => {
+    const user = userEvent.setup()
+    const hasActiveDownloads = false
+    const settingsDialogIsOpen = true
+
+    const getPreferenceFieldValue = jest.fn().mockImplementation((field) => {
+      if (field === 'concurrentDownloads') return 5
+      if (field === 'allowMetrics') return 'Select Option'
+
+      return null
+    })
+
+    const { setPreferenceFieldValue } = setup(
+      hasActiveDownloads,
+      settingsDialogIsOpen,
+      getPreferenceFieldValue
+    )
+
+    const metricsSelect = screen.getByLabelText('Send Usage Metrics', { exact: false })
+    await user.selectOptions(metricsSelect, 'Yes')
+
+    await waitFor(() => {
+      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+        field: 'allowMetrics',
+        value: 1
+      })
+
+      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+        field: 'hasMetricsPreferenceBeenSet',
+        value: true
+      })
+    })
+  })
+
   test('Changing the concurrency field and then closing dialog still causes change to store', async () => {
     const setDownloadLocation = jest.fn()
     const setPreferenceFieldValue = jest.fn()

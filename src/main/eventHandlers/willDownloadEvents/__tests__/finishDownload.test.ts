@@ -38,7 +38,7 @@ describe('finishDownload', () => {
     })
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'DownloadComplete',
       data: {
         downloadId: 'mock-download-id',

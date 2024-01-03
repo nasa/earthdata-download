@@ -8,7 +8,9 @@ import {
   FaCog,
   FaDownload,
   FaExclamationCircle,
-  FaSignInAlt
+  FaSignInAlt,
+  FaCheck,
+  FaBan
 } from 'react-icons/fa'
 import {
   VscChromeRestore,
@@ -62,6 +64,8 @@ const Layout = () => {
     maximizeWindow,
     minimizeWindow,
     setDownloadLocation,
+    setPreferenceFieldValue,
+    getPreferenceFieldValue,
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
     windowsLinuxTitleBar
@@ -158,12 +162,75 @@ const Layout = () => {
     }
   }
 
-  const onInitializeDownload = (event, info) => {
+  const metricsToastResponder = async (selection) => {
+    onDismissToast('allow-metrics-id')
+
+    if (selection === 'Settings') {
+      setSettingsDialogIsOpen(true)
+
+      return
+    }
+
+    setPreferenceFieldValue({
+      field: 'hasMetricsPreferenceBeenSet',
+      value: true
+    })
+
+    setPreferenceFieldValue({
+      field: 'allowMetrics',
+      value: selection
+    })
+  }
+
+  const isMetricsPreferenceSet = async () => {
+    const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
+
+    return hasMetricsPreferenceBeenSet
+  }
+
+  const onInitializeDownload = async (event, info) => {
     const {
       downloadIds: newDownloadIds,
       downloadLocation: newDownloadLocation,
       shouldUseDefaultLocation
     } = info
+
+    // Displaying Allow Metrics prompt if the user hasn't set a value
+    const hasMetricsPreferenceBeenSet = await isMetricsPreferenceSet()
+    if (!hasMetricsPreferenceBeenSet) {
+      addToast({
+        showCloseButton: false,
+        id: 'allow-metrics-id',
+        message: 'Send Anonymous Usage Data?',
+        variant: 'none',
+        actions: [
+          {
+            altText: 'Allow',
+            buttonText: 'Yes',
+            buttonProps: {
+              Icon: FaCheck,
+              onClick: () => metricsToastResponder(true)
+            }
+          },
+          {
+            altText: 'Opt-Out',
+            buttonText: 'No',
+            buttonProps: {
+              Icon: FaBan,
+              onClick: () => metricsToastResponder(false)
+            }
+          },
+          {
+            altText: 'Settings',
+            buttonText: 'Settings',
+            buttonProps: {
+              Icon: FaCog,
+              onClick: () => metricsToastResponder('Settings')
+            }
+          }
+        ]
+      })
+    }
 
     setDownloadIds(newDownloadIds)
     setSelectedDownloadLocation(newDownloadLocation)

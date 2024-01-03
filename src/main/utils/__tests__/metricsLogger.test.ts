@@ -27,10 +27,32 @@ describe('metricsLogger', () => {
     }
   }
 
-  test('should send a POST request to the specified logging endpoint', async () => {
+  test('should not send any metrics when user hasn\'t opted in', async () => {
+    const database = {
+      getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
+      updateDownloadById: jest.fn(),
+      getPreferencesByField: jest.fn().mockResolvedValue(
+        0
+      )
+    }
+
+    await metricsLogger(database, event)
+
+    expect(fetch).toHaveBeenCalledTimes(0)
+  })
+
+  test('should send a POST request to the specified logging endpoint when user allows metrics', async () => {
     const expectedBody = JSON.stringify({ params: event })
 
-    await metricsLogger(event)
+    const database = {
+      getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
+      updateDownloadById: jest.fn(),
+      getPreferencesByField: jest.fn().mockResolvedValue(
+        1
+      )
+    }
+
+    await metricsLogger(database, event)
 
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(fetch).toHaveBeenCalledWith(
@@ -46,6 +68,14 @@ describe('metricsLogger', () => {
   })
 
   test('should log an error when POST request fails', async () => {
+    const database = {
+      getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
+      updateDownloadById: jest.fn(),
+      getPreferencesByField: jest.fn().mockResolvedValue(
+        1
+      )
+    }
+
     const expectedError = new Error('Request failed')
 
     fetch
@@ -55,7 +85,7 @@ describe('metricsLogger', () => {
 
     console.error = jest.fn()
 
-    await metricsLogger(event)
+    await metricsLogger(database, event)
 
     expect(fetch).toHaveBeenCalledTimes(1)
 

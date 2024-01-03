@@ -28,7 +28,7 @@ const restartDownload = async ({
   } = info
 
   const report = await database.getDownloadReport(downloadId)
-  metricsLogger({
+  metricsLogger(database, {
     eventType: 'DownloadRestart',
     data: {
       downloadId: downloadIdForMetrics(downloadId),

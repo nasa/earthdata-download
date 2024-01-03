@@ -53,7 +53,9 @@ const Settings = ({
     setPreferenceFieldValue,
     getPreferenceFieldValue
   } = useContext(ElectronApiContext)
+
   const [concurrentDownloads, setConcurrentDownloads] = useState('')
+  const [metricsPreference, setMetricsPreference] = useState('')
 
   const onClearDefaultDownload = () => {
     setPreferenceFieldValue({
@@ -83,6 +85,26 @@ const Settings = ({
     if (valueNumeric > 0 && value.indexOf('.') < 0) {
       setConcurrentDownloads(valueNumeric.toString())
     }
+  }
+
+  const onChangeAllowMetrics = (event) => {
+    const { value: metricsApproval } = event.target
+
+    // DOMString type by default must convert: https://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-C74D1578
+    const numMetricsApproval = parseInt(metricsApproval, 10)
+
+    setPreferenceFieldValue({
+      field: 'allowMetrics',
+      value: numMetricsApproval
+    })
+
+    // Ensure users won't be prompted by toast after they have chosen a preference
+    setPreferenceFieldValue({
+      field: 'hasMetricsPreferenceBeenSet',
+      value: true
+    })
+
+    setMetricsPreference(numMetricsApproval)
   }
 
   // Event occurs when element loses focus, write to preferences.json
@@ -115,24 +137,41 @@ const Settings = ({
   }, [])
 
   useEffect(() => {
-    const fetchConcurrentDownloads = async () => {
+    const fetchCurrentSettings = async () => {
+      // Fetch current `concurrentDownloads`
       const newConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
       setConcurrentDownloads(newConcurrentDownloads.toString())
+
+      // Fetch current `allowMetrics`
+      const currentUsageMetrics = await getPreferenceFieldValue('allowMetrics')
+      const hasMetricsPreferenceBeenSet = await getPreferenceFieldValue('hasMetricsPreferenceBeenSet')
+
+      if (!hasMetricsPreferenceBeenSet) {
+        setMetricsPreference('Select Option')
+      } else {
+        setMetricsPreference(currentUsageMetrics)
+      }
     }
 
-    fetchConcurrentDownloads()
+    fetchCurrentSettings()
   }, [])
 
   useEffect(() => {
     // Handle edge case where change is made to the concurrency field but, exits
-    if (!settingsDialogIsOpen) {
+    const updateConcurrentDownloadsPreference = async () => {
       const valueNumeric = parseInt(concurrentDownloads.toString(), 10)
-      if (valueNumeric > 0) {
+      const currentConcurrentDownloads = await getPreferenceFieldValue('concurrentDownloads')
+
+      if (valueNumeric > 0 && valueNumeric !== currentConcurrentDownloads) {
         setPreferenceFieldValue({
           field: 'concurrentDownloads',
           value: valueNumeric
         })
       }
+    }
+
+    if (!settingsDialogIsOpen) {
+      updateConcurrentDownloadsPreference()
     }
   }, [settingsDialogIsOpen])
 
@@ -224,6 +263,22 @@ const Settings = ({
           value={concurrentDownloads}
           onBlur={onBlurConcurrentDownloads}
         />
+      </FormRow>
+      <FormRow
+        label="Send Usage Metrics"
+        description="Allow us to collect anonymous usage data to help us improve our application."
+      >
+        <select
+          aria-label="Send Usage Metrics"
+          className={styles.sendUsageMetricsForm}
+          id="allow-metrics"
+          onChange={onChangeAllowMetrics}
+          value={metricsPreference}
+        >
+          <option hidden value="Select Option">Select Option</option>
+          <option value={1}>Yes</option>
+          <option value={0}>No</option>
+        </select>
       </FormRow>
     </div>
   )

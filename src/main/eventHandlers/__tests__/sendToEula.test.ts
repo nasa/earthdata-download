@@ -45,7 +45,7 @@ describe('sendToEula', () => {
     })
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'SentToEula',
       data: {
         downloadId: 'downloadID'
@@ -99,7 +99,7 @@ describe('sendToEula', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'SentToEula',
         data: {
           downloadId: 'downloadID'
@@ -202,7 +202,7 @@ describe('sendToEula', () => {
       })
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
-      expect(metricsLogger).toHaveBeenCalledWith({
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
         eventType: 'SentToEula',
         data: {
           downloadId: 'downloadID'

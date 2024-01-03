@@ -24,7 +24,7 @@ describe('set a field in the preferences', () => {
     })
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'NewConcurrentDownloadsLimit',
       data: {
         newConcurrentDownloads: '2'
@@ -50,7 +50,7 @@ describe('set a field in the preferences', () => {
     })
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith({
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
       eventType: 'NewDefaultDownloadLocation'
     })
 

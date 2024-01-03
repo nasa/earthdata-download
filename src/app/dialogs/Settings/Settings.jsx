@@ -71,6 +71,11 @@ const Settings = ({
   }
 
   const onChangeConcurrentDownloads = (event) => {
+    setPreferenceFieldValue({
+      field: 'hasMetricsPreferenceBeenSet',
+      value: false
+    })
+
     const { value } = event.target
 
     // If value is non numerical and can't be parsed as an integer return 0

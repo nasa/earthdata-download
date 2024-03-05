@@ -1013,6 +1013,30 @@ describe('setupEventListeners', () => {
     })
   })
 
+  describe('autoUpdater error event', () => {
+    test('handles auto-update errors correctly', async () => {
+      const consoleMock = jest.spyOn(console, 'log').mockImplementation(() => {})
+      const error = new Error('Mock update error')
+
+      const {
+        appWindow,
+        autoUpdater,
+        database,
+        setUpdateAvailable
+      } = setup()
+
+      autoUpdater.emit('error', error)
+
+      expect(consoleMock).toHaveBeenCalledWith(`Error in auto-updater. ${error}`)
+      expect(setUpdateAvailable).toHaveBeenCalledWith(false)
+      expect(appWindow.webContents.send).toHaveBeenCalledWith('autoUpdateError', error.toString())
+      expect(startPendingDownloads).toHaveBeenCalledWith({
+        appWindow,
+        database
+      })
+    })
+  })
+
   describe('did-finish-load', () => {
     test('calls didFinishLoad', async () => {
       const {

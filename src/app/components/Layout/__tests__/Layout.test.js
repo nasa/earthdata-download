@@ -82,6 +82,7 @@ const setup = (overrideApiContextValue = {}, toasts = []) => {
         autoUpdateAvailable: jest.fn(),
         autoUpdateInstallLater: jest.fn(),
         autoUpdateProgress: jest.fn(),
+        autoUpdateError: jest.fn(),
         beginDownload: jest.fn(),
         initializeDownload: jest.fn((on, callback) => { callbacks.initializeDownload = callback }),
         setDownloadLocation: jest.fn(),

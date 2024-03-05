@@ -373,6 +373,8 @@ const setupEventListeners = ({
     console.log(`Error in auto-updater. ${error}`)
     setUpdateAvailable(false)
 
+    appWindow.webContents.send('autoUpdateError', error.toString())
+
     // Start any pending downloads
     await startPendingDownloads({
       appWindow,

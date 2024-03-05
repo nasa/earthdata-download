@@ -55,6 +55,7 @@ const Layout = () => {
     autoUpdateAvailable,
     autoUpdateInstallLater,
     autoUpdateProgress,
+    autoUpdateError,
     beginDownload,
     closeWindow,
     initializeDownload,
@@ -160,6 +161,25 @@ const Layout = () => {
         dismissToast(updateAvailableToastId)
       }, 3000)
     }
+  }
+
+  const onAutoUpdateError = (event, errorMessage) => {
+    addToast({
+      id: 'auto-update-error',
+      title: 'Auto-Update Failure',
+      message: errorMessage,
+      variant: 'error',
+      actions: [
+        {
+          altText: 'Allow',
+          buttonText: 'Manual Download',
+          buttonProps: {
+            Icon: FaDownload,
+            onClick: () => window.open('https://github.com/nasa/earthdata-download/releases/latest', '_blank')
+          }
+        }
+      ]
+    })
   }
 
   const metricsToastResponder = async (selection) => {
@@ -338,6 +358,7 @@ const Layout = () => {
     windowsLinuxTitleBar(true, onWindowMaximized)
     autoUpdateAvailable(true, onAutoUpdateAvailable)
     autoUpdateProgress(true, onAutoUpdateProgress)
+    autoUpdateError(true, onAutoUpdateError)
     setDownloadLocation(true, onSetDownloadLocation)
     showWaitingForEulaDialog(true, onShowWaitingForEulaDialog)
     showWaitingForLoginDialog(true, onShowWaitingForLoginDialog)
@@ -346,6 +367,7 @@ const Layout = () => {
       windowsLinuxTitleBar(false, onWindowMaximized)
       autoUpdateAvailable(false, onAutoUpdateAvailable)
       autoUpdateProgress(false, onAutoUpdateProgress)
+      autoUpdateError(false, onAutoUpdateError)
       setDownloadLocation(false, onSetDownloadLocation)
       showWaitingForEulaDialog(false, onShowWaitingForEulaDialog)
       showWaitingForLoginDialog(false, onShowWaitingForLoginDialog)

@@ -19,6 +19,7 @@ import deleteDownload from '../../eventHandlers/deleteDownload'
 import deleteDownloadHistory from '../../eventHandlers/deleteDownloadHistory'
 import didFinishLoad from '../../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../../eventHandlers/getPreferenceFieldValue'
+import metricsLogger from '../../utils/metricsLogger'
 import openDownloadFolder from '../../eventHandlers/openDownloadFolder'
 import pauseDownloadItem from '../../eventHandlers/pauseDownloadItem'
 import requestDownloadsProgress from '../../eventHandlers/requestDownloadsProgress'
@@ -46,6 +47,11 @@ jest.mock('../../eventHandlers/beforeQuit', () => ({
     .mockResolvedValueOnce(true)
     // `when beforeQuit returns false`
     .mockResolvedValueOnce(false)
+}))
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
 }))
 
 jest.mock('../../eventHandlers/beginDownload')

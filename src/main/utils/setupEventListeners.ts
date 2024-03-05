@@ -18,6 +18,7 @@ import deleteDownload from '../eventHandlers/deleteDownload'
 import deleteDownloadHistory from '../eventHandlers/deleteDownloadHistory'
 import didFinishLoad from '../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../eventHandlers/getPreferenceFieldValue'
+import metricsLogger from '../utils/metricsLogger'
 import openDownloadFolder from '../eventHandlers/openDownloadFolder'
 import pauseDownloadItem from '../eventHandlers/pauseDownloadItem'
 import requestDownloadsProgress from '../eventHandlers/requestDownloadsProgress'
@@ -374,6 +375,13 @@ const setupEventListeners = ({
     setUpdateAvailable(false)
 
     appWindow.webContents.send('autoUpdateError', error.toString())
+
+    metricsLogger(database, {
+      eventType: 'AutoUpdateFailure',
+      data: {
+        errorMesage: error.toString()
+      }
+    })
 
     // Start any pending downloads
     await startPendingDownloads({

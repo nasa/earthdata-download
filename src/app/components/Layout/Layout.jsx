@@ -164,10 +164,11 @@ const Layout = () => {
   }
 
   const onAutoUpdateError = (event, errorMessage) => {
+    console.log(errorMessage)
     addToast({
       id: 'auto-update-error',
       title: 'Auto-Update Failure',
-      message: errorMessage,
+      message: 'Failed to download latest update. Download new version manually:',
       variant: 'error',
       actions: [
         {

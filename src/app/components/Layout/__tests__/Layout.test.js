@@ -525,7 +525,7 @@ describe('Layout component', () => {
         expect(addToast).toHaveBeenCalledWith(expect.objectContaining({
           id: 'auto-update-error',
           title: 'Auto-Update Failure',
-          message: expect.any(Error),
+          message: 'Failed to download latest update. Download new version manually:',
           variant: 'error',
           actions: expect.arrayContaining([
             expect.objectContaining({

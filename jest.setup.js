@@ -10,6 +10,7 @@ window.electronApi = {
   autoUpdateAvailable: jest.fn(),
   autoUpdateInstallLater: jest.fn(),
   autoUpdateProgress: jest.fn(),
+  autoUpdateError: jest.fn(),
   beginDownload: jest.fn(),
   cancelDownloadItem: jest.fn(),
   cancelErroredDownloadItem: jest.fn(),

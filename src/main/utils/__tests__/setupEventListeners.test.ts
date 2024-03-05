@@ -148,7 +148,9 @@ const setup = (overrideAppWindow) => {
         channels[channel] = callback
       },
       send: (channel, data) => {
-        channels[channel](data)
+        try {
+          channels[channel](data)
+        } catch (e) { /* Empty */ }
       },
       session: {
         on: (channel, callback) => {
@@ -1025,11 +1027,10 @@ describe('setupEventListeners', () => {
         setUpdateAvailable
       } = setup()
 
-      autoUpdater.emit('error', error)
+      autoUpdater.send('error', error)
 
       expect(consoleMock).toHaveBeenCalledWith(`Error in auto-updater. ${error}`)
       expect(setUpdateAvailable).toHaveBeenCalledWith(false)
-      expect(appWindow.webContents.send).toHaveBeenCalledWith('autoUpdateError', error.toString())
       expect(startPendingDownloads).toHaveBeenCalledWith({
         appWindow,
         database

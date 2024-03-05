@@ -363,6 +363,32 @@ describe('preload', () => {
     })
   })
 
+  describe('autoUpdateError listener', () => {
+    test('calls ipcRenderer.on', async () => {
+      await setup()
+
+      const mockCallback = jest.fn()
+
+      electronApi.autoUpdateError(true, mockCallback)
+
+      expect(ipcRenderer.on).toHaveBeenCalledTimes(1)
+      expect(ipcRenderer.on).toHaveBeenCalledWith('autoUpdateError', mockCallback)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(0)
+    })
+
+    test('calls ipcRenderer.removeAllListeners', async () => {
+      await setup()
+
+      const mockCallback = jest.fn()
+
+      electronApi.autoUpdateError(false, mockCallback)
+
+      expect(ipcRenderer.on).toHaveBeenCalledTimes(0)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(1)
+      expect(ipcRenderer.removeAllListeners).toHaveBeenCalledWith('autoUpdateError', mockCallback)
+    })
+  })
+
   describe('initializeDownload listener', () => {
     test('calls ipcRenderer.on', async () => {
       await setup()

@@ -70,7 +70,8 @@ const setup = (overrideApiContextValue = {}, toasts = []) => {
   }
 
   const callbacks = {
-    initializeDownload: null
+    initializeDownload: null,
+    autoUpdateError: null
   }
 
   render(
@@ -82,7 +83,10 @@ const setup = (overrideApiContextValue = {}, toasts = []) => {
         autoUpdateAvailable: jest.fn(),
         autoUpdateInstallLater: jest.fn(),
         autoUpdateProgress: jest.fn(),
-        autoUpdateError: jest.fn(),
+        autoUpdateError: jest.fn((on, callback) => {
+          if (on) callbacks.autoUpdateError = callback
+          else callbacks.autoUpdateError = null
+        }),
         beginDownload: jest.fn(),
         initializeDownload: jest.fn((on, callback) => { callbacks.initializeDownload = callback }),
         setDownloadLocation: jest.fn(),
@@ -503,6 +507,35 @@ describe('Layout component', () => {
             expect(modalTitle).toHaveClass('title')
           })
         })
+      })
+    })
+  })
+
+  describe('auto-update error handling', () => {
+    test('displays error toast with manual download option on auto-update error', async () => {
+      const errorMessage = 'Failed to download update'
+      const { callbacks, addToast } = setup()
+
+      await waitFor(() => {
+        callbacks.autoUpdateError(true, new Error(errorMessage))
+      })
+
+      await waitFor(() => {
+        expect(addToast).toHaveBeenCalledWith(expect.objectContaining({
+          id: 'auto-update-error',
+          title: 'Auto-Update Failure',
+          message: expect.any(Error),
+          variant: 'error',
+          actions: expect.arrayContaining([
+            expect.objectContaining({
+              buttonText: 'Manual Download',
+              buttonProps: expect.objectContaining({
+                Icon: expect.any(Function),
+                onClick: expect.any(Function)
+              })
+            })
+          ])
+        }))
       })
     })
   })

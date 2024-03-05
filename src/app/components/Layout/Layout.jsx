@@ -163,8 +163,7 @@ const Layout = () => {
     }
   }
 
-  const onAutoUpdateError = (event, errorMessage) => {
-    console.log(errorMessage)
+  const onAutoUpdateError = () => {
     addToast({
       id: 'auto-update-error',
       title: 'Auto-Update Failure',

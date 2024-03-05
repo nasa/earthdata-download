@@ -374,7 +374,7 @@ const setupEventListeners = ({
     console.log(`Error in auto-updater. ${error}`)
     setUpdateAvailable(false)
 
-    appWindow.webContents.send('autoUpdateError', error.toString())
+    appWindow.webContents.send('autoUpdateError')
 
     metricsLogger(database, {
       eventType: 'AutoUpdateFailure',

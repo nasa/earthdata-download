@@ -513,6 +513,7 @@ describe('Layout component', () => {
 
   describe('auto-update error handling', () => {
     test('displays error toast with manual download option on auto-update error', async () => {
+      global.window.open = jest.fn()
       const errorMessage = 'Failed to download update'
       const { callbacks, addToast } = setup()
 
@@ -537,6 +538,12 @@ describe('Layout component', () => {
           ])
         }))
       })
+
+      const onClickFunction = addToast.mock.calls[0][0].actions[0].buttonProps.onClick
+
+      onClickFunction()
+
+      expect(window.open).toHaveBeenCalledWith('https://github.com/nasa/earthdata-download/releases/latest', '_blank')
     })
   })
 

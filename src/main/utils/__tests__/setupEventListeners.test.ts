@@ -19,6 +19,7 @@ import deleteDownload from '../../eventHandlers/deleteDownload'
 import deleteDownloadHistory from '../../eventHandlers/deleteDownloadHistory'
 import didFinishLoad from '../../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../../eventHandlers/getPreferenceFieldValue'
+import metricsLogger from '../../utils/metricsLogger'
 import openDownloadFolder from '../../eventHandlers/openDownloadFolder'
 import pauseDownloadItem from '../../eventHandlers/pauseDownloadItem'
 import requestDownloadsProgress from '../../eventHandlers/requestDownloadsProgress'
@@ -1033,6 +1034,14 @@ describe('setupEventListeners', () => {
       } = setup()
 
       autoUpdater.send('error', error)
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
+        eventType: 'AutoUpdateFailure',
+        data: {
+          errorMesage: error.toString()
+        }
+      })
 
       expect(consoleMock).toHaveBeenCalledWith(`Error in auto-updater. ${error}`)
       expect(setUpdateAvailable).toHaveBeenCalledWith(false)

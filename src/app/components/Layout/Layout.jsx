@@ -167,7 +167,7 @@ const Layout = () => {
     addToast({
       id: 'auto-update-error',
       title: 'Auto-Update Failure',
-      message: 'Failed to download latest update. Download new version manually:',
+      message: 'Failed to download latest update. Download new version manually',
       variant: 'error',
       actions: [
         {

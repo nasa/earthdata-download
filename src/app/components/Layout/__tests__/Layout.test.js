@@ -70,7 +70,8 @@ const setup = (overrideApiContextValue = {}, toasts = []) => {
   }
 
   const callbacks = {
-    initializeDownload: null
+    initializeDownload: null,
+    autoUpdateError: null
   }
 
   render(
@@ -82,6 +83,10 @@ const setup = (overrideApiContextValue = {}, toasts = []) => {
         autoUpdateAvailable: jest.fn(),
         autoUpdateInstallLater: jest.fn(),
         autoUpdateProgress: jest.fn(),
+        autoUpdateError: jest.fn((on, callback) => {
+          if (on) callbacks.autoUpdateError = callback
+          else callbacks.autoUpdateError = null
+        }),
         beginDownload: jest.fn(),
         initializeDownload: jest.fn((on, callback) => { callbacks.initializeDownload = callback }),
         setDownloadLocation: jest.fn(),
@@ -503,6 +508,42 @@ describe('Layout component', () => {
           })
         })
       })
+    })
+  })
+
+  describe('auto-update error handling', () => {
+    test('displays error toast with manual download option on auto-update error', async () => {
+      global.window.open = jest.fn()
+      const errorMessage = 'Failed to download update'
+      const { callbacks, addToast } = setup()
+
+      await waitFor(() => {
+        callbacks.autoUpdateError(true, new Error(errorMessage))
+      })
+
+      await waitFor(() => {
+        expect(addToast).toHaveBeenCalledWith(expect.objectContaining({
+          id: 'auto-update-error',
+          title: 'Auto-Update Failure',
+          message: 'Failed to download latest update. Download new version manually',
+          variant: 'error',
+          actions: expect.arrayContaining([
+            expect.objectContaining({
+              buttonText: 'Manual Download',
+              buttonProps: expect.objectContaining({
+                Icon: expect.any(Function),
+                onClick: expect.any(Function)
+              })
+            })
+          ])
+        }))
+      })
+
+      const onClickFunction = addToast.mock.calls[0][0].actions[0].buttonProps.onClick
+
+      onClickFunction()
+
+      expect(window.open).toHaveBeenCalledWith('https://github.com/nasa/earthdata-download/releases/latest', '_blank')
     })
   })
 

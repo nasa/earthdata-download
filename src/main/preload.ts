@@ -43,6 +43,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   // Messages to be received by the renderer process
   autoUpdateAvailable: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('autoUpdateAvailable', callback),
   autoUpdateProgress: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('autoUpdateProgress', callback),
+  autoUpdateError: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('autoUpdateError', callback),
   initializeDownload: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('initializeDownload', callback),
   setDownloadLocation: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('setDownloadLocation', callback),
   showWaitingForEulaDialog: (on, callback) => ipcRenderer[on ? 'on' : 'removeAllListeners']('showWaitingForEulaDialog', callback),

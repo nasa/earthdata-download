@@ -19,6 +19,7 @@ import deleteDownload from '../../eventHandlers/deleteDownload'
 import deleteDownloadHistory from '../../eventHandlers/deleteDownloadHistory'
 import didFinishLoad from '../../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../../eventHandlers/getPreferenceFieldValue'
+import metricsLogger from '../../utils/metricsLogger'
 import openDownloadFolder from '../../eventHandlers/openDownloadFolder'
 import pauseDownloadItem from '../../eventHandlers/pauseDownloadItem'
 import requestDownloadsProgress from '../../eventHandlers/requestDownloadsProgress'
@@ -46,6 +47,11 @@ jest.mock('../../eventHandlers/beforeQuit', () => ({
     .mockResolvedValueOnce(true)
     // `when beforeQuit returns false`
     .mockResolvedValueOnce(false)
+}))
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
 }))
 
 jest.mock('../../eventHandlers/beginDownload')
@@ -148,7 +154,9 @@ const setup = (overrideAppWindow) => {
         channels[channel] = callback
       },
       send: (channel, data) => {
-        channels[channel](data)
+        try {
+          channels[channel](data)
+        } catch (e) { /* Empty */ }
       },
       session: {
         on: (channel, callback) => {
@@ -1009,6 +1017,37 @@ describe('setupEventListeners', () => {
         expect(autoUpdater.quitAndInstall).toHaveBeenCalledTimes(0)
         expect(setUpdateAvailable).toHaveBeenCalledTimes(0)
         expect(startPendingDownloads).toHaveBeenCalledTimes(0)
+      })
+    })
+  })
+
+  describe('autoUpdater error event', () => {
+    test('handles auto-update errors correctly', async () => {
+      const consoleMock = jest.spyOn(console, 'log').mockImplementation(() => {})
+      const error = new Error('Mock update error')
+
+      const {
+        appWindow,
+        autoUpdater,
+        database,
+        setUpdateAvailable
+      } = setup()
+
+      autoUpdater.send('error', error)
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
+        eventType: 'AutoUpdateFailure',
+        data: {
+          errorMesage: error.toString()
+        }
+      })
+
+      expect(consoleMock).toHaveBeenCalledWith(`Error in auto-updater. ${error}`)
+      expect(setUpdateAvailable).toHaveBeenCalledWith(false)
+      expect(startPendingDownloads).toHaveBeenCalledWith({
+        appWindow,
+        database
       })
     })
   })

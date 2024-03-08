@@ -175,7 +175,7 @@ const Layout = () => {
           buttonText: 'Manual Download',
           buttonProps: {
             Icon: FaDownload,
-            onClick: () => window.open('https://github.com/nasa/earthdata-download/releases/latest', '_blank')
+            onClick: () => window.open('https://nasa.github.io/earthdata-download/', '_blank')
           }
         }
       ]

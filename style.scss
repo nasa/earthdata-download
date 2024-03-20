@@ -61,6 +61,33 @@ a {
   margin: 0 auto;
 }
 
+.acknowledgement-body {
+  text-align: center;
+  font-size: 1.5rem;
+
+  &--steps-list-container {
+    font-size: 1.2rem;
+    display: inline-block;
+    text-align: left;
+  }
+
+  &--steps-list {
+    padding-left: 0;
+    list-style-position: inside;
+    margin-left: 0;
+  }
+
+  &--italic-text {
+    font-size: 1rem;
+    font-style: italic;
+  }
+
+  &--checkbox {
+    font-size: 1.25rem;
+    padding-bottom: 1rem;
+  }
+}
+
 .primary-download {
   display: none;
   flex-direction: column;
@@ -126,6 +153,11 @@ a {
     font-weight: 300;
     text-align: center;
   }
+}
+
+.button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .button {

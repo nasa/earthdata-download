@@ -16,12 +16,22 @@
       </span>
     </header>
     <section class="primary-download primary-download--macos">
-      <h3> Attention MacOS users! In order to run Earthdata Download, you need to follow these steps:
-        In the Finder on your Mac, locate the app you want to open.
-        Don't use Launchpad to locate the app.
-        Control-click the app icon, then choose Open from the shortcut menu.
-        Click Open.</h3>
-      <a class="button button--primary primary-download__link" href="%VITE_OS_MACOS_DMG_DOWNLOAD_LINK%">
+      <div class="acknowledgement-body">
+        <h3>Attention MacOS users!<br> In order to run Earthdata Download, you need to follow these steps:</h3>
+        <div class="acknowledgement-body--steps-list-container">
+          <ol class="acknowledgement-body--steps-list">
+            <li>Locate the app you want to open in the Finder on your Mac.</li>
+            <li>Don’t use Launchpad to locate the app.</li>
+            <li>Control-click the app icon, then choose Open from the shortcut menu.</li>
+            <li>Click Open.</li>
+          </ol>
+        </div>
+        <p class="acknowledgement-body--italic-text">*This is only required for the first time you run the app.</p>
+      </div>
+      <label class="acknowledgement-body--checkbox">
+        <input type="checkbox" id="acknowledgementCheckbox"> I Understand
+      </label>
+      <a class="button button--primary primary-download__link" href="%VITE_OS_MACOS_DMG_DOWNLOAD_LINK%" id="macDownloadButton" disabled>
         <span class="primary-download__icon">
           <svg class="button__icon icon" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"
             fill="currentColor"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
@@ -232,5 +242,6 @@
     </span>
   </footer>
   <script type="module" src="/main.js"></script>
+  <script src="js/util/macDownloadMessageHelper.js"></script>
 </body>
 </html>

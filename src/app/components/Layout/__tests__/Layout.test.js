@@ -543,7 +543,7 @@ describe('Layout component', () => {
 
       onClickFunction()
 
-      expect(window.open).toHaveBeenCalledWith('https://github.com/nasa/earthdata-download/releases/latest', '_blank')
+      expect(window.open).toHaveBeenCalledWith('https://nasa.github.io/earthdata-download/', '_blank')
     })
   })
 

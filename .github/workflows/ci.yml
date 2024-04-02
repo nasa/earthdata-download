@@ -13,13 +13,13 @@ jobs:
           node-version: ['lts/hydrogen']
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
     - name: Cache node modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       env:
         cache-name: cache-node-modules
       with:
@@ -42,13 +42,13 @@ jobs:
           node-version: ['lts/hydrogen']
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
     - name: Cache node modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       env:
         cache-name: cache-node-modules
       with:
@@ -72,13 +72,13 @@ jobs:
           node-version: ['lts/hydrogen']
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
     - name: Cache node modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       env:
         cache-name: cache-node-modules
       with:
@@ -95,7 +95,9 @@ jobs:
     - name: Run Jest tests
       run: npm run test
     - name: Upload coverage to codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   sync:
     if: success() && github.ref == 'refs/heads/main' # only run on main success
@@ -103,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
       with:

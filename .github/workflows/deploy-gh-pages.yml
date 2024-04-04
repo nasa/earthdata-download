@@ -15,6 +15,11 @@ jobs:
       run: npm ci
     - name: Run build
       run: npm run build
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: dist/
     - name: Deploy to Github Pages
       uses: JamesIves/github-pages-deploy-action@v4
       with:

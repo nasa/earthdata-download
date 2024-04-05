@@ -2,7 +2,7 @@ name: deploy-gh-pages
 
 on:
   push:
-    branches: [gh-pages, gh-pages-debug]
+    branches: [gh-pages]
 
 jobs:
   deploy-gh-pages:
@@ -26,4 +26,4 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: gh-pages
         folder: dist
-        target-folder: dist
+        target-folder: docs

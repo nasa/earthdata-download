@@ -239,7 +239,7 @@ const DownloadItem = ({
                   actionsList={actionsList}
                 />
                 {
-                  state === downloadStates.interrupted && (
+                  state === downloadStates.interrupted && downloadLinks && (
                     <div className={styles.metaSecondary}>
                       <Button
                         onClick={

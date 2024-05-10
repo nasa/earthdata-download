@@ -27,6 +27,7 @@ import ListPage from '../../components/ListPage/ListPage'
 
 /**
  * @typedef {Object} DownloadsProps
+ * @property {Function} downloadLinks Download links for each download
  * @property {Function} setCurrentPage A function which sets the active page.
  * @property {Function} setHasActiveDownload A function to set whether a download is active.
  * @property {Function} setSelectedDownloadId A function to set the selectedDownloadId.
@@ -40,6 +41,7 @@ import ListPage from '../../components/ListPage/ListPage'
  *
  * return (
  *   <Downloads
+ *     downloadLinks={downloadLinks}
  *     setCurrentPage={setCurrentPage}
  *     setHasActiveDownload={setHasActiveDownload}
  *     setSelectedDownloadId={setSelectedDownloadId}
@@ -48,6 +50,7 @@ import ListPage from '../../components/ListPage/ListPage'
  * )
  */
 const Downloads = ({
+  downloadLinks,
   setCurrentPage,
   setHasActiveDownload,
   setSelectedDownloadId,
@@ -95,6 +98,7 @@ const Downloads = ({
           ...download,
           numberErrors: errors[downloadId]?.numberErrors
         },
+        downloadLinks,
         setCurrentPage,
         setSelectedDownloadId,
         showMoreInfoDialog,
@@ -214,6 +218,9 @@ const Downloads = ({
 }
 
 Downloads.propTypes = {
+  downloadLinks: PropTypes.objectOf(
+    PropTypes.arrayOf(PropTypes.string)
+  ).isRequired,
   setCurrentPage: PropTypes.func.isRequired,
   setHasActiveDownload: PropTypes.func.isRequired,
   setSelectedDownloadId: PropTypes.func.isRequired,

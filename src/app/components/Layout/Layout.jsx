@@ -84,6 +84,8 @@ const Layout = () => {
   const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(PAGES.downloads)
   const [downloadIds, setDownloadIds] = useState(null)
+  const [downloadLinks, setDownloadLinks] = useState([])
+  const [downloadLinksMap, setDownloadLinksMap] = useState({})
   const [hasActiveDownload, setHasActiveDownload] = useState(false)
   const [isWindowMaximized, setIsWindowMaximized] = useState(false)
   const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
@@ -212,6 +214,7 @@ const Layout = () => {
     const {
       downloadIds: newDownloadIds,
       downloadLocation: newDownloadLocation,
+      links,
       shouldUseDefaultLocation
     } = info
 
@@ -253,6 +256,9 @@ const Layout = () => {
     }
 
     setDownloadIds(newDownloadIds)
+    const newLinksMap = downloadLinksMap
+    newLinksMap[newDownloadIds] = links
+    setDownloadLinksMap(newLinksMap)
     setSelectedDownloadLocation(newDownloadLocation)
     setUseDefaultLocation(shouldUseDefaultLocation)
     // If shouldUseDefaultLocation is true, start the download(s)
@@ -313,6 +319,7 @@ const Layout = () => {
         setSelectedDownloadId(null)
         setPageComponent(
           <Downloads
+            downloadLinks={downloadLinksMap}
             setSelectedDownloadId={setSelectedDownloadId}
             setCurrentPage={setCurrentPage}
             hasActiveDownload={hasActiveDownload}
@@ -568,6 +575,7 @@ const Layout = () => {
         >
           <InitializeDownload
             downloadIds={downloadIds}
+            downloadLinks={downloadLinks}
             downloadLocation={selectedDownloadLocation}
             setDownloadIds={setDownloadIds}
             onCloseChooseLocationDialog={onCloseChooseLocationDialog}

@@ -15,6 +15,7 @@ import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 const initializeDownload = async ({
   database,
   downloadIds,
+  links,
   webContents
 }) => {
   if (downloadIds.length > 0) {
@@ -41,6 +42,7 @@ const initializeDownload = async ({
     webContents.send('initializeDownload', {
       downloadIds,
       downloadLocation: location,
+      links,
       shouldUseDefaultLocation: !!defaultDownloadLocation
     })
 

@@ -4,6 +4,7 @@ import classNames from 'classnames'
 import MiddleEllipsis from 'react-middle-ellipsis'
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 
+import Button from '../Button/Button'
 import Dropdown from '../Dropdown/Dropdown'
 import Progress from '../Progress/Progress'
 import Tooltip from '../Tooltip/Tooltip'
@@ -23,6 +24,7 @@ import * as styles from './DownloadItem.module.scss'
  * @typedef {Object} DownloadItemProps
  * @property {Array} actionsList A 2-D array of objects detailing action attributes.
  * @property {String} downloadId The ID of the DownloadItem.
+ * @property {String} downloadLinks The download links of the DownloadItem.
  * @property {String} itemName The name of the DownloadItem.
  * @property {Number} percent The download percent of the DownloadItem.
  * @property {Boolean} progressBar Enables or disables the progress bar.
@@ -47,6 +49,7 @@ import * as styles from './DownloadItem.module.scss'
  *   <DownloadItem
  *     actionsList={actionsList}
  *     downloadId={downloadId}
+ *     downloadLinks={downloadLinks}
  *     itemName={filename}
  *     percent={percent}
  *     setCurrentPage={setCurrentPage}
@@ -60,6 +63,7 @@ import * as styles from './DownloadItem.module.scss'
 const DownloadItem = ({
   actionsList,
   downloadId,
+  downloadLinks,
   itemName,
   percent,
   setCurrentPage,
@@ -79,6 +83,23 @@ const DownloadItem = ({
       setSelectedDownloadId(downloadId)
       setCurrentPage(PAGES.fileDownloads)
     }
+  }
+
+  const mapDownloadLinks = (links) => {
+    const linksArray = []
+    links.forEach((link) => {
+      linksArray.push(link)
+    })
+
+    return linksArray
+  }
+
+  const openDownloadLinks = (links) => {
+    const linksArray = mapDownloadLinks(links)
+
+    linksArray.forEach((url) => {
+      window.open(url, '_blank')
+    })
   }
 
   const accessibleEventProps = useAccessibleEvent((event) => {
@@ -217,6 +238,22 @@ const DownloadItem = ({
                   onOpenChange={setMoreActionsOpen}
                   actionsList={actionsList}
                 />
+                {
+                  state === downloadStates.interrupted && (
+                    <div className={styles.metaSecondary}>
+                      <Button
+                        onClick={
+                          (event) => {
+                            openDownloadLinks(downloadLinks[downloadId])
+                            event.stopPropagation()
+                          }
+                        }
+                      >
+                        Manually Download
+                      </Button>
+                    </div>
+                  )
+                }
               </div>
             )
           }
@@ -247,6 +284,7 @@ const DownloadItem = ({
 
 DownloadItem.defaultProps = {
   actionsList: null,
+  downloadLinks: null,
   setCurrentPage: null,
   setSelectedDownloadId: null,
   shouldBeClickable: false,
@@ -272,6 +310,9 @@ DownloadItem.propTypes = {
     )
   ),
   downloadId: PropTypes.string.isRequired,
+  downloadLinks: PropTypes.objectOf(
+    PropTypes.arrayOf(PropTypes.string)
+  ),
   itemName: PropTypes.string.isRequired,
   percent: PropTypes.number.isRequired,
   progressBar: PropTypes.bool,

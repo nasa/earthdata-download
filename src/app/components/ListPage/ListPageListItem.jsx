@@ -109,7 +109,7 @@ ListPageListItem.propTypes = {
       download: PropTypes.shape({}),
       downloadLinks: PropTypes.objectOf(
         PropTypes.arrayOf(PropTypes.string)
-      ).isRequired,
+      ),
       file: PropTypes.shape({}),
       setCurrentPage: PropTypes.func,
       setSelectedDownloadId: PropTypes.func,

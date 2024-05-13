@@ -86,11 +86,7 @@ const DownloadItem = ({
   }
 
   const openDownloadLinks = (links) => {
-    const linksArray = links.map((link) => link)
-
-    linksArray.forEach((url) => {
-      window.open(url, '_blank')
-    })
+    links.forEach((url) => window.open(url, '_blank'))
   }
 
   const accessibleEventProps = useAccessibleEvent((event) => {

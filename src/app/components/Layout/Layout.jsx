@@ -574,7 +574,6 @@ const Layout = () => {
         >
           <InitializeDownload
             downloadIds={downloadIds}
-            downloadLinks={downloadLinks}
             downloadLocation={selectedDownloadLocation}
             setDownloadIds={setDownloadIds}
             onCloseChooseLocationDialog={onCloseChooseLocationDialog}

@@ -84,7 +84,6 @@ const Layout = () => {
   const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(PAGES.downloads)
   const [downloadIds, setDownloadIds] = useState(null)
-  const [downloadLinks, setDownloadLinks] = useState([])
   const [downloadLinksMap, setDownloadLinksMap] = useState({})
   const [hasActiveDownload, setHasActiveDownload] = useState(false)
   const [isWindowMaximized, setIsWindowMaximized] = useState(false)

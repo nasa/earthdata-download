@@ -552,6 +552,39 @@ describe('DownloadItem component', () => {
     })
   })
 
+  describe('when a download is in "interrupted" state', () => {
+    test('displays the "Manually Download" button', async () => {
+      const mockCallback = jest.fn()
+      setup({
+        actionsList: [
+          [
+            {
+              label: 'Manually Download',
+              isActive: true,
+              isPrimary: false,
+              callback: mockCallback
+            }
+          ]
+        ],
+        percent: 0,
+        state: downloadStates.interrupted,
+        downloadLinks: { 'download-id': ['https://example.com/file1.zip'] }
+      })
+
+      global.open = jest.fn()
+
+      const manualDownloadButton = screen.getByText('Manually Download')
+      expect(manualDownloadButton).toBeInTheDocument()
+
+      await userEvent.click(manualDownloadButton)
+
+      expect(global.open).toHaveBeenCalledWith('https://example.com/file1.zip', '_blank')
+      expect(global.open).toHaveBeenCalledTimes(1)
+
+      global.open.mockRestore()
+    })
+  })
+
   describe('when a download is waiting for authentication', () => {
     describe('when the download has not started yet', () => {
       test('displays the correct download information', () => {

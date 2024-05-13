@@ -85,17 +85,8 @@ const DownloadItem = ({
     }
   }
 
-  const mapDownloadLinks = (links) => {
-    const linksArray = []
-    links.forEach((link) => {
-      linksArray.push(link)
-    })
-
-    return linksArray
-  }
-
   const openDownloadLinks = (links) => {
-    const linksArray = mapDownloadLinks(links)
+    const linksArray = links.map((link) => link)
 
     linksArray.forEach((url) => {
       window.open(url, '_blank')

@@ -585,6 +585,28 @@ describe('DownloadItem component', () => {
     })
   })
 
+  describe('when a download is not in an "interrupted" state', () => {
+    test('the "Manually Download" button is not visible', async () => {
+      const statesWhereButtonShouldNotAppear = [
+        downloadStates.starting,
+        downloadStates.active,
+        downloadStates.paused,
+        downloadStates.completed,
+        downloadStates.error
+      ]
+
+      statesWhereButtonShouldNotAppear.forEach((state) => {
+        setup({
+          state,
+          downloadLinks: { 'download-id': ['https://example.com/file1.zip'] }
+        })
+
+        const manualDownloadButton = screen.queryByText('Manually Download')
+        expect(manualDownloadButton).not.toBeInTheDocument()
+      })
+    })
+  })
+
   describe('when a download is waiting for authentication', () => {
     describe('when the download has not started yet', () => {
       test('displays the correct download information', () => {

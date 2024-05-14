@@ -571,17 +571,17 @@ describe('DownloadItem component', () => {
         downloadLinks: { 'download-id': ['https://example.com/file1.zip'] }
       })
 
-      global.open = jest.fn()
+      global.window.open = jest.fn()
 
       const manualDownloadButton = screen.getByText('Manually Download')
       expect(manualDownloadButton).toBeInTheDocument()
 
       await userEvent.click(manualDownloadButton)
 
-      expect(global.open).toHaveBeenCalledWith('https://example.com/file1.zip', '_blank')
-      expect(global.open).toHaveBeenCalledTimes(1)
+      expect(global.window.open).toHaveBeenCalledWith('https://example.com/file1.zip', '_blank')
+      expect(global.window.open).toHaveBeenCalledTimes(1)
 
-      global.open.mockRestore()
+      global.window.open.mockRestore()
     })
   })
 

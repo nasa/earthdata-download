@@ -56,6 +56,7 @@ const ListPageListItem = ({
 
   const {
     download,
+    downloadLinks,
     file,
     setCurrentPage,
     setSelectedDownloadId,
@@ -91,6 +92,7 @@ const ListPageListItem = ({
     <div style={style}>
       <DownloadListItem
         download={download}
+        downloadLinks={downloadLinks}
         setCurrentPage={setCurrentPage}
         setSelectedDownloadId={setSelectedDownloadId}
         showMoreInfoDialog={showMoreInfoDialog}
@@ -105,6 +107,9 @@ ListPageListItem.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
       download: PropTypes.shape({}),
+      downloadLinks: PropTypes.objectOf(
+        PropTypes.arrayOf(PropTypes.string)
+      ),
       file: PropTypes.shape({}),
       setCurrentPage: PropTypes.func,
       setSelectedDownloadId: PropTypes.func,

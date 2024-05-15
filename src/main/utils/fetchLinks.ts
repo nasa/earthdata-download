@@ -127,6 +127,7 @@ const fetchLinks = async ({
         initializeDownload({
           downloadIds: [downloadId],
           database,
+          links,
           webContents: appWindow.webContents
         })
       }

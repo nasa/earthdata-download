@@ -24,6 +24,7 @@ import useAppContext from '../../hooks/useAppContext'
 /**
  * @typedef {Object} DownloadListItemProps
  * @property {Object} download State of the download item.
+ * @property {Object} downloadLinks Download links for the download item
  * @property {Function} setCurrentPage A function which sets the active page.
  * @property {Function} setSelectedDownloadId A function which sets the setSelectedDownloadId.
  */
@@ -36,6 +37,7 @@ import useAppContext from '../../hooks/useAppContext'
  * return (
  *   <DownloadListItem
  *     download={download}
+ *     downloadLinks={downloadLinks}
  *     setCurrentPage={setCurrentPage}
  *     setSelectedDownloadId={setSelectedDownloadId}
  *   />
@@ -43,6 +45,7 @@ import useAppContext from '../../hooks/useAppContext'
  */
 const DownloadListItem = ({
   download,
+  downloadLinks,
   setCurrentPage,
   setSelectedDownloadId,
   showMoreInfoDialog
@@ -367,6 +370,7 @@ const DownloadListItem = ({
     <DownloadItem
       actionsList={actionsList}
       downloadId={downloadId}
+      downloadLinks={downloadLinks}
       setCurrentPage={setCurrentPage}
       setSelectedDownloadId={setSelectedDownloadId}
       showMoreInfoDialog={showMoreInfoDialog}
@@ -410,6 +414,7 @@ const DownloadListItem = ({
 }
 
 DownloadListItem.defaultProps = {
+  downloadLinks: null,
   setCurrentPage: null,
   setSelectedDownloadId: null
 }
@@ -427,6 +432,9 @@ DownloadListItem.propTypes = {
     }),
     state: PropTypes.string
   }).isRequired,
+  downloadLinks: PropTypes.objectOf(
+    PropTypes.arrayOf(PropTypes.string)
+  ),
   setCurrentPage: PropTypes.func,
   setSelectedDownloadId: PropTypes.func,
   showMoreInfoDialog: PropTypes.func.isRequired

@@ -27,11 +27,13 @@ describe('ListPageListItem', () => {
     test('renders a DownloadListItem', () => {
       const setCurrentPage = jest.fn()
       const setSelectedDownloadId = jest.fn()
+      const downloadLinks = {}
 
       setup({
         data: [{
           type: 'download',
           download: { mock: 'download' },
+          downloadLinks: {},
           setCurrentPage,
           setSelectedDownloadId
         }]
@@ -42,6 +44,7 @@ describe('ListPageListItem', () => {
         download: {
           mock: 'download'
         },
+        downloadLinks,
         setCurrentPage,
         setSelectedDownloadId
       }, {})

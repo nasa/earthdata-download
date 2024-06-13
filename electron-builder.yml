@@ -21,7 +21,7 @@ mac:
         - arm64
   notarize: false # afterSign will handle notarizing
   hardenedRuntime: true
-  gatekeeperAssess: False
+  gatekeeperAssess: false
   entitlements: './build/entitlements.mac.plist'
   entitlementsInherit: './build/entitlements.mac.plist'
 win:

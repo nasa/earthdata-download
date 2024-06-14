@@ -11,6 +11,7 @@ extraResources:
 artifactName: ${productName}-${arch}.${ext}
 extraMetadata:
   description: Earthdata Download
+afterSign: './build/notarize.js'
 mac:
   icon: './build/default/icons/icon.icns'
   target:
@@ -18,6 +19,11 @@ mac:
       arch:
         - x64
         - arm64
+  notarize: false # afterSign will handle notarizing
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: './build/entitlements.mac.plist'
+  entitlementsInherit: './build/entitlements.mac.plist'
 win:
   icon: './build/alt/icons/icon.ico'
   target:

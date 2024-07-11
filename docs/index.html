@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Download your Earth science data with only one click" />
   <title>Earthdata Download</title>
-  <script type="module" crossorigin src="/earthdata-download/assets/index-afcbe637.js"></script>
-  <link rel="stylesheet" href="/earthdata-download/assets/index-dc27bd0c.css">
+  <script type="module" crossorigin src="/earthdata-download/assets/index-927e0681.js"></script>
+  <link rel="stylesheet" href="/earthdata-download/assets/index-7e4f01df.css">
 </head>
 <body>
   <div id="app">
@@ -18,18 +18,6 @@
       </span>
     </header>
     <section class="primary-download primary-download--macos">
-      <div class="acknowledgement-body">
-        <h3>Attention MacOS users!<br> In order to run Earthdata Download the first time, you need to follow these steps:</h3>
-        <div class="acknowledgement-body--steps-list-container">
-          <ol class="acknowledgement-body--steps-list">
-            <li>Locate the app in the Finder on your Mac.</li>
-            <li>Do not use the Mac Launchpad to locate the app.</li>
-            <li>Control-click the app icon, then choose Open from the <br>shortcut menu. (You may need to repeat this step one time)</li>
-            <li>Click Open.</li>
-          </ol>
-        </div>
-        <p class="acknowledgement-body--italic-text">*This is only required for the first time you run the app.</p>
-      </div>
       <a class="button button--primary primary-download__link" href="https://github.com/nasa/earthdata-download/releases/latest/download/Earthdata-Download-x64.dmg" id="macDownloadButton" disabled>
         <span class="primary-download__icon">
           <svg class="button__icon icon" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"
@@ -62,6 +50,15 @@
         <span>
           106mb (.exe)
         </span>
+      </div>
+      <div class="acknowledgement-body container">
+        <h3 class="acknowledgement-body__title">Attention Windows users!</h3>
+        <p class="acknowledgement-body__content">
+          When you open the installer you might see a popup titled "Windows protected your PC". To allow the application to install, click on "More info" and then click "Run anyway" to run the installer.
+        </p>
+        <p class="acknowledgement-body__content">
+          If you don't see "Run anyway", the installer might be blocked. To unblock the installer, right-click on the "Earthdata-Download-x64" file in the File Explorer and select "Properties". On the "General" tab, select the "Unblock" checkbox in the "Security" options. Click the "OK" button save the change. After unblocking the installer, double click on the "Earthdata-Download-x64" to start the installation. Click "More info" in the "Windows protected your PC" popup and click "Run anyway" to run the installer.
+        </p>
       </div>
     </section>
     <section class="primary-download primary-download--linux">

@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Download your Earth science data with only one click" />
   <title>Earthdata Download</title>
+  <script type="module" crossorigin src="/earthdata-download/assets/index-927e0681.js"></script>
+  <link rel="stylesheet" href="/earthdata-download/assets/index-7e4f01df.css">
 </head>
 <body>
   <div id="app">
@@ -16,7 +18,7 @@
       </span>
     </header>
     <section class="primary-download primary-download--macos">
-      <a class="button button--primary primary-download__link" href="%VITE_OS_MACOS_DMG_DOWNLOAD_LINK%" id="macDownloadButton" disabled>
+      <a class="button button--primary primary-download__link" href="https://github.com/nasa/earthdata-download/releases/latest/download/Earthdata-Download-x64.dmg" id="macDownloadButton" disabled>
         <span class="primary-download__icon">
           <svg class="button__icon icon" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"
             fill="currentColor"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
@@ -28,13 +30,13 @@
       </a>
       <div class="primary-download__meta">
         <span>
-          %VITE_OS_MACOS_DMG_DOWNLOAD_SIZE% (.dmg)
+          138mb (.dmg)
         </span>
         <em class="primary-download__caveat"> for Intel-based Macs</em>
       </div>
     </section>
     <section class="primary-download primary-download--windows">
-      <a class="button button--primary primary-download__link" href="%VITE_OS_WINDOWS_EXE_DOWNLOAD_LINK%">
+      <a class="button button--primary primary-download__link" href="https://github.com/nasa/earthdata-download/releases/latest/download/Earthdata-Download-x64.exe">
         <span class="primary-download__icon">
           <svg class="icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"
             fill="currentColor"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
@@ -46,7 +48,7 @@
       </a>
       <div class="primary-download__meta">
         <span>
-          %VITE_OS_WINDOWS_EXE_DOWNLOAD_SIZE% (.exe)
+          106mb (.exe)
         </span>
       </div>
       <div class="acknowledgement-body container">
@@ -60,7 +62,7 @@
       </div>
     </section>
     <section class="primary-download primary-download--linux">
-      <a class="button button--primary primary-download__link" href="%VITE_OS_LINUX_APPIMAGE_DOWNLOAD_LINK%">
+      <a class="button button--primary primary-download__link" href="https://github.com/nasa/earthdata-download/releases/latest/download/Earthdata-Download-x86_64.AppImage">
         <span class="primary-download__icon">
           <svg class="icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"
             fill="currentColor"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
@@ -72,7 +74,7 @@
       </a>
       <div class="primary-download__meta">
         <span>
-          %VITE_OS_LINUX_APPIMAGE_DOWNLOAD_SIZE% (.AppImage)
+          141mb (.AppImage)
         </span>
       </div>
     </section>
@@ -89,7 +91,7 @@
           <h3 class="additional-downloads__download-title">Download for MacOS</h3>
           <ul class="additional-downloads__download-links-list">
             <li class="additional-downloads__download-links-item">
-              <a class="additional-downloads__download-link" download href="%VITE_OS_MACOS_DMG_DOWNLOAD_LINK%">
+              <a class="additional-downloads__download-link" download href="https://github.com/nasa/earthdata-download/releases/latest/download/Earthdata-Download-x64.dmg">
                 Download the .dmg installer
               </a>
             </li>
@@ -106,7 +108,7 @@
           <h3 class="additional-downloads__download-title">Download for Apple Silicon <br>(M-Series Chips)</h3>
           <ul class="additional-downloads__download-links-list">
             <li class="additional-downloads__download-links-item">
-              <a class="additional-downloads__download-link" download href="%VITE_OS_MACOS_SILICON_DMG_DOWNLOAD_LINK%">
+              <a class="additional-downloads__download-link" download href="https://github.com/nasa/earthdata-download/releases/latest/download/Earthdata-Download-arm64.dmg">
                 Download the .dmg installer
               </a>
             </li>
@@ -133,7 +135,7 @@
           <h3 class="additional-downloads__download-title">Download for Windows</h3>
           <ul class="additional-downloads__download-links-list">
             <li class="additional-downloads__download-links-item">
-              <a class="additional-downloads__download-link" download href="%VITE_OS_WINDOWS_EXE_DOWNLOAD_LINK%">
+              <a class="additional-downloads__download-link" download href="https://github.com/nasa/earthdata-download/releases/latest/download/Earthdata-Download-x64.exe">
                 Download the .exe installer
               </a>
             </li>
@@ -150,7 +152,7 @@
           <h3 class="additional-downloads__download-title">Download for Linux</h3>
           <ul class="additional-downloads__download-links-list">
             <li class="additional-downloads__download-links-item">
-              <a class="additional-downloads__download-link" download href="%VITE_OS_LINUX_APPIMAGE_DOWNLOAD_LINK%">
+              <a class="additional-downloads__download-link" download href="https://github.com/nasa/earthdata-download/releases/latest/download/Earthdata-Download-x86_64.AppImage">
                 Download the .AppImage installer
               </a>
             </li>
@@ -235,6 +237,6 @@
       </div>
     </span>
   </footer>
-  <script type="module" src="/main.js"></script>
+  
 </body>
 </html>

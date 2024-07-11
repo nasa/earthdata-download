@@ -65,21 +65,12 @@ a {
   text-align: center;
   font-size: 1.5rem;
 
-  &--steps-list-container {
-    font-size: 1.2rem;
-    display: inline-block;
-    text-align: left;
+  &__title {
+    font-size: 1.5rem;
   }
 
-  &--steps-list {
-    padding-left: 0;
-    list-style-position: inside;
-    margin-left: 0;
-  }
-
-  &--italic-text {
+  &__content {
     font-size: 1rem;
-    font-style: italic;
   }
 }
 

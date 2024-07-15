@@ -126,16 +126,16 @@ const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
   app.quit()
 } else {
+  // Windows/Linux Deep Linking
   app.on('second-instance', async (event, commandLine) => {
     // Someone tried to run a second instance, we should focus our window.
     if (appWindow) {
       if (appWindow.isMinimized()) appWindow.restore()
       appWindow.focus()
     }
-    // The commandLine is array of strings in which last element is deep link url
-    // the url str ends with /
 
-    const url = commandLine.pop().slice(0, -1)
+    // The commandLine is array of strings in which last element is deep link url
+    const url = commandLine.pop()
 
     await openUrl({
       appWindow,
@@ -149,6 +149,7 @@ if (!gotTheLock) {
     })
   })
 
+  // MacOS Deep Linking
   app.on('open-url', async (event, url) => {
     await openUrl({
       appWindow,

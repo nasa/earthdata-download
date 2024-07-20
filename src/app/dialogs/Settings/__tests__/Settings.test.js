@@ -14,268 +14,206 @@ import { ElectronApiContext } from '../../../context/ElectronApiContext'
 
 const currentlyDownloadingText = 'Files currently downloading will not be affected by changes to settings'
 
-const setup = (
-  hasActiveDownloads,
-  settingsDialogIsOpen,
-  getPreferenceFieldValue,
-  defaultDownloadLocation = ''
-) => {
-  // We need to mock hasActiveDownloads to render warning
-  const mockHasActiveDownloads = hasActiveDownloads
-  const mockSettingsDialogIsOpen = settingsDialogIsOpen
-  const mockDefaultDownloadLocation = defaultDownloadLocation
-  const chooseDownloadLocation = jest.fn()
-  const setDownloadLocation = jest.fn()
-  const setPreferenceFieldValue = jest.fn()
-  const getPreferenceFieldValueMock = getPreferenceFieldValue
-    || jest.fn((field) => {
+const setup = (overrideProps = {}, overrideContext = {}) => {
+  const user = userEvent.setup()
+
+  const props = {
+    hasActiveDownloads: false,
+    setDefaultDownloadLocation: jest.fn(),
+    setResetDialogOpen: jest.fn(),
+    settingsDialogIsOpen: true,
+    ...overrideProps
+  }
+
+  const context = {
+    chooseDownloadLocation: jest.fn(),
+    getAppVersion: jest.fn().mockResolvedValue('v1.0.0'),
+    getPreferenceFieldValue: jest.fn((field) => {
       if (field === 'concurrentDownloads') return 5
       if (field === 'defaultDownloadLocation') return null
 
       return null
-    })
+    }),
+    openLogFolder: jest.fn(),
+    setDownloadLocation: jest.fn(),
+    setPreferenceFieldValue: jest.fn(),
+    ...overrideContext
+  }
 
   const { rerender } = render(
-    <ElectronApiContext.Provider value={
-      {
-        chooseDownloadLocation,
-        setDownloadLocation,
-        setPreferenceFieldValue,
-        getPreferenceFieldValue: getPreferenceFieldValueMock
-      }
-    }
-    >
-      <Settings
-        hasActiveDownloads={mockHasActiveDownloads}
-        defaultDownloadLocation={mockDefaultDownloadLocation}
-        setDefaultDownloadLocation={jest.fn()}
-        settingsDialogIsOpen={mockSettingsDialogIsOpen}
-      />
+    <ElectronApiContext.Provider value={{ ...context }}>
+      <Settings {...props} />
     </ElectronApiContext.Provider>
   )
 
   return {
+    context,
+    props,
     rerender,
-    chooseDownloadLocation,
-    setDownloadLocation,
-    setPreferenceFieldValue,
-    getPreferenceFieldValue
+    user
   }
 }
 
 describe('Settings dialog', () => {
-  test('renders the Settings modal page including the element if there are active downloads', async () => {
-    const hasActiveDownloads = true
-    const settingsDialogIsOpen = true
+  describe('when there are no active downloads', () => {
+    test('renders the Settings modal', async () => {
+      setup()
 
-    setup(hasActiveDownloads, settingsDialogIsOpen)
-
-    await waitFor(() => {
-      expect(screen.getByText('Files currently downloading will not be affected by changes to settings')).toBeInTheDocument()
-    })
-  })
-
-  test('renders the Settings modal page excluding active downloads', async () => {
-    const hasActiveDownloads = false
-    const settingsDialogIsOpen = true
-
-    setup(hasActiveDownloads, settingsDialogIsOpen)
-
-    await waitFor(() => {
-      // Can't use getByTestId, that returns an error instead of null
+      expect(await screen.findByText('Earthdata Download Version: v1.0.0')).toBeInTheDocument()
       expect(screen.queryByText(currentlyDownloadingText)).not.toBeInTheDocument()
     })
   })
 
-  test('Clicking the download location sends a message to the main process', async () => {
-    const user = userEvent.setup()
-    const hasActiveDownloads = true
-    const settingsDialogIsOpen = true
+  describe('when there are active downloads', () => {
+    test('renders the Settings modal', async () => {
+      setup({
+        hasActiveDownloads: true
+      })
 
-    const { chooseDownloadLocation } = setup(hasActiveDownloads, settingsDialogIsOpen)
-
-    const setDownloadLocation = await screen.findByText('Choose download location')
-
-    await user.click(setDownloadLocation)
-
-    await waitFor(() => {
-      expect(chooseDownloadLocation).toHaveBeenCalledTimes(1)
+      expect(await screen.findByText('Earthdata Download Version: v1.0.0')).toBeInTheDocument()
+      expect(screen.getByText(currentlyDownloadingText)).toBeInTheDocument()
     })
   })
 
-  test('Clicking on the `Clear default download location` sends a message to the main process', async () => {
-    const user = userEvent.setup()
-    const hasActiveDownloads = true
-    const settingsDialogIsOpen = true
-    const getPreferenceFieldValueMock = jest.fn((field) => {
-      if (field === 'concurrentDownloads') return 5
-      if (field === 'defaultDownloadLocation') return '/test/location/'
+  describe('when clicking the download location', () => {
+    test('calls chooseDownloadLocation', async () => {
+      const { context, user } = setup()
 
-      return null
-    })
+      const setDownloadLocation = await screen.findByText('Choose download location')
 
-    setup(
-      hasActiveDownloads,
-      settingsDialogIsOpen,
-      getPreferenceFieldValueMock,
-      '/test/location/'
-    )
+      await user.click(setDownloadLocation)
 
-    const clearDownloadLocationButton = await screen.findByText('Clear download location')
-
-    await user.click(clearDownloadLocationButton)
-
-    setup(
-      hasActiveDownloads,
-      settingsDialogIsOpen,
-      getPreferenceFieldValueMock,
-      ''
-    )
-
-    await waitFor(() => {
-      screen.getByText('Choose download location')
+      expect(context.chooseDownloadLocation).toHaveBeenCalledTimes(1)
+      expect(context.chooseDownloadLocation).toHaveBeenCalledWith()
     })
   })
 
-  test('Typing into the input field for the concurrency will trigger a call to main process', async () => {
-    const user = userEvent.setup()
-    const hasActiveDownloads = true
-    const settingsDialogIsOpen = true
+  describe('when clicking on Clear Download Location', () => {
+    test('calls setPreferenceFieldValue', async () => {
+      const { context, user } = setup({
+        defaultDownloadLocation: '/test/location'
+      })
 
-    const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
+      const button = screen.getByRole('button', { name: 'Clear download location' })
+      await user.click(button)
 
-    await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
-    await user.type(screen.getByLabelText('Simultaneous Downloads'), '3')
-    // Trigger blur by leaving the text field
-    await user.tab()
-
-    await waitFor(() => {
-      expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
-      // Ensure that the string argument to being converted to a numerical
-      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
-        field: 'concurrentDownloads',
-        value: 3
+      expect(context.setPreferenceFieldValue).toHaveBeenCalledTimes(1)
+      expect(context.setPreferenceFieldValue).toHaveBeenCalledWith({
+        field: 'defaultDownloadLocation',
+        value: null
       })
     })
   })
 
-  test('Typing a value < 1 or characters into the text field will result in no calls', async () => {
-    const user = userEvent.setup()
-    const hasActiveDownloads = true
-    const settingsDialogIsOpen = true
-    const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
-    await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
-    await user.type(screen.getByLabelText('Simultaneous Downloads'), '-')
-    await user.type(screen.getByLabelText('Simultaneous Downloads'), 'a')
-    await user.type(screen.getByLabelText('Simultaneous Downloads'), '0')
-    // Trigger blur by leaving the text field
-    await user.tab()
+  describe('when modifying the Simultaneous Downloads field', () => {
+    describe('when typing a number into the Simultaneous Downloads field', () => {
+      test('calls setPreferenceFieldValue', async () => {
+        const { context, user } = setup()
 
-    await waitFor(() => {
-      // Negative values or non-numerical changes to the input should not attempt to change the json store
-      expect(setPreferenceFieldValue).toHaveBeenCalledTimes(0)
+        await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}3')
+        await user.tab()
+
+        expect(context.setPreferenceFieldValue).toHaveBeenCalledTimes(1)
+        // Ensure that the string argument to being converted to a numerical
+        expect(context.setPreferenceFieldValue).toHaveBeenCalledWith({
+          field: 'concurrentDownloads',
+          value: 3
+        })
+      })
+    })
+
+    describe('when typing characters into the Simultaneous Downloads field', () => {
+      test('does not call setPreferenceFieldValue', async () => {
+        const { context, user } = setup()
+
+        await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}a')
+        await user.tab()
+
+        expect(context.setPreferenceFieldValue).toHaveBeenCalledTimes(0)
+      })
+    })
+
+    describe('when removing the value from the Simultaneous Downloads field', () => {
+      test('does not call setPreferenceFieldValue', async () => {
+        const { context, user } = setup()
+
+        await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
+        await user.tab()
+
+        expect(context.setPreferenceFieldValue).toHaveBeenCalledTimes(0)
+      })
+    })
+
+    describe('when changing the value but closing the modal before bluring', () => {
+      test('calls setPreferenceFieldValue', async () => {
+        const {
+          context,
+          props,
+          rerender,
+          user
+        } = setup()
+
+        await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}6')
+
+        expect(context.setPreferenceFieldValue).toHaveBeenCalledTimes(0)
+
+        rerender(
+          <ElectronApiContext.Provider value={{ ...context }}>
+            <Settings
+              {...props}
+              settingsDialogIsOpen={false}
+            />
+          </ElectronApiContext.Provider>
+        )
+
+        await waitFor(() => {
+          expect(context.setPreferenceFieldValue).toHaveBeenCalledTimes(1)
+        })
+
+        expect(context.setPreferenceFieldValue).toHaveBeenCalledWith({
+          field: 'concurrentDownloads',
+          value: 6
+        })
+      })
     })
   })
 
-  test('Deleting the value in the field and leaving focus will not call a store change', async () => {
-    const user = userEvent.setup()
-    const hasActiveDownloads = true
-    const settingsDialogIsOpen = true
-    const { setPreferenceFieldValue } = setup(hasActiveDownloads, settingsDialogIsOpen)
-    await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
-    // Trigger blur by leaving the text field
-    await user.tab()
+  describe('when changing the Send Usage Metrics option', () => {
+    test('calls setPreferenceFieldValue', async () => {
+      const { context, user } = setup()
 
-    await waitFor(() => {
-    // Leaving the text field empty will not update the store
-      expect(setPreferenceFieldValue).toHaveBeenCalledTimes(0)
-    })
-  })
+      const metricsSelect = screen.getByLabelText('Send Usage Metrics')
+      await user.selectOptions(metricsSelect, 'Yes')
 
-  test('Changing metrics preferences calls setPreferenceFieldValue', async () => {
-    const user = userEvent.setup()
-    const hasActiveDownloads = false
-    const settingsDialogIsOpen = true
-
-    const getPreferenceFieldValue = jest.fn().mockImplementation((field) => {
-      if (field === 'concurrentDownloads') return 5
-      if (field === 'allowMetrics') return 'Select Option'
-
-      return null
-    })
-
-    const { setPreferenceFieldValue } = setup(
-      hasActiveDownloads,
-      settingsDialogIsOpen,
-      getPreferenceFieldValue
-    )
-
-    const metricsSelect = screen.getByLabelText('Send Usage Metrics', { exact: false })
-    await user.selectOptions(metricsSelect, 'Yes')
-
-    await waitFor(() => {
-      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
+      expect(context.setPreferenceFieldValue).toHaveBeenCalledTimes(1)
+      expect(context.setPreferenceFieldValue).toHaveBeenCalledWith({
         field: 'allowMetrics',
         value: 1
       })
-
-      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
-        field: 'hasMetricsPreferenceBeenSet',
-        value: true
-      })
     })
   })
 
-  test('Changing the concurrency field and then closing dialog still causes change to store', async () => {
-    const setDownloadLocation = jest.fn()
-    const setPreferenceFieldValue = jest.fn()
-    const getPreferenceFieldValue = () => 5
+  describe('when clicking the Open Log Folder button', () => {
+    test('calls openLogFolder', async () => {
+      const { context, user } = setup()
 
-    // Render
-    const { rerender } = render(
-      <ElectronApiContext.Provider value={
-        {
-          setDownloadLocation,
-          setPreferenceFieldValue,
-          getPreferenceFieldValue
-        }
-      }
-      >
-        <Settings
-          hasActiveDownloads={false}
-          setDefaultDownloadLocation={jest.fn()}
-          settingsDialogIsOpen
-        />
-      </ElectronApiContext.Provider>
-    )
-    const user = userEvent.setup()
-    await user.type(screen.getByLabelText('Simultaneous Downloads'), '{backspace}')
-    await user.type(screen.getByLabelText('Simultaneous Downloads'), '6')
+      const button = screen.getByRole('button', { name: 'Open Log Folder' })
+      await user.click(button)
 
-    // Re-render
-    rerender(
-      <ElectronApiContext.Provider value={
-        {
-          setDownloadLocation,
-          setPreferenceFieldValue,
-          getPreferenceFieldValue
-        }
-      }
-      >
-        <Settings
-          hasActiveDownloads={false}
-          setDefaultDownloadLocation={jest.fn()}
-          settingsDialogIsOpen={false}
-        />
-      </ElectronApiContext.Provider>
-    )
+      expect(context.openLogFolder).toHaveBeenCalledTimes(1)
+      expect(context.openLogFolder).toHaveBeenCalledWith()
+    })
+  })
 
-    await waitFor(() => {
-      expect(setPreferenceFieldValue).toHaveBeenCalledTimes(1)
-      expect(setPreferenceFieldValue).toHaveBeenCalledWith({
-        field: 'concurrentDownloads',
-        value: 6
-      })
+  describe('when clicking the Reset Application button', () => {
+    test('calls setResetDialogOpen', async () => {
+      const { props, user } = setup()
+
+      const button = screen.getByRole('button', { name: 'Reset Application' })
+      await user.click(button)
+
+      expect(props.setResetDialogOpen).toHaveBeenCalledTimes(1)
+      expect(props.setResetDialogOpen).toHaveBeenCalledWith(true)
     })
   })
 })

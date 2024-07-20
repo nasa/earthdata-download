@@ -43,6 +43,17 @@ const openUrl = async ({
     const getLinksUrl = searchParams.get('getLinks')
     const clientId = searchParams.get('clientId')
 
+    const paramsToLog = {
+      authUrl,
+      clientId,
+      downloadId: downloadIdWithoutTime,
+      eulaRedirectUrl,
+      getLinks: getLinksUrl,
+      hostname,
+      token: 'REDACTED'
+    }
+    console.log(`Opening URL: ${JSON.stringify(paramsToLog)}`)
+
     const now = new Date()
       .toISOString()
       .replace(/(:|-)/g, '')
@@ -85,6 +96,13 @@ const openUrl = async ({
     const token = searchParams.get('token')
     const fileId = searchParams.get('fileId')
 
+    const paramsToLog = {
+      hostname,
+      fileId,
+      token: 'REDACTED'
+    }
+    console.log(`Opening URL: ${JSON.stringify(paramsToLog)}`)
+
     // Save the new token in the database
     await database.setToken(token)
 
@@ -115,6 +133,12 @@ const openUrl = async ({
   // User has accepted a EULA, start the download
   if (hostname === 'eulaCallback') {
     const fileId = searchParams.get('fileId')
+
+    const paramsToLog = {
+      hostname,
+      fileId
+    }
+    console.log(`Opening URL: ${JSON.stringify(paramsToLog)}`)
 
     const { downloadId } = await database.getFileWhere({ id: fileId })
 

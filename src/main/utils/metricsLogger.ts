@@ -9,6 +9,8 @@ import config from '../config.json'
  * @param {Object} event json object to be sent to edd_logger
  */
 const metricsLogger = async (database, event) => {
+  console.log(`Metrics Event: ${JSON.stringify(event)}`)
+
   const allowMetrics = await database.getPreferencesByField('allowMetrics')
   if (!allowMetrics) {
     return

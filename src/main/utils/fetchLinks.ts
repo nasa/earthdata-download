@@ -38,11 +38,15 @@ const fetchLinks = async ({
 
   // If the getLinks URL is not trusted, don't fetch the links
   if (!isTrustedLink(getLinksUrl)) {
+    const message = `The host [${getLinksUrl}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
+
+    console.log(message)
+
     await database.updateDownloadById(downloadId, {
       loadingMoreFiles: false,
       state: downloadStates.error,
       errors: [{
-        message: `The host [${getLinksUrl}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
+        message
       }]
     })
 
@@ -145,6 +149,8 @@ const fetchLinks = async ({
     }
     /* eslint-enable no-await-in-loop */
   } catch (error) {
+    console.log(`Error while fetching download links, ${JSON.stringify(error)}`)
+
     await database.updateDownloadById(downloadId, {
       loadingMoreFiles: false,
       state: downloadStates.errorFetchingLinks,

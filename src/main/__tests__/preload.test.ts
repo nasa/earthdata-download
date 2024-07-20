@@ -212,6 +212,15 @@ describe('preload', () => {
     expect(ipcRenderer.send).toHaveBeenCalledWith('openDownloadFolder', { mock: 'data' })
   })
 
+  test('openLogFolder sends the openLogFolder message', async () => {
+    await setup()
+
+    electronApi.openLogFolder()
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('openLogFolder')
+  })
+
   test('pauseDownloadItem sends the pauseDownloadItem message', async () => {
     await setup()
 
@@ -219,6 +228,15 @@ describe('preload', () => {
 
     expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
     expect(ipcRenderer.send).toHaveBeenCalledWith('pauseDownloadItem', { mock: 'data' })
+  })
+
+  test('resetApplication sends the resetApplication message', async () => {
+    await setup()
+
+    electronApi.resetApplication()
+
+    expect(ipcRenderer.send).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.send).toHaveBeenCalledWith('resetApplication')
   })
 
   test('restartDownload sends the restartDownload message', async () => {
@@ -517,5 +535,14 @@ describe('preload', () => {
       expect(ipcRenderer.removeAllListeners).toHaveBeenCalledTimes(1)
       expect(ipcRenderer.removeAllListeners).toHaveBeenCalledWith('windowsLinuxTitleBar', mockCallback)
     })
+  })
+
+  test('getAppVersion sends the getAppVersion message', async () => {
+    await setup()
+
+    electronApi.getAppVersion()
+
+    expect(ipcRenderer.invoke).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.invoke).toHaveBeenCalledWith('getAppVersion')
   })
 })

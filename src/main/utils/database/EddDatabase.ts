@@ -16,6 +16,10 @@ class EddDatabase {
     this.tokenId = 1
   }
 
+  async destroy() {
+    await this.db.destroy()
+  }
+
   /**
    * Migrates the database.
    */

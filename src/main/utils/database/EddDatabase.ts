@@ -16,6 +16,9 @@ class EddDatabase {
     this.tokenId = 1
   }
 
+  /**
+   * Disconnects from the database file
+   */
   async destroy() {
     await this.db.destroy()
   }

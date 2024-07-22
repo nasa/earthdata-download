@@ -41,7 +41,7 @@ const ResetApplication = () => {
   return (
     <div className={styles.content}>
       <p>
-        Reseting the application will delete your download history, but any
+        Resetting the application will delete your download history, but any
         downloaded files will remain on your computer.
       </p>
 

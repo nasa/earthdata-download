@@ -4,10 +4,9 @@ import { app, shell } from 'electron'
 import path from 'path'
 
 /**
- * Opens the download folder associated with the given download ID.
+ * Disconnects from the database, deletes the database file and relaunches the application.
  * @param {Object} params The params object.
  * @param {Object} params.database `EddDatabase` instance
- * @param {String} params.info.downloadId The download ID.
  */
 const resetApplication = async ({
   database

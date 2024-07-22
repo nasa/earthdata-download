@@ -43,6 +43,9 @@ const openUrl = async ({
     const getLinksUrl = searchParams.get('getLinks')
     const clientId = searchParams.get('clientId')
 
+    // Logging out the `deepLink` was tricky to try to remove any tokens in the URL. Instead we are using this
+    // `paramsToLog` object of all the expected parameters and logging out the object. If a new parameter is added
+    // at some point it should also be added to this object to be logged
     const paramsToLog = {
       authUrl,
       clientId,
@@ -96,6 +99,9 @@ const openUrl = async ({
     const token = searchParams.get('token')
     const fileId = searchParams.get('fileId')
 
+    // Logging out the `deepLink` was tricky to try to remove any tokens in the URL. Instead we are using this
+    // `paramsToLog` object of all the expected parameters and logging out the object. If a new parameter is added
+    // at some point it should also be added to this object to be logged
     const paramsToLog = {
       hostname,
       fileId,
@@ -134,6 +140,9 @@ const openUrl = async ({
   if (hostname === 'eulaCallback') {
     const fileId = searchParams.get('fileId')
 
+    // Logging out the `deepLink` was tricky to try to remove any tokens in the URL. Instead we are using this
+    // `paramsToLog` object of all the expected parameters and logging out the object. If a new parameter is added
+    // at some point it should also be added to this object to be logged
     const paramsToLog = {
       hostname,
       fileId

@@ -4,6 +4,12 @@ import fetch from 'node-fetch'
 import metricsLogger from '../metricsLogger'
 import config from '../../config.json'
 
+jest.mock('electron', () => ({
+  app: {
+    getVersion: () => '1.0.0'
+  }
+}))
+
 jest.mock('node-fetch', () => ({
   __esModule: true,
   default: jest.fn()
@@ -42,7 +48,12 @@ describe('metricsLogger', () => {
   })
 
   test('should send a POST request to the specified logging endpoint when user allows metrics', async () => {
-    const expectedBody = JSON.stringify({ params: event })
+    const expectedBody = JSON.stringify({
+      params: {
+        ...event,
+        appVersion: '1.0.0'
+      }
+    })
 
     const database = {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
@@ -93,7 +104,12 @@ describe('metricsLogger', () => {
       config.logging,
       {
         method: 'POST',
-        body: JSON.stringify({ params: event }),
+        body: JSON.stringify({
+          params: {
+            ...event,
+            appVersion: '1.0.0'
+          }
+        }),
         headers: {
           'Content-Type': 'application/json'
         }

@@ -83,6 +83,8 @@ const willDownload = async ({
   // If the download has been cancelled, cancel this file
   const { state: downloadState } = await database.getDownloadById(downloadId)
   if (downloadState === downloadStates.cancelled) {
+    console.log(`The download was already cancelled, cancelling the file ${originalUrl}`)
+
     currentDownloadItems.cancelItem(downloadId, filename)
 
     return
@@ -103,6 +105,8 @@ const willDownload = async ({
 
   // If the last item in the urlChain is EDL, set the download to pending and forward the user to EDL
   if (lastUrl.includes('oauth/authorize')) {
+    console.log(`The download for ${originalUrl} was redirected to ${lastUrl}, sending the user to login. URL chain: ${JSON.stringify(urlChain)}`)
+
     currentDownloadItems.cancelItem(downloadId, filename)
 
     await database.updateDownloadById(downloadId, {
@@ -138,7 +142,10 @@ const willDownload = async ({
   const isFileActive = fileState === downloadStates.active
   const isDownloadActive = downloadState === downloadStates.active
 
+  // If the `verifyDownload` check failed, cancel the download.
   if (isFileActive && isDownloadActive && !downloadCheck) {
+    console.log(`The verifyDownload check failed, cancelling the download for ${originalUrl}`)
+
     currentDownloadItems.cancelItem(downloadId, filename)
 
     return
@@ -146,6 +153,8 @@ const willDownload = async ({
 
   // If the file has no totalBytes, report an error
   if (isFileActive && isDownloadActive && totalBytes === 0) {
+    console.log(`The download for ${originalUrl} has a totalBytes of ${totalBytes}. Cancelling the download.`)
+
     await database.updateFileById(fileId, {
       state: downloadStates.error,
       errors: 'This file could not be downloaded'

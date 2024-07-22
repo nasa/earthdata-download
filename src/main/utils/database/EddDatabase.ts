@@ -17,6 +17,13 @@ class EddDatabase {
   }
 
   /**
+   * Disconnects from the database file
+   */
+  async destroy() {
+    await this.db.destroy()
+  }
+
+  /**
    * Migrates the database.
    */
   async migrateDatabase() {

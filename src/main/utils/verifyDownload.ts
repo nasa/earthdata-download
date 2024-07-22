@@ -64,6 +64,8 @@ const verifyDownload = async ({
     } = json
 
     if (status === 403 && errorDescription.toLowerCase().includes('eula')) {
+      console.log(`The download for ${url} was redirected to ${resolutionUrl}, sending the user to agree to a EULA. Error description: ${errorDescription}`)
+
       await database.updateDownloadById(downloadId, {
         state: downloadStates.waitingForEula,
         eulaUrl: resolutionUrl
@@ -90,6 +92,8 @@ const verifyDownload = async ({
 
       message = `HTTP Error Response: ${status} ${statusText}`
     }
+
+    console.log(`Error occured in verifyDownload, message: ${message}`)
 
     await database.updateFileById(fileId, {
       state: downloadStates.error,

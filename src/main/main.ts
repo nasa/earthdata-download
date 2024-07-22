@@ -3,7 +3,7 @@
 import { app, BrowserWindow } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
-import electronLog from 'electron-log'
+import electronLog from 'electron-log/main'
 
 import openUrl from './eventHandlers/openUrl'
 
@@ -11,6 +11,15 @@ import CurrentDownloadItems from './utils/currentDownloadItems'
 import EddDatabase from './utils/database/EddDatabase'
 import setupEventListeners from './utils/setupEventListeners'
 import windowStateKeeper from './utils/windowStateKeeper'
+
+console.log = electronLog.log
+console.error = electronLog.error
+
+electronLog.errorHandler.startCatching()
+
+// Add the app version to all logs
+const appVersion = app.getVersion()
+electronLog.transports.file.format = `[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [v${appVersion}] [{level}] {text}`
 
 const userDataPath = app.getPath('userData')
 const database = new EddDatabase(userDataPath)

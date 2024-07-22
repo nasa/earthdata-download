@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { app } from 'electron'
 
 import initializeDownload from '../initializeDownload'

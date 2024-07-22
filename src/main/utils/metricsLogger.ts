@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { app } from 'electron'
 import fetch from 'node-fetch'
 
 import config from '../config.json'
@@ -9,6 +10,15 @@ import config from '../config.json'
  * @param {Object} event json object to be sent to edd_logger
  */
 const metricsLogger = async (database, event) => {
+  const appVersion = app.getVersion()
+
+  const eventWithVersion = {
+    ...event,
+    appVersion
+  }
+
+  console.log(`Metrics Event: ${JSON.stringify(eventWithVersion)}`)
+
   const allowMetrics = await database.getPreferencesByField('allowMetrics')
   if (!allowMetrics) {
     return
@@ -20,7 +30,7 @@ const metricsLogger = async (database, event) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ params: event })
+      body: JSON.stringify({ params: eventWithVersion })
     })
   } catch (error) {
     console.error(error)

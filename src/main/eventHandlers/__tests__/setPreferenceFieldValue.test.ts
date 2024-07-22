@@ -9,72 +9,101 @@ jest.mock('../../utils/metricsLogger.ts', () => ({
 }))
 
 describe('set a field in the preferences', () => {
-  test('Updates the value of an existing "concurrentDownloads" field in the preferences to the specified user value', async () => {
-    const database = {
-      setPreferences: jest.fn(),
-      getPreferences: jest.fn().mockResolvedValue({ concurrentDownloads: 5 })
-    }
-    const info = {
-      field: 'concurrentDownloads',
-      value: '2'
-    }
-    await setPreferenceFieldValue({
-      database,
-      info
-    })
-
-    expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'NewConcurrentDownloadsLimit',
-      data: {
-        newConcurrentDownloads: '2'
+  describe('when the field to set is concurrentDownloads', () => {
+    test('calls setPreferences and metricsLogger', async () => {
+      const database = {
+        setPreferences: jest.fn()
       }
-    })
+      const info = {
+        field: 'concurrentDownloads',
+        value: '2'
+      }
+      await setPreferenceFieldValue({
+        database,
+        info
+      })
 
-    expect(database.setPreferences).toHaveBeenCalledTimes(1)
-    expect(database.setPreferences).toHaveBeenCalledWith({ concurrentDownloads: '2' })
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
+        eventType: 'NewConcurrentDownloadsLimit',
+        data: {
+          newConcurrentDownloads: '2'
+        }
+      })
+
+      expect(database.setPreferences).toHaveBeenCalledTimes(1)
+      expect(database.setPreferences).toHaveBeenCalledWith({ concurrentDownloads: '2' })
+    })
   })
 
-  test('Updates the "defaultDownloadLocation" field in the preferences', async () => {
-    const database = {
-      setPreferences: jest.fn(),
-      getPreferences: jest.fn().mockResolvedValue({})
-    }
-    const info = {
-      field: 'defaultDownloadLocation',
-      value: 'new/location'
-    }
-    await setPreferenceFieldValue({
-      database,
-      info
-    })
+  describe('when the field to set is defaultDownloadLocation', () => {
+    test('calls setPreferences and metricsLogger', async () => {
+      const database = {
+        setPreferences: jest.fn()
+      }
+      const info = {
+        field: 'defaultDownloadLocation',
+        value: 'new/location'
+      }
+      await setPreferenceFieldValue({
+        database,
+        info
+      })
 
-    expect(metricsLogger).toHaveBeenCalledTimes(1)
-    expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'NewDefaultDownloadLocation'
-    })
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
+        eventType: 'NewDefaultDownloadLocation'
+      })
 
-    expect(database.setPreferences).toHaveBeenCalledTimes(1)
-    expect(database.setPreferences).toHaveBeenCalledWith({ defaultDownloadLocation: 'new/location' })
+      expect(database.setPreferences).toHaveBeenCalledTimes(1)
+      expect(database.setPreferences).toHaveBeenCalledWith({ defaultDownloadLocation: 'new/location' })
+    })
   })
 
-  test('Updates preferences for an unknown field and logs the field name', async () => {
-    const database = {
-      setPreferences: jest.fn(),
-      getPreferences: jest.fn().mockResolvedValue({})
-    }
-    const info = {
-      field: 'unknownField',
-      value: 'unknownValue'
-    }
-    await setPreferenceFieldValue({
-      database,
-      info
+  describe('when the field to set is not a value that should call metricsLogger', () => {
+    test('calls setPreferences but not metricsLogger', async () => {
+      const database = {
+        setPreferences: jest.fn()
+      }
+      const info = {
+        field: 'lastDownloadLocation',
+        value: '/mock/path'
+      }
+      await setPreferenceFieldValue({
+        database,
+        info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(0)
+
+      expect(database.setPreferences).toHaveBeenCalledTimes(1)
+      expect(database.setPreferences).toHaveBeenCalledWith({ lastDownloadLocation: '/mock/path' })
     })
+  })
 
-    expect(metricsLogger).toHaveBeenCalledTimes(0)
+  describe('when the field to set is allowMetrics', () => {
+    test('sets hasMetricsPreferenceBeenSet to true', async () => {
+      const database = {
+        setPreferences: jest.fn(),
+        getPreferences: jest.fn().mockResolvedValue({})
+      }
+      const info = {
+        field: 'allowMetrics',
+        value: 1
+      }
 
-    expect(database.setPreferences).toHaveBeenCalledTimes(1)
-    expect(database.setPreferences).toHaveBeenCalledWith({ unknownField: 'unknownValue' })
+      await setPreferenceFieldValue({
+        database,
+        info
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(0)
+
+      expect(database.setPreferences).toHaveBeenCalledTimes(1)
+      expect(database.setPreferences).toHaveBeenCalledWith({
+        allowMetrics: 1,
+        hasMetricsPreferenceBeenSet: 1
+      })
+    })
   })
 })

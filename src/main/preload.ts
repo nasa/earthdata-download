@@ -21,7 +21,9 @@ contextBridge.exposeInMainWorld('electronApi', {
   maximizeWindow: () => ipcRenderer.send('maximizeWindow'),
   minimizeWindow: () => ipcRenderer.send('minimizeWindow'),
   openDownloadFolder: (data) => ipcRenderer.send('openDownloadFolder', data),
+  openLogFolder: () => ipcRenderer.send('openLogFolder'),
   pauseDownloadItem: (data) => ipcRenderer.send('pauseDownloadItem', data),
+  resetApplication: () => ipcRenderer.send('resetApplication'),
   restartDownload: (data) => ipcRenderer.send('restartDownload', data),
   resumeDownloadItem: (data) => ipcRenderer.send('resumeDownloadItem', data),
   retryErroredDownloadItem: (data) => ipcRenderer.send('retryErroredDownloadItem', data),
@@ -52,5 +54,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   // System values for renderer
   isMac: process.platform === 'darwin',
   isWin: process.platform === 'win32',
-  isLinux: process.platform === 'linux'
+  isLinux: process.platform === 'linux',
+
+  getAppVersion: () => ipcRenderer.invoke('getAppVersion')
 })

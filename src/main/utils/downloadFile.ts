@@ -52,6 +52,8 @@ const downloadFile = async ({
     }
   }
 
+  console.log(`Starting a download for ${url}, with a token: ${token ? 'Yes' : 'No'}`)
+
   webContents.downloadURL(url, { headers })
 }
 

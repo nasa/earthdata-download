@@ -20,9 +20,11 @@ import didFinishLoad from '../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../eventHandlers/getPreferenceFieldValue'
 import metricsLogger from '../utils/metricsLogger'
 import openDownloadFolder from '../eventHandlers/openDownloadFolder'
+import openLogFolder from '../eventHandlers/openLogFolder'
 import pauseDownloadItem from '../eventHandlers/pauseDownloadItem'
 import requestDownloadsProgress from '../eventHandlers/requestDownloadsProgress'
 import requestFilesProgress from '../eventHandlers/requestFilesProgress'
+import resetApplication from '../eventHandlers/resetApplication'
 import restartDownload from '../eventHandlers/restartDownload'
 import resumeDownloadItem from '../eventHandlers/resumeDownloadItem'
 import retryErroredDownloadItem from '../eventHandlers/retryErroredDownloadItem'
@@ -100,6 +102,11 @@ const setupEventListeners = ({
       database,
       info
     })
+  })
+
+  // Open the log folder
+  ipcMain.on('openLogFolder', async () => {
+    await openLogFolder()
   })
 
   // Copy the download location path to the clipboard
@@ -222,6 +229,11 @@ const setupEventListeners = ({
       database,
       info
     })
+  })
+
+  // Reset the application
+  ipcMain.on('resetApplication', async () => {
+    await resetApplication({ database })
   })
 
   // Restart a download
@@ -444,6 +456,13 @@ const setupEventListeners = ({
   /**
    * Other listeners
    */
+
+  // Return the current app version
+  ipcMain.handle('getAppVersion', async () => {
+    const version = app.getVersion()
+
+    return `v${version}`
+  })
 
   // When the application finished loading, show the appWindow
   appWindow.webContents.once('did-finish-load', async () => {

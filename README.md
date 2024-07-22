@@ -63,6 +63,12 @@ That will trigger the Build/Release workflow, and create a new draft release mat
 - [Introduction](docs/README.md)
 - [Use Earthdata Download for Your Application](docs/USE_EDD.md)
 
+## Run Download Report
+
+You can run a generate a report on EDD downloads by running
+
+    npm run download-report
+
 ## License
 
 > Copyright © 2007-2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.

@@ -10,7 +10,8 @@ import {
   FaExclamationCircle,
   FaSignInAlt,
   FaCheck,
-  FaBan
+  FaBan,
+  FaTrash
 } from 'react-icons/fa'
 import {
   VscChromeRestore,
@@ -38,6 +39,7 @@ import { PAGES } from '../../constants/pages'
 import * as styles from './Layout.module.scss'
 import WaitingForEula from '../../dialogs/WaitingForEula/WaitingForEula'
 import WaitingForLogin from '../../dialogs/WaitingForLogin/WaitingForLogin'
+import ResetApplication from '../../dialogs/ResetApplication/ResetApplication'
 
 const updateAvailableToastId = 'updateAvailable'
 
@@ -93,6 +95,7 @@ const Layout = () => {
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false)
   const [useDefaultLocation, setUseDefaultLocation] = useState(false)
+  const [resetDialogOpen, setResetDialogOpen] = useState(false)
   const [waitingForEulaDialogIsOpen, setWaitingForEulaDialogIsOpen] = useState(false)
   const [waitingForLoginDialogIsOpen, setWaitingForLoginDialogIsOpen] = useState(false)
   const [waitingForDownloadId, setWaitingForDownloadId] = useState(null)
@@ -561,6 +564,7 @@ const Layout = () => {
             defaultDownloadLocation={selectedDownloadLocation}
             setDefaultDownloadLocation={setSelectedDownloadLocation}
             settingsDialogIsOpen={settingsDialogIsOpen}
+            setResetDialogOpen={setResetDialogOpen}
           />
         </Dialog>
 
@@ -624,6 +628,17 @@ const Layout = () => {
           <WaitingForLogin
             downloadId={waitingForDownloadId}
           />
+        </Dialog>
+
+        <Dialog
+          open={resetDialogOpen}
+          setOpen={setResetDialogOpen}
+          showTitle
+          closeButton
+          title="Are you sure you want to reset the application?"
+          TitleIcon={FaTrash}
+        >
+          <ResetApplication />
         </Dialog>
       </main>
     </div>

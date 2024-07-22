@@ -38,6 +38,17 @@ afterEach(() => {
 })
 
 describe('EddDatabase', () => {
+  describe('destroy', () => {
+    test('calls db.destroy', async () => {
+      const database = new EddDatabase('./')
+
+      // There isn't really anything to assert here, but this will make sure no errors are thrown
+      expect(async () => {
+        await database.destroy()
+      }).not.toThrowError()
+    })
+  })
+
   // These tests were terrible, if more migrations are written they will need to be listed here.
   // But if anything else breaks in the future, just get rid of the test, its not worth figuring out again.
   describe('migrateDatabase', () => {

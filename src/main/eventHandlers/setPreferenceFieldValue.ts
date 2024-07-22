@@ -34,9 +34,15 @@ const setPreferenceFieldValue = async ({
       break
   }
 
-  database.setPreferences({
+  const preferences = {
     [field]: value
-  })
+  }
+
+  if (field === 'allowMetrics') {
+    preferences.hasMetricsPreferenceBeenSet = 1
+  }
+
+  await database.setPreferences(preferences)
 }
 
 export default setPreferenceFieldValue

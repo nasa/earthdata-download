@@ -1,3 +1,7 @@
+.appVersion {
+  font-size: var(--text__normal);
+}
+
 .activeDownloadAlert {
   margin-bottom: var(--size__500);
 }
@@ -71,4 +75,3 @@
   width: 20%;
   color: var(--color__text--dark);
 }
-

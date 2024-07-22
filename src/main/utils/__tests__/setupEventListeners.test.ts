@@ -21,9 +21,11 @@ import didFinishLoad from '../../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../../eventHandlers/getPreferenceFieldValue'
 import metricsLogger from '../../utils/metricsLogger'
 import openDownloadFolder from '../../eventHandlers/openDownloadFolder'
+import openLogFolder from '../../eventHandlers/openLogFolder'
 import pauseDownloadItem from '../../eventHandlers/pauseDownloadItem'
 import requestDownloadsProgress from '../../eventHandlers/requestDownloadsProgress'
 import requestFilesProgress from '../../eventHandlers/requestFilesProgress'
+import resetApplication from '../../eventHandlers/resetApplication'
 import restartDownload from '../../eventHandlers/restartDownload'
 import resumeDownloadItem from '../../eventHandlers/resumeDownloadItem'
 import retryErroredDownloadItem from '../../eventHandlers/retryErroredDownloadItem'
@@ -69,9 +71,11 @@ jest.mock('../../eventHandlers/getPreferenceFieldValue', () => ({
 }))
 
 jest.mock('../../eventHandlers/openDownloadFolder')
+jest.mock('../../eventHandlers/openLogFolder')
 jest.mock('../../eventHandlers/pauseDownloadItem')
 jest.mock('../../eventHandlers/requestDownloadsProgress')
 jest.mock('../../eventHandlers/requestFilesProgress')
+jest.mock('../../eventHandlers/resetApplication')
 jest.mock('../../eventHandlers/restartDownload')
 jest.mock('../../eventHandlers/resumeDownloadItem')
 jest.mock('../../eventHandlers/retryErroredDownloadItem')
@@ -123,7 +127,8 @@ jest.mock(
         channels[channel](data)
       },
       quit: jest.fn(),
-      isPackaged: false
+      isPackaged: false,
+      getVersion: () => '1.0.0'
     }
     const mockShell = {
       openExternal: jest.fn()
@@ -315,6 +320,17 @@ describe('setupEventListeners', () => {
         database,
         info
       })
+    })
+  })
+
+  describe('openLogFolder', () => {
+    test('calls openLogFolder', () => {
+      setup()
+
+      ipcRenderer.send('openLogFolder')
+
+      expect(openLogFolder).toHaveBeenCalledTimes(1)
+      expect(openLogFolder).toHaveBeenCalledWith()
     })
   })
 
@@ -571,6 +587,17 @@ describe('setupEventListeners', () => {
         database,
         info
       })
+    })
+  })
+
+  describe('resetApplication', () => {
+    test('calls resetApplication', () => {
+      const { database } = setup()
+
+      ipcRenderer.send('resetApplication')
+
+      expect(resetApplication).toHaveBeenCalledTimes(1)
+      expect(resetApplication).toHaveBeenCalledWith({ database })
     })
   })
 
@@ -1018,6 +1045,16 @@ describe('setupEventListeners', () => {
         expect(setUpdateAvailable).toHaveBeenCalledTimes(0)
         expect(startPendingDownloads).toHaveBeenCalledTimes(0)
       })
+    })
+  })
+
+  describe('getAppVersion', () => {
+    test('returns the app version', async () => {
+      setup()
+
+      const result = await ipcRenderer.invoke('getAppVersion')
+
+      expect(result).toEqual('v1.0.0')
     })
   })
 

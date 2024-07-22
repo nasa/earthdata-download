@@ -64,6 +64,7 @@ const setup = (withErrors, overrideReport) => {
 
   // Props
   const props = {
+    downloadLinks: {},
     setCurrentPage,
     setHasActiveDownload,
     setSelectedDownloadId,

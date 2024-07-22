@@ -3,7 +3,11 @@ import React, {
   useState,
   useEffect
 } from 'react'
-import { FaBan, FaFolder } from 'react-icons/fa'
+import {
+  FaBan,
+  FaFolder,
+  FaTrash
+} from 'react-icons/fa'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
@@ -43,19 +47,23 @@ import * as styles from './Settings.module.scss'
  * )
  */
 const Settings = ({
-  hasActiveDownloads,
   defaultDownloadLocation,
+  hasActiveDownloads,
   setDefaultDownloadLocation,
+  setResetDialogOpen,
   settingsDialogIsOpen
 }) => {
   const {
     chooseDownloadLocation,
-    setPreferenceFieldValue,
-    getPreferenceFieldValue
+    getAppVersion,
+    getPreferenceFieldValue,
+    openLogFolder,
+    setPreferenceFieldValue
   } = useContext(ElectronApiContext)
 
   const [concurrentDownloads, setConcurrentDownloads] = useState('')
   const [metricsPreference, setMetricsPreference] = useState('')
+  const [appVersion, setAppVersion] = useState()
 
   const onClearDefaultDownload = () => {
     setPreferenceFieldValue({
@@ -98,12 +106,6 @@ const Settings = ({
       value: numMetricsApproval
     })
 
-    // Ensure users won't be prompted by toast after they have chosen a preference
-    setPreferenceFieldValue({
-      field: 'hasMetricsPreferenceBeenSet',
-      value: true
-    })
-
     setMetricsPreference(numMetricsApproval)
   }
 
@@ -128,12 +130,23 @@ const Settings = ({
     }
   }
 
+  // Event handler for Open Log Folder button
+  const onOpenLogFolder = () => {
+    openLogFolder()
+  }
+
+  // Event handler for Reset Application button
+  const onOpenResetDialog = () => {
+    setResetDialogOpen(true)
+  }
+
   useEffect(() => {
-    const fetchDefaultDownloadLocation = async () => {
+    const fetchValues = async () => {
       setDefaultDownloadLocation(await getPreferenceFieldValue('defaultDownloadLocation'))
+      setAppVersion(await getAppVersion())
     }
 
-    fetchDefaultDownloadLocation()
+    fetchValues()
   }, [])
 
   useEffect(() => {
@@ -182,6 +195,12 @@ const Settings = ({
 
   return (
     <div>
+      <div className={styles.appVersion}>
+        Earthdata Download Version:
+        {' '}
+        {appVersion}
+      </div>
+
       {
         hasActiveDownloads && (
           <Alert
@@ -192,6 +211,7 @@ const Settings = ({
           </Alert>
         )
       }
+
       <FormRow
         label="Download Location"
         description="Set the location where you would like to download your files. With a download location set, you will not be prompted to chose a location before a download begins."
@@ -251,6 +271,7 @@ const Settings = ({
             )
         }
       </FormRow>
+
       <FormRow
         label="Simultaneous Downloads"
         description="Set the maximum number of files that can be downloaded simultaneously."
@@ -264,6 +285,7 @@ const Settings = ({
           onBlur={onBlurConcurrentDownloads}
         />
       </FormRow>
+
       <FormRow
         label="Send Usage Metrics"
         description="Allow us to collect anonymous usage data to help us improve our application."
@@ -280,6 +302,33 @@ const Settings = ({
           <option value={0}>No</option>
         </select>
       </FormRow>
+
+      <FormRow
+        label="Log Folder"
+        description="If you encounter unexpected results, sending this log to the support team will help."
+      >
+        <Button
+          onClick={onOpenLogFolder}
+          Icon={FaFolder}
+          size="lg"
+        >
+          Open Log Folder
+        </Button>
+      </FormRow>
+
+      <FormRow
+        label="Reset Application"
+        description="If you are unable to download files after an update you can reset Earthdata Download. Warning! This will remove all history of downloads from the application! This cannot be undone."
+      >
+        <Button
+          onClick={onOpenResetDialog}
+          variant="danger"
+          Icon={FaTrash}
+          size="lg"
+        >
+          Reset Application
+        </Button>
+      </FormRow>
     </div>
   )
 }
@@ -292,6 +341,7 @@ Settings.propTypes = {
   hasActiveDownloads: PropTypes.bool.isRequired,
   defaultDownloadLocation: PropTypes.string,
   setDefaultDownloadLocation: PropTypes.func.isRequired,
+  setResetDialogOpen: PropTypes.func.isRequired,
   settingsDialogIsOpen: PropTypes.bool.isRequired
 }
 

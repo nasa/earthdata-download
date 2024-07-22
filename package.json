@@ -1,6 +1,6 @@
 {
   "name": "earthdata-download",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Earthdata Download is a cross-platform download manager designed to improve how users download Earth Science data. It accepts lists of files from applications like Earthdata Search (https://search.earthdata.nasa.gov/) and enables clients to offer users a streamlined experience when downloading files from their browser.",
   "repository": "nasa/earthdata-download",
   "homepage": "https://github.com/nasa/earthdata-download#readme",
@@ -35,7 +35,8 @@
     "test": "TZ='America/New_York' jest",
     "test:bamboo": "TZ='America/New_York' jest --ci --reporters=default --reporters=jest-junit",
     "test:watch": "TZ='America/New_York' jest --watchAll",
-    "test:watch-lite": "TZ='America/New_York' jest --watchAll --collectCoverageFrom='' --coverage=true"
+    "test:watch-lite": "TZ='America/New_York' jest --watchAll --collectCoverageFrom='' --coverage=true",
+    "download-report": "node scripts/download_report.js"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.0.4",
@@ -52,7 +53,7 @@
     "better-sqlite3": "^11.1.2",
     "bytes": "^3.1.2",
     "classnames": "^2.3.2",
-    "electron-log": "^4.4.8",
+    "electron-log": "^5.1.6",
     "electron-updater": "^6.2.1",
     "humanize-duration": "^3.28.0",
     "inter-ui": "^3.19.3",

@@ -1,3 +1,22 @@
+/**
+ * Run the short report (total downloads and downloads by OS)
+ * npm run download-report
+ *
+ * Run the full report (includes downoads by release)
+ * npm run download-report -- --full
+ */
+
+// Default fullReport to false
+let fullReport = false
+
+// Read in the `full` param from the command line
+process.argv.slice(2).forEach((val) => {
+  const [key] = val.split('=')
+  if (key === 'full') {
+    fullReport = true
+  }
+})
+
 const url = 'https://api.github.com/repos/nasa/earthdata-download/releases'
 
 const linuxDownloadNames = [
@@ -149,5 +168,8 @@ fetch(url)
     console.log('MacOS Auto Update: ', macUpdateCount)
     console.log('Windows Downloads: ', windowsDownloadCount)
     console.log('Windows Auto Update: ', windowsUpdateCount)
-    console.log('Counts By Release: ', JSON.stringify(downloadCounts, null, 2))
+
+    if (fullReport) {
+      console.log('Counts By Release: ', JSON.stringify(downloadCounts, null, 2))
+    }
   })

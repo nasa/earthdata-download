@@ -3,5 +3,10 @@
   "localhost": { "notes": "development" },
   "d53njncz5taqi.cloudfront.net": { "notes": "Corresponds to search.earthdata.nasa.gov" },
   "dycghwhsgr9el.cloudfront.net": { "notes": "Corresponds to search.uat.earthdata.nasa.gov" },
-  "d30czzksj9a4kf.cloudfront.net": { "notes": "Corresponds to search.sit.earthdata.nasa.gov" }
+  "d30czzksj9a4kf.cloudfront.net": { "notes": "Corresponds to search.sit.earthdata.nasa.gov" },
+  "api.search.sit.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.sit.earthdata.nasa.gov" },
+  "api.search.uat.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.uat.earthdata.nasa.gov" },
+  "api.search.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.earthdata.nasa.gov" },
+  "searchprodapi-1167262027.auto.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.earthdata.nasa.gov" },
+  "searchuatapi-2287602643.auto.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.uat.earthdata.nasa.gov" }
 }

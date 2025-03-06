@@ -8,5 +8,9 @@
   "api.search.uat.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.uat.earthdata.nasa.gov" },
   "api.search.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.earthdata.nasa.gov" },
   "searchprodapi-1167262027.auto.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.earthdata.nasa.gov" },
-  "searchuatapi-2287602643.auto.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.uat.earthdata.nasa.gov" }
+  "searchuatapi-2287602643.auto.earthdatacloud.nasa.gov": { "notes": "Corresponds to search.uat.earthdata.nasa.gov" },
+  "nsidc.org": { "notes": "Corresponds to NSIDC production" },
+  "integration.nsidc.org": { "notes": "Corresponds to NSIDC integration env" },
+  "staging.nsidc.org": { "notes": "Corresponds to NSIDC staging env" },
+  "qa.nsidc.org": { "notes": "Corresponds to NSIDC QA env" }
 }

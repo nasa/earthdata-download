@@ -2,7 +2,7 @@ name: deploy-gh-pages
 
 on:
   push:
-    branches: [download-page, EDD-72]
+    branches: [download-page]
 
 jobs:
   deploy-gh-pages:
@@ -22,9 +22,9 @@ jobs:
       with:
         name: build-artifacts
         path: dist/
-    # - name: Deploy to Github Pages
-    #   uses: JamesIves/github-pages-deploy-action@v4
-    #   with:
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-    #     branch: gh-pages
-    #     folder: dist
+    - name: Deploy to Github Pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages
+        folder: dist

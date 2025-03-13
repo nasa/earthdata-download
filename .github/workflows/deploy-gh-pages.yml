@@ -15,14 +15,16 @@ jobs:
       run: npm ci
     - name: Run build
       run: npm run build
+      env:
+        VITE_NASA_OFFICIAL: ${{ vars.VITE_NASA_OFFICIAL }}
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
         path: dist/
-    - name: Deploy to Github Pages
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
-        folder: dist
+    # - name: Deploy to Github Pages
+    #   uses: JamesIves/github-pages-deploy-action@v4
+    #   with:
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     branch: gh-pages
+    #     folder: dist

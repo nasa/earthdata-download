@@ -7,6 +7,17 @@ import startPendingDownloads from '../utils/startPendingDownloads'
 
 import downloadStates from '../../app/constants/downloadStates'
 
+
+/**
+ * Check the given hostname against the expected value in a case-insensitive
+ * manner.
+ * @param {String} hostname String representing the hostname from a URL
+ * @param {String} expected String representing the expected hostname
+ */
+export const checkHostname = (hostname: string, expected: string): boolean => {
+  return hostname.toLowerCase() === expected.toLowerCase();
+}
+
 /**
  * Parses `deepLink` for info and fetches download links
  * @param {Object} params
@@ -35,7 +46,7 @@ const openUrl = async ({
   } = url
 
   // Start a new download
-  if (hostname === 'startDownload') {
+  if (checkHostname(hostname, 'startDownload')) {
     const authUrl = searchParams.get('authUrl')
     const downloadIdWithoutTime = searchParams.get('downloadId')
     const eulaRedirectUrl = searchParams.get('eulaRedirectUrl')
@@ -95,7 +106,7 @@ const openUrl = async ({
   }
 
   // User has been authenticated, save the new token and start the download
-  if (hostname === 'authCallback') {
+  if (checkHostname(hostname,'authCallback')) {
     const token = searchParams.get('token')
     const fileId = searchParams.get('fileId')
 
@@ -137,7 +148,7 @@ const openUrl = async ({
   }
 
   // User has accepted a EULA, start the download
-  if (hostname === 'eulaCallback') {
+  if (checkHostname(hostname, 'eulacallback')) {
     const fileId = searchParams.get('fileId')
 
     // Logging out the `deepLink` was tricky to try to remove any tokens in the URL. Instead we are using this

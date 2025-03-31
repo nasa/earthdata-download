@@ -273,18 +273,18 @@ describe('openUrl', () => {
 
 describe('checkHostname', () => {
   test.each(['startDownload', 'startdownload'])('accepts case insensitive startDownload', async (hostname) => {
-    expect(checkHostname(hostname, 'startDownload')).toBe(true);
+    expect(checkHostname(hostname, 'startDownload')).toBe(true)
   })
 
   test.each(['authCallback', 'authcallback'])('accepts case insensitive authCallback', async (hostname) => {
-    expect(checkHostname(hostname, 'authCallback')).toBe(true);
+    expect(checkHostname(hostname, 'authCallback')).toBe(true)
   })
 
   test.each(['eulaCallback', 'eulacallback'])('accepts case insensitive eulaCallback', async (hostname) => {
-    expect(checkHostname(hostname, 'eulaCallback')).toBe(true);
+    expect(checkHostname(hostname, 'eulaCallback')).toBe(true)
   })
 
-  test.each(['foo', 'bar'])('returns false when hostnames do not compare', async (hostname) =>{
-    expect(checkHostname(hostname, 'baz')).toBe(false);
+  test.each(['foo', 'bar'])('returns false when hostnames do not compare', async (hostname) => {
+    expect(checkHostname(hostname, 'baz')).toBe(false)
   })
 })

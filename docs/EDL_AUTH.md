@@ -6,4 +6,6 @@ The result of the `authUrl` page's redirect should result in the user being sent
 
 ## startDownload - authUrl
 
-The authUrl will have a `fileId` parameter appended to it, which is the file ID of the file that triggered the authentication workflow. This `fileId` parameter needs to be returned in the [authCallback](USE_EDD.md#authentication-callback) deep link, in order to restart downloading that file.
+The authUrl in the startDownload deep link must include the `eddRedirect` query paramter with the value `earthdata-download://authCallback`. As a URL-encoded string, this looks like: `eddRedirect=earthdata-download%3A%2F%2FauthCallback`.
+
+The authUrl will have a `fileId` parameter appended to it by Earthdata Download, which is the file ID of the file that triggered the authentication workflow. This `fileId` parameter needs to be returned in the [authCallback](USE_EDD.md#authentication-callback) deep link, in order to restart downloading that file.

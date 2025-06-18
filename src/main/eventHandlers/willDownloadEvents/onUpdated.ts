@@ -1,6 +1,9 @@
 // @ts-nocheck
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsEvent from '../../../app/constants/metricsEvent'
+import metricsLogger from '../../utils/metricsLogger'
+import downloadIdForMetrics from '../../utils/downloadIdForMetrics'
 
 /**
  * Handles the DownloadItem 'updated' event
@@ -47,6 +50,14 @@ const onUpdated = async ({
   }
 
   if (state === 'interrupted') {
+    metricsLogger(database, {
+      eventType: metricsEvent.downloadInterrupted,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        filename
+      }
+    })
+
     await database.createPauseByDownloadIdAndFilename(downloadId, filename)
 
     // Update the database if the state has updated to interrupted

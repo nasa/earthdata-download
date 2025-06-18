@@ -6,6 +6,9 @@ import AbortController from 'abort-controller'
 
 import downloadStates from '../../app/constants/downloadStates'
 import sendToEula from '../eventHandlers/sendToEula'
+import metricsEvent from '../../app/constants/metricsEvent'
+import metricsLogger from './metricsLogger'
+import downloadIdForMetrics from './downloadIdForMetrics'
 
 /**
  * Verify the download works and log any errors. Also redirects the user to accept a EULA if that is detected.
@@ -94,6 +97,14 @@ const verifyDownload = async ({
     }
 
     console.log(`Error occured in verifyDownload, message: ${message}`)
+
+    metricsLogger(database, {
+      eventType: metricsEvent.downloadFailed,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        reason: message
+      }
+    })
 
     await database.updateFileById(fileId, {
       state: downloadStates.error,

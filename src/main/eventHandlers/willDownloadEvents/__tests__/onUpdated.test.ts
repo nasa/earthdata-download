@@ -5,6 +5,14 @@ import MockDate from 'mockdate'
 import onUpdated from '../onUpdated'
 
 import downloadStates from '../../../../app/constants/downloadStates'
+import metricsEvent from '../../../../app/constants/metricsEvent'
+import metricsLogger from '../../../utils/metricsLogger'
+import downloadIdForMetrics from '../../../utils/downloadIdForMetrics'
+
+jest.mock('../../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
@@ -34,6 +42,15 @@ describe('onUpdated', () => {
       downloadId,
       item,
       state
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
+      eventType: metricsEvent.downloadInterrupted,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        filename: 'mock-filename.png'
+      }
     })
 
     expect(database.getFileWhere).toHaveBeenCalledTimes(1)

@@ -2,6 +2,7 @@ const metricsEvent = {
   autoUpdateFailure: 'AutoUpdateFailure',
   downloadCancel: 'DownloadCancel',
   downloadComplete: 'DownloadComplete',
+  downloadInterrupted: 'DownloadInterrupted',
   downloadItemCancel: 'DownloadItemCancel',
   downloadPause: 'DownloadPause',
   downloadRestart: 'DownloadRestart',

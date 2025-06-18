@@ -11,6 +11,9 @@ import getLinksSchema from '../getLinksSchema.json'
 import isTrustedLink from './isTrustedLink'
 
 import packageDetails from '../../../package.json'
+import metricsEvent from '../../app/constants/metricsEvent'
+import metricsLogger from './metricsLogger'
+import downloadIdForMetrics from './downloadIdForMetrics'
 
 const ajv = new Ajv()
 
@@ -41,6 +44,14 @@ const fetchLinks = async ({
     const message = `The host [${getLinksUrl}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
 
     console.log(message)
+
+    metricsLogger(database, {
+      eventType: metricsEvent.downloadLinksFailed,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        reason: message
+      }
+    })
 
     await database.updateDownloadById(downloadId, {
       loadingMoreFiles: false,
@@ -92,11 +103,20 @@ const fetchLinks = async ({
       const validateGetLinks = ajv.compile(getLinksSchema)
       const valid = validateGetLinks(jsonResponse)
       if (!valid) {
+        const reason = 'The returned data does not match the expected schema.'
+        metricsLogger(database, {
+          eventType: metricsEvent.downloadLinksFailed,
+          data: {
+            downloadId: downloadIdForMetrics(downloadId),
+            reason
+          }
+        })
+
         await database.updateDownloadById(downloadId, {
           loadingMoreFiles: false,
           state: downloadStates.error,
           errors: [{
-            message: 'The returned data does not match the expected schema.'
+            message: reason
           }]
         })
 
@@ -149,7 +169,16 @@ const fetchLinks = async ({
     }
     /* eslint-enable no-await-in-loop */
   } catch (error) {
-    console.log(`Error while fetching download links, ${JSON.stringify(error)}`)
+    const reason = `Error while fetching download links: ${error.message}`
+    console.log(reason)
+
+    metricsLogger(database, {
+      eventType: metricsEvent.downloadLinksFailed,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        reason
+      }
+    })
 
     await database.updateDownloadById(downloadId, {
       loadingMoreFiles: false,

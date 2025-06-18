@@ -4,6 +4,8 @@ const metricsEvent = {
   downloadComplete: 'DownloadComplete',
   downloadInterrupted: 'DownloadInterrupted',
   downloadItemCancel: 'DownloadItemCancel',
+  downloadFailed: 'DownloadFailed',
+  downloadLinksFailed: 'DownloadLinksFailed',
   downloadPause: 'DownloadPause',
   downloadRestart: 'DownloadRestart',
   downloadResume: 'DownloadResume',

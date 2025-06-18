@@ -3,6 +3,7 @@
 import MockDate from 'mockdate'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsEvent from '../../../app/constants/metricsEvent'
 
 import restartDownload from '../restartDownload'
 
@@ -61,7 +62,7 @@ describe('restartDownload', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'DownloadRestart',
+        eventType: metricsEvent.downloadRestart,
         data: {
           downloadId: 'mock-download-id',
           filesCompleted: 8,
@@ -157,7 +158,7 @@ describe('restartDownload', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'DownloadRestart',
+        eventType: metricsEvent.downloadRestart,
         data: {
           downloadId: 'mock-download-id',
           filesCompleted: 8,
@@ -250,7 +251,7 @@ describe('restartDownload', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'DownloadRestart',
+        eventType: metricsEvent.downloadRestart,
         data: {
           downloadId: 'mock-download-id',
           filesCompleted: 8,

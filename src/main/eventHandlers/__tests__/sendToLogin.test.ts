@@ -5,6 +5,7 @@ import { shell } from 'electron'
 import sendToLogin from '../sendToLogin'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../../utils/metricsLogger'
 
 jest.mock('electronShell', () => ({
@@ -45,7 +46,7 @@ describe('sendToLogin', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'SentToEdl',
+      eventType: metricsEvent.sentToEdl,
       data: {
         downloadId: 'downloadID'
       }
@@ -98,7 +99,7 @@ describe('sendToLogin', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'SentToEdl',
+        eventType: metricsEvent.sentToEdl,
         data: {
           downloadId: 'downloadID'
         }
@@ -199,7 +200,7 @@ describe('sendToLogin', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'SentToEdl',
+        eventType: metricsEvent.sentToEdl,
         data: {
           downloadId: 'downloadID'
         }

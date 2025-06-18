@@ -78,7 +78,7 @@ const sendToEula = async ({
     })
 
     metricsLogger(database, {
-      eventType: metricsEvent.sendToEula,
+      eventType: metricsEvent.sentToEula,
       data: {
         downloadId: downloadIdForMetrics(downloadId)
       }

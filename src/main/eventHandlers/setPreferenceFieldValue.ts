@@ -16,7 +16,7 @@ const setPreferenceFieldValue = async ({
   switch (field) {
     case 'concurrentDownloads':
       metricsLogger(database, {
-        eventType: metricsEvent.newConcurrentDownloads,
+        eventType: metricsEvent.newConcurrentDownloadsLimit,
         data: {
           newConcurrentDownloads: value
         }
@@ -26,7 +26,7 @@ const setPreferenceFieldValue = async ({
 
     case 'defaultDownloadLocation':
       metricsLogger(database, {
-        eventType: metricsEvent.NewDefaultDownloadLocation
+        eventType: metricsEvent.newDefaultDownloadLocation
       })
 
       break

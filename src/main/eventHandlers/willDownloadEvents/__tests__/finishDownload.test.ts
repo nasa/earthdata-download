@@ -5,6 +5,7 @@ import MockDate from 'mockdate'
 import finishDownload from '../finishDownload'
 
 import downloadStates from '../../../../app/constants/downloadStates'
+import metricsEvent from '../../../../app/constants/metricsEvent'
 
 import metricsLogger from '../../../utils/metricsLogger'
 
@@ -39,7 +40,7 @@ describe('finishDownload', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'DownloadComplete',
+      eventType: metricsEvent.downloadComplete,
       data: {
         downloadId: 'mock-download-id',
         receivedBytes: 461748278,

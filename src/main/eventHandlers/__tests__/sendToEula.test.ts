@@ -5,6 +5,7 @@ import { shell } from 'electron'
 import sendToEula from '../sendToEula'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../../utils/metricsLogger'
 
 jest.mock('electronShell', () => ({
@@ -46,7 +47,7 @@ describe('sendToEula', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'SentToEula',
+      eventType: metricsEvent.sentToEula,
       data: {
         downloadId: 'downloadID'
       }
@@ -100,7 +101,7 @@ describe('sendToEula', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'SentToEula',
+        eventType: metricsEvent.sentToEula,
         data: {
           downloadId: 'downloadID'
         }
@@ -203,7 +204,7 @@ describe('sendToEula', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'SentToEula',
+        eventType: metricsEvent.sentToEula,
         data: {
           downloadId: 'downloadID'
         }

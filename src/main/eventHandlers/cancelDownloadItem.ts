@@ -69,7 +69,7 @@ const cancelDownloadItem = async ({
     await database.endPause(downloadId)
 
     metricsLogger(database, {
-      eventType: metricsEvent.DownloadCancel,
+      eventType: metricsEvent.downloadCancel,
       data: {
         downloadIds: [downloadIdForMetrics(downloadId)],
         cancelCount: 1
@@ -98,7 +98,7 @@ const cancelDownloadItem = async ({
     }))
 
     metricsLogger(database, {
-      eventType: metricsEvent.DownloadCancel,
+      eventType: metricsEvent.downloadCancel,
       data: {
         downloadIds: cancelledDownloadIds,
         cancelCount: cancelledDownloadIds.length

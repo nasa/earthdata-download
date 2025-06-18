@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../../utils/metricsLogger'
 import setPreferenceFieldValue from '../setPreferenceFieldValue'
 
@@ -25,7 +26,7 @@ describe('set a field in the preferences', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'NewConcurrentDownloadsLimit',
+        eventType: metricsEvent.newConcurrentDownloadsLimit,
         data: {
           newConcurrentDownloads: '2'
         }
@@ -52,7 +53,7 @@ describe('set a field in the preferences', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'NewDefaultDownloadLocation'
+        eventType: metricsEvent.newDefaultDownloadLocation
       })
 
       expect(database.setPreferences).toHaveBeenCalledTimes(1)

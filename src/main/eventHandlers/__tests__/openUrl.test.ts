@@ -5,6 +5,7 @@ import MockDate from 'mockdate'
 import openUrl, { checkHostname } from '../openUrl'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsEvent from '../../../app/constants/metricsEvent'
 
 import metricsLogger from '../../utils/metricsLogger'
 import startPendingDownloads from '../../utils/startPendingDownloads'
@@ -63,7 +64,7 @@ describe('openUrl', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'OpenUrl',
+        eventType: metricsEvent.openUrl,
         data: {
           clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'shortName_versionId'
@@ -109,7 +110,7 @@ describe('openUrl', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'OpenUrl',
+        eventType: metricsEvent.openUrl,
         data: {
           clientId: null,
           downloadId: 'shortName_versionId'
@@ -155,7 +156,7 @@ describe('openUrl', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'OpenUrl',
+        eventType: metricsEvent.openUrl,
         data: {
           clientId: 'eed-edsc-dev-serverless-client',
           downloadId: 'shortName_versionId'

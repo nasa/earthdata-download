@@ -3,6 +3,7 @@
 import resumeDownloadItem from '../resumeDownloadItem'
 import downloadStates from '../../../app/constants/downloadStates'
 import startNextDownload from '../../utils/startNextDownload'
+import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../../utils/metricsLogger.ts'
 
 jest.mock('../../utils/startNextDownload', () => ({
@@ -114,7 +115,7 @@ describe('resumeDownloadItem', () => {
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
         expect(metricsLogger).toHaveBeenCalledWith(database, {
-          eventType: 'DownloadResume',
+          eventType: metricsEvent.downloadResume,
           data: {
             downloadIds: ['mock-download-id'],
             downloadCount: 1
@@ -180,7 +181,7 @@ describe('resumeDownloadItem', () => {
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
         expect(metricsLogger).toHaveBeenCalledWith(database, {
-          eventType: 'DownloadResume',
+          eventType: metricsEvent.downloadResume,
           data: {
             downloadIds: ['mock-download-id'],
             downloadCount: 1
@@ -248,7 +249,7 @@ describe('resumeDownloadItem', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'DownloadResume',
+        eventType: metricsEvent.downloadResume,
         data: {
           downloadIds: ['download1', 'download2', 'download3'],
           downloadCount: 3

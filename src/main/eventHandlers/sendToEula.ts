@@ -3,6 +3,7 @@
 import { shell } from 'electron'
 
 import downloadStates from '../../app/constants/downloadStates'
+import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from '../utils/metricsLogger'
 import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
@@ -77,7 +78,7 @@ const sendToEula = async ({
     })
 
     metricsLogger(database, {
-      eventType: 'SentToEula',
+      eventType: metricsEvent.sendToEula,
       data: {
         downloadId: downloadIdForMetrics(downloadId)
       }

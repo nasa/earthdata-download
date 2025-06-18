@@ -2,6 +2,7 @@
 
 import { app } from 'electron'
 
+import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from './metricsLogger'
 import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
@@ -48,7 +49,7 @@ const initializeDownload = async ({
 
     const metricIds = downloadIds.map(downloadIdForMetrics)
     metricsLogger(database, {
-      eventType: 'DownloadStarted',
+      eventType: metricsEvent.downloadStarted,
       data: {
         downloadIds: metricIds
       }

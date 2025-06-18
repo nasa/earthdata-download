@@ -4,6 +4,7 @@ import 'array-foreach-async'
 
 import downloadStates from '../../app/constants/downloadStates'
 import startNextDownload from '../utils/startNextDownload'
+import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from '../utils/metricsLogger'
 import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
@@ -38,7 +39,7 @@ const resumeDownloadItem = async ({
 
   if (downloadId && !filename) {
     metricsLogger(database, {
-      eventType: 'DownloadResume',
+      eventType: metricsEvent.downloadResume,
       data: {
         downloadIds: [downloadIdForMetrics(downloadId)],
         downloadCount: 1
@@ -85,7 +86,7 @@ const resumeDownloadItem = async ({
     })
 
     metricsLogger(database, {
-      eventType: 'DownloadResume',
+      eventType: metricsEvent.downloadResume,
       data: {
         downloadIds,
         downloadCount: downloadIds.length

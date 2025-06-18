@@ -3,6 +3,7 @@
 import { shell } from 'electron'
 
 import downloadStates from '../../app/constants/downloadStates'
+import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from '../utils/metricsLogger'
 import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
@@ -71,7 +72,7 @@ const sendToLogin = async ({
     })
 
     metricsLogger(database, {
-      eventType: 'SentToEdl',
+      eventType: metricsEvent.sendToEdl,
       data: {
         downloadId: downloadIdForMetrics(downloadId)
       }

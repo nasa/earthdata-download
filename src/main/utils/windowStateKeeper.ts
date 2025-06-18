@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from './metricsLogger'
 
 /**
@@ -61,7 +62,7 @@ const windowStateKeeper = async (database) => {
   }
 
   metricsLogger(database, {
-    eventType: 'WindowSizePreferences',
+    eventType: metricsEvent.windowSizePreferences,
     data: {
       windowStateInfo
     }

@@ -18,6 +18,11 @@ jest.mock('../finishDownload', () => ({
   default: jest.fn(() => { })
 }))
 
+jest.mock('../../../utils/metricsLogger', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00.000')
 })

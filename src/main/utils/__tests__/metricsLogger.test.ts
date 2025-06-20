@@ -29,7 +29,7 @@ describe('metricsLogger', () => {
       receivedBytes: 20480,
       totalBytes: 25600,
       filesDownloaded: 8,
-      filesFailed: 2,
+      filesErrored: 2,
       duration: 14.1
     }
   }

@@ -290,7 +290,7 @@ describe('fetchLinks', () => {
     }
     fetch.mockImplementation(() => standardResponse)
     const getLinksUrl = 'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data'
-    const reason = `The host [${getLinksUrl}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
+    const reason = `The host [${getLinksUrl}] is not a trusted source and Earthdata Download will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
 
     await fetchLinks({
       appWindow,

@@ -41,7 +41,7 @@ const fetchLinks = async ({
 
   // If the getLinks URL is not trusted, don't fetch the links
   if (!isTrustedLink(getLinksUrl)) {
-    const message = `The host [${getLinksUrl}] is not a trusted source and Earthdata Downloader will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
+    const message = `The host [${getLinksUrl}] is not a trusted source and Earthdata Download will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at ${packageDetails.author.email} or submit a Pull Request at ${packageDetails.homepage}.`
 
     console.log(message)
 

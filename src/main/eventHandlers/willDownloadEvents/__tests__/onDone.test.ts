@@ -2,11 +2,14 @@
 
 import MockDate from 'mockdate'
 
+import metricsLogger from '../../../utils/metricsLogger'
+import downloadIdForMetrics from '../../../utils/downloadIdForMetrics'
 import onDone from '../onDone'
 import startNextDownload from '../../../utils/startNextDownload'
 import finishDownload from '../finishDownload'
 
 import downloadStates from '../../../../app/constants/downloadStates'
+import metricsEvent from '../../../../app/constants/metricsEvent'
 
 jest.mock('../../../utils/startNextDownload', () => ({
   __esModule: true,
@@ -120,6 +123,15 @@ describe('onDone', () => {
       item,
       state,
       webContents: {}
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
+      eventType: metricsEvent.downloadFailed,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        filename: 'mock-filename.png'
+      }
     })
 
     expect(database.getFileWhere).toHaveBeenCalledTimes(1)

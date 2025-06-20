@@ -59,7 +59,6 @@ jest.mock('../willDownloadEvents/onDone')
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
-  jest.clearAllMocks()
 })
 
 describe('willDownload', () => {

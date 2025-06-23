@@ -32,7 +32,8 @@ describe('finishDownload', () => {
         totalDownloadTime: 18938,
         erroredCount: 1,
         incompleteFileCount: 3,
-        interruptedCount: 1,
+        interruptedCanResumeCount: 1,
+        interruptedCanNotResumeCount: 0,
         cancelledCount: 1,
         pauseCount: 2
       })
@@ -54,7 +55,8 @@ describe('finishDownload', () => {
         filesDownloaded: 10,
         filesErrored: 1,
         filesIncomplete: 3,
-        filesInterrupted: 1,
+        filesInterruptedCanResume: 1,
+        filesInterruptedCanNotResume: 0,
         filesCancelled: 1,
         pauseCount: 2
       }

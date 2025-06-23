@@ -165,13 +165,13 @@ const FileDownloadsHeader = ({
   const shouldShowResume = [
     downloadStates.paused,
     downloadStates.error,
-    downloadStates.interrupted
+    downloadStates.interruptedCanResume
   ].includes(state)
   const shouldShowCancel = [
     downloadStates.paused,
     downloadStates.active,
     downloadStates.error,
-    downloadStates.interrupted,
+    downloadStates.interruptedCanResume,
     downloadStates.waitingForAuth
   ].includes(state)
 

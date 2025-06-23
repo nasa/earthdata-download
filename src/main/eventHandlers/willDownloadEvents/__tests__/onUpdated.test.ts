@@ -62,7 +62,7 @@ describe('onUpdated', () => {
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 42,
-      state: downloadStates.interrupted
+      state: downloadStates.interruptedCanResume
     })
 
     expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(1)
@@ -72,7 +72,7 @@ describe('onUpdated', () => {
     expect(database.createPauseByDownloadId).toHaveBeenCalledWith('mock-download-id', false)
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
-    expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: downloadStates.interrupted })
+    expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: downloadStates.interruptedCanResume })
   })
 
   test('updates the database for progressing downloads', async () => {

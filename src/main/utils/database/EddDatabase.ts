@@ -713,7 +713,8 @@ class EddDatabase {
         this.db.raw('(IFNULL(MAX(timeEnd), UNIXEPOCH() * 1000) - MIN(timeStart)) as totalDownloadTime'),
         this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state != \'COMPLETED\') as incompleteFileCount', [downloadId]),
         this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'ERROR\') as erroredCount', [downloadId]),
-        this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'INTERRUPTED\') as interruptedCount', [downloadId]),
+        this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'INTERRUPTED_CAN_RESUME\') as interruptedCanResumeCount', [downloadId]),
+        this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'INTERRUPTED_CAN_NOT_RESUME\') as interruptedCanNotResumeCount', [downloadId]),
         this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'CANCELLED\') as cancelledCount', [downloadId]),
         this.db.raw('(SELECT COUNT(id) FROM pauses WHERE downloadId = ? AND fileId IS NULL) as pauseCount', [downloadId])
       )

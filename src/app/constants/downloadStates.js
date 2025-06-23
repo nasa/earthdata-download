@@ -6,6 +6,8 @@ const downloadStates = {
   error: 'ERROR',
   errorFetchingLinks: 'ERROR_FETCHING_LINKS',
   interrupted: 'INTERRUPTED',
+  interruptedCanResume: 'INTERRUPTED_CAN_RESUME',
+  interruptedCanNotResume: 'INTERRUPTED_CAN_NOT_RESUME',
   paused: 'PAUSED',
   pending: 'PENDING',
   starting: 'STARTING',

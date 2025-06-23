@@ -145,7 +145,7 @@ describe('onDone', () => {
       cancelId: null,
       errors: 'This file could not be downloaded',
       percent: 0,
-      state: downloadStates.error,
+      state: downloadStates.interruptedCanNotResume,
       timeEnd: 1684029600000
     })
 

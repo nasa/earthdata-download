@@ -58,7 +58,7 @@ const onDone = async ({
 
       break
     case 'interrupted':
-      updatedState = downloadStates.error
+      updatedState = downloadStates.interruptedCanNotResume
       errors = 'This file could not be downloaded'
       metricsLogger(database, {
         eventType: metricsEvent.downloadErrored,

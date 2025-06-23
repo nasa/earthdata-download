@@ -34,7 +34,8 @@ const finishDownload = async ({
         filesDownloaded: downloadStatistics.fileCount,
         filesErrored: downloadStatistics.erroredCount,
         filesIncomplete: downloadStatistics.incompleteFileCount,
-        filesInterrupted: downloadStatistics.interruptedCount,
+        filesInterruptedCanResume: downloadStatistics.interruptedCanResumeCount,
+        filesInterruptedCanNotResume: downloadStatistics.interruptedCanNotResumeCount,
         filesCancelled: downloadStatistics.cancelledCount,
         pauseCount: downloadStatistics.pauseCount
       }

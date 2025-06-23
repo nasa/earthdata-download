@@ -8,14 +8,14 @@ const parseDownloadReport = (report) => {
   const allDownloadsPaused = !!(report.length && report.every(
     ({ state }) => (
       state === downloadStates.paused
-      || state === downloadStates.interrupted
+      || state === downloadStates.interruptedCanResume
     )
   ))
 
   const allDownloadsPausedOrCompleted = !!(report.length && report.every(
     ({ state }) => (
       state === downloadStates.paused
-      || state === downloadStates.interrupted
+      || state === downloadStates.interruptedCanResume
       || state === downloadStates.completed
     )
   ))
@@ -35,7 +35,7 @@ const parseDownloadReport = (report) => {
   const hasPausedDownload = !!(report.length && report.some(
     ({ state }) => (
       state === downloadStates.paused
-      || state === downloadStates.interrupted
+      || state === downloadStates.interruptedCanResume
     )
   ))
 

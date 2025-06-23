@@ -96,13 +96,14 @@ const verifyDownload = async ({
       message = `HTTP Error Response: ${status} ${statusText}`
     }
 
-    console.log(`Error occured in verifyDownload, message: ${message}`)
+    const errorMessage = `Error occured in verifyDownload, message: ${message}`
+    console.log(errorMessage)
 
     metricsLogger(database, {
-      eventType: metricsEvent.downloadFailed,
+      eventType: metricsEvent.downloadErrored,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
-        reason: message
+        reason: errorMessage
       }
     })
 

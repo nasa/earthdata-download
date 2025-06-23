@@ -32,7 +32,7 @@ const finishDownload = async ({
         totalBytes: downloadStatistics.totalBytesSum,
         duration: (downloadStatistics.totalDownloadTime / 1000).toFixed(1),
         filesDownloaded: downloadStatistics.fileCount,
-        filesErrored: downloadStatistics.failedErroredCount,
+        filesErrored: downloadStatistics.erroredCount,
         filesIncomplete: downloadStatistics.incompleteFileCount,
         filesInterrupted: downloadStatistics.interruptedCount,
         filesCancelled: downloadStatistics.cancelledCount,

@@ -240,10 +240,10 @@ describe('verifyDownload', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: metricsEvent.downloadFailed,
+        eventType: metricsEvent.downloadErrored,
         data: {
           downloadId: downloadIdForMetrics(downloadId),
-          reason: 'HTTP Error Response: 403 Forbidden'
+          reason: 'Error occured in verifyDownload, message: HTTP Error Response: 403 Forbidden'
         }
       })
 
@@ -300,10 +300,10 @@ describe('verifyDownload', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: metricsEvent.downloadFailed,
+        eventType: metricsEvent.downloadErrored,
         data: {
           downloadId: downloadIdForMetrics(downloadId),
-          reason: 'This file could not be downloaded'
+          reason: 'Error occured in verifyDownload, message: This file could not be downloaded'
         }
       })
 

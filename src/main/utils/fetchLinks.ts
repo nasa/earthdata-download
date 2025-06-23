@@ -46,7 +46,7 @@ const fetchLinks = async ({
     console.log(message)
 
     metricsLogger(database, {
-      eventType: metricsEvent.downloadLinksFailed,
+      eventType: metricsEvent.fetchLinksFailed,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
         reason: message
@@ -105,7 +105,7 @@ const fetchLinks = async ({
       if (!valid) {
         const reason = 'The returned data does not match the expected schema.'
         metricsLogger(database, {
-          eventType: metricsEvent.downloadLinksFailed,
+          eventType: metricsEvent.fetchLinksFailed,
           data: {
             downloadId: downloadIdForMetrics(downloadId),
             reason
@@ -173,7 +173,7 @@ const fetchLinks = async ({
     console.log(reason)
 
     metricsLogger(database, {
-      eventType: metricsEvent.downloadLinksFailed,
+      eventType: metricsEvent.fetchLinksFailed,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
         reason

@@ -61,7 +61,7 @@ const onDone = async ({
       updatedState = downloadStates.error
       errors = 'This file could not be downloaded'
       metricsLogger(database, {
-        eventType: metricsEvent.downloadFailed,
+        eventType: metricsEvent.downloadErrored,
         data: {
           downloadId: downloadIdForMetrics(downloadId),
           filename

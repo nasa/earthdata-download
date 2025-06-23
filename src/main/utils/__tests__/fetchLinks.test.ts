@@ -241,7 +241,7 @@ describe('fetchLinks', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: metricsEvent.downloadLinksFailed,
+      eventType: metricsEvent.fetchLinksFailed,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
         reason: `Error while fetching download links: ${error.message}`
@@ -303,7 +303,7 @@ describe('fetchLinks', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: metricsEvent.downloadLinksFailed,
+      eventType: metricsEvent.fetchLinksFailed,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
         reason
@@ -396,7 +396,7 @@ describe('fetchLinks', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: metricsEvent.downloadLinksFailed,
+      eventType: metricsEvent.fetchLinksFailed,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
         reason

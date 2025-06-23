@@ -159,7 +159,7 @@ const willDownload = async ({
     console.log(`The download for ${originalUrl} has a totalBytes of ${totalBytes}. Cancelling the download.`)
 
     metricsLogger(database, {
-      eventType: metricsEvent.downloadFailed,
+      eventType: metricsEvent.downloadErrored,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
         filename,

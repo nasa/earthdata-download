@@ -127,7 +127,7 @@ describe('onDone', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: metricsEvent.downloadFailed,
+      eventType: metricsEvent.downloadErrored,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
         filename: 'mock-filename.png'

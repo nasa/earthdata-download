@@ -95,6 +95,7 @@ const DownloadListItem = ({
   const shouldShowResume = [
     downloadStates.paused,
     downloadStates.error,
+    downloadStates.interrupted_DEPRECATED,
     downloadStates.interruptedCanResume
   ].includes(state)
   const shouldShowCancel = [
@@ -102,6 +103,7 @@ const DownloadListItem = ({
     downloadStates.paused,
     downloadStates.active,
     downloadStates.error,
+    downloadStates.interrupted_DEPRECATED,
     downloadStates.interruptedCanResume,
     downloadStates.waitingForAuth
   ].includes(state)

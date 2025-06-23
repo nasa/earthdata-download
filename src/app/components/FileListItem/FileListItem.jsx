@@ -68,6 +68,7 @@ const FileListItem = ({
     downloadStates.paused,
     downloadStates.active,
     downloadStates.error,
+    downloadStates.interrupted_DEPRECATED,
     downloadStates.interruptedCanResume
   ].includes(state)
 

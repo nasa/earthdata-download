@@ -70,12 +70,16 @@ describe('requestDownloadsProgress', () => {
         ]),
       getDownloadReport: jest.fn()
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 0,
           erroredFiles: 0,
           totalFiles: 7,
           finishedFiles: 0
         })
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 546,
           erroredFiles: 0,
           totalFiles: 7,
@@ -104,6 +108,8 @@ describe('requestDownloadsProgress', () => {
     expect(result).toEqual({
       downloadsReport: [{
         downloadId: 'mock-download-id-1',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -114,6 +120,8 @@ describe('requestDownloadsProgress', () => {
         state: downloadStates.active
       }, {
         downloadId: 'mock-download-id-2',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 5,
@@ -174,12 +182,16 @@ describe('requestDownloadsProgress', () => {
         ]),
       getDownloadReport: jest.fn()
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 0,
           erroredFiles: 0,
           totalFiles: 7,
           finishedFiles: 0
         })
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 546,
           erroredFiles: 0,
           totalFiles: 7,
@@ -208,6 +220,8 @@ describe('requestDownloadsProgress', () => {
     expect(result).toEqual({
       downloadsReport: [{
         downloadId: 'mock-download-id-1',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -218,6 +232,8 @@ describe('requestDownloadsProgress', () => {
         state: downloadStates.active
       }, {
         downloadId: 'mock-download-id-2',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 5,
@@ -278,12 +294,16 @@ describe('requestDownloadsProgress', () => {
         ]),
       getDownloadReport: jest.fn()
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 0,
           erroredFiles: 0,
           totalFiles: 7,
           finishedFiles: 0
         })
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 546,
           erroredFiles: 1,
           totalFiles: 7,
@@ -316,6 +336,8 @@ describe('requestDownloadsProgress', () => {
     expect(result).toEqual({
       downloadsReport: [{
         downloadId: 'mock-download-id-1',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -326,6 +348,8 @@ describe('requestDownloadsProgress', () => {
         state: downloadStates.active
       }, {
         downloadId: 'mock-download-id-2',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 5,
@@ -391,12 +415,16 @@ describe('requestDownloadsProgress', () => {
         ]),
       getDownloadReport: jest.fn()
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 0,
           erroredFiles: 0,
           totalFiles: 7,
           finishedFiles: 0
         })
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 546,
           erroredFiles: 1,
           totalFiles: 7,
@@ -425,6 +453,8 @@ describe('requestDownloadsProgress', () => {
     expect(result).toEqual({
       downloadsReport: [{
         downloadId: 'mock-download-id-1',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -435,6 +465,8 @@ describe('requestDownloadsProgress', () => {
         state: downloadStates.active
       }, {
         downloadId: 'mock-download-id-2',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 5,
@@ -498,12 +530,16 @@ describe('requestDownloadsProgress', () => {
         ]),
       getDownloadReport: jest.fn()
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 0,
           erroredFiles: 0,
           totalFiles: 7,
           finishedFiles: 0
         })
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 546,
           erroredFiles: 0,
           totalFiles: 7,
@@ -532,6 +568,8 @@ describe('requestDownloadsProgress', () => {
     expect(result).toEqual({
       downloadsReport: [{
         downloadId: 'mock-download-id-1',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -542,6 +580,8 @@ describe('requestDownloadsProgress', () => {
         state: downloadStates.active
       }, {
         downloadId: 'mock-download-id-2',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 0,
@@ -603,12 +643,16 @@ describe('requestDownloadsProgress', () => {
         ]),
       getDownloadReport: jest.fn()
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 0,
           erroredFiles: 0,
           totalFiles: 7,
           finishedFiles: 0
         })
         .mockResolvedValueOnce({
+          duplicateCount: 0,
+          invalidLinksCount: 0,
           percentSum: 546,
           erroredFiles: 0,
           totalFiles: 7,
@@ -637,6 +681,8 @@ describe('requestDownloadsProgress', () => {
     expect(result).toEqual({
       downloadsReport: [{
         downloadId: 'mock-download-id-1',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: true,
         progress: {
           finishedFiles: 0,
@@ -647,6 +693,8 @@ describe('requestDownloadsProgress', () => {
         state: downloadStates.active
       }, {
         downloadId: 'mock-download-id-2',
+        duplicateCount: 0,
+        invalidLinksCount: 0,
         loadingMoreFiles: false,
         progress: {
           finishedFiles: 5,

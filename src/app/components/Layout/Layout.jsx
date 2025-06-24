@@ -36,10 +36,12 @@ import useAppContext from '../../hooks/useAppContext'
 
 import { PAGES } from '../../constants/pages'
 
-import * as styles from './Layout.module.scss'
+import AdditionalDetails from '../../dialogs/AdditionalDetails/AdditionalDetails'
 import WaitingForEula from '../../dialogs/WaitingForEula/WaitingForEula'
 import WaitingForLogin from '../../dialogs/WaitingForLogin/WaitingForLogin'
 import ResetApplication from '../../dialogs/ResetApplication/ResetApplication'
+
+import * as styles from './Layout.module.scss'
 
 const updateAvailableToastId = 'updateAvailable'
 
@@ -83,13 +85,15 @@ const Layout = () => {
   const { activeToasts = {} } = toasts
 
   const [activeMoreInfoDownloadInfo, setActiveMoreInfoDownloadInfo] = useState({})
+  const [activeAdditionalDetailsInfo, setActiveAdditionalDetailsInfo] = useState({})
   const [chooseDownloadLocationIsOpen, setChooseDownloadLocationIsOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(PAGES.downloads)
   const [downloadIds, setDownloadIds] = useState(null)
   const [downloadLinks, setDownloadLinks] = useState({})
   const [hasActiveDownload, setHasActiveDownload] = useState(false)
   const [isWindowMaximized, setIsWindowMaximized] = useState(false)
-  const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState()
+  const [additionalDetailsIsOpen, setAdditionalDetailsIsOpen] = useState(false)
+  const [moreErrorInfoIsOpen, setMoreErrorInfoIsOpen] = useState(false)
   const [pageComponent, setPageComponent] = useState(null)
   const [selectedDownloadId, setSelectedDownloadId] = useState(null)
   const [selectedDownloadLocation, setSelectedDownloadLocation] = useState(null)
@@ -112,6 +116,11 @@ const Layout = () => {
     })
 
     setMoreErrorInfoIsOpen(true)
+  }
+
+  const showAdditionalDetailsDialog = (downloadId) => {
+    setActiveAdditionalDetailsInfo({ downloadId })
+    setAdditionalDetailsIsOpen(true)
   }
 
   const onWindowMaximized = (event, windowMaximized) => {
@@ -324,10 +333,11 @@ const Layout = () => {
         setPageComponent(
           <Downloads
             downloadLinks={downloadLinks}
-            setSelectedDownloadId={setSelectedDownloadId}
-            setCurrentPage={setCurrentPage}
             hasActiveDownload={hasActiveDownload}
+            showAdditionalDetailsDialog={showAdditionalDetailsDialog}
+            setCurrentPage={setCurrentPage}
             setHasActiveDownload={setHasActiveDownload}
+            setSelectedDownloadId={setSelectedDownloadId}
             showMoreInfoDialog={showMoreInfoDialog}
           />
         )
@@ -337,6 +347,7 @@ const Layout = () => {
         setSelectedDownloadId(null)
         setPageComponent(
           <DownloadHistory
+            showAdditionalDetailsDialog={showAdditionalDetailsDialog}
             setCurrentPage={setCurrentPage}
             showMoreInfoDialog={showMoreInfoDialog}
           />
@@ -601,6 +612,20 @@ const Layout = () => {
             onCloseMoreErrorInfoDialog={setMoreErrorInfoIsOpen}
             setCurrentPage={setCurrentPage}
             setSelectedDownloadId={setSelectedDownloadId}
+          />
+        </Dialog>
+
+        <Dialog
+          open={additionalDetailsIsOpen}
+          closeButton
+          setOpen={setAdditionalDetailsIsOpen}
+          showTitle
+          title="Additional Details"
+        >
+          <AdditionalDetails
+            activeAdditionalDetailsInfo={activeAdditionalDetailsInfo}
+            onCloseAdditionalDetailsDialog={setAdditionalDetailsIsOpen}
+            setActiveAdditionalDetailsInfo={setActiveAdditionalDetailsInfo}
           />
         </Dialog>
 

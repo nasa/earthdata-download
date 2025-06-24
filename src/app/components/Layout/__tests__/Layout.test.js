@@ -121,10 +121,6 @@ const setup = (overrideApiContextValue = {}, toasts = []) => {
   }
 }
 
-beforeEach(() => {
-  jest.clearAllMocks()
-})
-
 describe('Layout component', () => {
   test('renders the downloads page', () => {
     setup()

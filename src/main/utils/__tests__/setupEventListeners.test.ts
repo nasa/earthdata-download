@@ -24,6 +24,7 @@ import metricsLogger from '../../utils/metricsLogger'
 import openDownloadFolder from '../../eventHandlers/openDownloadFolder'
 import openLogFolder from '../../eventHandlers/openLogFolder'
 import pauseDownloadItem from '../../eventHandlers/pauseDownloadItem'
+import requestAddionalDetailsReport from '../../eventHandlers/requestAddionalDetailsReport'
 import requestDownloadsProgress from '../../eventHandlers/requestDownloadsProgress'
 import requestFilesProgress from '../../eventHandlers/requestFilesProgress'
 import resetApplication from '../../eventHandlers/resetApplication'
@@ -74,6 +75,7 @@ jest.mock('../../eventHandlers/getPreferenceFieldValue', () => ({
 jest.mock('../../eventHandlers/openDownloadFolder')
 jest.mock('../../eventHandlers/openLogFolder')
 jest.mock('../../eventHandlers/pauseDownloadItem')
+jest.mock('../../eventHandlers/requestAddionalDetailsReport')
 jest.mock('../../eventHandlers/requestDownloadsProgress')
 jest.mock('../../eventHandlers/requestFilesProgress')
 jest.mock('../../eventHandlers/resetApplication')
@@ -825,6 +827,23 @@ describe('setupEventListeners', () => {
 
       expect(undoRestartingDownload).toHaveBeenCalledTimes(1)
       expect(undoRestartingDownload).toHaveBeenCalledWith({
+        database,
+        info
+      })
+    })
+  })
+
+  describe('requestAddionalDetailsReport', () => {
+    test('calls requestAddionalDetailsReport', () => {
+      const { database } = setup()
+
+      const event = {}
+      const info = { mock: 'info' }
+
+      ipcRenderer.send('requestAddionalDetailsReport', event, info)
+
+      expect(requestAddionalDetailsReport).toHaveBeenCalledTimes(1)
+      expect(requestAddionalDetailsReport).toHaveBeenCalledWith({
         database,
         info
       })

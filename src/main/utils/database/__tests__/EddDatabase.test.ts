@@ -13,8 +13,6 @@ let mockDbConnection
 let dbTracker
 
 beforeEach(() => {
-  jest.clearAllMocks()
-
   jest.spyOn(getDatabaseConnection, 'getDatabaseConnection').mockImplementationOnce(() => {
     mockDbConnection = knex({
       client: 'sqlite',
@@ -104,6 +102,12 @@ describe('EddDatabase', () => {
             name: '20230916012751_add_clear_id_to_downloads.js'
           }, {
             name: '20231221182834_add_allow_metrics_columns_to_preferences.js'
+          }, {
+            name: '20250618182156_add_unique_to_files.js'
+          }, {
+            name: '20250618183159_add_duplicate_count_to_files.js'
+          }, {
+            name: '20250618195255_add_invalid_links_to_downloads.js'
           }])
         } else if (step === 5) {
           // Query: select `name` from `knex_migrations` order by `id` asc'
@@ -1238,7 +1242,7 @@ describe('EddDatabase', () => {
   describe('addLinksByDownloadId', () => {
     test('add links to the download', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('insert into `files` (`createdAt`, `downloadId`, `filename`, `percent`, `state`, `url`) select ? as `createdAt`, ? as `downloadId`, ? as `filename`, ? as `percent`, ? as `state`, ? as `url` union all select ? as `createdAt`, ? as `downloadId`, ? as `filename`, ? as `percent`, ? as `state`, ? as `url` union all select ? as `createdAt`, ? as `downloadId`, ? as `filename`, ? as `percent`, ? as `state`, ? as `url`')
+        expect(query.sql).toEqual('insert into `files` (`createdAt`, `downloadId`, `filename`, `percent`, `state`, `url`) select ? as `createdAt`, ? as `downloadId`, ? as `filename`, ? as `percent`, ? as `state`, ? as `url` union all select ? as `createdAt`, ? as `downloadId`, ? as `filename`, ? as `percent`, ? as `state`, ? as `url` union all select ? as `createdAt`, ? as `downloadId`, ? as `filename`, ? as `percent`, ? as `state`, ? as `url` where true on conflict (`downloadId`, `filename`) do update set `duplicateCount` = `duplicateCount` + 1')
         expect(query.bindings).toEqual([
           1682899200000,
           'mock-download-1',
@@ -1274,13 +1278,44 @@ describe('EddDatabase', () => {
     })
   })
 
+  describe('getAdditionalDetailsReport', () => {
+    test('returns the report', async () => {
+      dbTracker.on('query', (query) => {
+        expect(query.sql).toEqual('select (SELECT invalidLinks FROM downloads WHERE id = ?) as invalidLinksCount, sum(`duplicateCount`) as `duplicateCount` from `files` where `downloadId` = ?')
+        expect(query.bindings).toEqual([
+          'mock-download-1',
+          'mock-download-1'
+        ])
+
+        query.response([{
+          invalidLinksCount: 0,
+          duplicateCount: 0
+        }])
+      })
+
+      const database = new EddDatabase('./')
+
+      const result = await database.getAdditionalDetailsReport('mock-download-1')
+
+      expect(result).toEqual([{
+        invalidLinksCount: 0,
+        duplicateCount: 0
+      }])
+    })
+  })
+
   describe('getDownloadReport', () => {
     test('returns the report', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual('select sum(`percent`) as `percentSum`, count(`id`) as `totalFiles`, count(CASE `state` WHEN \'COMPLETED\' THEN 1 ELSE NULL END) as `finishedFiles` from `files` where `downloadId` = ? and `deleteId` is null')
-        expect(query.bindings).toEqual(['mock-download-1'])
+        expect(query.sql).toEqual('select (SELECT invalidLinks FROM downloads WHERE id = ?) as invalidLinksCount, sum(`duplicateCount`) as `duplicateCount`, sum(`percent`) as `percentSum`, count(`id`) as `totalFiles`, count(CASE `state` WHEN \'COMPLETED\' THEN 1 ELSE NULL END) as `finishedFiles` from `files` where `downloadId` = ? and `deleteId` is null')
+        expect(query.bindings).toEqual([
+          'mock-download-1',
+          'mock-download-1'
+        ])
 
         query.response([{
+          invalidLinksCount: 0,
+          duplicateCount: 0,
           percentSum: 42,
           totalFiles: 10,
           finishedFiles: 0
@@ -1292,6 +1327,8 @@ describe('EddDatabase', () => {
       const result = await database.getDownloadReport('mock-download-1')
 
       expect(result).toEqual({
+        invalidLinksCount: 0,
+        duplicateCount: 0,
         percentSum: 42,
         totalFiles: 10,
         finishedFiles: 0
@@ -1812,16 +1849,30 @@ describe('EddDatabase', () => {
   describe('getDownloadStatistics', () => {
     test('returns statistics for a completed download', async () => {
       dbTracker.on('query', (query) => {
-        expect(query.sql).toEqual(expect.stringContaining('select count(`id`) as `fileCount'))
-        expect(query.bindings).toContain('mock-download-id')
-        expect(query.bindings).toContain(1)
+        expect(query.sql).toEqual('select count(`id`) as `fileCount`, sum(`duplicateCount`) as `duplicateCount`, sum(`receivedBytes`) as `receivedBytesSum`, sum(`totalBytes`) as `totalBytesSum`, (SELECT invalidLinks FROM downloads WHERE id = ?) as invalidLinksCount, (IFNULL(MAX(timeEnd), UNIXEPOCH() * 1000) - MIN(timeStart)) as totalDownloadTime, (SELECT COUNT(id) FROM files WHERE downloadId = ? AND state != \'COMPLETED\') as incompleteFileCount, (SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'ERROR\') as erroredCount, (SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'INTERRUPTED_CAN_RESUME\') as interruptedCanResumeCount, (SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'INTERRUPTED_CAN_NOT_RESUME\') as interruptedCanNotResumeCount, (SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'CANCELLED\') as cancelledCount, (SELECT COUNT(id) FROM pauses WHERE downloadId = ? AND fileId IS NULL) as pauseCount from `files` where `downloadId` = ? limit ?')
+        expect(query.bindings).toEqual([
+          'mock-download-id',
+          'mock-download-id',
+          'mock-download-id',
+          'mock-download-id',
+          'mock-download-id',
+          'mock-download-id',
+          'mock-download-id',
+          'mock-download-id',
+          1])
 
         query.response({
           fileCount: 5,
+          duplicateCount: 0,
           receivedBytesSum: 1000,
           totalBytesSum: 2000,
+          invalidLinksCount: 0,
           totalDownloadTime: 5000,
           incompleteFileCount: 0,
+          erroredCount: 0,
+          interruptedCanResumeCount: 0,
+          interruptedCanNotResumeCount: 0,
+          cancelledCount: 0,
           pauseCount: 2
         })
       })
@@ -1832,10 +1883,16 @@ describe('EddDatabase', () => {
 
       expect(result).toEqual({
         fileCount: 5,
+        duplicateCount: 0,
         receivedBytesSum: 1000,
         totalBytesSum: 2000,
+        invalidLinksCount: 0,
         totalDownloadTime: 5000,
         incompleteFileCount: 0,
+        erroredCount: 0,
+        interruptedCanResumeCount: 0,
+        interruptedCanNotResumeCount: 0,
+        cancelledCount: 0,
         pauseCount: 2
       })
     })

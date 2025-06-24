@@ -33,10 +33,6 @@ const setup = (overrideProps) => {
   }
 }
 
-beforeEach(() => {
-  jest.clearAllMocks()
-})
-
 describe('DropdownItem component', () => {
   test('renders the menu item', () => {
     setup()

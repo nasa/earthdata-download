@@ -22,8 +22,6 @@ jest.mock('../../utils/metricsLogger.ts', () => ({
 
 beforeEach(() => {
   MockDate.set('2023-05-01')
-
-  jest.clearAllMocks()
 })
 
 describe('restartDownload', () => {

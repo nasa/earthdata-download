@@ -21,7 +21,9 @@ import AppContext from '../../../context/AppContext'
 jest.mock('../../DownloadItem/DownloadItem')
 
 const download = {
+  duplicateCount: 0,
   errors: null,
+  invalidLinksCount: 0,
   loadingMoreFiles: false,
   progress: {
     percent: 50,
@@ -51,6 +53,7 @@ const setup = (overrideProps = {}) => {
   const setCurrentPage = jest.fn()
   const setSelectedDownloadId = jest.fn()
   const setRestartingDownload = jest.fn()
+  const showAdditionalDetailsDialog = jest.fn()
   const showMoreInfoDialog = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
@@ -61,6 +64,7 @@ const setup = (overrideProps = {}) => {
   const props = {
     setCurrentPage,
     setSelectedDownloadId,
+    showAdditionalDetailsDialog,
     showMoreInfoDialog,
     download,
     ...overrideProps
@@ -118,6 +122,7 @@ const setup = (overrideProps = {}) => {
     sendToLogin,
     setCancellingDownload,
     setRestartingDownload,
+    showAdditionalDetailsDialog,
     showWaitingForEulaDialog,
     showWaitingForLoginDialog,
     setSelectedDownloadId,
@@ -147,6 +152,13 @@ describe('DownloadListItem component', () => {
     expect(DownloadItem).toHaveBeenCalledTimes(1)
     expect(DownloadItem).toHaveBeenCalledWith(expect.objectContaining({
       actionsList: [
+        expect.arrayContaining([
+          expect.objectContaining({
+            isActive: false,
+            isPrimary: false,
+            label: 'View Additional Details'
+          })
+        ]),
         expect.arrayContaining([
           expect.objectContaining({
             isActive: false,
@@ -202,6 +214,23 @@ describe('DownloadListItem component', () => {
       //   // tertiary: <DownloadListItemFileProgress receivedBytes={61587289} shouldShowBytes totalBytes={61587289} />
       // })
     }), {})
+  })
+
+  describe('when clicking `View Additional Details`', () => {
+    test('calls showAdditionalDetailsDialog', async () => {
+      const { showAdditionalDetailsDialog } = setup({
+        download: {
+          ...download,
+          duplicateCount: 1
+        }
+      })
+
+      const button = screen.getByText('View Additional Details')
+      await userEvent.click(button)
+
+      expect(showAdditionalDetailsDialog).toHaveBeenCalledTimes(1)
+      expect(showAdditionalDetailsDialog).toHaveBeenCalledWith('mock-download-id')
+    })
   })
 
   describe('when clicking `Log In with Earthdata Login`', () => {

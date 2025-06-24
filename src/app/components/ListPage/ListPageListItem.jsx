@@ -60,9 +60,8 @@ const ListPageListItem = ({
     file,
     setCurrentPage,
     setSelectedDownloadId,
+    showAdditionalDetailsDialog,
     showMoreInfoDialog,
-    showWaitingForEulaDialog,
-    showWaitingForLoginDialog,
     type
   } = item
 
@@ -81,6 +80,7 @@ const ListPageListItem = ({
       <div style={style}>
         <DownloadHistoryListItem
           download={download}
+          showAdditionalDetailsDialog={showAdditionalDetailsDialog}
           showMoreInfoDialog={showMoreInfoDialog}
         />
       </div>
@@ -95,9 +95,8 @@ const ListPageListItem = ({
         downloadLinks={downloadLinks}
         setCurrentPage={setCurrentPage}
         setSelectedDownloadId={setSelectedDownloadId}
+        showAdditionalDetailsDialog={showAdditionalDetailsDialog}
         showMoreInfoDialog={showMoreInfoDialog}
-        showWaitingForEulaDialog={showWaitingForEulaDialog}
-        showWaitingForLoginDialog={showWaitingForLoginDialog}
       />
     </div>
   )
@@ -113,6 +112,7 @@ ListPageListItem.propTypes = {
       file: PropTypes.shape({}),
       setCurrentPage: PropTypes.func,
       setSelectedDownloadId: PropTypes.func,
+      showAdditionalDetailsDialog: PropTypes.func,
       showMoreInfoDialog: PropTypes.func,
       showWaitingForEulaDialog: PropTypes.func,
       showWaitingForLoginDialog: PropTypes.func,

@@ -44,6 +44,7 @@ const setup = (overrideProps = {}) => {
   const restartDownload = jest.fn()
   const setPendingDeleteDownloadHistory = jest.fn()
   const setRestartingDownload = jest.fn()
+  const showAdditionalDetailsDialog = jest.fn()
   const showMoreInfoDialog = jest.fn()
   const showWaitingForEulaDialog = jest.fn()
   const showWaitingForLoginDialog = jest.fn()
@@ -51,6 +52,7 @@ const setup = (overrideProps = {}) => {
   const undoRestartingDownload = jest.fn()
 
   const props = {
+    showAdditionalDetailsDialog,
     showMoreInfoDialog,
     download,
     ...overrideProps
@@ -95,6 +97,7 @@ const setup = (overrideProps = {}) => {
     restartDownload,
     setPendingDeleteDownloadHistory,
     setRestartingDownload,
+    showAdditionalDetailsDialog,
     toasts,
     undoDeleteDownloadHistory,
     undoRestartingDownload
@@ -120,6 +123,13 @@ describe('DownloadHistoryListItem component', () => {
     expect(DownloadItem).toHaveBeenCalledTimes(1)
     expect(DownloadItem).toHaveBeenCalledWith(expect.objectContaining({
       actionsList: [
+        expect.arrayContaining([
+          expect.objectContaining({
+            isActive: false,
+            isPrimary: false,
+            label: 'View Additional Details'
+          })
+        ]),
         expect.arrayContaining([
           expect.objectContaining({
             isActive: true,
@@ -152,6 +162,22 @@ describe('DownloadHistoryListItem component', () => {
       //   // tertiary: <DownloadHistoryListItemFileProgress receivedBytes={61587289} shouldShowBytes totalBytes={61587289} />
       // })
     }), {})
+  })
+
+  describe('when clicking `View Additional Details`', () => {
+    test('calls openDownloadFolder', async () => {
+      const { showAdditionalDetailsDialog } = setup({
+        download: {
+          ...download,
+          duplicateCount: 1
+        }
+      })
+
+      const button = screen.getByText('View Additional Details')
+      await userEvent.click(button)
+
+      expect(showAdditionalDetailsDialog).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('when clicking `Open Folder`', () => {

@@ -311,6 +311,15 @@ describe('preload', () => {
     expect(ipcRenderer.send).toHaveBeenCalledWith('undoRestartingDownload', { mock: 'data' })
   })
 
+  test('requestAddionalDetailsReport sends the requestAddionalDetailsReport message', async () => {
+    await setup()
+
+    electronApi.requestAddionalDetailsReport({ mock: 'data' })
+
+    expect(ipcRenderer.invoke).toHaveBeenCalledTimes(1)
+    expect(ipcRenderer.invoke).toHaveBeenCalledWith('requestAddionalDetailsReport', { mock: 'data' })
+  })
+
   test('requestDownloadsProgress sends the requestDownloadsProgress message', async () => {
     await setup()
 

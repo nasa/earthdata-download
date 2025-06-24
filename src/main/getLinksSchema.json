@@ -16,10 +16,9 @@
       "items": {
         "type": "string",
         "description": "A link",
-        "pattern": "^https?://.*"
+        "pattern": "^(https?|ftp)://[^\\s/$.?#].[^\\s]*$"
       },
-      "minItems": 0,
-      "uniqueItems": true
+      "minItems": 0
     }
   },
   "required": ["links"]

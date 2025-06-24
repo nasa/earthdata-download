@@ -6,10 +6,6 @@ import '@testing-library/jest-dom'
 import useAccessibleEvent from '../useAccessibleEvent'
 import Button from '../../components/Button/Button'
 
-afterEach(() => {
-  jest.clearAllMocks()
-})
-
 const TestComponent = ({
   // eslint-disable-next-line react/prop-types
   callback

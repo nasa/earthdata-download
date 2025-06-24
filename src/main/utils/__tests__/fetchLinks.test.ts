@@ -112,6 +112,7 @@ describe('fetchLinks', () => {
     expect(database.updateDownloadById).toHaveBeenCalledWith(
       'mock-download-id',
       {
+        invalidLinks: 0,
         loadingMoreFiles: false
       }
     )
@@ -133,74 +134,183 @@ describe('fetchLinks', () => {
     }))
   })
 
-  test('loads the links and calls initializeDownload when done is true', async () => {
-    const appWindow = {}
-    const downloadId = 'mock-download-id'
-    const getLinksUrl = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
-    const database = {
-      updateDownloadById: jest.fn(),
-      addLinksByDownloadId: jest.fn()
-    }
-    const getLinksToken = 'Bearer mock-token'
+  describe('when done is true', () => {
+    test('loads the links and calls initializeDownload', async () => {
+      const appWindow = {}
+      const downloadId = 'mock-download-id'
+      const getLinksUrl = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
+      const database = {
+        updateDownloadById: jest.fn(),
+        addLinksByDownloadId: jest.fn()
+      }
+      const getLinksToken = 'Bearer mock-token'
 
-    const page1Response = {
-      json: jest.fn().mockReturnValue({
-        done: true,
-        links: [
-          'https://example.com/file1.png'
-        ]
+      const page1Response = {
+        json: jest.fn().mockReturnValue({
+          done: true,
+          links: [
+            'https://example.com/file1.png'
+          ]
+        })
+      }
+
+      fetch
+        .mockImplementationOnce(() => page1Response)
+
+      await fetchLinks({
+        appWindow,
+        authUrl: '',
+        database,
+        downloadId,
+        getLinksToken,
+        getLinksUrl
       })
-    }
 
-    fetch
-      .mockImplementationOnce(() => page1Response)
+      expect(fetch).toHaveBeenCalledTimes(1)
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
+        {
+          headers: {
+            Authorization: 'Bearer mock-token'
+          },
+          method: 'get'
+        }
+      )
 
-    await fetchLinks({
-      appWindow,
-      authUrl: '',
-      database,
-      downloadId,
-      getLinksToken,
-      getLinksUrl
+      expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
+      expect(database.updateDownloadById).toHaveBeenCalledWith(
+        'mock-download-id',
+        {
+          loadingMoreFiles: true,
+          state: downloadStates.starting
+        }
+      )
+
+      expect(database.updateDownloadById).toHaveBeenCalledWith(
+        'mock-download-id',
+        {
+          invalidLinks: 0,
+          loadingMoreFiles: false
+        }
+      )
+
+      expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(1)
+      expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
+        'mock-download-id',
+        ['https://example.com/file1.png']
+      )
+
+      expect(initializeDownload).toHaveBeenCalledTimes(1)
+      expect(initializeDownload).toHaveBeenCalledWith(expect.objectContaining({
+        downloadIds: ['mock-download-id']
+      }))
     })
+  })
 
-    expect(fetch).toHaveBeenCalledTimes(1)
-    expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
-      {
-        headers: {
-          Authorization: 'Bearer mock-token'
-        },
-        method: 'get'
+  describe('when the links have invalid links', () => {
+    test('loads the links and calls initializeDownload', async () => {
+      const appWindow = {}
+      const downloadId = 'mock-download-id'
+      const getLinksUrl = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
+      const database = {
+        updateDownloadById: jest.fn(),
+        addLinksByDownloadId: jest.fn()
       }
-    )
+      const getLinksToken = 'Bearer mock-token'
 
-    expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
-    expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'mock-download-id',
-      {
-        loadingMoreFiles: true,
-        state: downloadStates.starting
+      const page1Response = {
+        json: jest.fn().mockReturnValue({
+          cursor: 'mock-cursor',
+          links: [
+            'https://example.com/file1.png',
+            'ftp://example.com/file1.png'
+          ]
+        })
       }
-    )
-
-    expect(database.updateDownloadById).toHaveBeenCalledWith(
-      'mock-download-id',
-      {
-        loadingMoreFiles: false
+      const page2Response = {
+        json: jest.fn().mockReturnValue({
+          cursor: null,
+          links: [
+            'https://example.com/file2.png',
+            'ftp://example.com/file2.png'
+          ]
+        })
       }
-    )
+      const page3Response = {
+        json: jest.fn().mockReturnValue({
+          cursor: null,
+          links: []
+        })
+      }
 
-    expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(1)
-    expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
-      'mock-download-id',
-      ['https://example.com/file1.png']
-    )
+      fetch
+        .mockImplementationOnce(() => page1Response)
+        .mockImplementationOnce(() => page2Response)
+        .mockImplementationOnce(() => page3Response)
 
-    expect(initializeDownload).toHaveBeenCalledTimes(1)
-    expect(initializeDownload).toHaveBeenCalledWith(expect.objectContaining({
-      downloadIds: ['mock-download-id']
-    }))
+      await fetchLinks({
+        appWindow,
+        authUrl: '',
+        database,
+        downloadId,
+        getLinksToken,
+        getLinksUrl
+      })
+
+      expect(fetch).toHaveBeenCalledTimes(3)
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
+        {
+          headers: {
+            Authorization: 'Bearer mock-token'
+          },
+          method: 'get'
+        }
+      )
+
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&cursor=mock-cursor',
+        {
+          headers: {
+            Authorization: 'Bearer mock-token'
+          },
+          method: 'get'
+        }
+      )
+
+      expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
+      expect(database.updateDownloadById).toHaveBeenCalledWith(
+        'mock-download-id',
+        {
+          loadingMoreFiles: true,
+          state: downloadStates.starting
+        }
+      )
+
+      expect(database.updateDownloadById).toHaveBeenCalledWith(
+        'mock-download-id',
+        {
+          invalidLinks: 2,
+          loadingMoreFiles: false
+        }
+      )
+
+      expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(2)
+      expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
+        'mock-download-id',
+        ['https://example.com/file1.png']
+      )
+
+      expect(database.addLinksByDownloadId).toHaveBeenCalledWith(
+        'mock-download-id',
+        ['https://example.com/file2.png']
+      )
+
+      expect(initializeDownload).toHaveBeenCalledTimes(1)
+      expect(initializeDownload).toHaveBeenCalledWith(expect.objectContaining({
+        downloadIds: ['mock-download-id']
+      }))
+    })
   })
 
   test('saves the error on error', async () => {
@@ -249,7 +359,8 @@ describe('fetchLinks', () => {
     })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
-    expect(database.updateDownloadById).toHaveBeenCalledWith(
+    expect(database.updateDownloadById).toHaveBeenNthCalledWith(
+      1,
       'mock-download-id',
       {
         loadingMoreFiles: true,
@@ -257,7 +368,8 @@ describe('fetchLinks', () => {
       }
     )
 
-    expect(database.updateDownloadById).toHaveBeenCalledWith(
+    expect(database.updateDownloadById).toHaveBeenNthCalledWith(
+      2,
       'mock-download-id',
       {
         errors: '{}',
@@ -272,6 +384,8 @@ describe('fetchLinks', () => {
   })
 
   test('does not download links from an untrusted source', async () => {
+    const consoleSpy = jest.spyOn(console, 'log')
+
     const appWindow = {}
     const downloadId = 'mock-download-id'
 
@@ -290,7 +404,7 @@ describe('fetchLinks', () => {
     }
     fetch.mockImplementation(() => standardResponse)
     const getLinksUrl = 'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data'
-    const reason = `The host [${getLinksUrl}] is not a trusted source and Earthdata Download will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
+    const errorMessage = `The host [${getLinksUrl}] is not a trusted source and Earthdata Download will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
 
     await fetchLinks({
       appWindow,
@@ -306,12 +420,17 @@ describe('fetchLinks', () => {
       eventType: metricsEvent.fetchLinksFailed,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
-        reason
+        reason: errorMessage
       }
     })
 
+    expect(consoleSpy).toHaveBeenCalledTimes(2)
+    expect(consoleSpy).toHaveBeenNthCalledWith(1, 'Checking [fakery] for matching trusted host')
+    expect(consoleSpy).toHaveBeenNthCalledWith(2, errorMessage)
+
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
-    expect(database.updateDownloadById).toHaveBeenCalledWith(
+    expect(database.updateDownloadById).toHaveBeenNthCalledWith(
+      1,
       'mock-download-id',
       {
         loadingMoreFiles: true,
@@ -319,14 +438,19 @@ describe('fetchLinks', () => {
       }
     )
 
-    expect(database.updateDownloadById).toHaveBeenCalledWith(
+    expect(database.updateDownloadById).toHaveBeenNthCalledWith(
+      2,
       'mock-download-id',
       {
-        errors: [{
-          message: reason
-        }],
+        errors: JSON.stringify([{
+          message: errorMessage
+        }]),
+        //         Errors: JSON.stringify([{
+        //           message: `The host [${getLinksUrl}] is not a trusted source and Earthdata Download will not continue.
+        // If you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
+        //         }]),
         loadingMoreFiles: false,
-        state: downloadStates.error
+        state: downloadStates.errorFetchingLinks
       }
     )
 
@@ -353,6 +477,8 @@ describe('fetchLinks', () => {
     ['missing links', { cursor: 'abc' }],
     ['empty response', '']
   ])('halts on invalid JSON response: %s', async ([, badResponse]) => {
+    const consoleSpy = jest.spyOn(console, 'log')
+
     const appWindow = {}
     const downloadId = 'mock-download-id'
     const getLinksUrl = 'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data'
@@ -378,7 +504,7 @@ describe('fetchLinks', () => {
         links: []
       })
     }
-    const reason = 'The returned data does not match the expected schema.'
+    const errorMessage = 'The response from the getLinks endpoint did not match the expected schema. Error: [{"instancePath":"","schemaPath":"#/type","keyword":"type","params":{"type":"object"},"message":"must be object"}]'
 
     fetch
       .mockImplementationOnce(() => page1Response)
@@ -399,12 +525,17 @@ describe('fetchLinks', () => {
       eventType: metricsEvent.fetchLinksFailed,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
-        reason
+        errorMessage
       }
     })
 
+    expect(consoleSpy).toHaveBeenCalledTimes(2)
+    expect(consoleSpy).toHaveBeenNthCalledWith(1, 'Checking [localhost] for matching trusted host')
+    expect(consoleSpy).toHaveBeenNthCalledWith(2, errorMessage)
+
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
-    expect(database.updateDownloadById).toHaveBeenCalledWith(
+    expect(database.updateDownloadById).toHaveBeenNthCalledWith(
+      1,
       'mock-download-id',
       {
         loadingMoreFiles: true,
@@ -412,14 +543,15 @@ describe('fetchLinks', () => {
       }
     )
 
-    expect(database.updateDownloadById).toHaveBeenCalledWith(
+    expect(database.updateDownloadById).toHaveBeenNthCalledWith(
+      2,
       'mock-download-id',
       {
-        errors: [{
-          message: reason
-        }],
+        errors: JSON.stringify([{
+          message: errorMessage
+        }]),
         loadingMoreFiles: false,
-        state: downloadStates.error
+        state: downloadStates.errorFetchingLinks
       }
     )
 

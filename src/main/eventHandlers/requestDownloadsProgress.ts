@@ -42,6 +42,8 @@ const requestDownloadsProgress = async ({
     } = download
 
     const {
+      duplicateCount,
+      invalidLinksCount,
       percentSum,
       totalFiles,
       finishedFiles
@@ -68,6 +70,8 @@ const requestDownloadsProgress = async ({
     if (restartId || cancelId) {
       return {
         downloadId,
+        duplicateCount,
+        invalidLinksCount,
         loadingMoreFiles: false,
         progress: cancelId ? progress : {
           percent: 0,
@@ -82,6 +86,8 @@ const requestDownloadsProgress = async ({
 
     return {
       downloadId,
+      duplicateCount,
+      invalidLinksCount,
       // Sqlite booleans are actually integers 1/0
       loadingMoreFiles: loadingMoreFiles === 1,
       progress,

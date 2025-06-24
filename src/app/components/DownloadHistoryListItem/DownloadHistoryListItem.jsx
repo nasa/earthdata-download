@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
   FaClipboard,
+  FaExclamationTriangle,
   FaFolderOpen,
   FaUndo
 } from 'react-icons/fa'
@@ -20,6 +21,7 @@ import { UNDO_TIMEOUT } from '../../constants/undoTimeout'
 /**
  * @typedef {Object} DownloadHistoryListItemProps
  * @property {Object} download State of the download item.
+ * @property {Function} showAdditionalDetailsDialog A function to set the `showAdditionalDetailsDialog` in the layout.
  * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout.
  */
 
@@ -31,12 +33,14 @@ import { UNDO_TIMEOUT } from '../../constants/undoTimeout'
  * return (
  *   <DownloadHistoryListItem
  *     download={download}
+ *     showAdditionalDetailsDialog={showAdditionalDetailsDialog}
  *     showMoreInfoDialog={showMoreInfoDialog}
  *   />
  * )
  */
 const DownloadHistoryListItem = ({
   download,
+  showAdditionalDetailsDialog,
   showMoreInfoDialog
 }) => {
   const appContext = useAppContext()
@@ -57,6 +61,8 @@ const DownloadHistoryListItem = ({
 
   const {
     downloadId,
+    duplicateCount,
+    invalidLinksCount,
     numberErrors = 0,
     progress,
     state,
@@ -70,6 +76,8 @@ const DownloadHistoryListItem = ({
   } = progress
 
   const shouldShowActions = state !== downloadStates.errorFetchingLinks
+
+  const shouldShowAdditonalDetails = duplicateCount > 0 || invalidLinksCount > 0
 
   const onClickDeleteDownload = () => {
     const now = new Date().getTime()
@@ -181,6 +189,15 @@ const DownloadHistoryListItem = ({
   const actionsList = [
     [
       {
+        label: 'View Additional Details',
+        isActive: shouldShowAdditonalDetails,
+        isPrimary: shouldShowAdditonalDetails,
+        callback: () => showAdditionalDetailsDialog(downloadId),
+        icon: FaExclamationTriangle
+      }
+    ],
+    [
+      {
         label: 'Open Folder',
         isActive: shouldShowActions,
         isPrimary: true,
@@ -253,6 +270,8 @@ const DownloadHistoryListItem = ({
 DownloadHistoryListItem.propTypes = {
   download: PropTypes.shape({
     downloadId: PropTypes.string,
+    duplicateCount: PropTypes.number,
+    invalidLinksCount: PropTypes.number,
     numberErrors: PropTypes.number,
     loadingMoreFiles: PropTypes.bool,
     progress: PropTypes.shape({
@@ -264,6 +283,7 @@ DownloadHistoryListItem.propTypes = {
     state: PropTypes.string,
     timeStart: PropTypes.number
   }).isRequired,
+  showAdditionalDetailsDialog: PropTypes.func.isRequired,
   showMoreInfoDialog: PropTypes.func.isRequired
 }
 

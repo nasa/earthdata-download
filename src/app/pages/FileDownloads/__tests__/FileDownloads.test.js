@@ -113,8 +113,6 @@ const setup = (withErrors, overrideProps) => {
 
 beforeEach(() => {
   jest.useFakeTimers()
-
-  jest.clearAllMocks()
 })
 
 afterEach(() => {

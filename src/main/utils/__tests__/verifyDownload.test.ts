@@ -7,6 +7,9 @@ import verifyDownload from '../verifyDownload'
 
 import downloadStates from '../../../app/constants/downloadStates'
 import sendToEula from '../../eventHandlers/sendToEula'
+import metricsEvent from '../../../app/constants/metricsEvent'
+import metricsLogger from '../metricsLogger'
+import downloadIdForMetrics from '../downloadIdForMetrics'
 
 jest.mock('node-fetch', () => ({
   __esModule: true,
@@ -14,6 +17,11 @@ jest.mock('node-fetch', () => ({
 }))
 
 jest.mock('../../eventHandlers/sendToEula', () => ({
+  __esModule: true,
+  default: jest.fn()
+}))
+
+jest.mock('../metricsLogger', () => ({
   __esModule: true,
   default: jest.fn()
 }))
@@ -230,6 +238,15 @@ describe('verifyDownload', () => {
         })
       )
 
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
+        eventType: metricsEvent.downloadErrored,
+        data: {
+          downloadId: downloadIdForMetrics(downloadId),
+          reason: 'Error occured in verifyDownload, message: HTTP Error Response: 403 Forbidden'
+        }
+      })
+
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 
       expect(database.updateFileById).toHaveBeenCalledTimes(1)
@@ -280,6 +297,15 @@ describe('verifyDownload', () => {
           size: 250
         })
       )
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
+        eventType: metricsEvent.downloadErrored,
+        data: {
+          downloadId: downloadIdForMetrics(downloadId),
+          reason: 'Error occured in verifyDownload, message: This file could not be downloaded'
+        }
+      })
 
       expect(database.updateDownloadById).toHaveBeenCalledTimes(0)
 

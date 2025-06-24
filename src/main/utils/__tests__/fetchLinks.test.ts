@@ -6,6 +6,9 @@ import fetchLinks from '../fetchLinks'
 import initializeDownload from '../initializeDownload'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsEvent from '../../../app/constants/metricsEvent'
+import metricsLogger from '../metricsLogger'
+import downloadIdForMetrics from '../downloadIdForMetrics'
 
 jest.spyOn(console, 'error').mockImplementation(() => {})
 
@@ -15,6 +18,11 @@ jest.mock('node-fetch', () => ({
 }))
 
 jest.mock('../initializeDownload', () => ({
+  __esModule: true,
+  default: jest.fn()
+}))
+
+jest.mock('../metricsLogger', () => ({
   __esModule: true,
   default: jest.fn()
 }))
@@ -204,10 +212,11 @@ describe('fetchLinks', () => {
       addLinksByDownloadId: jest.fn()
     }
     const getLinksToken = 'Bearer mock-token'
+    const error = new Error(downloadStates.error)
 
     fetch
       .mockImplementationOnce(() => {
-        throw new Error(downloadStates.error)
+        throw error
       })
 
     await fetchLinks({
@@ -229,6 +238,15 @@ describe('fetchLinks', () => {
         method: 'get'
       }
     )
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
+      eventType: metricsEvent.fetchLinksFailed,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        reason: `Error while fetching download links: ${error.message}`
+      }
+    })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
     expect(database.updateDownloadById).toHaveBeenCalledWith(
@@ -272,6 +290,7 @@ describe('fetchLinks', () => {
     }
     fetch.mockImplementation(() => standardResponse)
     const getLinksUrl = 'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data'
+    const reason = `The host [${getLinksUrl}] is not a trusted source and Earthdata Download will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
 
     await fetchLinks({
       appWindow,
@@ -280,6 +299,15 @@ describe('fetchLinks', () => {
       downloadId,
       getLinksToken,
       getLinksUrl
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
+      eventType: metricsEvent.fetchLinksFailed,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        reason
+      }
     })
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
@@ -295,8 +323,7 @@ describe('fetchLinks', () => {
       'mock-download-id',
       {
         errors: [{
-          message: `The host [${getLinksUrl}] is not a trusted source and Earthdata Downloader will not continue.
-If you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
+          message: reason
         }],
         loadingMoreFiles: false,
         state: downloadStates.error
@@ -351,6 +378,7 @@ If you wish to have this link included in the list of trusted sources please con
         links: []
       })
     }
+    const reason = 'The returned data does not match the expected schema.'
 
     fetch
       .mockImplementationOnce(() => page1Response)
@@ -366,6 +394,15 @@ If you wish to have this link included in the list of trusted sources please con
       getLinksUrl
     })
 
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
+      eventType: metricsEvent.fetchLinksFailed,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        reason
+      }
+    })
+
     expect(database.updateDownloadById).toHaveBeenCalledTimes(2)
     expect(database.updateDownloadById).toHaveBeenCalledWith(
       'mock-download-id',
@@ -379,7 +416,7 @@ If you wish to have this link included in the list of trusted sources please con
       'mock-download-id',
       {
         errors: [{
-          message: 'The returned data does not match the expected schema.'
+          message: reason
         }],
         loadingMoreFiles: false,
         state: downloadStates.error

@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../../utils/metricsLogger'
 import downloadIdForMetrics from '../../utils/downloadIdForMetrics'
 
@@ -22,15 +23,20 @@ const finishDownload = async ({
     })
 
     const downloadStatistics = await database.getDownloadStatistics(downloadId)
+
     metricsLogger(database, {
-      eventType: 'DownloadComplete',
+      eventType: metricsEvent.downloadComplete,
       data: {
         downloadId: downloadIdForMetrics(downloadId),
         receivedBytes: downloadStatistics.receivedBytesSum,
         totalBytes: downloadStatistics.totalBytesSum,
         duration: (downloadStatistics.totalDownloadTime / 1000).toFixed(1),
         filesDownloaded: downloadStatistics.fileCount,
-        filesFailed: downloadStatistics.incompleteFileCount,
+        filesErrored: downloadStatistics.erroredCount,
+        filesIncomplete: downloadStatistics.incompleteFileCount,
+        filesInterruptedCanResume: downloadStatistics.interruptedCanResumeCount,
+        filesInterruptedCanNotResume: downloadStatistics.interruptedCanNotResumeCount,
+        filesCancelled: downloadStatistics.cancelledCount,
         pauseCount: downloadStatistics.pauseCount
       }
     })

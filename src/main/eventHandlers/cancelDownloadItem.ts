@@ -5,6 +5,8 @@ import finishDownload from './willDownloadEvents/finishDownload'
 import metricsLogger from '../utils/metricsLogger'
 import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
+import metricsEvent from '../../app/constants/metricsEvent'
+
 /**
  * Cancels a download and updates the database state
  * @param {Object} params
@@ -41,7 +43,7 @@ const cancelDownloadItem = async ({
     })
 
     metricsLogger(database, {
-      eventType: 'DownloadItemCancel',
+      eventType: metricsEvent.downloadItemCancel,
       data: {
         downloadId: downloadIdForMetrics(downloadId)
       }
@@ -67,7 +69,7 @@ const cancelDownloadItem = async ({
     await database.endPause(downloadId)
 
     metricsLogger(database, {
-      eventType: 'DownloadCancel',
+      eventType: metricsEvent.downloadCancel,
       data: {
         downloadIds: [downloadIdForMetrics(downloadId)],
         cancelCount: 1
@@ -96,7 +98,7 @@ const cancelDownloadItem = async ({
     }))
 
     metricsLogger(database, {
-      eventType: 'DownloadCancel',
+      eventType: metricsEvent.downloadCancel,
       data: {
         downloadIds: cancelledDownloadIds,
         cancelCount: cancelledDownloadIds.length

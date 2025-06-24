@@ -6,6 +6,7 @@ import startNextDownload from '../utils/startNextDownload'
 import startPendingDownloads from '../utils/startPendingDownloads'
 
 import downloadStates from '../../app/constants/downloadStates'
+import metricsEvent from '../../app/constants/metricsEvent'
 
 /**
  * Check the given hostname against the expected value in a case-insensitive
@@ -87,7 +88,7 @@ const openUrl = async ({
     })
 
     metricsLogger(database, {
-      eventType: 'OpenUrl',
+      eventType: metricsEvent.openUrl,
       data: {
         clientId,
         downloadId: downloadIdForMetrics(downloadId)

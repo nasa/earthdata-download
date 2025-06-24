@@ -3,6 +3,7 @@
 import { app } from 'electron'
 
 import initializeDownload from '../initializeDownload'
+import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../metricsLogger'
 
 jest.mock('electron', () => ({
@@ -34,7 +35,7 @@ describe('initializeDownload', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'DownloadStarted',
+      eventType: metricsEvent.downloadStarted,
       data: {
         downloadIds: ['mockDownloadId']
       }
@@ -74,7 +75,7 @@ describe('initializeDownload', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'DownloadStarted',
+      eventType: metricsEvent.downloadStarted,
       data: {
         downloadIds: ['mockDownloadId']
       }
@@ -115,7 +116,7 @@ describe('initializeDownload', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'DownloadStarted',
+      eventType: metricsEvent.downloadStarted,
       data: {
         downloadIds: ['mockDownloadId']
       }

@@ -5,6 +5,7 @@ import MockDate from 'mockdate'
 import cancelDownloadItem from '../cancelDownloadItem'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../../utils/metricsLogger.ts'
 
 beforeEach(() => {
@@ -42,7 +43,7 @@ describe('cancelDownloadItem', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'DownloadItemCancel',
+        eventType: metricsEvent.downloadItemCancel,
         data: {
           downloadId: 'mock-download-id'
         }
@@ -92,7 +93,7 @@ describe('cancelDownloadItem', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'DownloadCancel',
+        eventType: metricsEvent.downloadCancel,
         data: {
           downloadIds: ['mock-download-id'],
           cancelCount: 1
@@ -150,7 +151,7 @@ describe('cancelDownloadItem', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: 'DownloadCancel',
+        eventType: metricsEvent.downloadCancel,
         data: {
           downloadIds: [123, 456],
           cancelCount: 2

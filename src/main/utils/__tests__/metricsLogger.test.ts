@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import fetch from 'node-fetch'
+import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../metricsLogger'
 import config from '../../config.json'
 
@@ -21,14 +22,14 @@ describe('metricsLogger', () => {
   })
 
   const event = {
-    eventType: 'DownloadComplete',
+    eventType: metricsEvent.downloadComplete,
     data: {
       downloadId: '1010_Test',
       fileCount: 10,
       receivedBytes: 20480,
       totalBytes: 25600,
       filesDownloaded: 8,
-      filesFailed: 2,
+      filesErrored: 2,
       duration: 14.1
     }
   }

@@ -18,6 +18,7 @@ import deleteDownload from '../eventHandlers/deleteDownload'
 import deleteDownloadHistory from '../eventHandlers/deleteDownloadHistory'
 import didFinishLoad from '../eventHandlers/didFinishLoad'
 import getPreferenceFieldValue from '../eventHandlers/getPreferenceFieldValue'
+import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from '../utils/metricsLogger'
 import openDownloadFolder from '../eventHandlers/openDownloadFolder'
 import openLogFolder from '../eventHandlers/openLogFolder'
@@ -389,7 +390,7 @@ const setupEventListeners = ({
     appWindow.webContents.send('autoUpdateError')
 
     metricsLogger(database, {
-      eventType: 'AutoUpdateFailure',
+      eventType: metricsEvent.autoUpdateFailure,
       data: {
         errorMesage: error.toString()
       }

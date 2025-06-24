@@ -2,11 +2,14 @@
 
 import MockDate from 'mockdate'
 
+import metricsLogger from '../../../utils/metricsLogger'
+import downloadIdForMetrics from '../../../utils/downloadIdForMetrics'
 import onDone from '../onDone'
 import startNextDownload from '../../../utils/startNextDownload'
 import finishDownload from '../finishDownload'
 
 import downloadStates from '../../../../app/constants/downloadStates'
+import metricsEvent from '../../../../app/constants/metricsEvent'
 
 jest.mock('../../../utils/startNextDownload', () => ({
   __esModule: true,
@@ -16,6 +19,11 @@ jest.mock('../../../utils/startNextDownload', () => ({
 jest.mock('../finishDownload', () => ({
   __esModule: true,
   default: jest.fn(() => { })
+}))
+
+jest.mock('../../../utils/metricsLogger', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
 }))
 
 beforeEach(() => {
@@ -117,6 +125,15 @@ describe('onDone', () => {
       webContents: {}
     })
 
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
+      eventType: metricsEvent.downloadErrored,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        filename: 'mock-filename.png'
+      }
+    })
+
     expect(database.getFileWhere).toHaveBeenCalledTimes(1)
     expect(database.getFileWhere).toHaveBeenCalledWith({
       downloadId: 'mock-download-id',
@@ -128,7 +145,7 @@ describe('onDone', () => {
       cancelId: null,
       errors: 'This file could not be downloaded',
       percent: 0,
-      state: downloadStates.error,
+      state: downloadStates.interruptedCanNotResume,
       timeEnd: 1684029600000
     })
 

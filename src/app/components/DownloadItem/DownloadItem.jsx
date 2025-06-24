@@ -133,10 +133,12 @@ const DownloadItem = ({
     stateForClassName = downloadStates.pending
   } else if (state === downloadStates.waitingForAuth || state === downloadStates.waitingForEula) {
     // If waitingForAuth and some progress has been made, show the `interrupted` state
-    stateForClassName = downloadStates.interrupted
+    stateForClassName = downloadStates.interruptedCanResume
   } else if (state === downloadStates.errorFetchingLinks) {
     stateForClassName = downloadStates.error
   }
+
+  const shouldShowManualDownload = state === downloadStates.interruptedCanResume && downloadLinks
 
   return (
     <li
@@ -226,7 +228,7 @@ const DownloadItem = ({
                   actionsList={actionsList}
                 />
                 {
-                  state === downloadStates.interrupted && downloadLinks && (
+                  shouldShowManualDownload && (
                     <div className={styles.metaSecondary}>
                       <Button
                         onClick={

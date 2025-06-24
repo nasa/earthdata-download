@@ -5,6 +5,14 @@ import MockDate from 'mockdate'
 import onUpdated from '../onUpdated'
 
 import downloadStates from '../../../../app/constants/downloadStates'
+import metricsEvent from '../../../../app/constants/metricsEvent'
+import metricsLogger from '../../../utils/metricsLogger'
+import downloadIdForMetrics from '../../../utils/downloadIdForMetrics'
+
+jest.mock('../../../utils/metricsLogger.ts', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
@@ -36,6 +44,15 @@ describe('onUpdated', () => {
       state
     })
 
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
+      eventType: metricsEvent.downloadInterrupted,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        filename: 'mock-filename.png'
+      }
+    })
+
     expect(database.getFileWhere).toHaveBeenCalledTimes(1)
     expect(database.getFileWhere).toHaveBeenCalledWith({
       downloadId: 'mock-download-id',
@@ -45,7 +62,7 @@ describe('onUpdated', () => {
     expect(database.updateFileById).toHaveBeenCalledTimes(1)
     expect(database.updateFileById).toHaveBeenCalledWith(123, {
       percent: 42,
-      state: downloadStates.interrupted
+      state: downloadStates.interruptedCanResume
     })
 
     expect(database.createPauseByDownloadIdAndFilename).toHaveBeenCalledTimes(1)
@@ -55,7 +72,7 @@ describe('onUpdated', () => {
     expect(database.createPauseByDownloadId).toHaveBeenCalledWith('mock-download-id', false)
 
     expect(database.updateDownloadById).toHaveBeenCalledTimes(1)
-    expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: downloadStates.interrupted })
+    expect(database.updateDownloadById).toHaveBeenCalledWith('mock-download-id', { state: downloadStates.interruptedCanResume })
   })
 
   test('updates the database for progressing downloads', async () => {

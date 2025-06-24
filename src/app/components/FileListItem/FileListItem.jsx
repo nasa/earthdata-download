@@ -68,7 +68,8 @@ const FileListItem = ({
     downloadStates.paused,
     downloadStates.active,
     downloadStates.error,
-    downloadStates.interrupted
+    downloadStates.interrupted_DEPRECATED,
+    downloadStates.interruptedCanResume
   ].includes(state)
 
   // Disable copy filepath if the download has not completed.

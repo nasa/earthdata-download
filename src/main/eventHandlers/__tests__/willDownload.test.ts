@@ -7,6 +7,9 @@ import willDownload from '../willDownload'
 import sendToLogin from '../sendToLogin'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import metricsEvent from '../../../app/constants/metricsEvent'
+import metricsLogger from '../../utils/metricsLogger'
+import downloadIdForMetrics from '../../utils/downloadIdForMetrics'
 import startNextDownload from '../../utils/startNextDownload'
 import verifyDownload from '../../utils/verifyDownload'
 import finishDownload from '../willDownloadEvents/finishDownload'
@@ -24,6 +27,11 @@ jest.mock('../sendToLogin', () => ({
 }))
 
 jest.mock('../../utils/startNextDownload', () => ({
+  __esModule: true,
+  default: jest.fn(() => {})
+}))
+
+jest.mock('../../utils/metricsLogger.ts', () => ({
   __esModule: true,
   default: jest.fn(() => {})
 }))
@@ -208,6 +216,16 @@ describe('willDownload', () => {
         downloadsWaitingForEula,
         item,
         webContents
+      })
+
+      expect(metricsLogger).toHaveBeenCalledTimes(1)
+      expect(metricsLogger).toHaveBeenCalledWith(database, {
+        eventType: metricsEvent.downloadErrored,
+        data: {
+          downloadId: downloadIdForMetrics('mock-download-id'),
+          filename: 'mock-filename.png',
+          reason: 'File reported a size of 0 bytes.'
+        }
       })
 
       expect(item.setSavePath).toHaveBeenCalledTimes(1)
@@ -618,7 +636,7 @@ describe('willDownload', () => {
         cancelItem: jest.fn()
       }
       const database = {
-        getDownloadById: jest.fn().mockReturnValue({ state: downloadStates.active }),
+        getDownloadById: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         updateDownloadById: jest.fn(),
         updateFileById: jest.fn()
@@ -680,7 +698,7 @@ describe('willDownload', () => {
         cancelItem: jest.fn()
       }
       const database = {
-        getDownloadById: jest.fn().mockReturnValue({ state: downloadStates.active }),
+        getDownloadById: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         getFileWhere: jest.fn().mockResolvedValue({ state: downloadStates.active }),
         updateDownloadById: jest.fn(),
         updateFileById: jest.fn()

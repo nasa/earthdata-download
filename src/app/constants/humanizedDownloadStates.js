@@ -6,7 +6,9 @@ const humanizedDownloadStates = {
   [downloadStates.completed]: 'Complete',
   [downloadStates.errorFetchingLinks]: 'The download could not be started.',
   [downloadStates.error]: 'An error occurred',
-  [downloadStates.interrupted]: 'Interrupted',
+  [downloadStates.interrupted_DEPRECATED]: 'Interrupted',
+  [downloadStates.interruptedCanResume]: 'Interrupted',
+  [downloadStates.interruptedCanNotResume]: 'Interrupted',
   [downloadStates.paused]: 'Paused',
   [downloadStates.pending]: 'Not yet started',
   [downloadStates.starting]: 'Initializing'
@@ -14,7 +16,7 @@ const humanizedDownloadStates = {
 
 const getHumanizedDownloadStates = (state, percent = 0) => {
   if (state === downloadStates.waitingForAuth || state === downloadStates.waitingForEula) {
-    if (percent > 0) return humanizedDownloadStates[downloadStates.interrupted]
+    if (percent > 0) return humanizedDownloadStates[downloadStates.interruptedCanResume]
 
     return humanizedDownloadStates[downloadStates.pending]
   }

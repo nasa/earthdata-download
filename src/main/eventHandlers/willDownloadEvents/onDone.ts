@@ -3,6 +3,9 @@
 import downloadStates from '../../../app/constants/downloadStates'
 import finishDownload from './finishDownload'
 import startNextDownload from '../../utils/startNextDownload'
+import metricsEvent from '../../../app/constants/metricsEvent'
+import metricsLogger from '../../utils/metricsLogger'
+import downloadIdForMetrics from '../../utils/downloadIdForMetrics'
 
 /**
  * Handles the DownloadItem 'done' event
@@ -55,8 +58,16 @@ const onDone = async ({
 
       break
     case 'interrupted':
-      updatedState = downloadStates.error
+      updatedState = downloadStates.interruptedCanNotResume
       errors = 'This file could not be downloaded'
+      metricsLogger(database, {
+        eventType: metricsEvent.downloadErrored,
+        data: {
+          downloadId: downloadIdForMetrics(downloadId),
+          filename
+        }
+      })
+
       break
     default:
       updatedState = downloadStates.completed

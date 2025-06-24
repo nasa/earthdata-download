@@ -2,6 +2,7 @@
 
 import downloadStates from '../../app/constants/downloadStates'
 import downloadIdForMetrics from '../utils/downloadIdForMetrics'
+import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from '../utils/metricsLogger'
 import startNextDownload from '../utils/startNextDownload'
 
@@ -29,7 +30,7 @@ const restartDownload = async ({
 
   const report = await database.getDownloadReport(downloadId)
   metricsLogger(database, {
-    eventType: 'DownloadRestart',
+    eventType: metricsEvent.downloadRestart,
     data: {
       downloadId: downloadIdForMetrics(downloadId),
       filesCompleted: report.finishedFiles,

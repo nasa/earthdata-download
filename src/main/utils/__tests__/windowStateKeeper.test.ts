@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../metricsLogger'
 import windowStateKeeper from '../windowStateKeeper'
 
@@ -26,7 +27,7 @@ describe('windowStateKeeper', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'WindowSizePreferences',
+      eventType: metricsEvent.windowSizePreferences,
       data: {
         windowStateInfo: {
           height: 600,
@@ -63,7 +64,7 @@ describe('windowStateKeeper', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'WindowSizePreferences',
+      eventType: metricsEvent.windowSizePreferences,
       data: {
         windowStateInfo: {
           height: 700,
@@ -118,7 +119,7 @@ describe('windowStateKeeper', () => {
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
         expect(metricsLogger).toHaveBeenCalledWith(database, {
-          eventType: 'WindowSizePreferences',
+          eventType: metricsEvent.windowSizePreferences,
           data: {
             windowStateInfo: {
               height: 700,
@@ -176,7 +177,7 @@ describe('windowStateKeeper', () => {
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
         expect(metricsLogger).toHaveBeenCalledWith(database, {
-          eventType: 'WindowSizePreferences',
+          eventType: metricsEvent.windowSizePreferences,
           data: {
             windowStateInfo: {
               height: 700,
@@ -236,7 +237,7 @@ describe('windowStateKeeper', () => {
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
         expect(metricsLogger).toHaveBeenCalledWith(database, {
-          eventType: 'WindowSizePreferences',
+          eventType: metricsEvent.windowSizePreferences,
           data: {
             windowStateInfo: {
               height: 700,
@@ -294,7 +295,7 @@ describe('windowStateKeeper', () => {
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
         expect(metricsLogger).toHaveBeenCalledWith(database, {
-          eventType: 'WindowSizePreferences',
+          eventType: metricsEvent.windowSizePreferences,
           data: {
             windowStateInfo: {
               height: 700,
@@ -359,7 +360,7 @@ describe('windowStateKeeper', () => {
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
         expect(metricsLogger).toHaveBeenCalledWith(database, {
-          eventType: 'WindowSizePreferences',
+          eventType: metricsEvent.windowSizePreferences,
           data: {
             windowStateInfo: {
               height: 700,
@@ -412,7 +413,7 @@ describe('windowStateKeeper', () => {
 
         expect(metricsLogger).toHaveBeenCalledTimes(1)
         expect(metricsLogger).toHaveBeenCalledWith(database, {
-          eventType: 'WindowSizePreferences',
+          eventType: metricsEvent.windowSizePreferences,
           data: {
             windowStateInfo: {
               height: 700,

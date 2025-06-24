@@ -567,7 +567,7 @@ describe('DownloadItem component', () => {
           ]
         ],
         percent: 0,
-        state: downloadStates.interrupted,
+        state: downloadStates.interruptedCanResume,
         downloadLinks: { 'download-id': ['https://example.com/file1.zip'] }
       })
 

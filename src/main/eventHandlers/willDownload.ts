@@ -11,6 +11,9 @@ import onUpdated from './willDownloadEvents/onUpdated'
 import downloadStates from '../../app/constants/downloadStates'
 import verifyDownload from '../utils/verifyDownload'
 import finishDownload from './willDownloadEvents/finishDownload'
+import metricsEvent from '../../app/constants/metricsEvent'
+import metricsLogger from '../utils/metricsLogger'
+import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Handles the DownloadItem events
@@ -154,6 +157,15 @@ const willDownload = async ({
   // If the file has no totalBytes, report an error
   if (isFileActive && isDownloadActive && totalBytes === 0) {
     console.log(`The download for ${originalUrl} has a totalBytes of ${totalBytes}. Cancelling the download.`)
+
+    metricsLogger(database, {
+      eventType: metricsEvent.downloadErrored,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        filename,
+        reason: 'File reported a size of 0 bytes.'
+      }
+    })
 
     await database.updateFileById(fileId, {
       state: downloadStates.error,

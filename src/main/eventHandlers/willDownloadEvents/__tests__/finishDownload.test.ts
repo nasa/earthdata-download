@@ -4,12 +4,15 @@ import MockDate from 'mockdate'
 
 import finishDownload from '../finishDownload'
 
+import downloadIdForMetrics from '../../../utils/downloadIdForMetrics'
 import downloadStates from '../../../../app/constants/downloadStates'
+import metricsEvent from '../../../../app/constants/metricsEvent'
 
 import metricsLogger from '../../../utils/metricsLogger'
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00.000')
+  jest.clearAllMocks()
 })
 
 jest.mock('../../../utils/metricsLogger.ts', () => ({
@@ -23,11 +26,15 @@ describe('finishDownload', () => {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(0),
       updateDownloadById: jest.fn(),
       getDownloadStatistics: jest.fn().mockResolvedValue({
-        fileCount: 7,
+        fileCount: 10,
         receivedBytesSum: 461748278,
         totalBytesSum: 461748278,
         totalDownloadTime: 18938,
-        incompleteFileCount: 0,
+        erroredCount: 1,
+        incompleteFileCount: 3,
+        interruptedCanResumeCount: 1,
+        interruptedCanNotResumeCount: 0,
+        cancelledCount: 1,
         pauseCount: 2
       })
     }
@@ -39,14 +46,18 @@ describe('finishDownload', () => {
 
     expect(metricsLogger).toHaveBeenCalledTimes(1)
     expect(metricsLogger).toHaveBeenCalledWith(database, {
-      eventType: 'DownloadComplete',
+      eventType: metricsEvent.downloadComplete,
       data: {
-        downloadId: 'mock-download-id',
+        downloadId: downloadIdForMetrics('mock-download-id'),
         receivedBytes: 461748278,
         totalBytes: 461748278,
         duration: '18.9',
-        filesFailed: 0,
-        filesDownloaded: 7,
+        filesDownloaded: 10,
+        filesErrored: 1,
+        filesIncomplete: 3,
+        filesInterruptedCanResume: 1,
+        filesInterruptedCanNotResume: 0,
+        filesCancelled: 1,
         pauseCount: 2
       }
     })
@@ -72,7 +83,10 @@ describe('finishDownload', () => {
         receivedBytesSum: 461748278,
         totalBytesSum: 461748278,
         totalDownloadTime: 18938,
+        erroredCount: 0,
         incompleteFileCount: 0,
+        interruptedCount: 0,
+        cancelledCount: 0,
         pauseCount: 2
       })
     }

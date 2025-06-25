@@ -246,6 +246,10 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(sendToLogin).toHaveBeenCalledTimes(1)
+      expect(sendToLogin).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id',
+        forceLogin: true
+      })
     })
   })
 
@@ -262,6 +266,10 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(sendToEula).toHaveBeenCalledTimes(1)
+      expect(sendToEula).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id',
+        forceLogin: true
+      })
     })
   })
 
@@ -278,6 +286,9 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(pauseDownloadItem).toHaveBeenCalledTimes(1)
+      expect(pauseDownloadItem).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id'
+      })
     })
   })
 
@@ -294,6 +305,9 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(resumeDownloadItem).toHaveBeenCalledTimes(1)
+      expect(resumeDownloadItem).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id'
+      })
     })
   })
 
@@ -313,6 +327,9 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(openDownloadFolder).toHaveBeenCalledTimes(1)
+      expect(openDownloadFolder).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id'
+      })
     })
   })
 
@@ -332,6 +349,9 @@ describe('DownloadListItem component', () => {
       await userEvent.click(button)
 
       expect(copyDownloadPath).toHaveBeenCalledTimes(1)
+      expect(copyDownloadPath).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id'
+      })
     })
   })
 

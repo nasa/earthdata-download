@@ -177,6 +177,7 @@ describe('DownloadHistoryListItem component', () => {
       await userEvent.click(button)
 
       expect(showAdditionalDetailsDialog).toHaveBeenCalledTimes(1)
+      expect(showAdditionalDetailsDialog).toHaveBeenCalledWith('mock-download-id')
     })
   })
 
@@ -188,6 +189,9 @@ describe('DownloadHistoryListItem component', () => {
       await userEvent.click(button)
 
       expect(openDownloadFolder).toHaveBeenCalledTimes(1)
+      expect(openDownloadFolder).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id'
+      })
     })
   })
 
@@ -199,6 +203,9 @@ describe('DownloadHistoryListItem component', () => {
       await userEvent.click(button)
 
       expect(copyDownloadPath).toHaveBeenCalledTimes(1)
+      expect(copyDownloadPath).toHaveBeenCalledWith({
+        downloadId: 'mock-download-id'
+      })
     })
   })
 

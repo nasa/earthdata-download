@@ -445,10 +445,6 @@ describe('fetchLinks', () => {
         errors: JSON.stringify([{
           message: errorMessage
         }]),
-        //         Errors: JSON.stringify([{
-        //           message: `The host [${getLinksUrl}] is not a trusted source and Earthdata Download will not continue.
-        // If you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
-        //         }]),
         loadingMoreFiles: false,
         state: downloadStates.errorFetchingLinks
       }

@@ -23,6 +23,7 @@ import metricsLogger from '../utils/metricsLogger'
 import openDownloadFolder from '../eventHandlers/openDownloadFolder'
 import openLogFolder from '../eventHandlers/openLogFolder'
 import pauseDownloadItem from '../eventHandlers/pauseDownloadItem'
+import requestAddionalDetailsReport from '../eventHandlers/requestAddionalDetailsReport'
 import requestDownloadsProgress from '../eventHandlers/requestDownloadsProgress'
 import requestFilesProgress from '../eventHandlers/requestFilesProgress'
 import resetApplication from '../eventHandlers/resetApplication'
@@ -339,6 +340,16 @@ const setupEventListeners = ({
   /**
    * Reporting event listeners
    */
+
+  // Called when the Downloads list needs an additional details report
+  ipcMain.handle('requestAddionalDetailsReport', async (event, info) => {
+    const report = await requestAddionalDetailsReport({
+      database,
+      info
+    })
+
+    return report
+  })
 
   // Called when the Downloads list needs a progress report
   ipcMain.handle('requestDownloadsProgress', async (event, info) => {

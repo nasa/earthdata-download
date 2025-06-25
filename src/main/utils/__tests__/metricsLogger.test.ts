@@ -17,10 +17,6 @@ jest.mock('node-fetch', () => ({
 }))
 
 describe('metricsLogger', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
   const event = {
     eventType: metricsEvent.downloadComplete,
     data: {

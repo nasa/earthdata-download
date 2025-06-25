@@ -266,6 +266,13 @@ class EddDatabase {
             url
           }
         }))
+        .onConflict(['downloadId', 'filename'])
+        .merge({
+          // Updates the duplicateCount column by one for every
+          // duplicate file, triggered by the unique constraint
+          // on (downloadId, filename)
+          duplicateCount: this.db.raw('?? + 1', ['duplicateCount'])
+        })
     })
 
     await Promise.all(promises)
@@ -627,12 +634,37 @@ class EddDatabase {
   /** Reports */
 
   /**
+   * Returns the additional details report for the given downloadId.
+   * @param {String} downloadId ID of download to return additional details
+   */
+  async getAdditionalDetailsReport(downloadId) {
+    const query = this.db('files')
+      .select(
+        this.db.raw('(SELECT invalidLinks FROM downloads WHERE id = ?) as invalidLinksCount', [downloadId])
+      )
+      .sum({
+        // Return the sum of the `duplicateCount` column as `duplicateCount`
+        duplicateCount: 'duplicateCount'
+      })
+      .where({
+        downloadId
+      })
+
+    return query
+  }
+
+  /**
    * Returns the files progress for the given downloadId
    * @param {String} downloadId ID of download to return progress
    */
   async getDownloadReport(downloadId) {
     const [result] = await this.db('files')
+      .select(
+        this.db.raw('(SELECT invalidLinks FROM downloads WHERE id = ?) as invalidLinksCount', [downloadId])
+      )
       .sum({
+        // Return the sum of the `duplicateCount` column as `duplicateCount`
+        duplicateCount: 'duplicateCount',
         // Return the sum of the `percent` column as `percentSum`
         percentSum: 'percent'
       })
@@ -707,15 +739,30 @@ class EddDatabase {
       .where({ downloadId })
       .first()
       .count('id as fileCount')
-      .sum('receivedBytes as receivedBytesSum')
-      .sum('totalBytes as totalBytesSum')
+      .sum({
+        // Return the sum of the `duplicateCount` column as `duplicateCount`
+        duplicateCount: 'duplicateCount',
+        // Returns the sum of the `receivedBytes` as `receivedBytesSum`
+        receivedBytesSum: 'receivedBytes',
+        // Returns the sum of the `totalBytes` as `totalBytesSum`
+        totalBytesSum: 'totalBytes'
+      })
       .select(
+        // Returns the invalidLinks count from the downloads table
+        this.db.raw('(SELECT invalidLinks FROM downloads WHERE id = ?) as invalidLinksCount', [downloadId]),
+        // Returns the total download time in milliseconds
         this.db.raw('(IFNULL(MAX(timeEnd), UNIXEPOCH() * 1000) - MIN(timeStart)) as totalDownloadTime'),
-        this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state != \'COMPLETED\') as incompleteFileCount', [downloadId]),
-        this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'ERROR\') as erroredCount', [downloadId]),
-        this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'INTERRUPTED_CAN_RESUME\') as interruptedCanResumeCount', [downloadId]),
-        this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'INTERRUPTED_CAN_NOT_RESUME\') as interruptedCanNotResumeCount', [downloadId]),
-        this.db.raw('(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = \'CANCELLED\') as cancelledCount', [downloadId]),
+        // Returns the count of files that are not in the completed state
+        this.db.raw(`(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state != '${downloadStates.completed}') as incompleteFileCount`, [downloadId]),
+        // Returns the count of files that are in the error state
+        this.db.raw(`(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = '${downloadStates.error}') as erroredCount`, [downloadId]),
+        // Returns the count of files that are in the interrupted state and can be resumed
+        this.db.raw(`(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = '${downloadStates.interruptedCanResume}') as interruptedCanResumeCount`, [downloadId]),
+        // Returns the count of files that are in the interrupted state and cannot be resumed
+        this.db.raw(`(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = '${downloadStates.interruptedCanNotResume}') as interruptedCanNotResumeCount`, [downloadId]),
+        // Returns the count of files that are in the cancelled state
+        this.db.raw(`(SELECT COUNT(id) FROM files WHERE downloadId = ? AND state = '${downloadStates.cancelled}') as cancelledCount`, [downloadId]),
+        // Returns the count of files that are in the paused state
         this.db.raw('(SELECT COUNT(id) FROM pauses WHERE downloadId = ? AND fileId IS NULL) as pauseCount', [downloadId])
       )
 

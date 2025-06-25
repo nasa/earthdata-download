@@ -5,10 +5,6 @@ import '@testing-library/jest-dom'
 
 import useToasts from '../useToasts'
 
-afterEach(() => {
-  jest.clearAllMocks()
-})
-
 const TestComponent = () => {
   const {
     toasts,

@@ -12,7 +12,6 @@ import metricsLogger from '../../../utils/metricsLogger'
 
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00.000')
-  jest.clearAllMocks()
 })
 
 jest.mock('../../../utils/metricsLogger.ts', () => ({
@@ -35,7 +34,9 @@ describe('finishDownload', () => {
         interruptedCanResumeCount: 1,
         interruptedCanNotResumeCount: 0,
         cancelledCount: 1,
-        pauseCount: 2
+        pauseCount: 2,
+        duplicateCount: 0,
+        invalidLinksCount: 0
       })
     }
 
@@ -58,7 +59,9 @@ describe('finishDownload', () => {
         filesInterruptedCanResume: 1,
         filesInterruptedCanNotResume: 0,
         filesCancelled: 1,
-        pauseCount: 2
+        pauseCount: 2,
+        duplicateCount: 0,
+        invalidLinksCount: 0
       }
     })
 
@@ -87,7 +90,9 @@ describe('finishDownload', () => {
         incompleteFileCount: 0,
         interruptedCount: 0,
         cancelledCount: 0,
-        pauseCount: 2
+        pauseCount: 2,
+        duplicateCount: 0,
+        invalidLinksCount: 0
       })
     }
 

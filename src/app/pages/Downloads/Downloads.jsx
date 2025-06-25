@@ -20,10 +20,11 @@ import DownloadHeader from '../../components/DownloadHeader/DownloadHeader'
 
 import parseDownloadReport from '../../utils/parseDownloadReport'
 
-import * as styles from './Downloads.module.scss'
 import addErrorToasts from '../../utils/addErrorToasts'
 import useAppContext from '../../hooks/useAppContext'
 import ListPage from '../../components/ListPage/ListPage'
+
+import * as styles from './Downloads.module.scss'
 
 /**
  * @typedef {Object} DownloadsProps
@@ -31,6 +32,7 @@ import ListPage from '../../components/ListPage/ListPage'
  * @property {Function} setCurrentPage A function which sets the active page.
  * @property {Function} setHasActiveDownload A function to set whether a download is active.
  * @property {Function} setSelectedDownloadId A function to set the selectedDownloadId.
+ * @property {Function} showAdditionalDetailsDialog A function to set the `showAdditionalDetailsDialog` in the layout.
  * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout.
 
 /**
@@ -45,6 +47,7 @@ import ListPage from '../../components/ListPage/ListPage'
  *     setCurrentPage={setCurrentPage}
  *     setHasActiveDownload={setHasActiveDownload}
  *     setSelectedDownloadId={setSelectedDownloadId}
+ *     showAdditionalDetailsDialog={showAdditionalDetailsDialog}
  *     showMoreInfoDialog={showMoreInfoDialog}
  *   />
  * )
@@ -54,6 +57,7 @@ const Downloads = ({
   setCurrentPage,
   setHasActiveDownload,
   setSelectedDownloadId,
+  showAdditionalDetailsDialog,
   showMoreInfoDialog
 }) => {
   const appContext = useAppContext()
@@ -101,6 +105,7 @@ const Downloads = ({
         downloadLinks,
         setCurrentPage,
         setSelectedDownloadId,
+        showAdditionalDetailsDialog,
         showMoreInfoDialog,
         type: 'download'
       }
@@ -224,6 +229,7 @@ Downloads.propTypes = {
   setCurrentPage: PropTypes.func.isRequired,
   setHasActiveDownload: PropTypes.func.isRequired,
   setSelectedDownloadId: PropTypes.func.isRequired,
+  showAdditionalDetailsDialog: PropTypes.func.isRequired,
   showMoreInfoDialog: PropTypes.func.isRequired
 }
 

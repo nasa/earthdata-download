@@ -15,8 +15,6 @@ jest.mock('../../utils/startNextDownload', () => ({
 
 beforeEach(() => {
   MockDate.set('2023-05-01')
-
-  jest.clearAllMocks()
 })
 
 describe('beginDownload', () => {

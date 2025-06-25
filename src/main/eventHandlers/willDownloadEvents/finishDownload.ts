@@ -37,7 +37,9 @@ const finishDownload = async ({
         filesInterruptedCanResume: downloadStatistics.interruptedCanResumeCount,
         filesInterruptedCanNotResume: downloadStatistics.interruptedCanNotResumeCount,
         filesCancelled: downloadStatistics.cancelledCount,
-        pauseCount: downloadStatistics.pauseCount
+        pauseCount: downloadStatistics.pauseCount,
+        duplicateCount: downloadStatistics.duplicateCount,
+        invalidLinksCount: downloadStatistics.invalidLinksCount
       }
     })
   }

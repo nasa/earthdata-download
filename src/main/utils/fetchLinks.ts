@@ -55,10 +55,10 @@ const fetchLinks = async ({
 
     await database.updateDownloadById(downloadId, {
       loadingMoreFiles: false,
-      state: downloadStates.error,
-      errors: [{
+      state: downloadStates.errorFetchingLinks,
+      errors: JSON.stringify([{
         message
-      }]
+      }])
     })
 
     return
@@ -69,6 +69,8 @@ const fetchLinks = async ({
   let cursor
 
   let response
+
+  let invalidLinks = 0
 
   try {
     // https://eslint.org/docs/latest/rules/no-await-in-loop#when-not-to-use-it
@@ -102,25 +104,28 @@ const fetchLinks = async ({
       // If the response is not valid, don't add the links to the database
       const validateGetLinks = ajv.compile(getLinksSchema)
       const valid = validateGetLinks(jsonResponse)
+
       if (!valid) {
-        const reason = 'The returned data does not match the expected schema.'
+        const validationErrors = validateGetLinks.errors
+        const errorMessage = `The response from the getLinks endpoint did not match the expected schema. Error: ${JSON.stringify(validationErrors)}`
+        console.log(errorMessage)
+
+        // Log the error to the metrics logger
         metricsLogger(database, {
           eventType: metricsEvent.fetchLinksFailed,
           data: {
             downloadId: downloadIdForMetrics(downloadId),
-            reason
+            errorMessage
           }
         })
 
         await database.updateDownloadById(downloadId, {
           loadingMoreFiles: false,
-          state: downloadStates.error,
-          errors: [{
-            message: reason
-          }]
+          state: downloadStates.errorFetchingLinks,
+          errors: JSON.stringify([{
+            message: errorMessage
+          }])
         })
-
-        console.error(validateGetLinks.errors)
 
         return
       }
@@ -131,11 +136,18 @@ const fetchLinks = async ({
         links = []
       } = jsonResponse
 
+      const numberOfLinks = links.length
+
+      // Filter the links to only include https links
+      const filteredLinks = links.filter((link) => link.startsWith('https://'))
+      invalidLinks += numberOfLinks - filteredLinks.length
+
       // If no links exist, set `loadingMoreFiles` to false and exit the loop
-      if (links.length === 0) {
+      if (numberOfLinks === 0) {
         finished = true
 
         await database.updateDownloadById(downloadId, {
+          invalidLinks,
           loadingMoreFiles: false
         })
 
@@ -143,7 +155,7 @@ const fetchLinks = async ({
       }
 
       // Add the links to the download
-      await database.addLinksByDownloadId(downloadId, links)
+      await database.addLinksByDownloadId(downloadId, filteredLinks)
 
       // If this is the first response back, create a download in the database
       if (pageNum === 1) {
@@ -151,7 +163,7 @@ const fetchLinks = async ({
         initializeDownload({
           downloadIds: [downloadId],
           database,
-          links,
+          links: filteredLinks,
           webContents: appWindow.webContents
         })
       }
@@ -159,6 +171,7 @@ const fetchLinks = async ({
       // If `done` is true, set `loadingMoreFiles` to false
       if (done) {
         await database.updateDownloadById(downloadId, {
+          invalidLinks,
           loadingMoreFiles: false
         })
       }

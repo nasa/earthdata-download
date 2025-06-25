@@ -28,6 +28,7 @@ import ListPage from '../../components/ListPage/ListPage'
 /**
  * @typedef {Object} DownloadsHistoryProps
  * @property {Function} setCurrentPage A function which sets the active page.
+ * @property {Function} showAdditionalDetailsDialog A function to set the `showAdditionalDetailsDialog` in the layout.
  * @property {Function} showMoreInfoDialog A function to set the `showMoreInfoDialog` in the layout.
 
 /**
@@ -39,12 +40,14 @@ import ListPage from '../../components/ListPage/ListPage'
  * return (
  *   <DownloadHistory
  *     setCurrentPage={setCurrentPage}
+ *     showAdditionalDetailsDialog={showAdditionalDetailsDialog}
  *     showMoreInfoDialog={showMoreInfoDialog}
  *   />
  * )
  */
 const DownloadHistory = ({
   setCurrentPage,
+  showAdditionalDetailsDialog,
   showMoreInfoDialog
 }) => {
   const appContext = useAppContext()
@@ -92,6 +95,7 @@ const DownloadHistory = ({
           numberErrors: errors[downloadId]?.numberErrors
         },
         setCurrentPage,
+        showAdditionalDetailsDialog,
         showMoreInfoDialog,
         type: 'downloadHistory'
       }
@@ -214,6 +218,7 @@ const DownloadHistory = ({
 
 DownloadHistory.propTypes = {
   setCurrentPage: PropTypes.func.isRequired,
+  showAdditionalDetailsDialog: PropTypes.func.isRequired,
   showMoreInfoDialog: PropTypes.func.isRequired
 }
 

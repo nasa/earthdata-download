@@ -27,6 +27,8 @@ describe('ListPageListItem', () => {
     test('renders a DownloadListItem', () => {
       const setCurrentPage = jest.fn()
       const setSelectedDownloadId = jest.fn()
+      const showAdditionalDetailsDialog = jest.fn()
+      const showMoreInfoDialog = jest.fn()
       const downloadLinks = {}
 
       setup({
@@ -35,7 +37,9 @@ describe('ListPageListItem', () => {
           download: { mock: 'download' },
           downloadLinks: {},
           setCurrentPage,
-          setSelectedDownloadId
+          setSelectedDownloadId,
+          showAdditionalDetailsDialog,
+          showMoreInfoDialog
         }]
       })
 
@@ -46,7 +50,9 @@ describe('ListPageListItem', () => {
         },
         downloadLinks,
         setCurrentPage,
-        setSelectedDownloadId
+        setSelectedDownloadId,
+        showAdditionalDetailsDialog,
+        showMoreInfoDialog
       }, {})
 
       expect(FileListItem).toHaveBeenCalledTimes(0)
@@ -55,12 +61,14 @@ describe('ListPageListItem', () => {
 
   describe('when the ListItem is an inactive download', () => {
     test('renders a DownloadHistoryListItem', () => {
+      const showAdditionalDetailsDialog = jest.fn()
       const showMoreInfoDialog = jest.fn()
 
       setup({
         data: [{
           type: 'downloadHistory',
           download: { mock: 'download' },
+          showAdditionalDetailsDialog,
           showMoreInfoDialog
         }]
       })
@@ -70,6 +78,7 @@ describe('ListPageListItem', () => {
         download: {
           mock: 'download'
         },
+        showAdditionalDetailsDialog,
         showMoreInfoDialog
       }, {})
 

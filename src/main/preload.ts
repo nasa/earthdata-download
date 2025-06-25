@@ -39,6 +39,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   undoRestartingDownload: (data) => ipcRenderer.send('undoRestartingDownload', data),
 
   // Reporting
+  requestAddionalDetailsReport: (data) => ipcRenderer.invoke('requestAddionalDetailsReport', data),
   requestDownloadsProgress: (data) => ipcRenderer.invoke('requestDownloadsProgress', data),
   requestFilesProgress: (data) => ipcRenderer.invoke('requestFilesProgress', data),
 

@@ -22,6 +22,7 @@ const setup = (withErrors, overrideReport) => {
   const setCurrentPage = jest.fn()
   const setHasActiveDownload = jest.fn()
   const setSelectedDownloadId = jest.fn()
+  const showAdditionalDetailsDialog = jest.fn()
   const showMoreInfoDialog = jest.fn()
 
   const errors = {
@@ -68,6 +69,7 @@ const setup = (withErrors, overrideReport) => {
     setCurrentPage,
     setHasActiveDownload,
     setSelectedDownloadId,
+    showAdditionalDetailsDialog,
     showMoreInfoDialog
   }
 
@@ -100,13 +102,13 @@ const setup = (withErrors, overrideReport) => {
     requestDownloadsProgress,
     retryErroredDownloadItem,
     setCurrentPage,
+    showAdditionalDetailsDialog,
     showMoreInfoDialog
   }
 }
 
 beforeEach(() => {
   jest.useFakeTimers()
-  jest.clearAllMocks()
 })
 
 afterEach(() => {

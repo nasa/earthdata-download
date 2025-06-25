@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import {
   FaBan,
   FaClipboard,
+  FaExclamationTriangle,
   FaFolderOpen,
   FaPause,
   FaPlay,
@@ -48,6 +49,7 @@ const DownloadListItem = ({
   downloadLinks,
   setCurrentPage,
   setSelectedDownloadId,
+  showAdditionalDetailsDialog,
   showMoreInfoDialog
 }) => {
   const appContext = useAppContext()
@@ -74,6 +76,8 @@ const DownloadListItem = ({
 
   const {
     downloadId,
+    duplicateCount,
+    invalidLinksCount,
     numberErrors = 0,
     loadingMoreFiles,
     progress,
@@ -133,6 +137,7 @@ const DownloadListItem = ({
   const shouldBeClickable = state !== downloadStates.starting
     && state !== downloadStates.pending
     && totalFiles > 0
+  const shouldShowAdditonalDetails = duplicateCount > 0 || invalidLinksCount > 0
 
   const onClickClearDownload = () => {
     const now = new Date().getTime()
@@ -293,6 +298,15 @@ const DownloadListItem = ({
   const actionsList = [
     [
       {
+        label: 'View Additional Details',
+        isActive: shouldShowAdditonalDetails,
+        isPrimary: shouldShowAdditonalDetails,
+        callback: () => showAdditionalDetailsDialog(downloadId),
+        icon: FaExclamationTriangle
+      }
+    ],
+    [
+      {
         label: 'Log In with Earthdata Login',
         isActive: shouldShowLogin,
         isPrimary: shouldShowLogin,
@@ -424,6 +438,8 @@ DownloadListItem.defaultProps = {
 DownloadListItem.propTypes = {
   download: PropTypes.shape({
     downloadId: PropTypes.string,
+    duplicateCount: PropTypes.number,
+    invalidLinksCount: PropTypes.number,
     numberErrors: PropTypes.number,
     loadingMoreFiles: PropTypes.bool,
     progress: PropTypes.shape({
@@ -439,6 +455,7 @@ DownloadListItem.propTypes = {
   ),
   setCurrentPage: PropTypes.func,
   setSelectedDownloadId: PropTypes.func,
+  showAdditionalDetailsDialog: PropTypes.func.isRequired,
   showMoreInfoDialog: PropTypes.func.isRequired
 }
 

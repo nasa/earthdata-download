@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import https from 'https'
+import { net } from 'electron'
 import Ajv from 'ajv'
 
 import initializeDownload from './initializeDownload'
@@ -13,13 +13,8 @@ import isTrustedLink from './isTrustedLink'
 import packageDetails from '../../../package.json'
 import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from './metricsLogger'
-import downloadIdForMetrics from './downloadIdForMetrics'
 
 const ajv = new Ajv()
-
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false
-})
 
 /**
  * Fetches links for the given downloadId, adds links to the database.
@@ -97,10 +92,9 @@ const fetchLinks = async ({
         headers.Authorization = getLinksToken
       }
 
-      response = await fetch(updatedUrl, {
+      response = await net.fetch(updatedUrl, {
         headers,
-        method: 'get',
-        agent: httpsAgent
+        method: 'GET'
       })
 
       // eslint-disable-next-line no-await-in-loop

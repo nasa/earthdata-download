@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { net } from 'electron'
+
 import fetchLinks from '../fetchLinks'
 import initializeDownload from '../initializeDownload'
 
@@ -7,6 +9,12 @@ import downloadStates from '../../../app/constants/downloadStates'
 import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../metricsLogger'
 import downloadIdForMetrics from '../downloadIdForMetrics'
+
+jest.mock('electron', () => ({
+  net: {
+    fetch: jest.fn()
+  }
+}))
 
 jest.spyOn(console, 'error').mockImplementation(() => {})
 
@@ -58,7 +66,7 @@ describe('fetchLinks', () => {
       })
     }
 
-    fetch
+    net.fetch
       .mockImplementationOnce(() => page1Response)
       .mockImplementationOnce(() => page2Response)
       .mockImplementationOnce(() => page3Response)
@@ -72,34 +80,24 @@ describe('fetchLinks', () => {
       getLinksUrl
     })
 
-    expect(fetch).toHaveBeenCalledTimes(3)
-    expect(fetch).toHaveBeenCalledWith(
+    expect(net.fetch).toHaveBeenCalledTimes(3)
+    expect(net.fetch).toHaveBeenCalledWith(
       'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
       {
         headers: {
           Authorization: 'Bearer mock-token'
         },
-        method: 'get',
-        agent: expect.objectContaining({
-          options: expect.objectContaining({
-            rejectUnauthorized: false
-          })
-        })
+        method: 'GET'
       }
     )
 
-    expect(fetch).toHaveBeenCalledWith(
+    expect(net.fetch).toHaveBeenCalledWith(
       'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&cursor=mock-cursor',
       {
         headers: {
           Authorization: 'Bearer mock-token'
         },
-        method: 'get',
-        agent: expect.objectContaining({
-          options: expect.objectContaining({
-            rejectUnauthorized: false
-          })
-        })
+        method: 'GET'
       }
     )
 
@@ -157,7 +155,7 @@ describe('fetchLinks', () => {
         })
       }
 
-      fetch
+      net.fetch
         .mockImplementationOnce(() => page1Response)
 
       await fetchLinks({
@@ -169,19 +167,14 @@ describe('fetchLinks', () => {
         getLinksUrl
       })
 
-      expect(fetch).toHaveBeenCalledTimes(1)
-      expect(fetch).toHaveBeenCalledWith(
+      expect(net.fetch).toHaveBeenCalledTimes(1)
+      expect(net.fetch).toHaveBeenCalledWith(
         'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
         {
           headers: {
             Authorization: 'Bearer mock-token'
           },
-          method: 'get',
-          agent: expect.objectContaining({
-            options: expect.objectContaining({
-              rejectUnauthorized: false
-            })
-          })
+          method: 'GET'
         }
       )
 
@@ -251,7 +244,7 @@ describe('fetchLinks', () => {
         })
       }
 
-      fetch
+      net.fetch
         .mockImplementationOnce(() => page1Response)
         .mockImplementationOnce(() => page2Response)
         .mockImplementationOnce(() => page3Response)
@@ -265,34 +258,24 @@ describe('fetchLinks', () => {
         getLinksUrl
       })
 
-      expect(fetch).toHaveBeenCalledTimes(3)
-      expect(fetch).toHaveBeenCalledWith(
+      expect(net.fetch).toHaveBeenCalledTimes(3)
+      expect(net.fetch).toHaveBeenCalledWith(
         'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
         {
           headers: {
             Authorization: 'Bearer mock-token'
           },
-          method: 'get',
-          agent: expect.objectContaining({
-            options: expect.objectContaining({
-              rejectUnauthorized: false
-            })
-          })
+          method: 'GET'
         }
       )
 
-      expect(fetch).toHaveBeenCalledWith(
+      expect(net.fetch).toHaveBeenCalledWith(
         'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&cursor=mock-cursor',
         {
           headers: {
             Authorization: 'Bearer mock-token'
           },
-          method: 'get',
-          agent: expect.objectContaining({
-            options: expect.objectContaining({
-              rejectUnauthorized: false
-            })
-          })
+          method: 'GET'
         }
       )
 
@@ -342,7 +325,7 @@ describe('fetchLinks', () => {
     const getLinksToken = 'Bearer mock-token'
     const error = new Error(downloadStates.error)
 
-    fetch
+    net.fetch
       .mockImplementationOnce(() => {
         throw error
       })
@@ -356,19 +339,14 @@ describe('fetchLinks', () => {
       getLinksUrl
     })
 
-    expect(fetch).toHaveBeenCalledTimes(1)
-    expect(fetch).toHaveBeenCalledWith(
+    expect(net.fetch).toHaveBeenCalledTimes(1)
+    expect(net.fetch).toHaveBeenCalledWith(
       'http://localhost:3000/granule_links?id=42&flattenLinks=true&linkTypes=data&pageNum=1',
       {
         headers: {
           Authorization: 'Bearer mock-token'
         },
-        method: 'get',
-        agent: expect.objectContaining({
-          options: expect.objectContaining({
-            rejectUnauthorized: false
-          })
-        })
+        method: 'GET'
       }
     )
 
@@ -425,7 +403,7 @@ describe('fetchLinks', () => {
         links: ['https://example.com/file1.png']
       })
     }
-    fetch.mockImplementation(() => standardResponse)
+    net.fetch.mockImplementation(() => standardResponse)
     const getLinksUrl = 'http://fakery/granule_links?id=301&flattenLinks=true&linkTypes=data'
     const errorMessage = `The host [${getLinksUrl}] is not a trusted source and Earthdata Download will not continue.\nIf you wish to have this link included in the list of trusted sources please contact us at support@earthdata.nasa.gov or submit a Pull Request at https://github.com/nasa/earthdata-download#readme.`
 
@@ -476,7 +454,7 @@ describe('fetchLinks', () => {
     expect(database.addLinksByDownloadId).toHaveBeenCalledTimes(0)
 
     // We should not have fetched anything
-    expect(fetch).toHaveBeenCalledTimes(0)
+    expect(net.fetch).toHaveBeenCalledTimes(0)
   })
 
   test.each([
@@ -525,7 +503,7 @@ describe('fetchLinks', () => {
     }
     const errorMessage = 'The response from the getLinks endpoint did not match the expected schema. Error: [{"instancePath":"","schemaPath":"#/type","keyword":"type","params":{"type":"object"},"message":"must be object"}]'
 
-    fetch
+    net.fetch
       .mockImplementationOnce(() => page1Response)
       .mockImplementationOnce(() => page2Response)
       .mockImplementation(() => page3Response)
@@ -580,6 +558,6 @@ describe('fetchLinks', () => {
       ['https://example.com/file1.png']
     )
 
-    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(net.fetch).toHaveBeenCalledTimes(2)
   })
 })

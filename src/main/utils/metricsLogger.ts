@@ -1,14 +1,9 @@
 // @ts-nocheck
 
-import { app } from 'electron'
-import https from 'https'
+import { app, net } from 'electron'
 
 import config from '../config.json'
 import downloadIdForMetrics from './downloadIdForMetrics'
-
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false
-})
 
 /**
  * Dispatches specified events to edd_logger lambda to be logged on CloudWatch
@@ -55,13 +50,12 @@ const metricsLogger = async (database, event) => {
   }
 
   try {
-    await fetch(config.logging, {
+    await net.fetch(config.logging, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ params: eventWithVersion }),
-      agent: httpsAgent
+      body: JSON.stringify({ params: eventWithVersion })
     })
   } catch (error) {
     console.error(error)

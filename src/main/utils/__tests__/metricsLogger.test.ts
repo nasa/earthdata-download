@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { net } from 'electron'
 import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../metricsLogger'
 import config from '../../config.json'
@@ -7,6 +8,9 @@ import config from '../../config.json'
 jest.mock('electron', () => ({
   app: {
     getVersion: () => '1.0.0'
+  },
+  net: {
+    fetch: jest.fn()
   }
 }))
 
@@ -38,7 +42,7 @@ describe('metricsLogger', () => {
 
     await metricsLogger(database, event)
 
-    expect(fetch).toHaveBeenCalledTimes(0)
+    expect(net.fetch).toHaveBeenCalledTimes(0)
   })
 
   test('should send a POST request to the specified logging endpoint when user allows metrics', async () => {
@@ -66,20 +70,15 @@ describe('metricsLogger', () => {
 
     await metricsLogger(database, event)
 
-    expect(fetch).toHaveBeenCalledTimes(1)
-    expect(fetch).toHaveBeenCalledWith(
+    expect(net.fetch).toHaveBeenCalledTimes(1)
+    expect(net.fetch).toHaveBeenCalledWith(
       config.logging,
       {
         method: 'POST',
         body: expectedBody,
         headers: {
           'Content-Type': 'application/json'
-        },
-        agent: expect.objectContaining({
-          options: expect.objectContaining({
-            rejectUnauthorized: false
-          })
-        })
+        }
       }
     )
   })
@@ -98,7 +97,7 @@ describe('metricsLogger', () => {
 
     const expectedError = new Error('Request failed')
 
-    fetch
+    net.fetch
       .mockImplementationOnce(() => {
         throw new Error('Request failed')
       })
@@ -107,9 +106,9 @@ describe('metricsLogger', () => {
 
     await metricsLogger(database, event)
 
-    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(net.fetch).toHaveBeenCalledTimes(1)
 
-    expect(fetch).toHaveBeenCalledWith(
+    expect(net.fetch).toHaveBeenCalledWith(
       config.logging,
       {
         method: 'POST',
@@ -125,12 +124,7 @@ describe('metricsLogger', () => {
         }),
         headers: {
           'Content-Type': 'application/json'
-        },
-        agent: expect.objectContaining({
-          options: expect.objectContaining({
-            rejectUnauthorized: false
-          })
-        })
+        }
       }
     )
 

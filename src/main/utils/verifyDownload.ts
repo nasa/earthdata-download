@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { net } from 'electron'
 import AbortController from 'abort-controller'
 
 import downloadStates from '../../app/constants/downloadStates'
@@ -39,7 +40,7 @@ const verifyDownload = async ({
 
   let response
   try {
-    response = await fetch(url, {
+    response = await net.fetch(url, {
       method: 'GET',
       headers,
       signal: controller.signal,

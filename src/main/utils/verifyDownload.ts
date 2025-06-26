@@ -7,12 +7,14 @@ import downloadStates from '../../app/constants/downloadStates'
 import sendToEula from '../eventHandlers/sendToEula'
 import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from './metricsLogger'
+import sendToLogin from '../eventHandlers/sendToLogin'
 
 /**
  * Verify the download works and log any errors. Also redirects the user to accept a EULA if that is detected.
  * @param {Object} params
  * @param {Object} params.database `EddDatabase` instance
  * @param {String} params.downloadId downloadId of the DownloadItem being downloaded
+ * @param {Object} params.downloadsWaitingForAuth Object where we can mark a downloadId as waiting for authentication
  * @param {Object} params.downloadsWaitingForEula Object where we can mark a downloadId as waiting for EULA acceptance
  * @param {Number} params.fileId Optional file ID to start downloading
  * @param {String} params.url URL to verify
@@ -21,12 +23,13 @@ import metricsLogger from './metricsLogger'
 const verifyDownload = async ({
   database,
   downloadId,
+  downloadsWaitingForAuth,
   downloadsWaitingForEula,
   fileId,
   url,
   webContents
 }) => {
-  if (downloadsWaitingForEula[downloadId]) return false
+  if (downloadsWaitingForAuth[downloadId] || downloadsWaitingForEula[downloadId]) return false
 
   const { token } = await database.getToken()
 
@@ -56,6 +59,26 @@ const verifyDownload = async ({
     }
 
     const { status } = response
+
+    if (status === 401) {
+      console.log(`The download for ${url} had a status code of 401, sending the user to login.`)
+
+      await database.updateDownloadById(downloadId, {
+        state: downloadStates.waitingForAuth
+      })
+
+      await sendToLogin({
+        database,
+        downloadsWaitingForAuth,
+        info: {
+          downloadId,
+          fileId
+        },
+        webContents
+      })
+
+      return false
+    }
 
     const json = await response.json()
 

@@ -395,6 +395,7 @@ describe('willDownload', () => {
       expect(verifyDownload).toHaveBeenCalledTimes(1)
       expect(verifyDownload).toHaveBeenCalledWith(expect.objectContaining({
         downloadId: 'mock-download-id',
+        downloadsWaitingForAuth: {},
         downloadsWaitingForEula: {},
         fileId: 123,
         url: 'http://example.com/mock-filename.png'
@@ -468,6 +469,7 @@ describe('willDownload', () => {
       expect(verifyDownload).toHaveBeenCalledTimes(1)
       expect(verifyDownload).toHaveBeenCalledWith(expect.objectContaining({
         downloadId: 'mock-download-id',
+        downloadsWaitingForAuth: {},
         downloadsWaitingForEula: {},
         fileId: 123,
         url: 'http://example.com/mock-filename.png'

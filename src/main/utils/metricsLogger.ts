@@ -28,11 +28,11 @@ const metricsLogger = async (database, event) => {
   }
 
   if (downloadIds && downloadIds.length > 0) {
-    dataWithVersion.clientIds = downloadIds.map((id) => {
-      const download = database.getDownloadById(id)
+    dataWithVersion.clientIds = await Promise.all(downloadIds.map(async (id) => {
+      const download = await database.getDownloadById(id)
 
       return download?.clientId
-    })
+    }))
 
     dataWithVersion.downloadIds = downloadIds.map(downloadIdForMetrics)
   }

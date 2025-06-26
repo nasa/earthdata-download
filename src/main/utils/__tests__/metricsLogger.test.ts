@@ -16,7 +16,7 @@ jest.mock('electron', () => ({
 
 describe('metricsLogger', () => {
   const event = {
-    eventType: metricsEvent.downloadComplete,
+    eventType: metricsEvent.DownloadComplete,
     data: {
       downloadId: '1010_Test',
       fileCount: 10,
@@ -129,5 +129,48 @@ describe('metricsLogger', () => {
     )
 
     expect(console.error).toHaveBeenCalledWith(expectedError)
+  })
+
+  test('should include downloadIds and clientIds in the event data when multiple downloads are provided', async () => {
+    const eventWithMultipleDownloads = {
+      eventType: metricsEvent.DownloadPause,
+      data: {
+        downloadIds: ['1010_Test', '2020_Test']
+      }
+    }
+
+    const database = {
+      getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
+      updateDownloadById: jest.fn(),
+      getPreferencesByField: jest.fn().mockResolvedValue(
+        1
+      ),
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'test-client-id'
+      })
+    }
+
+    await metricsLogger(database, eventWithMultipleDownloads)
+
+    expect(net.fetch).toHaveBeenCalledTimes(1)
+    expect(net.fetch).toHaveBeenCalledWith(
+      config.logging,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          params: {
+            ...eventWithMultipleDownloads,
+            data: {
+              ...eventWithMultipleDownloads.data,
+              appVersion: '1.0.0',
+              clientIds: ['test-client-id', 'test-client-id']
+            }
+          }
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
   })
 })

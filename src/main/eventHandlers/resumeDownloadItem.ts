@@ -6,7 +6,6 @@ import downloadStates from '../../app/constants/downloadStates'
 import startNextDownload from '../utils/startNextDownload'
 import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from '../utils/metricsLogger'
-import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Resumes a download and updates the database
@@ -41,7 +40,7 @@ const resumeDownloadItem = async ({
     metricsLogger(database, {
       eventType: metricsEvent.downloadResume,
       data: {
-        downloadIds: [downloadIdForMetrics(downloadId)],
+        downloadIds: [downloadId],
         downloadCount: 1
       }
     })
@@ -82,7 +81,7 @@ const resumeDownloadItem = async ({
         state: newState
       })
 
-      downloadIds.push(downloadIdForMetrics(id))
+      downloadIds.push(id)
     })
 
     metricsLogger(database, {

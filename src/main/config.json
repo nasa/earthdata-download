@@ -1,4 +1,4 @@
 {
   "note": "This endpoint is for EDSC CloudWatch",
-  "logging": "https://d53njncz5taqi.cloudfront.net/edd_logger"
+  "logging": "https://searchprodapi-1167262027.auto.earthdatacloud.nasa.gov/edd_logger"
 }

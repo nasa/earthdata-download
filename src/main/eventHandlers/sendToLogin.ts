@@ -5,7 +5,6 @@ import { shell } from 'electron'
 import downloadStates from '../../app/constants/downloadStates'
 import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from '../utils/metricsLogger'
-import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Sends the user to the download's authUrl to get a new token
@@ -74,7 +73,7 @@ const sendToLogin = async ({
     metricsLogger(database, {
       eventType: metricsEvent.sentToEdl,
       data: {
-        downloadId: downloadIdForMetrics(downloadId)
+        downloadId
       }
     })
   }

@@ -24,11 +24,6 @@ jest.mock(
   { virtual: true }
 )
 
-jest.mock('node-fetch', () => ({
-  __esModule: true,
-  default: jest.fn()
-}))
-
 describe('did-finish-load', () => {
   describe('when the app is not packaged', () => {
     test('opens the app window', async () => {

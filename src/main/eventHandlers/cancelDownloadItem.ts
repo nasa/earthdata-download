@@ -3,7 +3,6 @@
 import downloadStates from '../../app/constants/downloadStates'
 import finishDownload from './willDownloadEvents/finishDownload'
 import metricsLogger from '../utils/metricsLogger'
-import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 import metricsEvent from '../../app/constants/metricsEvent'
 
@@ -45,7 +44,7 @@ const cancelDownloadItem = async ({
     metricsLogger(database, {
       eventType: metricsEvent.downloadItemCancel,
       data: {
-        downloadId: downloadIdForMetrics(downloadId)
+        downloadId
       }
     })
   }
@@ -71,7 +70,7 @@ const cancelDownloadItem = async ({
     metricsLogger(database, {
       eventType: metricsEvent.downloadCancel,
       data: {
-        downloadIds: [downloadIdForMetrics(downloadId)],
+        downloadIds: [downloadId],
         cancelCount: 1
       }
     })
@@ -93,7 +92,7 @@ const cancelDownloadItem = async ({
     const cancelledDownloadIds = []
     await Promise.all(updatedDownloads.map(async (updatedDownload) => {
       const { id } = updatedDownload
-      cancelledDownloadIds.push(downloadIdForMetrics(id))
+      cancelledDownloadIds.push(id)
       await database.endPause(id)
     }))
 

@@ -4,7 +4,6 @@ import { app } from 'electron'
 
 import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from './metricsLogger'
-import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Sends a message to the renderer process to start a download for the given downloadIds.
@@ -47,11 +46,10 @@ const initializeDownload = async ({
       shouldUseDefaultLocation: !!defaultDownloadLocation
     })
 
-    const metricIds = downloadIds.map(downloadIdForMetrics)
     metricsLogger(database, {
       eventType: metricsEvent.downloadStarted,
       data: {
-        downloadIds: metricIds
+        downloadIds
       }
     })
   }

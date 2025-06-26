@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import fetch from 'node-fetch'
 import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../metricsLogger'
 import config from '../../config.json'
@@ -9,11 +8,6 @@ jest.mock('electron', () => ({
   app: {
     getVersion: () => '1.0.0'
   }
-}))
-
-jest.mock('node-fetch', () => ({
-  __esModule: true,
-  default: jest.fn()
 }))
 
 describe('metricsLogger', () => {
@@ -36,7 +30,10 @@ describe('metricsLogger', () => {
       updateDownloadById: jest.fn(),
       getPreferencesByField: jest.fn().mockResolvedValue(
         0
-      )
+      ),
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'test-client-id'
+      })
     }
 
     await metricsLogger(database, event)
@@ -48,7 +45,11 @@ describe('metricsLogger', () => {
     const expectedBody = JSON.stringify({
       params: {
         ...event,
-        appVersion: '1.0.0'
+        data: {
+          ...event.data,
+          appVersion: '1.0.0',
+          clientId: 'test-client-id'
+        }
       }
     })
 
@@ -57,7 +58,10 @@ describe('metricsLogger', () => {
       updateDownloadById: jest.fn(),
       getPreferencesByField: jest.fn().mockResolvedValue(
         1
-      )
+      ),
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'test-client-id'
+      })
     }
 
     await metricsLogger(database, event)
@@ -86,7 +90,10 @@ describe('metricsLogger', () => {
       updateDownloadById: jest.fn(),
       getPreferencesByField: jest.fn().mockResolvedValue(
         1
-      )
+      ),
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'test-client-id'
+      })
     }
 
     const expectedError = new Error('Request failed')
@@ -109,7 +116,11 @@ describe('metricsLogger', () => {
         body: JSON.stringify({
           params: {
             ...event,
-            appVersion: '1.0.0'
+            data: {
+              ...event.data,
+              appVersion: '1.0.0',
+              clientId: 'test-client-id'
+            }
           }
         }),
         headers: {

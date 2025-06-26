@@ -5,7 +5,6 @@ import finishDownload from './finishDownload'
 import startNextDownload from '../../utils/startNextDownload'
 import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../../utils/metricsLogger'
-import downloadIdForMetrics from '../../utils/downloadIdForMetrics'
 
 /**
  * Handles the DownloadItem 'done' event
@@ -63,7 +62,7 @@ const onDone = async ({
       metricsLogger(database, {
         eventType: metricsEvent.downloadErrored,
         data: {
-          downloadId: downloadIdForMetrics(downloadId),
+          downloadId,
           filename
         }
       })

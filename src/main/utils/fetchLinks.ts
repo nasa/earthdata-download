@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import fetch from 'node-fetch'
 import https from 'https'
 import Ajv from 'ajv'
 
@@ -53,7 +52,7 @@ const fetchLinks = async ({
     metricsLogger(database, {
       eventType: metricsEvent.fetchLinksFailed,
       data: {
-        downloadId: downloadIdForMetrics(downloadId),
+        downloadId,
         reason: message
       }
     })
@@ -120,7 +119,7 @@ const fetchLinks = async ({
         metricsLogger(database, {
           eventType: metricsEvent.fetchLinksFailed,
           data: {
-            downloadId: downloadIdForMetrics(downloadId),
+            downloadId,
             errorMessage
           }
         })
@@ -194,7 +193,7 @@ const fetchLinks = async ({
     metricsLogger(database, {
       eventType: metricsEvent.fetchLinksFailed,
       data: {
-        downloadId: downloadIdForMetrics(downloadId),
+        downloadId,
         reason
       }
     })

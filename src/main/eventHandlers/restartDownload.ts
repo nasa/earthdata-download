@@ -32,7 +32,7 @@ const restartDownload = async ({
   metricsLogger(database, {
     eventType: metricsEvent.downloadRestart,
     data: {
-      downloadId: downloadIdForMetrics(downloadId),
+      downloadId,
       filesCompleted: report.finishedFiles,
       filesInProgress: report.totalFiles - report.finishedFiles
     }

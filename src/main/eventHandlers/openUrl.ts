@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 import metricsLogger from '../utils/metricsLogger'
 import startNextDownload from '../utils/startNextDownload'
 import startPendingDownloads from '../utils/startPendingDownloads'
@@ -80,6 +79,7 @@ const openUrl = async ({
     // Create a download in the database
     await database.createDownload(downloadId, {
       authUrl,
+      clientId,
       createdAt: new Date().getTime(),
       eulaRedirectUrl,
       getLinksToken,
@@ -91,7 +91,7 @@ const openUrl = async ({
       eventType: metricsEvent.openUrl,
       data: {
         clientId,
-        downloadId: downloadIdForMetrics(downloadId)
+        downloadId
       }
     })
 

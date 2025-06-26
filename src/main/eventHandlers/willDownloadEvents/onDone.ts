@@ -63,7 +63,7 @@ const onDone = async ({
       metricsLogger(database, {
         eventType: metricsEvent.downloadErrored,
         data: {
-          downloadId: downloadIdForMetrics(downloadId),
+          downloadId,
           filename
         }
       })

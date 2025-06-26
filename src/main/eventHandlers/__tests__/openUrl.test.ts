@@ -54,6 +54,7 @@ describe('openUrl', () => {
         'shortName_versionId-20230501_000000',
         {
           authUrl: null,
+          clientId: 'eed-edsc-dev-serverless-client',
           createdAt: 1682899200000,
           eulaRedirectUrl: null,
           getLinksToken: 'Bearer mock-token',
@@ -67,7 +68,7 @@ describe('openUrl', () => {
         eventType: metricsEvent.openUrl,
         data: {
           clientId: 'eed-edsc-dev-serverless-client',
-          downloadId: 'shortName_versionId'
+          downloadId: 'shortName_versionId-20230501_000000'
         }
       })
 
@@ -100,6 +101,7 @@ describe('openUrl', () => {
         'shortName_versionId-20230501_000000',
         {
           authUrl: null,
+          clientId: null,
           createdAt: 1682899200000,
           eulaRedirectUrl: null,
           getLinksToken: 'Bearer mock-token',
@@ -113,7 +115,7 @@ describe('openUrl', () => {
         eventType: metricsEvent.openUrl,
         data: {
           clientId: null,
-          downloadId: 'shortName_versionId'
+          downloadId: 'shortName_versionId-20230501_000000'
         }
       })
 
@@ -146,6 +148,7 @@ describe('openUrl', () => {
         'shortName_versionId-20230501_000000',
         {
           authUrl: null,
+          clientId: 'eed-edsc-dev-serverless-client',
           createdAt: 1682899200000,
           eulaRedirectUrl: null,
           getLinksToken: 'Bearer mock-token',
@@ -159,7 +162,7 @@ describe('openUrl', () => {
         eventType: metricsEvent.openUrl,
         data: {
           clientId: 'eed-edsc-dev-serverless-client',
-          downloadId: 'shortName_versionId'
+          downloadId: 'shortName_versionId-20230501_000000'
         }
       })
 

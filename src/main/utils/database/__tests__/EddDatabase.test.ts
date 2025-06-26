@@ -108,6 +108,8 @@ describe('EddDatabase', () => {
             name: '20250618183159_add_duplicate_count_to_files.js'
           }, {
             name: '20250618195255_add_invalid_links_to_downloads.js'
+          }, {
+            name: '20250626153244_add_client_id_to_downloads.js'
           }])
         } else if (step === 5) {
           // Query: select `name` from `knex_migrations` order by `id` asc'

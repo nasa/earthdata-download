@@ -41,7 +41,7 @@ const resumeDownloadItem = async ({
     metricsLogger(database, {
       eventType: metricsEvent.downloadResume,
       data: {
-        downloadIds: [downloadIdForMetrics(downloadId)],
+        downloadIds: [downloadId],
         downloadCount: 1
       }
     })
@@ -82,7 +82,7 @@ const resumeDownloadItem = async ({
         state: newState
       })
 
-      downloadIds.push(downloadIdForMetrics(id))
+      downloadIds.push(id)
     })
 
     metricsLogger(database, {

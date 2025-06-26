@@ -95,11 +95,6 @@ jest.mock('../../eventHandlers/undoRestartingDownload')
 jest.mock('../../eventHandlers/willDownload')
 jest.mock('../../utils/startPendingDownloads')
 
-jest.mock('node-fetch', () => ({
-  __esModule: true,
-  default: jest.fn()
-}))
-
 const channels = {}
 
 jest.mock(

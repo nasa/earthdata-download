@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import MockDate from 'mockdate'
-import fetch from 'node-fetch'
 
 import verifyDownload from '../verifyDownload'
 
@@ -10,11 +9,6 @@ import sendToEula from '../../eventHandlers/sendToEula'
 import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../metricsLogger'
 import downloadIdForMetrics from '../downloadIdForMetrics'
-
-jest.mock('node-fetch', () => ({
-  __esModule: true,
-  default: jest.fn()
-}))
 
 jest.mock('../../eventHandlers/sendToEula', () => ({
   __esModule: true,

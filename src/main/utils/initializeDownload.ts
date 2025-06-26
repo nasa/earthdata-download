@@ -47,11 +47,11 @@ const initializeDownload = async ({
       shouldUseDefaultLocation: !!defaultDownloadLocation
     })
 
-    const metricIds = downloadIds.map(downloadIdForMetrics)
+    // const metricIds = downloadIds.map(downloadIdForMetrics)
     metricsLogger(database, {
       eventType: metricsEvent.downloadStarted,
       data: {
-        downloadIds: metricIds
+        downloadIds
       }
     })
   }

@@ -74,7 +74,7 @@ const sendToLogin = async ({
     metricsLogger(database, {
       eventType: metricsEvent.sentToEdl,
       data: {
-        downloadId: downloadIdForMetrics(downloadId)
+        downloadId
       }
     })
   }

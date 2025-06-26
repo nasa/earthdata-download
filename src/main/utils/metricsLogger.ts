@@ -1,10 +1,11 @@
 // @ts-nocheck
 
 import { app } from 'electron'
-import fetch from 'node-fetch'
 import https from 'https'
 
 import config from '../config.json'
+import downloadIdForMetrics from './downloadIdForMetrics'
+
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false
 })
@@ -16,9 +17,34 @@ const httpsAgent = new https.Agent({
 const metricsLogger = async (database, event) => {
   const appVersion = app.getVersion()
 
+  const { data } = event
+  const { downloadId, downloadIds } = data
+
+  const dataWithVersion = {
+    ...data,
+    appVersion
+  }
+
+  if (downloadId) {
+    const download = await database.getDownloadById(downloadId)
+
+    dataWithVersion.clientId = download.clientId
+    dataWithVersion.downloadId = downloadIdForMetrics(downloadId)
+  }
+
+  if (downloadIds && downloadIds.length > 0) {
+    dataWithVersion.clientIds = downloadIds.map((id) => {
+      const download = database.getDownloadById(id)
+
+      return download?.clientId
+    })
+
+    dataWithVersion.downloadIds = downloadIds.map(downloadIdForMetrics)
+  }
+
   const eventWithVersion = {
     ...event,
-    appVersion
+    data: dataWithVersion
   }
 
   console.log(`Metrics Event: ${JSON.stringify(eventWithVersion)}`)
@@ -34,7 +60,8 @@ const metricsLogger = async (database, event) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ params: eventWithVersion })
+      body: JSON.stringify({ params: eventWithVersion }),
+      agent: httpsAgent
     })
   } catch (error) {
     console.error(error)

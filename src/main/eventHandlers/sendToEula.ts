@@ -80,7 +80,7 @@ const sendToEula = async ({
     metricsLogger(database, {
       eventType: metricsEvent.sentToEula,
       data: {
-        downloadId: downloadIdForMetrics(downloadId)
+        downloadId
       }
     })
   }

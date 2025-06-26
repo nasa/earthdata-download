@@ -53,7 +53,7 @@ const onUpdated = async ({
     metricsLogger(database, {
       eventType: metricsEvent.downloadInterrupted,
       data: {
-        downloadId: downloadIdForMetrics(downloadId),
+        downloadId,
         filename
       }
     })

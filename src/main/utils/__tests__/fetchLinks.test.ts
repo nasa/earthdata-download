@@ -86,7 +86,12 @@ describe('fetchLinks', () => {
         headers: {
           Authorization: 'Bearer mock-token'
         },
-        method: 'get'
+        method: 'get',
+        agent: expect.objectContaining({
+          options: expect.objectContaining({
+            rejectUnauthorized: false
+          })
+        })
       }
     )
 
@@ -96,7 +101,12 @@ describe('fetchLinks', () => {
         headers: {
           Authorization: 'Bearer mock-token'
         },
-        method: 'get'
+        method: 'get',
+        agent: expect.objectContaining({
+          options: expect.objectContaining({
+            rejectUnauthorized: false
+          })
+        })
       }
     )
 
@@ -173,7 +183,12 @@ describe('fetchLinks', () => {
           headers: {
             Authorization: 'Bearer mock-token'
           },
-          method: 'get'
+          method: 'get',
+          agent: expect.objectContaining({
+            options: expect.objectContaining({
+              rejectUnauthorized: false
+            })
+          })
         }
       )
 
@@ -264,7 +279,12 @@ describe('fetchLinks', () => {
           headers: {
             Authorization: 'Bearer mock-token'
           },
-          method: 'get'
+          method: 'get',
+          agent: expect.objectContaining({
+            options: expect.objectContaining({
+              rejectUnauthorized: false
+            })
+          })
         }
       )
 
@@ -274,7 +294,12 @@ describe('fetchLinks', () => {
           headers: {
             Authorization: 'Bearer mock-token'
           },
-          method: 'get'
+          method: 'get',
+          agent: expect.objectContaining({
+            options: expect.objectContaining({
+              rejectUnauthorized: false
+            })
+          })
         }
       )
 
@@ -345,7 +370,12 @@ describe('fetchLinks', () => {
         headers: {
           Authorization: 'Bearer mock-token'
         },
-        method: 'get'
+        method: 'get',
+        agent: expect.objectContaining({
+          options: expect.objectContaining({
+            rejectUnauthorized: false
+          })
+        })
       }
     )
 

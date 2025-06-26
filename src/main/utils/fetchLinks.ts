@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import fetch from 'node-fetch'
+import https from 'https'
 import Ajv from 'ajv'
 
 import initializeDownload from './initializeDownload'
@@ -16,6 +17,10 @@ import metricsLogger from './metricsLogger'
 import downloadIdForMetrics from './downloadIdForMetrics'
 
 const ajv = new Ajv()
+
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false
+})
 
 /**
  * Fetches links for the given downloadId, adds links to the database.
@@ -95,7 +100,8 @@ const fetchLinks = async ({
 
       response = await fetch(updatedUrl, {
         headers,
-        method: 'get'
+        method: 'get',
+        agent: httpsAgent
       })
 
       // eslint-disable-next-line no-await-in-loop

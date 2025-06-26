@@ -2,8 +2,12 @@
 
 import { app } from 'electron'
 import fetch from 'node-fetch'
+import https from 'https'
 
 import config from '../config.json'
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false
+})
 
 /**
  * Dispatches specified events to edd_logger lambda to be logged on CloudWatch

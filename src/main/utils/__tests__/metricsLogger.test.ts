@@ -70,7 +70,12 @@ describe('metricsLogger', () => {
         body: expectedBody,
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        agent: expect.objectContaining({
+          options: expect.objectContaining({
+            rejectUnauthorized: false
+          })
+        })
       }
     )
   })
@@ -109,7 +114,12 @@ describe('metricsLogger', () => {
         }),
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        agent: expect.objectContaining({
+          options: expect.objectContaining({
+            rejectUnauthorized: false
+          })
+        })
       }
     )
 

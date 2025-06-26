@@ -12,7 +12,7 @@ import downloadIdForMetrics from './downloadIdForMetrics'
 const metricsLogger = async (database, event) => {
   const appVersion = app.getVersion()
 
-  const { data } = event
+  const { data = {} } = event
   const { downloadId, downloadIds } = data
 
   const dataWithVersion = {

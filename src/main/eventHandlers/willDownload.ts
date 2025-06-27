@@ -131,6 +131,7 @@ const willDownload = async ({
   const downloadCheck = await verifyDownload({
     database,
     downloadId,
+    downloadsWaitingForAuth,
     downloadsWaitingForEula,
     fileId,
     url: lastUrl,

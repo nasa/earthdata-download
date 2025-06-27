@@ -28,7 +28,17 @@ describe('metricsLogger', () => {
     }
   }
 
+  const eventWithVersionAndClientId = {
+    ...event,
+    data: {
+      ...event.data,
+      appVersion: '1.0.0',
+      clientId: 'test-client-id'
+    }
+  }
+
   test('should not send any metrics when user hasn\'t opted in', async () => {
+    const consoleMock = jest.spyOn(console, 'log')
     const database = {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
       updateDownloadById: jest.fn(),
@@ -42,19 +52,16 @@ describe('metricsLogger', () => {
 
     await metricsLogger(database, event)
 
+    expect(consoleMock).toHaveBeenCalledTimes(1)
+    expect(consoleMock).toHaveBeenCalledWith(`Metrics Event (Reported: false): ${JSON.stringify(eventWithVersionAndClientId)}`)
+
     expect(net.fetch).toHaveBeenCalledTimes(0)
   })
 
   test('should send a POST request to the specified logging endpoint when user allows metrics', async () => {
+    const consoleMock = jest.spyOn(console, 'log')
     const expectedBody = JSON.stringify({
-      params: {
-        ...event,
-        data: {
-          ...event.data,
-          appVersion: '1.0.0',
-          clientId: 'test-client-id'
-        }
-      }
+      params: eventWithVersionAndClientId
     })
 
     const database = {
@@ -70,6 +77,9 @@ describe('metricsLogger', () => {
 
     await metricsLogger(database, event)
 
+    expect(consoleMock).toHaveBeenCalledTimes(1)
+    expect(consoleMock).toHaveBeenCalledWith(`Metrics Event (Reported: true): ${JSON.stringify(eventWithVersionAndClientId)}`)
+
     expect(net.fetch).toHaveBeenCalledTimes(1)
     expect(net.fetch).toHaveBeenCalledWith(
       config.logging,
@@ -84,6 +94,8 @@ describe('metricsLogger', () => {
   })
 
   test('should log an error when POST request fails', async () => {
+    const consoleMock = jest.spyOn(console, 'log')
+    const consoleErrorMock = jest.spyOn(console, 'error')
     const database = {
       getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
       updateDownloadById: jest.fn(),
@@ -102,9 +114,10 @@ describe('metricsLogger', () => {
         throw new Error('Request failed')
       })
 
-    console.error = jest.fn()
-
     await metricsLogger(database, event)
+
+    expect(consoleMock).toHaveBeenCalledTimes(1)
+    expect(consoleMock).toHaveBeenCalledWith(`Metrics Event (Reported: true): ${JSON.stringify(eventWithVersionAndClientId)}`)
 
     expect(net.fetch).toHaveBeenCalledTimes(1)
 
@@ -128,10 +141,12 @@ describe('metricsLogger', () => {
       }
     )
 
-    expect(console.error).toHaveBeenCalledWith(expectedError)
+    expect(consoleErrorMock).toHaveBeenCalledTimes(1)
+    expect(consoleErrorMock).toHaveBeenCalledWith(expectedError)
   })
 
   test('should include downloadIds and clientIds in the event data when multiple downloads are provided', async () => {
+    const consoleMock = jest.spyOn(console, 'log')
     const eventWithMultipleDownloads = {
       eventType: metricsEvent.downloadPause,
       data: {
@@ -151,6 +166,16 @@ describe('metricsLogger', () => {
     }
 
     await metricsLogger(database, eventWithMultipleDownloads)
+
+    expect(consoleMock).toHaveBeenCalledTimes(1)
+    expect(consoleMock).toHaveBeenCalledWith(`Metrics Event (Reported: true): ${JSON.stringify({
+      ...eventWithMultipleDownloads,
+      data: {
+        ...eventWithMultipleDownloads.data,
+        appVersion: '1.0.0',
+        clientIds: ['test-client-id', 'test-client-id']
+      }
+    })}`)
 
     expect(net.fetch).toHaveBeenCalledTimes(1)
     expect(net.fetch).toHaveBeenCalledWith(

@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import fetch from 'node-fetch'
+import { net } from 'electron'
 import Ajv from 'ajv'
 
 import initializeDownload from './initializeDownload'
@@ -13,7 +13,6 @@ import isTrustedLink from './isTrustedLink'
 import packageDetails from '../../../package.json'
 import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from './metricsLogger'
-import downloadIdForMetrics from './downloadIdForMetrics'
 
 const ajv = new Ajv()
 
@@ -48,7 +47,7 @@ const fetchLinks = async ({
     metricsLogger(database, {
       eventType: metricsEvent.fetchLinksFailed,
       data: {
-        downloadId: downloadIdForMetrics(downloadId),
+        downloadId,
         reason: message
       }
     })
@@ -93,9 +92,9 @@ const fetchLinks = async ({
         headers.Authorization = getLinksToken
       }
 
-      response = await fetch(updatedUrl, {
+      response = await net.fetch(updatedUrl, {
         headers,
-        method: 'get'
+        method: 'GET'
       })
 
       // eslint-disable-next-line no-await-in-loop
@@ -114,7 +113,7 @@ const fetchLinks = async ({
         metricsLogger(database, {
           eventType: metricsEvent.fetchLinksFailed,
           data: {
-            downloadId: downloadIdForMetrics(downloadId),
+            downloadId,
             errorMessage
           }
         })
@@ -188,7 +187,7 @@ const fetchLinks = async ({
     metricsLogger(database, {
       eventType: metricsEvent.fetchLinksFailed,
       data: {
-        downloadId: downloadIdForMetrics(downloadId),
+        downloadId,
         reason
       }
     })

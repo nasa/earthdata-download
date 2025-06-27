@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import fetch from 'node-fetch'
+import { net } from 'electron'
 import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../metricsLogger'
 import config from '../../config.json'
@@ -8,12 +8,10 @@ import config from '../../config.json'
 jest.mock('electron', () => ({
   app: {
     getVersion: () => '1.0.0'
+  },
+  net: {
+    fetch: jest.fn()
   }
-}))
-
-jest.mock('node-fetch', () => ({
-  __esModule: true,
-  default: jest.fn()
 }))
 
 describe('metricsLogger', () => {
@@ -36,19 +34,26 @@ describe('metricsLogger', () => {
       updateDownloadById: jest.fn(),
       getPreferencesByField: jest.fn().mockResolvedValue(
         0
-      )
+      ),
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'test-client-id'
+      })
     }
 
     await metricsLogger(database, event)
 
-    expect(fetch).toHaveBeenCalledTimes(0)
+    expect(net.fetch).toHaveBeenCalledTimes(0)
   })
 
   test('should send a POST request to the specified logging endpoint when user allows metrics', async () => {
     const expectedBody = JSON.stringify({
       params: {
         ...event,
-        appVersion: '1.0.0'
+        data: {
+          ...event.data,
+          appVersion: '1.0.0',
+          clientId: 'test-client-id'
+        }
       }
     })
 
@@ -57,13 +62,16 @@ describe('metricsLogger', () => {
       updateDownloadById: jest.fn(),
       getPreferencesByField: jest.fn().mockResolvedValue(
         1
-      )
+      ),
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'test-client-id'
+      })
     }
 
     await metricsLogger(database, event)
 
-    expect(fetch).toHaveBeenCalledTimes(1)
-    expect(fetch).toHaveBeenCalledWith(
+    expect(net.fetch).toHaveBeenCalledTimes(1)
+    expect(net.fetch).toHaveBeenCalledWith(
       config.logging,
       {
         method: 'POST',
@@ -81,12 +89,15 @@ describe('metricsLogger', () => {
       updateDownloadById: jest.fn(),
       getPreferencesByField: jest.fn().mockResolvedValue(
         1
-      )
+      ),
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'test-client-id'
+      })
     }
 
     const expectedError = new Error('Request failed')
 
-    fetch
+    net.fetch
       .mockImplementationOnce(() => {
         throw new Error('Request failed')
       })
@@ -95,16 +106,20 @@ describe('metricsLogger', () => {
 
     await metricsLogger(database, event)
 
-    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(net.fetch).toHaveBeenCalledTimes(1)
 
-    expect(fetch).toHaveBeenCalledWith(
+    expect(net.fetch).toHaveBeenCalledWith(
       config.logging,
       {
         method: 'POST',
         body: JSON.stringify({
           params: {
             ...event,
-            appVersion: '1.0.0'
+            data: {
+              ...event.data,
+              appVersion: '1.0.0',
+              clientId: 'test-client-id'
+            }
           }
         }),
         headers: {
@@ -114,5 +129,48 @@ describe('metricsLogger', () => {
     )
 
     expect(console.error).toHaveBeenCalledWith(expectedError)
+  })
+
+  test('should include downloadIds and clientIds in the event data when multiple downloads are provided', async () => {
+    const eventWithMultipleDownloads = {
+      eventType: metricsEvent.downloadPause,
+      data: {
+        downloadIds: ['1010_Test', '2020_Test']
+      }
+    }
+
+    const database = {
+      getNotCompletedFilesCountByDownloadId: jest.fn().mockResolvedValue(1),
+      updateDownloadById: jest.fn(),
+      getPreferencesByField: jest.fn().mockResolvedValue(
+        1
+      ),
+      getDownloadById: jest.fn().mockResolvedValue({
+        clientId: 'test-client-id'
+      })
+    }
+
+    await metricsLogger(database, eventWithMultipleDownloads)
+
+    expect(net.fetch).toHaveBeenCalledTimes(1)
+    expect(net.fetch).toHaveBeenCalledWith(
+      config.logging,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          params: {
+            ...eventWithMultipleDownloads,
+            data: {
+              ...eventWithMultipleDownloads.data,
+              appVersion: '1.0.0',
+              clientIds: ['test-client-id', 'test-client-id']
+            }
+          }
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
   })
 })

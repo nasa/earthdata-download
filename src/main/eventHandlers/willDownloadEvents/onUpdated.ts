@@ -3,7 +3,6 @@
 import downloadStates from '../../../app/constants/downloadStates'
 import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../../utils/metricsLogger'
-import downloadIdForMetrics from '../../utils/downloadIdForMetrics'
 
 /**
  * Handles the DownloadItem 'updated' event
@@ -53,7 +52,7 @@ const onUpdated = async ({
     metricsLogger(database, {
       eventType: metricsEvent.downloadInterrupted,
       data: {
-        downloadId: downloadIdForMetrics(downloadId),
+        downloadId,
         filename
       }
     })

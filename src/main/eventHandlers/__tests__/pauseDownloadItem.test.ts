@@ -87,7 +87,7 @@ describe('pauseDownloadItem', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: metricsEvent.DownloadPause,
+        eventType: metricsEvent.downloadPause,
         data: {
           downloadCount: 1,
           downloadIds: ['mock-download-id']
@@ -136,7 +136,7 @@ describe('pauseDownloadItem', () => {
 
       expect(metricsLogger).toHaveBeenCalledTimes(1)
       expect(metricsLogger).toHaveBeenCalledWith(database, {
-        eventType: metricsEvent.DownloadPause,
+        eventType: metricsEvent.downloadPause,
         data: {
           downloadIds: ['mock-download-id-1', 'mock-download-id-2']
         }

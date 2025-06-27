@@ -13,7 +13,6 @@ import verifyDownload from '../utils/verifyDownload'
 import finishDownload from './willDownloadEvents/finishDownload'
 import metricsEvent from '../../app/constants/metricsEvent'
 import metricsLogger from '../utils/metricsLogger'
-import downloadIdForMetrics from '../utils/downloadIdForMetrics'
 
 /**
  * Handles the DownloadItem events
@@ -161,7 +160,7 @@ const willDownload = async ({
     metricsLogger(database, {
       eventType: metricsEvent.downloadErrored,
       data: {
-        downloadId: downloadIdForMetrics(downloadId),
+        downloadId,
         filename,
         reason: 'File reported a size of 0 bytes.'
       }

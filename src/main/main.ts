@@ -137,6 +137,9 @@ if (!gotTheLock) {
 } else {
   // Windows/Linux Deep Linking
   app.on('second-instance', async (event, commandLine) => {
+    // Ensure the database is up to date
+    await database.migrateDatabase()
+
     // Someone tried to run a second instance, we should focus our window.
     if (appWindow) {
       if (appWindow.isMinimized()) appWindow.restore()
@@ -160,6 +163,9 @@ if (!gotTheLock) {
 
   // MacOS Deep Linking
   app.on('open-url', async (event, url) => {
+    // Ensure the database is up to date
+    await database.migrateDatabase()
+
     await openUrl({
       appWindow,
       currentDownloadItems,

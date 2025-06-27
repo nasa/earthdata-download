@@ -1,7 +1,7 @@
 // @ts-nocheck
 
+import { net } from 'electron'
 import MockDate from 'mockdate'
-import fetch from 'node-fetch'
 
 import verifyDownload from '../verifyDownload'
 
@@ -11,9 +11,10 @@ import metricsEvent from '../../../app/constants/metricsEvent'
 import metricsLogger from '../metricsLogger'
 import downloadIdForMetrics from '../downloadIdForMetrics'
 
-jest.mock('node-fetch', () => ({
-  __esModule: true,
-  default: jest.fn()
+jest.mock('electron', () => ({
+  net: {
+    fetch: jest.fn()
+  }
 }))
 
 jest.mock('../../eventHandlers/sendToEula', () => ({
@@ -57,7 +58,7 @@ describe('verifyDownload', () => {
         })
       }
 
-      fetch.mockImplementationOnce(() => response)
+      net.fetch.mockImplementationOnce(() => response)
 
       const result = await verifyDownload({
         database,
@@ -70,8 +71,8 @@ describe('verifyDownload', () => {
 
       expect(result).toEqual(true)
 
-      expect(fetch).toHaveBeenCalledTimes(1)
-      expect(fetch).toHaveBeenCalledWith(
+      expect(net.fetch).toHaveBeenCalledTimes(1)
+      expect(net.fetch).toHaveBeenCalledWith(
         'http://example.com/file.png',
         expect.objectContaining({
           follow: 20,
@@ -115,7 +116,7 @@ describe('verifyDownload', () => {
         })
       }
 
-      fetch.mockImplementationOnce(() => response)
+      net.fetch.mockImplementationOnce(() => response)
 
       const result = await verifyDownload({
         database,
@@ -128,8 +129,8 @@ describe('verifyDownload', () => {
 
       expect(result).toEqual(false)
 
-      expect(fetch).toHaveBeenCalledTimes(1)
-      expect(fetch).toHaveBeenCalledWith(
+      expect(net.fetch).toHaveBeenCalledTimes(1)
+      expect(net.fetch).toHaveBeenCalledWith(
         'http://example.com/file.png',
         expect.objectContaining({
           follow: 20,
@@ -157,7 +158,7 @@ describe('verifyDownload', () => {
       }))
     })
 
-    test('does not try to fetch the file if the downloadId is waitingForEula', async () => {
+    test('does not try to net.fetch the file if the downloadId is waitingForEula', async () => {
       const downloadId = 'mock-download-id'
       const downloadsWaitingForEula = {
         [downloadId]: {}
@@ -184,7 +185,7 @@ describe('verifyDownload', () => {
 
       expect(result).toEqual(false)
 
-      expect(fetch).toHaveBeenCalledTimes(0)
+      expect(net.fetch).toHaveBeenCalledTimes(0)
 
       expect(database.updateFileById).toHaveBeenCalledTimes(0)
 
@@ -215,7 +216,7 @@ describe('verifyDownload', () => {
         statusText: 'Forbidden'
       }
 
-      fetch.mockImplementationOnce(() => response)
+      net.fetch.mockImplementationOnce(() => response)
       const result = await verifyDownload({
         database,
         downloadId,
@@ -227,8 +228,8 @@ describe('verifyDownload', () => {
 
       expect(result).toEqual(false)
 
-      expect(fetch).toHaveBeenCalledTimes(1)
-      expect(fetch).toHaveBeenCalledWith(
+      expect(net.fetch).toHaveBeenCalledTimes(1)
+      expect(net.fetch).toHaveBeenCalledWith(
         'http://example.com/file.png',
         expect.objectContaining({
           follow: 20,
@@ -274,7 +275,7 @@ describe('verifyDownload', () => {
       const fileId = 123
       const url = 'http://example.com/file.png'
 
-      fetch.mockImplementationOnce(() => undefined)
+      net.fetch.mockImplementationOnce(() => undefined)
 
       const result = await verifyDownload({
         database,
@@ -287,8 +288,8 @@ describe('verifyDownload', () => {
 
       expect(result).toEqual(false)
 
-      expect(fetch).toHaveBeenCalledTimes(1)
-      expect(fetch).toHaveBeenCalledWith(
+      expect(net.fetch).toHaveBeenCalledTimes(1)
+      expect(net.fetch).toHaveBeenCalledWith(
         'http://example.com/file.png',
         expect.objectContaining({
           follow: 20,

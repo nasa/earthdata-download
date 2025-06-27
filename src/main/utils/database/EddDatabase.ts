@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { chunk } from 'lodash'
+import { chunk } from 'lodash-es'
 
 import downloadStates from '../../../app/constants/downloadStates'
 

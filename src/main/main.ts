@@ -146,30 +146,36 @@ if (!gotTheLock) {
     // The commandLine is array of strings in which last element is deep link url
     const url = commandLine.pop()
 
-    await openUrl({
-      appWindow,
-      currentDownloadItems,
-      database,
-      deepLink: url,
-      downloadIdContext,
-      downloadsWaitingForAuth,
-      downloadsWaitingForEula,
-      updateAvailable
-    })
+    // Delay the opening of the URL to ensure any new database migrations have been applied
+    setTimeout(async () => {
+      await openUrl({
+        appWindow,
+        currentDownloadItems,
+        database,
+        deepLink: url,
+        downloadIdContext,
+        downloadsWaitingForAuth,
+        downloadsWaitingForEula,
+        updateAvailable
+      })
+    }, 0)
   })
 
   // MacOS Deep Linking
   app.on('open-url', async (event, url) => {
-    await openUrl({
-      appWindow,
-      currentDownloadItems,
-      database,
-      deepLink: url,
-      downloadIdContext,
-      downloadsWaitingForAuth,
-      downloadsWaitingForEula,
-      updateAvailable
-    })
+    // Delay the opening of the URL to ensure any new database migrations have been applied
+    setTimeout(async () => {
+      await openUrl({
+        appWindow,
+        currentDownloadItems,
+        database,
+        deepLink: url,
+        downloadIdContext,
+        downloadsWaitingForAuth,
+        downloadsWaitingForEula,
+        updateAvailable
+      })
+    }, 0)
   })
 
   // Create window, load the rest of the app, etc...

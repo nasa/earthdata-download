@@ -42,9 +42,9 @@ const metricsLogger = async (database, event) => {
     data: dataWithVersion
   }
 
-  console.log(`Metrics Event: ${JSON.stringify(eventWithVersion)}`)
-
   const allowMetrics = await database.getPreferencesByField('allowMetrics')
+  console.log(`Metrics Event (Reported: ${allowMetrics}): ${JSON.stringify(eventWithVersion)}`)
+
   if (!allowMetrics) {
     return
   }

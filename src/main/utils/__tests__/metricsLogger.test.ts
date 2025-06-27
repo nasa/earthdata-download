@@ -16,7 +16,7 @@ jest.mock('electron', () => ({
 
 describe('metricsLogger', () => {
   const event = {
-    eventType: metricsEvent.DownloadComplete,
+    eventType: metricsEvent.downloadComplete,
     data: {
       downloadId: '1010_Test',
       fileCount: 10,
@@ -133,7 +133,7 @@ describe('metricsLogger', () => {
 
   test('should include downloadIds and clientIds in the event data when multiple downloads are provided', async () => {
     const eventWithMultipleDownloads = {
-      eventType: metricsEvent.DownloadPause,
+      eventType: metricsEvent.downloadPause,
       data: {
         downloadIds: ['1010_Test', '2020_Test']
       }

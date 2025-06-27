@@ -51,5 +51,3 @@ window.electronApi = {
   isWin: false,
   isLinux: false
 }
-
-global.fetch = jest.fn()

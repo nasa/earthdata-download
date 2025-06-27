@@ -16,7 +16,7 @@ jest.mock('electron', () => ({
 
 describe('metricsLogger', () => {
   const event = {
-    eventType: metricsEvent.DownloadComplete,
+    eventType: metricsEvent.downloadComplete,
     data: {
       downloadId: '1010_Test',
       fileCount: 10,

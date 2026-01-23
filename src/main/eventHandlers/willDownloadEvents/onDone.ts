@@ -74,7 +74,7 @@ const onDone = async ({
   }
 
   // If the `previousState` is not active, don't worry about updating the file
-  if (previousState === downloadStates.active) {
+  if (previousState === downloadStates.active || previousState === downloadStates.starting) {
     // Update the state in the database
     await database.updateFileById(fileId, {
       cancelId: null,

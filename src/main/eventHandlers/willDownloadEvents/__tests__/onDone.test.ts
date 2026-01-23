@@ -230,6 +230,76 @@ describe('onDone', () => {
     })
   })
 
+  test('updates the database and calls startNextDownload for a starting download', async () => {
+    const currentDownloadItems = {
+      removeItem: jest.fn()
+    }
+    const downloadId = 'mock-download-id'
+    const item = {
+      getFilename: jest.fn().mockReturnValue('mock-filename.png'),
+      getReceivedBytes: jest.fn().mockReturnValue(42),
+      getTotalBytes: jest.fn().mockReturnValue(100)
+    }
+    const state = 'interrupted'
+    const database = {
+      getDownloadById: jest.fn().mockResolvedValue({ errors: [] }),
+      updateDownloadById: jest.fn(),
+      getFileWhere: jest.fn().mockResolvedValue({
+        id: 123,
+        state: downloadStates.starting
+      }),
+      updateFileById: jest.fn()
+    }
+
+    await onDone({
+      currentDownloadItems,
+      database,
+      downloadId,
+      downloadIdContext: {},
+      item,
+      state,
+      webContents: {}
+    })
+
+    expect(metricsLogger).toHaveBeenCalledTimes(1)
+    expect(metricsLogger).toHaveBeenCalledWith(database, {
+      eventType: metricsEvent.downloadErrored,
+      data: {
+        downloadId: downloadIdForMetrics(downloadId),
+        filename: 'mock-filename.png'
+      }
+    })
+
+    expect(database.getFileWhere).toHaveBeenCalledTimes(1)
+    expect(database.getFileWhere).toHaveBeenCalledWith({
+      downloadId: 'mock-download-id',
+      filename: 'mock-filename.png'
+    })
+
+    expect(database.updateFileById).toHaveBeenCalledTimes(1)
+    expect(database.updateFileById).toHaveBeenCalledWith(123, {
+      cancelId: null,
+      errors: 'This file could not be downloaded',
+      percent: 0,
+      state: downloadStates.interruptedCanNotResume,
+      timeEnd: 1684029600000
+    })
+
+    expect(startNextDownload).toHaveBeenCalledTimes(1)
+    expect(startNextDownload).toHaveBeenCalledWith({
+      currentDownloadItems,
+      database,
+      downloadIdContext: {},
+      webContents: {}
+    })
+
+    expect(finishDownload).toHaveBeenCalledTimes(1)
+    expect(finishDownload).toHaveBeenCalledWith({
+      database,
+      downloadId: 'mock-download-id'
+    })
+  })
+
   test('does not set a cancelled file to cancelled when the download state is appQuitting', async () => {
     const currentDownloadItems = {
       removeItem: jest.fn()

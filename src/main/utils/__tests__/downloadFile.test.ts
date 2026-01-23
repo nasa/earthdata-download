@@ -6,6 +6,7 @@ import MockDate from 'mockdate'
 import downloadFile from '../downloadFile'
 
 import downloadStates from '../../../app/constants/downloadStates'
+import checkTokenExpired from '../checkTokenExpired'
 
 jest.mock(
   'electron',
@@ -23,6 +24,11 @@ jest.mock(
   { virtual: true }
 )
 
+jest.mock('../checkTokenExpired', () => ({
+  __esModule: true,
+  default: jest.fn().mockResolvedValue(false)
+}))
+
 beforeEach(() => {
   MockDate.set('2023-05-13T22:00:00')
 })
@@ -32,7 +38,6 @@ describe('downloadFile', () => {
     const downloadId = 'mock-download-id'
     const downloadIdContext = {}
     const database = {
-      getToken: jest.fn().mockResolvedValue({ token: null }),
       getDownloadById: jest.fn().mockResolvedValue({ downloadLocation: '/mock/location' }),
       updateFileById: jest.fn()
     }
@@ -65,13 +70,17 @@ describe('downloadFile', () => {
       'http://example.com/mock-file.png',
       { headers: {} }
     )
+
+    expect(checkTokenExpired).toHaveBeenCalledTimes(1)
+    expect(checkTokenExpired).toHaveBeenCalledWith({ database })
   })
 
   test('updates downloadIdContext and calls downloadURL with a token', async () => {
+    checkTokenExpired.mockResolvedValueOnce('mock-token')
+
     const downloadId = 'mock-download-id'
     const downloadIdContext = {}
     const database = {
-      getToken: jest.fn().mockResolvedValue({ token: 'mock-token' }),
       getDownloadById: jest.fn().mockResolvedValue({ downloadLocation: '/mock/location' }),
       updateFileById: jest.fn()
     }
@@ -108,5 +117,8 @@ describe('downloadFile', () => {
         }
       }
     )
+
+    expect(checkTokenExpired).toHaveBeenCalledTimes(1)
+    expect(checkTokenExpired).toHaveBeenCalledWith({ database })
   })
 })

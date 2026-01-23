@@ -12,5 +12,7 @@
   "nsidc.org": { "notes": "Corresponds to NSIDC production" },
   "integration.nsidc.org": { "notes": "Corresponds to NSIDC integration env" },
   "staging.nsidc.org": { "notes": "Corresponds to NSIDC staging env" },
-  "qa.nsidc.org": { "notes": "Corresponds to NSIDC QA env" }
+  "qa.nsidc.org": { "notes": "Corresponds to NSIDC QA env" },
+  "disc.gsfc.nasa.gov": { "notes": "Corresponds to the GES DISC production environment"  },
+  "uui-test.gesdisc.eosdis.nasa.gov": { "notes": "Corresponds to the GES DISC test environment"  }
 }

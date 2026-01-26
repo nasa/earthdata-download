@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken'
  * Checks if the stored token is expired. If it is expired, removes it from the database. If not, returns the token.
  * @param {Object} params
  * @param {Object} params.database `EddDatabase` instance
- * @returns {String|Boolean} The valid token, or false if the token is expired or not present
+ * @returns {String|null} The valid token, or false if the token is expired or not present
  */
 const checkTokenExpired = async ({
   database
@@ -15,7 +15,7 @@ const checkTokenExpired = async ({
   const { token } = await database.getToken()
 
   if (!token) {
-    return false
+    return null
   }
 
   // Decode the token to check its expiration
@@ -32,9 +32,10 @@ const checkTokenExpired = async ({
   console.log('User token has expired, removing it from the database.')
 
   // Token is expired, remove it from the database
+  // We remove the token by setting it to null, not actually deleting the record
   await database.setToken(null)
 
-  return false
+  return null
 }
 
 export default checkTokenExpired

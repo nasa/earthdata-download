@@ -26,7 +26,7 @@ jest.mock(
 
 jest.mock('../checkTokenExpired', () => ({
   __esModule: true,
-  default: jest.fn().mockResolvedValue(false)
+  default: jest.fn().mockResolvedValue(null)
 }))
 
 beforeEach(() => {

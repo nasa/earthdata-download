@@ -2,7 +2,7 @@ import checkTokenExpired from '../checkTokenExpired'
 
 describe('checkTokenExpired', () => {
   describe('when there is no token stored', () => {
-    test('returns false', async () => {
+    test('returns null', async () => {
       const database = {
         getToken: jest.fn().mockResolvedValue({ token: null }),
         setToken: jest.fn()
@@ -15,12 +15,12 @@ describe('checkTokenExpired', () => {
 
       expect(database.setToken).toHaveBeenCalledTimes(0)
 
-      expect(result).toBe(false)
+      expect(result).toEqual(null)
     })
   })
 
   describe('when the token is expired', () => {
-    test('removes the token from the database and returns false', async () => {
+    test('removes the token from the database and returns null', async () => {
       const consoleMock = jest.spyOn(console, 'log').mockImplementation(() => {})
 
       // This is a JWT token with an expiration date in the past (Sun Sep 13 2020)
@@ -39,7 +39,7 @@ describe('checkTokenExpired', () => {
       expect(database.setToken).toHaveBeenCalledTimes(1)
       expect(database.setToken).toHaveBeenCalledWith(null)
 
-      expect(result).toBe(false)
+      expect(result).toEqual(null)
 
       expect(consoleMock).toHaveBeenCalledTimes(1)
       expect(consoleMock).toHaveBeenCalledWith('User token has expired, removing it from the database.')

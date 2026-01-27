@@ -3,6 +3,7 @@
 import { session } from 'electron'
 
 import downloadStates from '../../app/constants/downloadStates'
+import checkTokenExpired from './checkTokenExpired'
 
 /**
  * Starts a download of the given file
@@ -18,7 +19,7 @@ const downloadFile = async ({
   file,
   webContents
 }) => {
-  const { token } = await database.getToken()
+  const token = await checkTokenExpired({ database })
 
   const {
     downloadId,

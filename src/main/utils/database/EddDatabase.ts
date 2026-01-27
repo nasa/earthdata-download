@@ -34,7 +34,8 @@ class EddDatabase {
   /* Preferences */
 
   /**
-   * Returns the preferences.
+   * Returns the preferences. The preferences value will always be saved in the row
+   * where `id` is `this.preferencesId`
    */
   async getPreferences() {
     return this.db('preferences')
@@ -57,7 +58,8 @@ class EddDatabase {
   }
 
   /**
-   * Sets the given preferences.
+   * Sets the given preferences. The preferences value will always be saved in the row
+   * where `id` is `this.preferencesId`
    * @param {Object} data Preferences to be set.
    */
   async setPreferences(data) {
@@ -66,12 +68,19 @@ class EddDatabase {
 
   /* Token */
 
+  /**
+   * Returns the token. The token value will always be saved in the row where `id` is `this.tokenId`
+   */
   async getToken() {
     return this.db('token')
       .where({ id: this.tokenId })
       .first()
   }
 
+  /**
+   * Sets the token. The token value will always be saved in the row where `id` is `this.tokenId`
+   * @param token The token to be set.
+   */
   async setToken(token) {
     return this.db('token')
       .update({ token })

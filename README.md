@@ -69,16 +69,6 @@ You can run a generate a report on EDD downloads by running
 
     npm run download-report
 
-## Generate icons
-
-If you require icons to be re-generated, run the following command then add these scripts to package.json
-
-    $ npm install electron-icon-builder@latest --save-dev
-
-    "icons:alt": "electron-icon-builder --flatten --input=./src/icons/icon-alt@1024.png --output=./build/alt",
-    "icons:default": "electron-icon-builder --flatten --input=./src/icons/icon@1024.png --output=./build/default",
-
-    Uninstall the package once complete.
 
 ## License
 

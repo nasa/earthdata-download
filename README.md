@@ -69,7 +69,6 @@ You can run a generate a report on EDD downloads by running
 
     npm run download-report
 
-
 ## License
 
 > Copyright © 2007-2023 United States Government as represented by the Administrator of the National Aeronautics and Space Administration. All Rights Reserved.

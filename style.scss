@@ -133,10 +133,18 @@ a {
   }
 
   &__secondary-heading {
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
     color: var(--color__gray-dark);
     font-size: 1.5rem;
     font-weight: 300;
+    text-align: center;
+  }
+
+  &__version {
+    margin-bottom: 3rem;
+    color: var(--color__gray-dark);
+    font-size: 0.875rem;
+    font-weight: 400;
     text-align: center;
   }
 }

@@ -7,7 +7,6 @@ tmp
 /coverage
 cypress/screenshots
 cypress/videos
-.nyc_output
 dist
 dist-electron
 /test-results/

@@ -6,6 +6,10 @@ on:
     tags:
       - 'v*'
 
+# TODO: Remove in EDD-90
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
 jobs:
   release:
     runs-on: ${{ matrix.os }}
@@ -38,7 +42,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Electron Builder Action
-        uses: macrouch/action-electron-builder@v1.6.1
+        uses: macrouch/action-electron-builder@v1.6.2
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}

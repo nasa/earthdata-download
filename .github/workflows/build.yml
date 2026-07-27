@@ -6,10 +6,6 @@ on:
     tags:
       - 'v*'
 
-# TODO: Remove in EDD-90
-env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
-
 jobs:
   release:
     runs-on: ${{ matrix.os }}
